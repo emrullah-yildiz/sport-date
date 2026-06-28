@@ -1,0 +1,39 @@
+# Positioning
+
+## Working category
+
+Sport Date is a connection platform built around small local sports events. It is not a swipe app with sports interests added to profiles, and it is not merely a sports booking marketplace.
+
+## Audience tension
+
+Active adults want new relationships but dislike performing themselves through profiles and sustaining conversations without a reason to meet. Existing sports communities can be difficult to enter, while conventional first dates create pressure before shared context exists.
+
+## Positioning statement
+
+For active adults who are tired of profile-first dating and awkward online chat, Sport Date makes meeting new people feel natural by organizing the first encounter around a shared local sport. Unlike swipe apps, a good experience remains worthwhile even when romance is not the outcome.
+
+## Brand promise
+
+Meet through movement.
+
+## Reasons to believe we must earn
+
+- Events are small, structured, and appropriate to the member's experience.
+- Intentions and expectations are explicit before requesting a place.
+- Exact meeting details are protected until authorization.
+- Hosts have practical coordination and safety tools.
+- The product measures safe completed encounters, not addictive engagement.
+
+Do not use these as claims until their corresponding product and operational controls exist.
+
+## Message hierarchy
+
+1. Do something you already enjoy.
+2. Meet people in a setting that gives connection room to emerge.
+3. Know the level, time, place area, and intentions before committing.
+4. Keep sensitive details private until acceptance.
+
+## Language to avoid
+
+Avoid “perfect match,” “guaranteed safe,” “verified community,” “find the one,” fake member counts, invented testimonials, and framing friendship as failure.
+

@@ -4,12 +4,15 @@
 
 Build a safe, Europe-first sports dating product for adults. Work autonomously from the prioritized roadmap, keep changes reviewable, and leave the repository in a verified state.
 
+Use `$run-product-studio` for ongoing product work. Continue through the highest-value unblocked roadmap outcomes; ask the owner only when the escalation policy in that skill requires it.
+
 ## Required checks
 
 - Run relevant tests and type checks before declaring work complete.
 - Add tests for product rules and security-sensitive behavior.
 - Record material architecture, privacy, and safety decisions in `docs/`.
 - Treat location, preferences, messages, reports, blocks, and matching behavior as sensitive data.
+- Update `docs/operations/agent-state.md` after each coherent work cycle.
 
 ## Escalate before
 
@@ -26,4 +29,3 @@ Build a safe, Europe-first sports dating product for adults. Work autonomously f
 - Expose precise participant locations before an event join is accepted.
 - Build dark patterns, discriminatory targeting, or engagement mechanics that compromise safety.
 - Silently weaken authentication, authorization, audit, moderation, or privacy controls.
-

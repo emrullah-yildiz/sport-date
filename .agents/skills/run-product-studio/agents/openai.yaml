@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Studio"
+  short_description: "Run product, design, safety, and growth work"
+  default_prompt: "Use $run-product-studio to choose and complete the highest-value unblocked Sport Date task."
