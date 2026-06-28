@@ -83,7 +83,7 @@ export default function SignUpForm() {
           <p className="step-indicator">Account created</p>
           <h1>Welcome to Sport Date.</h1>
           <p>Check your inbox when email verification becomes available. Your profile is not public yet.</p>
-          <a className="btn-primary success-link" href="/landing">Return home</a>
+          <a className="btn-primary success-link" href="/profile">View your private profile</a>
         </div>
       </div>
     );

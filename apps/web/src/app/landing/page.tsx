@@ -40,7 +40,10 @@ export default function LandingPage() {
       <nav className="navbar" aria-label="Primary navigation">
         <div className="nav-container">
           <Link className="logo" href="/landing">Sport Date</Link>
-          <Link href="/signup" className="nav-cta">Create a profile</Link>
+          <div className="landing-nav-actions">
+            <Link href="/login" className="nav-signin">Sign in</Link>
+            <Link href="/signup" className="nav-cta">Create a profile</Link>
+          </div>
         </div>
       </nav>
 

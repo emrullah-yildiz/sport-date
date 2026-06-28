@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { setSessionCookie } from "@/lib/session";
 
 export const runtime = "nodejs";
 
@@ -60,13 +61,7 @@ export async function POST(request: Request) {
       { success: true, user: { id: users[0].id, email: users[0].email } },
       { status: 201 },
     );
-    response.cookies.set("auth_token", session.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      expires: session.expiresAt,
-      path: "/",
-    });
+    setSessionCookie(response, session);
     return response;
   } catch (error) {
     if (error instanceof SyntaxError) {

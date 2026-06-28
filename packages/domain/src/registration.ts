@@ -32,6 +32,26 @@ export type RegistrationValidation =
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export type LoginInput = Readonly<{ email: string; password: string }>;
+export type LoginValidation =
+  | { valid: true; data: LoginInput }
+  | { valid: false; errors: readonly string[] };
+
+export function validateLogin(raw: unknown): LoginValidation {
+  if (!raw || typeof raw !== "object") {
+    return { valid: false, errors: ["Email and password are required."] };
+  }
+  const input = raw as Record<string, unknown>;
+  const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+  const password = typeof input.password === "string" ? input.password : "";
+  const errors: string[] = [];
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) errors.push("Enter a valid email address.");
+  if (!password || password.length > 1024) errors.push("Enter your password.");
+  return errors.length > 0
+    ? { valid: false, errors }
+    : { valid: true, data: { email, password } };
+}
+
 export function ageOnDate(dateOfBirth: string, today = new Date()): number | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) return null;
 
@@ -123,4 +143,3 @@ export function validateRegistration(
     },
   };
 }
-

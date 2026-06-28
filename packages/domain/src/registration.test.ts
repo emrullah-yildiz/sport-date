@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ageOnDate, validateRegistration } from "./registration";
+import { ageOnDate, validateLogin, validateRegistration } from "./registration";
 
 const validInput = {
   email: " Athlete@Example.com ", password: "StrongPassword9",
@@ -36,6 +36,21 @@ describe("registration validation", () => {
       sports: [...validInput.sports, ...validInput.sports],
     });
     expect(result.valid).toBe(false);
+  });
+});
+
+describe("login validation", () => {
+  it("normalizes valid credentials", () => {
+    expect(validateLogin({ email: " ANA@Example.com ", password: "secret" })).toEqual({
+      valid: true,
+      data: { email: "ana@example.com", password: "secret" },
+    });
+  });
+
+  it("returns the same validation shape for missing credentials", () => {
+    const result = validateLogin({ email: "invalid", password: "" });
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors).toHaveLength(2);
   });
 });
 

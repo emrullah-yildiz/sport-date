@@ -4,7 +4,7 @@
 
 - [x] Private-beta signup UI and shared validation.
 - [x] Opaque hashed session creation and explicit database migration.
-- [ ] Login, logout, server-side session lookup, rotation, and protected routes.
+- [x] Login, logout, server-side session lookup, rotation, and protected profile route.
 - [ ] Email verification and password reset design; implementation requires an approved email provider.
 - [ ] Draft account privacy controls: export, deletion, consent records, and retention states.
 
@@ -33,4 +33,3 @@
 - A real moderation owner and escalation channel exist.
 - Production infrastructure, monitoring, backup, recovery, email, and domain ownership are approved.
 - No external acquisition begins until safe event supply exists.
-
