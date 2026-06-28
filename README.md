@@ -21,5 +21,4 @@ This repository is a new product foundation. The working name is temporary until
 
 ## Status
 
-Product discovery and the first vertical slice are in progress.
-
+The web landing page and five-step private-beta signup are implemented. Shared registration, join-request, and location-privacy rules are tested. Authentication is not ready for external users; see `docs/security/authentication.md` for launch gates.
