@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import LogoutButton from "@/components/LogoutButton";
+import PrivacyControls from "@/components/PrivacyControls";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata = { title: "Your profile — Sport Date" };
@@ -42,7 +43,7 @@ export default async function ProfilePage() {
           <div className="profile-sport-list">{user.sports.map((sport) => <div className="profile-sport" key={sport.name}><strong>{sport.name}</strong><span>{sport.skillLevel} · {sport.frequency}</span></div>)}</div>
         </article>
       </section>
+      <PrivacyControls />
     </main>
   );
 }
-

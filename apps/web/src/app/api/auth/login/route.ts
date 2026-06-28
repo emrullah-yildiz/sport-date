@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 
 const DUMMY_PASSWORD_HASH = "$2b$12$Ad/rUVoyWWEHpeHc7A7mX.CJ5QzyE20ylxhB323v6GK1CvjyTuxMq";
 
-type LoginUserRow = { id: string | number; email: string; password_hash: string };
+type LoginUserRow = { id: string | number; email: string; password_hash: string; account_status: string };
 
 export async function POST(request: Request) {
   try {
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const sql = getDatabase();
     const rows = await sql`
-      SELECT id, email, password_hash
+      SELECT id, email, password_hash, account_status
       FROM users
       WHERE email = ${validation.data.email}
       LIMIT 1
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       user?.password_hash ?? DUMMY_PASSWORD_HASH,
     );
 
-    if (!user || !passwordMatches) {
+    if (!user || !passwordMatches || user.account_status !== "active") {
       return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
     }
 

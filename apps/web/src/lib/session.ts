@@ -83,6 +83,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     LEFT JOIN user_sports ON user_sports.user_id = users.id
     WHERE sessions.token_hash = ${hashSessionToken(token)}
       AND sessions.expires_at > NOW()
+      AND users.account_status = 'active'
     GROUP BY users.id
     LIMIT 1
   ` as unknown as SessionUserRow[];
@@ -106,4 +107,3 @@ export async function revokeSessionToken(token: string): Promise<void> {
   const sql = getDatabase();
   await sql`DELETE FROM sessions WHERE token_hash = ${hashSessionToken(token)}`;
 }
-

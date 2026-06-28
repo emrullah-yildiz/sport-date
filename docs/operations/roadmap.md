@@ -6,7 +6,7 @@
 - [x] Opaque hashed session creation and explicit database migration.
 - [x] Login, logout, server-side session lookup, rotation, and protected profile route.
 - [ ] Email verification and password reset design; implementation requires an approved email provider.
-- [ ] Draft account privacy controls: export, deletion, consent records, and retention states.
+- [x] Draft and implement account export, re-authenticated deletion request, request audit, consent boundary, and retention states.
 
 ## Next: complete event loop
 
@@ -16,6 +16,7 @@
 - [ ] Implement discovery eligibility and filters.
 - [ ] Implement request, accept, skip, third-skip decline, cancellation, and capacity invariants.
 - [ ] Add event room authorization without real-time chat initially.
+- [ ] Extend access/export/deletion coverage as event, request, room, report, and message data is introduced.
 
 ## Then: safety and local launch
 
