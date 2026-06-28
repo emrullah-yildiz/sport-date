@@ -10,7 +10,7 @@
 
 ## Next: complete event loop
 
-- [ ] Define event, capacity, location, language, experience, cancellation, and visibility rules.
+- [x] Define and test event lifecycle, capacity, adult age range, location, language, experience, blocking, cancellation, and visibility rules.
 - [ ] Implement authenticated profile editing.
 - [ ] Implement host event creation and private/public location separation.
 - [ ] Implement discovery eligibility and filters.

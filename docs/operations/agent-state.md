@@ -2,20 +2,20 @@
 
 ## Current outcome
 
-Specify the complete event domain and precise-location visibility model, then implement its tested invariants before building event screens.
+Implement authenticated profile editing with server-side ownership, validation, and an experience that makes intentions and sporting identity feel human rather than administrative.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
-- Completed signup, login, session rotation, protected profile, and logout.
-- Added machine-readable account export, access-request audit, password-confirmed deletion requests, immediate account lock, and session revocation.
-- Documented European privacy-rights preparation, consent boundaries, states, and unresolved retention decisions using official EU/EDPB sources.
+- Completed the secure account loop and account privacy controls.
+- Defined and implemented tested event publishing, lifecycle, capacity, adult age range, sport experience, language, blocking, cancellation, completion, and precise-location visibility rules.
+- Documented failure, recovery, authorization, and instrumentation requirements for the event loop.
 
 ## Next three outcomes
 
-1. Define and test event lifecycle, capacity, eligibility, language, experience, cancellation, and location-visibility rules.
-2. Implement authenticated profile editing against server-side ownership checks.
-3. Implement host event creation with public approximate and private precise locations separated by authorization.
+1. Implement authenticated profile editing against server-side ownership checks.
+2. Implement host event creation with public approximate and private precise locations separated in persistence and authorization.
+3. Implement discovery eligibility and filters without leaking block or precise-location data.
 
 ## Owner blockers
 
@@ -28,7 +28,7 @@ Specify the complete event domain and precise-location visibility model, then im
 
 - “Sport Date” is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
-- Deletion processing beyond profile lock remains an operational launch gate.
-- Custom authentication must receive a production security review or be replaced with a maintained auth library.
+- Event age ranges are adult-only preferences and require fairness and launch-country review before production.
+- Location-viewer roles must be resolved from server records, never client claims.
 - No social, safety, verification, or traction claims may exceed implemented evidence.
 
