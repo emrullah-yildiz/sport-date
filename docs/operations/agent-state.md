@@ -2,20 +2,20 @@
 
 ## Current outcome
 
-Implement authenticated profile editing with server-side ownership, validation, and an experience that makes intentions and sporting identity feel human rather than administrative.
+Implement host event creation with public approximate and private precise locations separated in persistence, validation, and authorization.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
 - Completed the secure account loop and account privacy controls.
-- Defined and implemented tested event publishing, lifecycle, capacity, adult age range, sport experience, language, blocking, cancellation, completion, and precise-location visibility rules.
-- Documented failure, recovery, authorization, and instrumentation requirements for the event loop.
+- Defined and tested event lifecycle, eligibility, blocking, capacity, and precise-location visibility rules.
+- Added authenticated profile editing for identity, approximate location, languages, intentions, bio, sports, skill, and frequency; ownership is derived only from the live server session.
 
 ## Next three outcomes
 
-1. Implement authenticated profile editing against server-side ownership checks.
-2. Implement host event creation with public approximate and private precise locations separated in persistence and authorization.
-3. Implement discovery eligibility and filters without leaking block or precise-location data.
+1. Implement host event creation with separate public and private location data.
+2. Implement discovery eligibility and filters without leaking block or precise-location data.
+3. Implement join request, accept, skip, third-skip decline, cancellation, and atomic capacity enforcement.
 
 ## Owner blockers
 

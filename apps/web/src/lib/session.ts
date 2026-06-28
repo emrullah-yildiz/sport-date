@@ -15,6 +15,7 @@ export type SessionUser = Readonly<{
   lastName: string;
   location: string;
   bio: string;
+  languages: readonly string[];
   seeking: "dating" | "friendship" | "group";
   emailVerified: boolean;
   sports: ReadonlyArray<{
@@ -31,6 +32,7 @@ type SessionUserRow = {
   last_name: string;
   location: string;
   bio: string;
+  languages: string[];
   seeking: SessionUser["seeking"];
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
@@ -67,7 +69,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const rows = await sql`
     SELECT
       users.id, users.email, users.first_name, users.last_name, users.location,
-      users.bio, users.seeking, users.email_verified,
+      users.bio, users.languages, users.seeking, users.email_verified,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -97,6 +99,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     lastName: row.last_name,
     location: row.location,
     bio: row.bio,
+    languages: row.languages,
     seeking: row.seeking,
     emailVerified: row.email_verified,
     sports: row.sports,

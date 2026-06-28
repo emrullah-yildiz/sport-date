@@ -11,7 +11,7 @@
 ## Next: complete event loop
 
 - [x] Define and test event lifecycle, capacity, adult age range, location, language, experience, blocking, cancellation, and visibility rules.
-- [ ] Implement authenticated profile editing.
+- [x] Implement authenticated profile editing with server-derived ownership and shared validation.
 - [ ] Implement host event creation and private/public location separation.
 - [ ] Implement discovery eligibility and filters.
 - [ ] Implement request, accept, skip, third-skip decline, cancellation, and capacity invariants.

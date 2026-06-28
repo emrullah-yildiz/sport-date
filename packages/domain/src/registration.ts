@@ -52,6 +52,61 @@ export function validateLogin(raw: unknown): LoginValidation {
     : { valid: true, data: { email, password } };
 }
 
+export type ProfileUpdateInput = Readonly<{
+  firstName: string;
+  lastName: string;
+  location: string;
+  bio: string;
+  seeking: Seeking;
+  languages: readonly string[];
+  sports: readonly RegistrationSport[];
+}>;
+
+export type ProfileUpdateValidation =
+  | { valid: true; data: ProfileUpdateInput }
+  | { valid: false; errors: readonly string[] };
+
+export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
+  if (!raw || typeof raw !== "object") return { valid: false, errors: ["Profile details are required."] };
+  const input = raw as Record<string, unknown>;
+  const firstName = typeof input.firstName === "string" ? input.firstName.trim() : "";
+  const lastName = typeof input.lastName === "string" ? input.lastName.trim() : "";
+  const location = typeof input.location === "string" ? input.location.trim() : "";
+  const bio = typeof input.bio === "string" ? input.bio.trim() : "";
+  const seeking = input.seeking;
+  const languages = Array.isArray(input.languages)
+    ? input.languages.filter((language): language is string => typeof language === "string").map((language) => language.trim()).filter(Boolean)
+    : [];
+  const rawSports = Array.isArray(input.sports) ? input.sports : [];
+  const errors: string[] = [];
+
+  if (!firstName || firstName.length > 80) errors.push("Enter a first name of 80 characters or fewer.");
+  if (!lastName || lastName.length > 80) errors.push("Enter a last name of 80 characters or fewer.");
+  if (!location || location.length > 120) errors.push("Enter a city or region of 120 characters or fewer.");
+  if (bio.length > 200) errors.push("Bio must be 200 characters or fewer.");
+  if (!SEEKING_OPTIONS.includes(seeking as Seeking)) errors.push("Choose a valid connection preference.");
+  if (languages.length > 5 || languages.some((language) => language.length > 35)) errors.push("Choose up to five languages of 35 characters or fewer.");
+  if (new Set(languages.map((language) => language.toLowerCase())).size !== languages.length) errors.push("Choose each language only once.");
+  if (rawSports.length < 1 || rawSports.length > 5) errors.push("Choose between one and five sports.");
+
+  const sports: RegistrationSport[] = [];
+  for (const rawSport of rawSports) {
+    if (!rawSport || typeof rawSport !== "object") { errors.push("Each sport selection must be valid."); continue; }
+    const sport = rawSport as Record<string, unknown>;
+    const name = typeof sport.name === "string" ? sport.name.trim() : "";
+    if (!name || name.length > 60) errors.push("Each sport needs a valid name.");
+    if (!SPORT_SKILL_LEVELS.includes(sport.skillLevel as SportSkillLevel)) errors.push("Each sport needs a valid skill level.");
+    if (!SPORT_FREQUENCIES.includes(sport.frequency as SportFrequency)) errors.push("Each sport needs a valid frequency.");
+    if (name && name.length <= 60 && SPORT_SKILL_LEVELS.includes(sport.skillLevel as SportSkillLevel) && SPORT_FREQUENCIES.includes(sport.frequency as SportFrequency)) {
+      sports.push({ name, skillLevel: sport.skillLevel as SportSkillLevel, frequency: sport.frequency as SportFrequency });
+    }
+  }
+  if (new Set(sports.map((sport) => sport.name.toLowerCase())).size !== sports.length) errors.push("Choose each sport only once.");
+  return errors.length > 0
+    ? { valid: false, errors }
+    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports } };
+}
+
 export function ageOnDate(dateOfBirth: string, today = new Date()): number | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) return null;
 

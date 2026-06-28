@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ageOnDate, validateLogin, validateRegistration } from "./registration";
+import { ageOnDate, validateLogin, validateProfileUpdate, validateRegistration } from "./registration";
 
 const validInput = {
   email: " Athlete@Example.com ", password: "StrongPassword9",
@@ -54,3 +54,24 @@ describe("login validation", () => {
   });
 });
 
+describe("profile update validation", () => {
+  it("accepts a complete member-owned profile update", () => {
+    const result = validateProfileUpdate({
+      firstName: " Ana ", lastName: "Popescu", location: "Bucharest", bio: "Runs before breakfast.",
+      seeking: "friendship", languages: ["Romanian", "English"],
+      sports: [{ name: "Running", skillLevel: "intermediate", frequency: "weekly" }],
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) expect(result.data.firstName).toBe("Ana");
+  });
+
+  it("rejects duplicate languages and sports", () => {
+    const sport = { name: "Running", skillLevel: "intermediate", frequency: "weekly" };
+    const result = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "dating",
+      languages: ["English", "english"], sports: [sport, sport],
+    });
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors).toEqual(expect.arrayContaining(["Choose each language only once.", "Choose each sport only once."]));
+  });
+});
