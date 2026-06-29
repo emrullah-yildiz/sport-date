@@ -2,6 +2,8 @@
 
 This is a preparation document. No account may be created or content published without the owner's explicit authorization, platform-term acceptance, and credentials.
 
+The evidence-backed Bucharest research copy, bilingual host outreach, form fields, campaign tags, and measurement rules live in [bucharest-research-campaign.md](./bucharest-research-campaign.md). Use that packet for research recruitment; keep the broader concepts below for a later product launch.
+
 ## Recommended initial accounts
 
 - Instagram: visual proof of the feeling, host stories, event etiquette, and founder belief.
@@ -40,4 +42,3 @@ Each post still needs channel-specific copy, creative, alt text, owner approval,
 ## Community response rules
 
 Never diagnose, argue with safety reports, expose personal data, promise outcomes, or move sensitive complaints into casual direct messages. Acknowledge concerns, preserve evidence, and route them into the formal moderation process once it exists.
-

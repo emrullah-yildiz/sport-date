@@ -62,6 +62,10 @@ Block, report, request, cancel, accept, and skip behavior must not fork by clien
 
 Mobile device management can remotely revoke other sessions but cannot revoke the session authorizing its own request; current-device termination uses the logout path so the server revocation and SecureStore deletion run together. Web may revoke any native session for account recovery.
 
+## 2026-06-29 - Validate a corridor before claiming a city
+
+Treat Bucharest as a research hypothesis. First test the Aviatorilor-Herastrau to Aurel Vlaicu-Floreasca corridor with recurring beginner-friendly run/run-walk and four-person indoor padel formats. Running tests low-friction demand; padel tests the bounded social encounter. Keep bouldering as the replacement if padel economics fail. Do not add neighborhoods, sports, or paid acquisition before four credible hosts and repeated event supply exist.
+
 ## Open decisions
 
 - Final product and company name.

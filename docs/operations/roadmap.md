@@ -28,7 +28,8 @@
 - [x] Add explicitly role-gated moderator queues, case transitions, and reporter-safe decision notices.
 - [x] Add role-gated appeal outcomes with separation-of-review safeguards.
 - [x] Add purpose-limited evidence references and case-access logging without accepting file uploads.
-- [ ] Research and choose one launch city and two or three sports.
+- [x] Research Bucharest and recommend a corridor plus two-sport validation wedge without treating it as the owner's final choice.
+- [ ] Validate or reject the Aviatorilor-Herastrau / Aurel Vlaicu-Floreasca run-walk and padel wedge through interviews and host commitments.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.
 - [ ] Prepare final brand screen, social account packet, launch content, and measurement plan.
