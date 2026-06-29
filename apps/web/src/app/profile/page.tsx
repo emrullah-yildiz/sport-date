@@ -26,7 +26,7 @@ export default async function ProfilePage() {
         </div>
         <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
       </section>
-      <div className="profile-primary-action"><Link href="/discover">Discover events <span aria-hidden="true">→</span></Link><Link href="/events/new">Host a new event <span aria-hidden="true">→</span></Link></div>
+      <div className="profile-primary-action"><Link href="/discover">Discover events <span aria-hidden="true">→</span></Link><Link href="/events/new">Host a new event <span aria-hidden="true">→</span></Link><Link href="/safety">Safety center <span aria-hidden="true">→</span></Link></div>
       <section className="profile-grid">
         <article className="profile-panel">
           <p className="panel-label">About</p>

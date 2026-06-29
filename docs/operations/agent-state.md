@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Add reporter-visible safety case status and appeal foundations while keeping moderation decisions behind explicit staff roles.
+Add explicitly role-gated moderator case transitions, decision notices, and appeal outcomes without creating a general-purpose admin backdoor.
 
 ## Completed and verified
 
@@ -13,12 +13,14 @@ Add reporter-visible safety case status and appeal foundations while keeping mod
 - Added member blocking, structured safety reports, immediate shared-access revocation, and append-only moderation audit records.
 - Added safety-report and block coverage to account export.
 - Documented response priorities, evidence handling, appeals, staffing gates, and EU Digital Services Act preparation boundaries.
-- Thirty-four tests pass; all workspaces type-check; lint and the production web build pass.
+- Added a private member Safety Center with report states, reporter-safe decision notices, deadline enforcement, and one structured appeal per case.
+- Extended account export to decision notices and member-submitted appeals.
+- Thirty-six tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add member-visible report status, decision notices, and structured appeals.
-2. Add role-gated moderator case transitions and immutable decision audit events.
+1. Add role-gated moderator case transitions and immutable decision audit events.
+2. Add role-gated appeal review with outcome notices and separation-of-review safeguards.
 3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 
 ## Owner blockers

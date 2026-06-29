@@ -18,6 +18,10 @@ export type SafetyReportValidation =
   | { valid: true; data: SafetyReportInput; priority: SafetyPriority }
   | { valid: false; errors: readonly string[] };
 
+export type SafetyAppealValidation =
+  | { valid: true; reason: string }
+  | { valid: false; errors: readonly string[] };
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const USER_ID_PATTERN = /^\d+$/;
 
@@ -49,3 +53,12 @@ export function validateSafetyReport(raw: unknown): SafetyReportValidation {
   };
 }
 
+export function validateSafetyAppeal(raw: unknown): SafetyAppealValidation {
+  if (!raw || typeof raw !== "object") return { valid: false, errors: ["Appeal reason is required."] };
+  const value = (raw as Record<string, unknown>).reason;
+  const reason = typeof value === "string" ? value.trim() : "";
+  if (reason.length < 20 || reason.length > 2000) {
+    return { valid: false, errors: ["Explain the appeal using 20 to 2000 characters."] };
+  }
+  return { valid: true, reason };
+}

@@ -68,6 +68,8 @@ Every state or action change must append to the moderation audit log. Existing a
 
 The product needs a decision notice with decision ID, affected rule or legal basis, action, effective period, meaningful explanation, appeal deadline, and appeal route. Appeals need their own status, reviewer, outcome, rationale, and immutable audit event. An appeal never restores contact between blocked members automatically.
 
+The implemented foundation gives a reporter a private Safety Center, displays only a reporter-safe decision summary, enforces the appeal deadline at the database mutation boundary, accepts one structured appeal per report, and appends appeal creation to the case audit. Moderator assignment, independent-review enforcement, decision issuance, and appeal outcomes remain unavailable until role-gated staff tooling is implemented.
+
 ## Staffing launch gate
 
 Do not enable open messaging or acquire real event demand until named people own:

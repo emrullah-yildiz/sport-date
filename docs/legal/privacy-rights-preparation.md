@@ -37,7 +37,7 @@ Direct account and profile identifiers are erased. Aggregated product statistics
 - JSON account export containing profile and sports data, excluding password hashes and session secrets.
 - An audit record for completed access exports.
 - Export coverage for hosted events, requests, accepted seats, and precise meeting details already disclosed to the member.
-- Export coverage for safety reports submitted and member blocks created, excluding security secrets and internal case material requiring rights-of-others review.
+- Export coverage for safety reports, reporter-visible decision notices, appeals submitted, and member blocks created, excluding security secrets and internal case material requiring rights-of-others review.
 - Password re-authentication before requesting deletion.
 - Immediate transition to `deletion_pending` and revocation of every session.
 - Immediate cancellation of hosted events, closure of pending/accepted requests, and removal of accepted seats when deletion is requested.
@@ -65,6 +65,6 @@ Accepting product terms is not a blanket privacy or marketing consent. Marketing
 
 - Identity verification proportionate to each rights request without collecting unnecessary ID documents.
 - A request inbox, responsible owner, due-date tracking, recipient notification, and appeal/escalation process.
-- Export coverage for future messages, moderation decisions, consent history, and relevant profiling once those records exist.
+- Export coverage for future messages, consent history, relevant profiling, and any additional moderation records once those records exist.
 - A deletion processor that handles dependencies, backups, vendors, recipients, safety exceptions, and completion notices.
 - Privacy notice mapping purposes, lawful bases, recipients, transfers, retention criteria, rights, and complaint routes.

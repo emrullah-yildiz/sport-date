@@ -17,12 +17,15 @@
 - [x] Implement request, accept, skip, third-skip decline, requester cancellation, and atomic seat-capacity invariants.
 - [x] Add server-authorized event rooms for hosts and accepted participants without open messaging.
 - [x] Extend access/export/deletion coverage to events, join requests, accepted seats, and disclosed meeting details.
-- [ ] Extend access/export/deletion coverage again when moderation decisions and messages are introduced.
+- [x] Extend access/export coverage to reporter-visible moderation decisions and appeals.
+- [ ] Extend access/export/deletion coverage again when messages are introduced.
 
 ## Then: safety and local launch
 
 - [x] Implement block/report paths, immediate access revocation, and append-only moderation audit records before messaging.
 - [x] Design operational response levels, evidence handling, decisions, appeals, staffing gates, and transparency measures.
+- [x] Add a member Safety Center with report status, decision notices, deadline enforcement, and one structured appeal per case.
+- [ ] Add explicitly role-gated moderator queues, case transitions, decision notices, and appeal outcomes.
 - [ ] Research and choose one launch city and two or three sports.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.

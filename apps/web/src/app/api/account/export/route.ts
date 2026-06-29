@@ -83,8 +83,17 @@ export async function GET() {
     ORDER BY request.requested_at
   `;
   const safetyReports = await sql`
-    SELECT id, reported_user_id, event_id, category, details, status, priority, created_at, updated_at
+    SELECT id, reported_user_id, event_id, category, details, status, priority,
+      decision_code, decision_summary, decided_at, appeal_deadline, created_at, updated_at
     FROM safety_reports WHERE reporter_user_id = ${user.id} ORDER BY created_at
+  `;
+  const safetyAppeals = await sql`
+    SELECT appeal.id, appeal.report_id, appeal.reason, appeal.status, appeal.outcome_summary,
+      appeal.created_at, appeal.decided_at
+    FROM moderation_appeals AS appeal
+    JOIN safety_reports AS report ON report.id = appeal.report_id
+    WHERE appeal.appellant_user_id = ${user.id} AND report.reporter_user_id = ${user.id}
+    ORDER BY appeal.created_at
   `;
   const blocks = await sql`
     SELECT blocked_user_id, created_at FROM user_blocks
@@ -119,6 +128,7 @@ export async function GET() {
     hostedEvents,
     joinRequestsAndAcceptedParticipation: joinRequests,
     safetyReportsSubmitted: safetyReports,
+    safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };

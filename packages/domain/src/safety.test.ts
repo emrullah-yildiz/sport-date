@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityForSafetyCategory, validateSafetyReport } from "./safety";
+import { priorityForSafetyCategory, validateSafetyAppeal, validateSafetyReport } from "./safety";
 
 describe("safety reports", () => {
   it("prioritizes immediate physical and minor-safety risks", () => {
@@ -25,3 +25,18 @@ describe("safety reports", () => {
   });
 });
 
+describe("safety appeals", () => {
+  it("trims and accepts a sufficiently detailed appeal", () => {
+    expect(validateSafetyAppeal({ reason: "  The decision missed the attached event context.  " })).toEqual({
+      valid: true,
+      reason: "The decision missed the attached event context.",
+    });
+  });
+
+  it("rejects an appeal without enough context", () => {
+    expect(validateSafetyAppeal({ reason: "Please reconsider." })).toEqual({
+      valid: false,
+      errors: ["Explain the appeal using 20 to 2000 characters."],
+    });
+  });
+});
