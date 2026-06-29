@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Harden the already-scaffolded email-verification and password-reset flows with direct unit tests of the security-sensitive token core (`apps/web/src/lib/auth-email.ts`), which previously had only thin pre-database route guards. Delivery stays provider-gated and disabled until an owner approves an email provider; no real emails are sent.
+Extend the email-verification and password-reset hardening from the token core out to the four HTTP routes. The `email-verification/request` route had no test at all and the other three only asserted a single pre-database guard branch. Added direct route-level coverage for success, already-verified, expired (410), invalid, validation-error, database-unavailable (503), authentication (401), cross-site rejection (403), rate-limit exhaustion (429), and password-reset enumeration neutrality. Routes are exercised with `@/lib/auth-email`, `@/lib/session`, and the rate-limit store mocked/reset so no live PostgreSQL or email provider is required. Delivery stays provider-gated and disabled until an owner approves an email provider.
 
 ## Completed and verified
 
@@ -54,12 +54,13 @@ Harden the already-scaffolded email-verification and password-reset flows with d
 - Implemented scheduled cleanup for expired browser sessions, spent mobile sessions, and outdated refresh-token history (`apps/web/src/lib/session-cleanup.mjs` with tests).
 - Scaffolded email-verification and password-reset: dedicated request/confirm routes, a provider-gated delivery adapter (disabled by default, optional console simulation), bilingual-ready email drafts, single-use hashed tokens, and account-deletion token revocation, all wired into web pages and the profile surface.
 - Added a direct unit suite for the verification/reset core: single-use consumption, expiry with no side effects, sibling-token invalidation, already-verified handling, requester-IP hashing instead of cleartext, and the reset boundary that deletes all browser sessions and revokes all mobile sessions.
-- One hundred twenty tests pass (73 web + 47 domain); all workspaces type-check.
+- Added direct HTTP-route coverage for all four verification/reset routes (including `email-verification/request`, which previously had no test): success, already-verified, expired (410), invalid, validation-error, 503 unavailable, 401 unauthenticated, 403 cross-site, 429 rate-limit exhaustion, and password-reset enumeration neutrality across existing/missing accounts and database failure.
+- One hundred forty-two tests pass (95 web + 47 domain); all workspaces type-check.
 
 ## Next three outcomes
 
-1. Add direct unit coverage for the four verification/reset HTTP routes' success/expired/410/already-verified branches (only pre-database guard paths are covered today), plus the `email-verification/request` route which still has no test.
-2. Threat-model and document the email-verification and password-reset flows in `docs/security/authentication.md`: token entropy, single-use, expiry windows, enumeration neutrality, rate limits, and the reset session-revocation boundary; flag the email-provider selection as an owner gate.
+1. Threat-model and document the email-verification and password-reset flows in `docs/security/authentication.md`: token entropy, single-use, expiry windows, enumeration neutrality, rate limits, and the reset session-revocation boundary; flag the email-provider selection as an owner gate.
+2. Add an end-to-end (or DB-integration) test of the verification/reset persistence against an isolated PostgreSQL instance once the test-database gate is met, so token single-use and session revocation are asserted against real SQL rather than recorded statements.
 3. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
 
 ## Owner blockers
