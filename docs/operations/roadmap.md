@@ -39,7 +39,8 @@
 - [x] Implement a responsive web progress surface using real product records, with calm empty and recovery states.
 - [x] Build an Expo interaction prototype for event reflection and the Movement Arc using the shared tested domain rules.
 - [x] Implement and threat-model separate revocable native sessions with SecureStore, short access tokens, rotating refresh tokens, and reuse revocation.
-- [ ] Replace mobile demo event state with native-authorized live discovery, room, reflection, and progress data.
+- [x] Replace signed-in mobile demo state with native-authorized live approximate discovery, accepted/host room, reflection, and Movement Arc data.
+- [ ] Add native join requests, requester cancellation, host decisions, blocking, and reporting with web-equivalent recovery.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
 ## Launch gates

@@ -184,6 +184,12 @@ export type EventRoom = Readonly<{
   participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string }>;
 }>;
 
+export type MemberEventSummary = Readonly<{
+  id: string; title: string; sport: string; startsAt: string; timeZone: string;
+  city: string; areaLabel: string; isHost: boolean; hasEnded: boolean;
+  reflection: EventRoom["reflection"];
+}>;
+
 type EventRoomRow = {
   id: string; title: string; sport: string; starts_at: string; time_zone: string;
   venue_name: string; address: string; arrival_instructions: string | null; is_host: boolean;
@@ -248,4 +254,38 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
       : null,
     participants: participants.map((participant) => ({ userId: String(participant.user_id), firstName: participant.first_name, skillLevel: participant.skill_level })),
   };
+}
+
+export async function getMemberEventSummaries(userId: string): Promise<MemberEventSummary[]> {
+  const sql = getDatabase();
+  const rows = await sql`
+    SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
+      events.public_city, events.public_area_label, (events.host_user_id = ${userId}) AS is_host,
+      (events.starts_at + (events.duration_minutes * INTERVAL '1 minute') <= NOW()) AS has_ended,
+      reflection.attendance, reflection.would_join_again
+    FROM events
+    LEFT JOIN event_reflections AS reflection ON reflection.event_id = events.id AND reflection.user_id = ${userId}
+    WHERE events.status IN ('published', 'completed')
+      AND (
+        events.host_user_id = ${userId}
+        OR EXISTS (SELECT 1 FROM event_participants WHERE event_id = events.id AND user_id = ${userId})
+      )
+    ORDER BY
+      (events.starts_at + (events.duration_minutes * INTERVAL '1 minute') <= NOW()) ASC,
+      events.starts_at DESC
+    LIMIT 30
+  ` as unknown as Array<{
+    id: string; title: string; sport: string; starts_at: string; time_zone: string;
+    public_city: string; public_area_label: string; is_host: boolean; has_ended: boolean;
+    attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
+    would_join_again: NonNullable<EventRoom["reflection"]>["wouldJoinAgain"] | null;
+  }>;
+  return rows.map((row) => ({
+    id: row.id, title: row.title, sport: row.sport, startsAt: row.starts_at,
+    timeZone: row.time_zone, city: row.public_city, areaLabel: row.public_area_label,
+    isHost: row.is_host, hasEnded: row.has_ended,
+    reflection: row.attendance && row.would_join_again
+      ? { attendance: row.attendance, wouldJoinAgain: row.would_join_again }
+      : null,
+  }));
 }

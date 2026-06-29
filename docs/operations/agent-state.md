@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Replace declared mobile demo event state with native-authorized live discovery, accepted-room, reflection, and Movement Arc data.
+Add native join requests and cancellation with capacity, block, retry, and conflict recovery equivalent to web.
 
 ## Completed and verified
 
@@ -32,13 +32,16 @@ Replace declared mobile demo event state with native-authorized live discovery, 
 - Added SecureStore-backed native credential handling, HTTPS/path restrictions, serialized refresh, optional live login, logout, and authenticated member restoration.
 - Extended account export with native device-session metadata and documented remaining device-compromise and attestation risks.
 - Verified Expo SDK 56 configuration and a 581-module Android Hermes bundle after native auth integration.
+- Added native-authorized live approximate discovery, authorized hosted/accepted event selection, exact room access, private reflection, and live Movement Arc data.
+- Added explicit mobile loading, empty, retry, stale access, lost room access, and reflection submission states; live discovery remains read-only pending mutation parity.
+- Verified a 582-module Android Hermes bundle after live product-data integration.
 - Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add native-authorized live discovery, accepted-room, reflection, and Movement Arc APIs and replace mobile demo state.
-2. Add member-facing device-session review and remote revocation.
-3. Add outbound decision-notification delivery after an approved email provider exists.
+1. Add native join requests and cancellation with web-equivalent capacity, block, and conflict recovery.
+2. Add native block/report paths and host request decisions.
+3. Add member-facing device-session review and remote revocation.
 
 ## Owner blockers
 

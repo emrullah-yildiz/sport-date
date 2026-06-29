@@ -48,6 +48,10 @@ Keep the Expo interaction prototype visibly labelled until secure native session
 
 Do not share browser cookies with native clients. Issue a short opaque access token and a rotating fixed-lifetime refresh token, store only hashes, bind the family to an installation UUID, and revoke on spent-token reuse. Treat installation headers as replay friction rather than hardware attestation.
 
+## 2026-06-29 - Native discovery stays read-only until mutation parity exists
+
+Live mobile discovery may expose the same approximate compatible-event data as web, but request controls wait for native-authorized capacity conflicts, cancellation, blocking, reporting, and retry recovery. Polished buttons must not imply a safe mutation path before the server boundary exists.
+
 ## Open decisions
 
 - Final product and company name.

@@ -35,3 +35,4 @@
 - Session persistence after device loss or iOS reinstall: keep a fixed server expiry, account-deletion revocation, logout revocation, and a planned member device-management surface.
 - Token exfiltration through configuration: permit only relative `/api/mobile/` paths in authenticated fetches and require an HTTPS `EXPO_PUBLIC_API_URL` outside local development. Public Expo environment values must never contain secrets.
 - Residual risk: a compromised device process can steal both binding and tokens; production requires anomaly detection, rate limiting, app-integrity review, and an incident-revocation procedure.
+- Native discovery receives approximate locations only. Exact room logistics use the existing host/accepted-participant authorization and are fetched only for the selected event-day view; they are not persisted by the application client.
