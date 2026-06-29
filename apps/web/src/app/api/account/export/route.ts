@@ -82,6 +82,14 @@ export async function GET() {
     WHERE request.requester_user_id = ${user.id}
     ORDER BY request.requested_at
   `;
+  const safetyReports = await sql`
+    SELECT id, reported_user_id, event_id, category, details, status, priority, created_at, updated_at
+    FROM safety_reports WHERE reporter_user_id = ${user.id} ORDER BY created_at
+  `;
+  const blocks = await sql`
+    SELECT blocked_user_id, created_at FROM user_blocks
+    WHERE blocker_user_id = ${user.id} ORDER BY created_at
+  `;
 
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
@@ -110,6 +118,8 @@ export async function GET() {
     },
     hostedEvents,
     joinRequestsAndAcceptedParticipation: joinRequests,
+    safetyReportsSubmitted: safetyReports,
+    memberBlocksCreated: blocks,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 

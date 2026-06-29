@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Implement member blocking, safety reports, and immutable moderation audit records before any open messaging capability.
+Add reporter-visible safety case status and appeal foundations while keeping moderation decisions behind explicit staff roles.
 
 ## Completed and verified
 
@@ -10,13 +10,16 @@ Implement member blocking, safety reports, and immutable moderation audit record
 - Completed the account, event, discovery, request, and authorized room loops.
 - Extended account export to hosted events, join requests, accepted seats, and precise locations already disclosed.
 - Deletion requests now immediately cancel hosted events, close active requests, remove accepted seats, revoke room/location access, and revoke sessions.
-- Thirty-one tests pass; all workspaces type-check; lint and the production web build pass.
+- Added member blocking, structured safety reports, immediate shared-access revocation, and append-only moderation audit records.
+- Added safety-report and block coverage to account export.
+- Documented response priorities, evidence handling, appeals, staffing gates, and EU Digital Services Act preparation boundaries.
+- Thirty-four tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Implement block/report paths and moderation audit records.
-2. Design operational response levels, evidence handling, and appeals.
-3. Add purpose-limited room coordination messages only after moderation gates pass.
+1. Add member-visible report status, decision notices, and structured appeals.
+2. Add role-gated moderator case transitions and immutable decision audit events.
+3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 
 ## Owner blockers
 
@@ -24,12 +27,12 @@ Implement member blocking, safety reports, and immutable moderation audit record
 - Provide or authorize infrastructure credentials only when production services are selected.
 - Approve final brand and personally create or authorize external social accounts before publication.
 - Qualified European counsel must approve final retention periods, lawful bases, privacy notices, and deletion exceptions.
+- Name trained safety owners and an escalation rota before critical-response targets or member messaging can go live.
 
 ## Active assumptions and risks
 
-- “Sport Date” is a working name; Bucharest is a research hypothesis.
+- "Sport Date" is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
 - Deletion finalization and vendor/backup propagation remain operational launch gates.
 - Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.
-

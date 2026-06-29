@@ -8,8 +8,8 @@ The European Commission describes rights to information, access, rectification, 
 
 Sources:
 
-- European Commission, “Information for individuals”: https://commission.europa.eu/law/law-topic/data-protection/information-individuals_en
-- European Commission, “Do we always have to delete personal data if a person asks?”: https://commission.europa.eu/law/law-topic/data-protection/rules-business-and-organisations/dealing-citizens/do-we-always-have-delete-personal-data-if-person-asks_en
+- European Commission, "Information for individuals": https://commission.europa.eu/law/law-topic/data-protection/information-individuals_en
+- European Commission, "Do we always have to delete personal data if a person asks?": https://commission.europa.eu/law/law-topic/data-protection/rules-business-and-organisations/dealing-citizens/do-we-always-have-delete-personal-data-if-person-asks_en
 - European Data Protection Board, SME guide on responding to erasure requests: https://www.edpb.europa.eu/sme-data-protection-guide/faq-frequently-asked-questions/answer/how-do-i-respond-request-erasure_en
 
 The EDPB says requests should be answered without undue delay and generally within one month, with a possible extension for complex requests if the person is informed in time. Verify the exact procedure and national considerations with counsel before launch.
@@ -37,6 +37,7 @@ Direct account and profile identifiers are erased. Aggregated product statistics
 - JSON account export containing profile and sports data, excluding password hashes and session secrets.
 - An audit record for completed access exports.
 - Export coverage for hosted events, requests, accepted seats, and precise meeting details already disclosed to the member.
+- Export coverage for safety reports submitted and member blocks created, excluding security secrets and internal case material requiring rights-of-others review.
 - Password re-authentication before requesting deletion.
 - Immediate transition to `deletion_pending` and revocation of every session.
 - Immediate cancellation of hosted events, closure of pending/accepted requests, and removal of accepted seats when deletion is requested.
@@ -64,6 +65,6 @@ Accepting product terms is not a blanket privacy or marketing consent. Marketing
 
 - Identity verification proportionate to each rights request without collecting unnecessary ID documents.
 - A request inbox, responsible owner, due-date tracking, recipient notification, and appeal/escalation process.
-- Export coverage for future messages, reports, blocks, consent history, and relevant profiling once those records exist.
+- Export coverage for future messages, moderation decisions, consent history, and relevant profiling once those records exist.
 - A deletion processor that handles dependencies, backups, vendors, recipients, safety exceptions, and completion notices.
 - Privacy notice mapping purposes, lawful bases, recipients, transfers, retention criteria, rights, and complaint routes.

@@ -15,7 +15,7 @@ export type DiscoveryRequest = { id: string; status: "pending" | "accepted" | "d
 export type DiscoveryEvent = Readonly<{
   id: string; sport: string; title: string; description: string; startsAt: string;
   timeZone: string; durationMinutes: number; capacity: number; language: string;
-  minimumAge: number; maximumAge: number; experienceLevels: string[]; hostFirstName: string;
+  minimumAge: number; maximumAge: number; experienceLevels: string[]; hostUserId: string; hostFirstName: string;
   areaLabel: string; city: string; countryCode: string; acceptedCount: number;
   placesRemaining: number; request: DiscoveryRequest | null;
 }>;
@@ -32,19 +32,20 @@ type DiscoveryEventRow = {
   id: string; sport: string; title: string; description: string; starts_at: string;
   time_zone: string; duration_minutes: number; capacity: number; language: string;
   minimum_age: number; maximum_age: number; experience_levels: string[];
-  host_first_name: string; public_area_label: string; public_city: string; public_country_code: string;
+  host_user_id: string | number; host_first_name: string; public_area_label: string; public_city: string; public_country_code: string;
   accepted_count: number; request_id: string | null; request_status: DiscoveryRequest["status"] | null;
   request_skip_count: number | null;
 };
 
 export type HostJoinRequest = Readonly<{
   id: string; status: DiscoveryRequest["status"]; skipCount: number; introduction: string; requestedAt: string;
+  requesterId: string;
   requester: { firstName: string; age: number; bio: string; languages: string[]; skillLevel: string };
 }>;
 
 type HostJoinRequestRow = {
   id: string; status: DiscoveryRequest["status"]; skip_count: number; introduction: string;
-  requested_at: string; first_name: string; age: number; bio: string; languages: string[]; skill_level: string;
+  requested_at: string; requester_user_id: string | number; first_name: string; age: number; bio: string; languages: string[]; skill_level: string;
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -83,7 +84,7 @@ export async function getDiscoverableEvents(
       events.id, events.sport, events.title, events.description, events.starts_at,
       events.time_zone, events.duration_minutes, events.capacity, events.language,
       events.minimum_age, events.maximum_age, events.experience_levels,
-      host.first_name AS host_first_name,
+      events.host_user_id, host.first_name AS host_first_name,
       events.public_area_label, events.public_city, events.public_country_code,
       (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
       member_request.id AS request_id, member_request.status AS request_status,
@@ -125,7 +126,7 @@ export async function getDiscoverableEvents(
     startsAt: row.starts_at, timeZone: row.time_zone, durationMinutes: row.duration_minutes,
     capacity: row.capacity, language: row.language, minimumAge: row.minimum_age,
     maximumAge: row.maximum_age, experienceLevels: row.experience_levels,
-    hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
+    hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
     city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
@@ -141,6 +142,7 @@ export async function getHostJoinRequests(eventId: string, hostId: string): Prom
   const sql = getDatabase();
   const rows = await sql`
     SELECT request.id, request.status, request.skip_count, request.introduction, request.requested_at,
+      request.requester_user_id,
       requester.first_name, DATE_PART('year', AGE(CURRENT_DATE, requester.date_of_birth))::integer AS age,
       requester.bio, requester.languages, sport.skill_level
     FROM join_requests AS request
@@ -152,6 +154,7 @@ export async function getHostJoinRequests(eventId: string, hostId: string): Prom
   ` as unknown as HostJoinRequestRow[];
   return rows.map((row) => ({
     id: row.id, status: row.status, skipCount: row.skip_count, introduction: row.introduction,
+    requesterId: String(row.requester_user_id),
     requestedAt: row.requested_at,
     requester: { firstName: row.first_name, age: row.age, bio: row.bio, languages: row.languages, skillLevel: row.skill_level },
   }));
@@ -177,7 +180,7 @@ export async function getAcceptedEventLocation(
 export type EventRoom = Readonly<{
   id: string; title: string; sport: string; startsAt: string; timeZone: string;
   venueName: string; address: string; instructions: string | null; isHost: boolean;
-  participants: ReadonlyArray<{ firstName: string; skillLevel: string }>;
+  participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string }>;
 }>;
 
 type EventRoomRow = {
@@ -216,7 +219,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   if (!room) return null;
 
   const participants = await sql`
-    SELECT member.first_name, sport.skill_level
+    SELECT member.id AS user_id, member.first_name, sport.skill_level
     FROM event_participants AS participant
     JOIN users AS member ON member.id = participant.user_id AND member.account_status = 'active'
     JOIN events ON events.id = participant.event_id
@@ -229,11 +232,11 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
            OR (blocker_user_id = member.id AND blocked_user_id = ${userId})
       )
     ORDER BY participant.seat_number
-  ` as unknown as Array<{ first_name: string; skill_level: string }>;
+  ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string }>;
   return {
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
     timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
     instructions: room.arrival_instructions, isHost: room.is_host,
-    participants: participants.map((participant) => ({ firstName: participant.first_name, skillLevel: participant.skill_level })),
+    participants: participants.map((participant) => ({ userId: String(participant.user_id), firstName: participant.first_name, skillLevel: participant.skill_level })),
   };
 }

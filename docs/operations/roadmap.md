@@ -17,12 +17,12 @@
 - [x] Implement request, accept, skip, third-skip decline, requester cancellation, and atomic seat-capacity invariants.
 - [x] Add server-authorized event rooms for hosts and accepted participants without open messaging.
 - [x] Extend access/export/deletion coverage to events, join requests, accepted seats, and disclosed meeting details.
-- [ ] Extend access/export/deletion coverage again when reports and messages are introduced.
+- [ ] Extend access/export/deletion coverage again when moderation decisions and messages are introduced.
 
 ## Then: safety and local launch
 
-- [ ] Implement block/report paths and moderation audit records before messaging.
-- [ ] Design operational response levels, evidence handling, and appeals.
+- [x] Implement block/report paths, immediate access revocation, and append-only moderation audit records before messaging.
+- [x] Design operational response levels, evidence handling, decisions, appeals, staffing gates, and transparency measures.
 - [ ] Research and choose one launch city and two or three sports.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.

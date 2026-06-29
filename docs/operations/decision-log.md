@@ -1,32 +1,36 @@
 # Decision log
 
-## 2026-06-29 — Product operating principle
+## 2026-06-29 - Product operating principle
 
 Optimize for safe completed encounters and willingness to meet again, not swipes or screen time.
 
-## 2026-06-29 — Autonomous operating model
+## 2026-06-29 - Autonomous operating model
 
 Use the repo-scoped `$run-product-studio` skill as the durable product-lead workflow. Keep external publishing, spending, production, credentials, platform terms, and legal sign-off under owner control.
 
-## 2026-06-29 — Database-backed browser sessions
+## 2026-06-29 - Database-backed browser sessions
 
 Use random opaque session cookies with only SHA-256 hashes stored in PostgreSQL. Resolve authorization server-side on every protected boundary. Login rotates a browser's previous session and logout revokes it. Reassess a maintained authentication library before production because custom authentication increases long-term security responsibility.
 
-## 2026-06-29 — Deletion is an auditable state transition
+## 2026-06-29 - Deletion is an auditable state transition
 
 A deletion request immediately locks the profile and revokes sessions, then enters an auditable queue. Do not promise unconditional instant erasure: determine and document applicable legal or safety exceptions, vendor propagation, backup expiry, and completion before launch. Terms acceptance is not treated as blanket privacy or marketing consent.
 
-## 2026-06-29 — Precise event locations use a separate persistence boundary
+## 2026-06-29 - Precise event locations use a separate persistence boundary
 
 Store discoverable event fields and exact meeting locations in separate tables. Public discovery queries must not join the private table. Only host, accepted-participant, or explicitly authorized audited moderation paths may retrieve precise meeting data.
 
-## 2026-06-29 — Mutual blocks disappear from discovery without explanation
+## 2026-06-29 - Mutual blocks disappear from discovery without explanation
 
 Exclude an event when either the requester or host has blocked the other. Return no block-specific reason or placeholder card, preventing discovery behavior from revealing the relationship.
 
-## 2026-06-29 — Event capacity is enforced with unique numbered seats
+## 2026-06-29 - Event capacity is enforced with unique numbered seats
 
 Accepting a request atomically claims the lowest available numbered seat under unique database constraints. Concurrent accept attempts cannot create more participant rows than the event capacity; a losing conflict leaves the request pending instead of overfilling the event.
+
+## 2026-06-29 - Open messaging waits for human safety operations
+
+Do not enable member messaging merely because room authorization exists. Require accessible reporting, immediate blocking, append-only case audit, evidence policy, staffed critical escalation, decision notices, and appeals first. Automated priority routes cases but never constitutes a finding.
 
 ## Open decisions
 
