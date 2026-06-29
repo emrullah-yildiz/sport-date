@@ -26,3 +26,12 @@
 - An opaque evidence locator can still be sensitive if staff encode personal data into it. Training, access review, and monitoring remain required.
 - Retention-review dates trigger review, not automatic deletion. Counsel and the safety owner must approve final retention and preservation rules before launch.
 - Case access logs are themselves personal data and require a defined retention period and restricted review process.
+
+## Native session threats and controls
+
+- Token theft: use separate short access and rotating refresh credentials, store only hashes server-side, and keep native values in SecureStore rather than ordinary app storage.
+- Refresh replay: retain spent refresh hashes until family expiry and revoke the family when reuse is detected.
+- Cross-device replay: bind access and refresh to a generated installation UUID, while explicitly not claiming hardware attestation.
+- Session persistence after device loss or iOS reinstall: keep a fixed server expiry, account-deletion revocation, logout revocation, and a planned member device-management surface.
+- Token exfiltration through configuration: permit only relative `/api/mobile/` paths in authenticated fetches and require an HTTPS `EXPO_PUBLIC_API_URL` outside local development. Public Expo environment values must never contain secrets.
+- Residual risk: a compromised device process can steal both binding and tokens; production requires anomaly detection, rate limiting, app-integrity review, and an incident-revocation procedure.

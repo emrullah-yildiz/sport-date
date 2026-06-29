@@ -3,8 +3,10 @@ import {
   type EventReflectionInput,
 } from "@sport-date/domain";
 import { StatusBar } from "expo-status-bar";
-import { useMemo, useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+
+import { loginMobile, logoutMobile, mobileApiConfigured, restoreMobileMember } from "./src/auth/session";
 
 type Tab = "discover" | "event" | "arc";
 
@@ -26,18 +28,32 @@ const againChoices: Array<{ value: EventReflectionInput["wouldJoinAgain"]; label
 ];
 
 export default function App() {
+  const configured = mobileApiConfigured();
+  const [authState, setAuthState] = useState<"checking" | "signed_out" | "signed_in" | "prototype">(configured ? "checking" : "prototype");
+  const [memberName, setMemberName] = useState("");
   const [tab, setTab] = useState<Tab>("discover");
   const [draftAttendance, setDraftAttendance] = useState<EventReflectionInput["attendance"]>("attended");
   const [draftAgain, setDraftAgain] = useState<EventReflectionInput["wouldJoinAgain"]>("prefer_not_to_say");
   const [reflection, setReflection] = useState<EventReflectionInput | null>(null);
   const progress = useMemo(() => calculateMovementProgress(reflection?.attendance === "attended" ? 1 : 0), [reflection]);
 
+  useEffect(() => {
+    if (!configured) return;
+    restoreMobileMember()
+      .then((member) => { if (member) { setMemberName(member.firstName); setAuthState("signed_in"); } else setAuthState("signed_out"); })
+      .catch(() => setAuthState("signed_out"));
+  }, [configured]);
+
+  if (authState === "checking") return <SafeAreaView style={styles.safeArea}><View style={styles.loading}><ActivityIndicator color="#17241d" /><Text style={styles.loadingText}>Restoring secure session...</Text></View></SafeAreaView>;
+  if (authState === "signed_out") return <LoginGate onSignedIn={(firstName) => { setMemberName(firstName); setAuthState("signed_in"); }} />;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
       <View style={styles.appShell}>
         <ScrollView contentContainerStyle={styles.screen}>
-          <View style={styles.prototypeBanner}><Text style={styles.prototypeText}>INTERACTION PROTOTYPE · NOT SYNCED</Text></View>
+          <View style={styles.prototypeBanner}><Text style={styles.prototypeText}>{authState === "signed_in" ? "SECURE SESSION · DEMO EVENTS NOT SYNCED" : "INTERACTION PROTOTYPE · NOT SYNCED"}</Text></View>
+          {authState === "signed_in" ? <View style={styles.sessionRow}><Text style={styles.sessionText}>Signed in as {memberName}</Text><Pressable accessibilityRole="button" onPress={() => logoutMobile().finally(() => { setMemberName(""); setAuthState("signed_out"); })}><Text style={styles.sessionAction}>Sign out</Text></Pressable></View> : null}
           <View style={styles.header}>
             <View><Text style={styles.overline}>SPORT DATE</Text><Text style={styles.title}>{tab === "discover" ? "Move. Meet. Repeat." : tab === "event" ? "After the movement." : "Your Movement Arc."}</Text></View>
             <View style={styles.avatar}><Text style={styles.avatarText}>A</Text></View>
@@ -63,6 +79,33 @@ export default function App() {
       </View>
     </SafeAreaView>
   );
+}
+
+function LoginGate({ onSignedIn }: { onSignedIn: (firstName: string) => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+  async function signIn() {
+    setSubmitting(true);
+    setMessage("");
+    try {
+      const result = await loginMobile(email, password);
+      onSignedIn(result.member.firstName);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Sign in failed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+  return <SafeAreaView style={styles.safeArea}><StatusBar style="dark" /><View style={styles.loginScreen}>
+    <View style={styles.prototypeBanner}><Text style={styles.prototypeText}>SECURE MOBILE SESSION</Text></View>
+    <Text style={styles.loginOverline}>SPORT DATE</Text><Text style={styles.loginTitle}>Bring your next move with you.</Text><Text style={styles.loginBody}>Sign in creates a revocable device session. Events remain clearly marked as demo content until live mobile event APIs are connected.</Text>
+    <TextInput accessibilityLabel="Email" autoCapitalize="none" autoComplete="email" keyboardType="email-address" value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#8b958e" style={styles.loginInput} />
+    <TextInput accessibilityLabel="Password" autoCapitalize="none" autoComplete="current-password" secureTextEntry value={password} onChangeText={setPassword} placeholder="Password" placeholderTextColor="#8b958e" style={styles.loginInput} />
+    <Pressable accessibilityRole="button" disabled={submitting || !email || !password} onPress={signIn} style={({ pressed }) => [styles.loginButton, (pressed || submitting) && styles.pressed]}><Text style={styles.loginButtonText}>{submitting ? "Signing in..." : "Sign in securely"}</Text></Pressable>
+    {message ? <Text accessibilityLiveRegion="polite" style={styles.loginError}>{message}</Text> : null}
+  </View></SafeAreaView>;
 }
 
 function DiscoverScreen({ onOpenEvent }: { onOpenEvent: () => void }) {
@@ -118,7 +161,10 @@ function TabButton({ label, active, onPress }: { label: string; active: boolean;
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#f4f0e7" }, appShell: { flex: 1 }, screen: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 120 },
+  loading: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 }, loadingText: { color: "#657168", fontSize: 12, fontWeight: "700" },
+  loginScreen: { flex: 1, justifyContent: "center", paddingHorizontal: 25 }, loginOverline: { color: "#657168", fontSize: 10, fontWeight: "900", letterSpacing: 1.4 }, loginTitle: { maxWidth: 330, color: "#17241d", fontSize: 42, lineHeight: 42, fontWeight: "900", letterSpacing: -1.8, marginTop: 10 }, loginBody: { color: "#657168", fontSize: 12, lineHeight: 19, marginTop: 15, marginBottom: 26 }, loginInput: { minHeight: 52, borderWidth: 1, borderColor: "#d1d7d2", borderRadius: 15, paddingHorizontal: 15, backgroundColor: "white", color: "#17241d", marginBottom: 10 }, loginButton: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 15, backgroundColor: "#17241d", marginTop: 3 }, loginButtonText: { color: "#c9f458", fontWeight: "900" }, loginError: { color: "#8f2a2a", fontSize: 11, lineHeight: 16, marginTop: 12 },
   prototypeBanner: { alignSelf: "flex-start", borderRadius: 20, backgroundColor: "#ffe0d4", paddingHorizontal: 10, paddingVertical: 6, marginBottom: 18 }, prototypeText: { color: "#713b31", fontSize: 8, fontWeight: "900", letterSpacing: 1 },
+  sessionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: -8, marginBottom: 19 }, sessionText: { color: "#657168", fontSize: 10, fontWeight: "700" }, sessionAction: { color: "#713b31", fontSize: 10, fontWeight: "900" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }, overline: { color: "#657168", fontSize: 10, fontWeight: "800", letterSpacing: 1.4 }, title: { maxWidth: 280, color: "#17241d", fontSize: 30, fontWeight: "900", letterSpacing: -1.2, marginTop: 5 }, avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#17241d", alignItems: "center", justifyContent: "center" }, avatarText: { color: "#c9f458", fontWeight: "900" },
   filterRow: { flexDirection: "row", gap: 9, marginBottom: 34 }, filter: { borderWidth: 1, borderColor: "#c8cdc8", borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10 }, activeFilter: { borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: "#17241d" }, filterText: { color: "#526057", fontSize: 12, fontWeight: "700" }, activeFilterText: { color: "white", fontSize: 12, fontWeight: "800" }, sectionTitle: { color: "#17241d", fontSize: 20, fontWeight: "900", marginBottom: 14 },
   card: { flexDirection: "row", alignItems: "center", backgroundColor: "white", borderRadius: 22, padding: 14, marginBottom: 11 }, eventIcon: { width: 62, height: 72, borderRadius: 17, alignItems: "center", justifyContent: "center" }, eventIconText: { color: "#17241d", fontSize: 25, fontWeight: "900" }, eventCopy: { flex: 1, paddingHorizontal: 14 }, eventTitle: { fontSize: 17, fontWeight: "900", color: "#17241d" }, eventPlace: { color: "#707b73", fontSize: 11, marginTop: 5 }, eventTime: { color: "#314b3a", fontSize: 11, fontWeight: "800", marginTop: 6 }, arrow: { color: "#627067", fontSize: 28 }, createButton: { backgroundColor: "#c9f458", borderRadius: 18, alignItems: "center", paddingVertical: 17, marginTop: 16 }, createButtonText: { color: "#17241d", fontWeight: "900", fontSize: 15 }, pressed: { opacity: .72 },

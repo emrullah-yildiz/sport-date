@@ -38,7 +38,8 @@
 - [x] Define and test a progression model that rewards qualified self-confirmed attendance, useful reflection, and real hosted/joined events.
 - [x] Implement a responsive web progress surface using real product records, with calm empty and recovery states.
 - [x] Build an Expo interaction prototype for event reflection and the Movement Arc using the shared tested domain rules.
-- [ ] Replace mobile demo state with live API data after secure native session transport is implemented and threat-modelled.
+- [x] Implement and threat-model separate revocable native sessions with SecureStore, short access tokens, rotating refresh tokens, and reuse revocation.
+- [ ] Replace mobile demo event state with native-authorized live discovery, room, reflection, and progress data.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
 ## Launch gates

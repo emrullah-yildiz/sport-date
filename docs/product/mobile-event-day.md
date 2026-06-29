@@ -18,18 +18,23 @@ The prototype is visibly labelled `INTERACTION PROTOTYPE · NOT SYNCED`. Its eve
 - Use progression as a quiet record of movement, not a notification or points engine.
 - Preserve the web rules: only qualified self-confirmed attendance advances the arc; no streaks, leaderboard, skip score, or screen-time reward.
 
-## Required live integration
+## Implemented secure-session foundation
+
+- Optional sign-in activates only when `EXPO_PUBLIC_API_URL` exists; non-HTTPS origins are refused outside explicit local development hosts.
+- The server issues separate device-scoped opaque access and refresh credentials and never exposes browser cookies to native authorization.
+- SecureStore holds the generated installation UUID and token pair with device-only accessibility.
+- Access refresh is serialized and retried once; invalid or replayed refresh clears local state and requires sign-in.
+- The app visibly distinguishes a secure signed-in session from still-unsynced demo event content.
+
+## Required live event integration
 
 The native app must not reuse browser-cookie assumptions. Before replacing prototype state, implement and threat-model:
 
-- a mobile session exchange with revocable, rotated, device-scoped credentials;
-- storage in an approved native secure-storage mechanism, never plain async storage;
-- an environment-specific HTTPS API origin with no production secret in `EXPO_PUBLIC_*` values;
 - logout, expiry, device loss, account deletion, and role/access revocation behavior;
-- CSRF/origin differences between browser and native authenticated mutations;
+- member-facing device-session review and remote revocation;
+- live discovery, accepted room, reflection, and progress endpoints using native bearer authorization;
 - no precise-location caching outside the authorized event-room lifecycle;
 - loading, offline, retry, stale-session, and partial-submit recovery;
 - privacy export/deletion coverage identical to web.
 
 Production app identifiers, signing, push credentials, store accounts, terms acceptance, and deployment require owner authorization.
-

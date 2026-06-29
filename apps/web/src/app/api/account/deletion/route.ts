@@ -65,6 +65,10 @@ export async function POST(request: Request) {
       DELETE FROM sessions
       USING updated_user
       WHERE sessions.user_id = updated_user.id
+    ), revoked_mobile_sessions AS (
+      UPDATE mobile_sessions SET revoked_at = NOW()
+      FROM updated_user
+      WHERE mobile_sessions.user_id = updated_user.id AND mobile_sessions.revoked_at IS NULL
     )
     SELECT id FROM new_request
   `;

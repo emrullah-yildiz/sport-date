@@ -39,6 +39,7 @@ Direct account and profile identifiers are erased. Aggregated product statistics
 - Export coverage for hosted events, requests, accepted seats, and precise meeting details already disclosed to the member.
 - Export coverage for safety reports, reporter-visible decision notices, appeals submitted, and member blocks created, excluding security secrets and internal case material requiring rights-of-others review.
 - Export coverage for private attendance and willingness-to-join-again reflections, including whether each reflection qualified for the private Movement Arc.
+- Export coverage for native device-session metadata such as device label, use time, expiry, and revocation, while excluding access and refresh tokens and hashes.
 - Password re-authentication before requesting deletion.
 - Immediate transition to `deletion_pending` and revocation of every session.
 - Immediate cancellation of hosted events, closure of pending/accepted requests, and removal of accepted seats when deletion is requested.

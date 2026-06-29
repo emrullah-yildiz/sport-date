@@ -103,6 +103,10 @@ export async function GET() {
     SELECT event_id, attendance, would_join_again, qualified_for_progress, created_at, updated_at
     FROM event_reflections WHERE user_id = ${user.id} ORDER BY created_at
   `;
+  const mobileDevices = await sql`
+    SELECT device_name, access_expires_at, refresh_expires_at, last_used_at, created_at, revoked_at
+    FROM mobile_sessions WHERE user_id = ${user.id} ORDER BY created_at
+  `;
 
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
@@ -135,6 +139,7 @@ export async function GET() {
     safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
     privateEventReflections: eventReflections,
+    mobileDeviceSessions: mobileDevices,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 

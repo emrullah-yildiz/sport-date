@@ -44,6 +44,10 @@ Use progression to make reliable participation, good hosting, completed movement
 
 Keep the Expo interaction prototype visibly labelled until secure native session transport and live API integration exist. Do not let polished local state imply a real account, persisted reflection, or production readiness. Native clients must not copy browser-cookie assumptions.
 
+## 2026-06-29 - Native sessions use a separate rotating credential family
+
+Do not share browser cookies with native clients. Issue a short opaque access token and a rotating fixed-lifetime refresh token, store only hashes, bind the family to an installation UUID, and revoke on spent-token reuse. Treat installation headers as replay friction rather than hardware attestation.
+
 ## Open decisions
 
 - Final product and company name.
