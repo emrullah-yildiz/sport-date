@@ -1,0 +1,23 @@
+name: CI
+
+# Stack-agnostic verification gate. Runs the hermetic suite only — the
+# database-backed integration tests self-skip unless RUN_DB_INTEGRATION=1, so no
+# secrets are required here. A separate integration job can be added later, gated
+# on a Neon test-branch connection string in repository secrets.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
