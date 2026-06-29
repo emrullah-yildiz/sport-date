@@ -8,11 +8,15 @@ import ReportSafetyControls from "@/components/ReportSafetyControls";
 import { getEventRoom, getHostEvent, getHostJoinRequests } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
-function getRecoveryGuidance(counts: { stillIn: number; unsure: number; cannotMake: number }) {
+function getRecoveryGuidance(
+  counts: { stillIn: number; unsure: number; cannotMake: number },
+  pendingRequestCount: number,
+) {
   if (counts.cannotMake === 0 && counts.unsure === 0) {
     return {
       title: "The critical change has not shaken the group yet.",
       body: "Keep watching the room and only make further edits if the plan materially changes again.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} still waiting if you later need to rebuild the group.` : null,
     };
   }
 
@@ -20,6 +24,7 @@ function getRecoveryGuidance(counts: { stillIn: number; unsure: number; cannotMa
     return {
       title: "No accepted member currently plans to come.",
       body: "This invitation may no longer be real. Cancel early or move the plan to another day instead of hoping people still arrive.",
+      replacement: pendingRequestCount > 0 ? `Even with ${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request" : "requests"}, only continue if you are ready to rebuild the plan honestly around a new group.` : null,
     };
   }
 
@@ -27,6 +32,7 @@ function getRecoveryGuidance(counts: { stillIn: number; unsure: number; cannotMa
     return {
       title: "The group may have dropped below a viable size.",
       body: "Decide quickly whether to cancel, substantially reshape the plan, or host only if the remaining group is still honest and safe.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} available if you need replacements, but accept only people who still fit the changed plan.` : null,
     };
   }
 
@@ -34,12 +40,14 @@ function getRecoveryGuidance(counts: { stillIn: number; unsure: number; cannotMa
     return {
       title: "Some people dropped after the critical change.",
       body: "The event may still work, but treat the remaining group as the new reality. Do not lower capacity below accepted seats; wait for members to leave or accept replacements honestly.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} already in the funnel, so review those before widening the invitation again.` : "There are no pending requests waiting, so any rebuild depends on the current accepted group or future discovery.",
     };
   }
 
   return {
     title: "Some accepted members are unsure after the change.",
     body: "Use the room as your decision surface and avoid assuming attendance until the unsure members answer more clearly or the plan changes again.",
+    replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} available if the unsure group later falls through.` : null,
   };
 }
 
@@ -52,14 +60,15 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
   const requests = await getHostJoinRequests(eventId, host.id);
   const room = await getEventRoom(eventId, host.id);
   const startsAt = new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeStyle: "short", timeZone: event.timeZone }).format(new Date(event.startsAt));
-  const recovery = room?.latestCriticalUpdateId ? getRecoveryGuidance(room.criticalUpdateResponseCounts) : null;
+  const pendingRequestCount = requests.filter((request) => request.status === "pending").length;
+  const recovery = room?.latestCriticalUpdateId ? getRecoveryGuidance(room.criticalUpdateResponseCounts, pendingRequestCount) : null;
 
   return (
     <main className="host-event-page">
       <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><Link href="/events/new">Host another</Link></nav>
       <header className="host-event-hero"><p className="eyebrow">Published · {event.sport}</p><h1>{event.title}</h1><p>{event.description}</p><div className="event-facts"><span>{startsAt}</span><span>{event.durationMinutes} minutes</span><span>{event.capacity} total places</span><span>{event.minimumAge}–{event.maximumAge}</span><span>{event.language}</span></div></header>
       <div className="host-room-link"><Link href={`/events/${event.id}/room`}>Open the event room →</Link></div>
-      {room?.latestCriticalUpdateId ? <section className="host-recovery-card"><p className="panel-label">Recovery after a critical change</p><h2>{recovery?.title}</h2><p>{recovery?.body}</p><div><span>{room.criticalUpdateResponseCounts.stillIn} still in</span><span>{room.criticalUpdateResponseCounts.unsure} unsure</span><span>{room.criticalUpdateResponseCounts.cannotMake} cannot make it</span></div><small>Use the room to watch responses, edit only what stays true, and cancel early if the plan no longer honestly exists.</small></section> : null}
+      {room?.latestCriticalUpdateId ? <section className="host-recovery-card"><p className="panel-label">Recovery after a critical change</p><h2>{recovery?.title}</h2><p>{recovery?.body}</p><div><span>{room.criticalUpdateResponseCounts.stillIn} still in</span><span>{room.criticalUpdateResponseCounts.unsure} unsure</span><span>{room.criticalUpdateResponseCounts.cannotMake} cannot make it</span></div>{recovery?.replacement ? <p>{recovery.replacement}</p> : null}<small>Use the room to watch responses, review pending requests before widening the invitation again, and cancel early if the plan no longer honestly exists.</small></section> : null}
       <section className="host-location-grid">
         <article className="host-location-card public"><p className="panel-label">Discovery sees</p><h2>{event.publicLocation.areaLabel}</h2><p>{event.publicLocation.city}, {event.publicLocation.countryCode}</p><small>No exact venue or address is included in public event data.</small></article>
         <article className="host-location-card private"><p className="panel-label">Accepted people see</p><h2>{event.privateLocation.venueName}</h2><p>{event.privateLocation.address}</p>{event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}</article>
