@@ -17,6 +17,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@sentry/nextjs": "^10.62.0",
     "@sport-date/domain": "*",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^12.42.0",

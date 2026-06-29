@@ -21,7 +21,7 @@ have.
 | Database | **Neon Postgres** (keep) | `eu-central-1` (Frankfurt) | Already in use; managed; **branching** gives instant prod/dev/test isolation and disposable CI databases; PITR backups; scales to zero. | High — standard Postgres; `pg_dump` portable. |
 | Web + mobile API | **Vercel**, functions pinned to `fra1` | Frankfurt | Native Next.js 16 fit, zero-ops, preview deploys, built-in Cron, env management, GDPR DPA, EU compute region. One deployment serves the web app and the mobile API. | High — Next.js is portable to any Node host. |
 | Shared rate-limit store (Gate 6) | **Upstash Redis** | Frankfurt | Serverless Redis, free tier, pairs with Vercel; gives the existing in-app rate limits a cross-replica/restart-durable backing store and closes the reset-request timing residual. | High — adapter-isolated; falls back to in-memory. |
-| Error monitoring | **Sentry** (EU data region) | EU | Mature, EU data residency, generous dev tier; one DSN env var. | High — SDK-isolated. |
+| Error monitoring | **Sentry** (EU data region) — **WIRED 2026-06-30** | EU | Mature, EU data residency, generous dev tier; one DSN env var. **`@sentry/nextjs` is integrated and build-verified on Next 16.2.9; env-gated on `NEXT_PUBLIC_SENTRY_DSN` (no-op without it), PII-scrubbed, Session Replay OFF. Activates when the owner sets the DSN.** | High — SDK-isolated. |
 | Uptime | **Better Stack** or **UptimeRobot** | n/a | Free external check on `/api/health`. | High. |
 | Backup / recovery | **Neon PITR** | Frankfurt | Point-in-time restore + history retention (start at 7 days); optional scheduled logical dump later. | n/a |
 | Scheduled jobs | **Vercel Cron** → protected internal endpoint | Frankfurt | Runs the existing session-cleanup logic on a schedule without a separate worker. | High. |
@@ -68,7 +68,8 @@ chat, not in the repo**. A Vercel/secret-manager env entry is ideal.
 | `EMAIL_DELIVERY_ENABLED` | `false` until Gate 4 | keep disabled |
 | `EMAIL_DELIVERY_PROVIDER` | provider id once Gate 4 lands | Gate 4 |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | shared rate-limit store | Upstash (step 4) |
-| `SENTRY_DSN` | error reporting | Sentry (step 5) |
+| `NEXT_PUBLIC_SENTRY_DSN` | error reporting (server + edge + client; public-safe) | Sentry (step 5) |
+| `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT` | *optional* — source-map upload at build time | Sentry (step 5) |
 
 (`RUN_DB_INTEGRATION` is test-only and must never be set in production.)
 
@@ -77,7 +78,7 @@ chat, not in the repo**. A Vercel/secret-manager env entry is ideal.
 - **Now:** CI workflow (done); add a `/api/health` endpoint; scaffold the Upstash rate-limit adapter behind a flag (in-memory fallback until the URL exists, mirroring the email-adapter seam); add a `vercel.json` (region `fra1` + the session-cleanup cron) and a `.env.production.example`.
 - **Once Neon prod + test strings exist:** run migrations against production; add the CI integration job against the test branch; clean up the dev DB's fixture residue if desired.
 - **Once Upstash exists:** wire the in-app rate limits to the shared store and add the integration test.
-- **Once Sentry DSN exists:** wire error reporting (server + client) with PII scrubbing.
+- **Sentry error reporting (server + edge + client) with PII scrubbing is now wired and build-verified (2026-06-30)** — env-gated on `NEXT_PUBLIC_SENTRY_DSN`, Session Replay OFF, `beforeSend` strips bodies/cookies/auth-headers/query/email/IP. It is a no-op until the owner sets the DSN; once set + redeployed, trigger a live test error to confirm events land. Source-map upload additionally needs `SENTRY_AUTH_TOKEN`+`SENTRY_ORG`+`SENTRY_PROJECT`.
 
 ## Interlocks
 
