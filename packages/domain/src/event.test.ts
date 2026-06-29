@@ -8,6 +8,7 @@ import {
   InvalidEventTransition,
   publicEventLocation,
   publishEvent,
+  validateEventCreation,
   type EventCandidate,
   type SportEvent,
 } from "./event";
@@ -15,7 +16,8 @@ import {
 const future = new Date("2026-07-10T17:00:00.000Z");
 const event = (overrides: Partial<SportEvent> = {}): SportEvent => ({
   id: "event-1", hostId: "host-1", sport: "Tennis", title: "An easy evening rally",
-  startsAt: future, durationMinutes: 90, capacity: 4, language: "English",
+  description: "A relaxed rally with time to warm up and meet the group.",
+  startsAt: future, timeZone: "Europe/Bucharest", durationMinutes: 90, capacity: 4, language: "English",
   participantAgeRange: { minimum: 24, maximum: 38 },
   experienceLevels: ["beginner", "intermediate"], status: "draft",
   location: {
@@ -46,6 +48,39 @@ describe("event lifecycle", () => {
     const completed = completeEvent(event({ status: "published" }), new Date("2026-07-10T19:00:00Z"));
     expect(completed.status).toBe("completed");
     expect(() => cancelEvent(completed)).toThrow(InvalidEventTransition);
+  });
+});
+
+describe("event creation input", () => {
+  it("normalizes a complete public and private location payload", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      startsAt: source.startsAt.toISOString(),
+      location: {
+        public: { ...source.location.public, countryCode: "ro" },
+        private: source.location.private,
+      },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(true);
+    if (result.valid) expect(result.data.location.public.countryCode).toBe("RO");
+  });
+
+  it("rejects invalid coordinates, duplicate levels, and thin descriptions", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      description: "Too short",
+      startsAt: source.startsAt.toISOString(),
+      experienceLevels: ["beginner", "beginner"],
+      location: { ...source.location, public: { ...source.location.public, approximateLatitude: 120 } },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors).toEqual(expect.arrayContaining([
+      "Coordinates must use valid latitude and longitude ranges.",
+      "Choose valid experience levels without duplicates.",
+      "Event description must contain 20 to 1000 characters.",
+    ]));
   });
 });
 

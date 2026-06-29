@@ -16,6 +16,10 @@ Use random opaque session cookies with only SHA-256 hashes stored in PostgreSQL.
 
 A deletion request immediately locks the profile and revokes sessions, then enters an auditable queue. Do not promise unconditional instant erasure: determine and document applicable legal or safety exceptions, vendor propagation, backup expiry, and completion before launch. Terms acceptance is not treated as blanket privacy or marketing consent.
 
+## 2026-06-29 — Precise event locations use a separate persistence boundary
+
+Store discoverable event fields and exact meeting locations in separate tables. Public discovery queries must not join the private table. Only host, accepted-participant, or explicitly authorized audited moderation paths may retrieve precise meeting data.
+
 ## Open decisions
 
 - Final product and company name.

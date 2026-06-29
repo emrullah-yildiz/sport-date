@@ -8,15 +8,15 @@ export type ApproximateEventLocation = Readonly<{
   city: string;
   countryCode: string;
   areaLabel: string;
-  approximateLatitude: number;
-  approximateLongitude: number;
+  approximateLatitude: number | null;
+  approximateLongitude: number | null;
 }>;
 
 export type PrivateMeetingLocation = Readonly<{
   venueName: string;
   address: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   instructions?: string;
 }>;
 
@@ -30,7 +30,9 @@ export type SportEvent = Readonly<{
   hostId: string;
   sport: string;
   title: string;
+  description: string;
   startsAt: Date;
+  timeZone: string;
   durationMinutes: number;
   capacity: number;
   language: string;
@@ -86,6 +88,79 @@ export class InvalidEventTransition extends Error {
   }
 }
 
+export type EventCreationInput = Omit<SportEvent, "id" | "hostId" | "status">;
+export type EventCreationValidation =
+  | { valid: true; data: EventCreationInput }
+  | { valid: false; errors: readonly string[] };
+
+function optionalCoordinate(value: unknown, minimum: number, maximum: number): number | null | undefined {
+  if (value === null || value === undefined || value === "") return null;
+  const coordinate = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(coordinate) && coordinate >= minimum && coordinate <= maximum ? coordinate : undefined;
+}
+
+export function validateEventCreation(raw: unknown, now = new Date()): EventCreationValidation {
+  if (!raw || typeof raw !== "object") return { valid: false, errors: ["Event details are required."] };
+  const input = raw as Record<string, unknown>;
+  const location = input.location && typeof input.location === "object" ? input.location as Record<string, unknown> : {};
+  const publicLocation = location.public && typeof location.public === "object" ? location.public as Record<string, unknown> : {};
+  const privateLocation = location.private && typeof location.private === "object" ? location.private as Record<string, unknown> : {};
+  const levels = Array.isArray(input.experienceLevels)
+    ? input.experienceLevels.filter((level): level is ExperienceLevel => level === "beginner" || level === "intermediate" || level === "advanced")
+    : [];
+  const startsAt = typeof input.startsAt === "string" || input.startsAt instanceof Date ? new Date(input.startsAt) : new Date(Number.NaN);
+  const capacity = Number(input.capacity);
+  const durationMinutes = Number(input.durationMinutes);
+  const minimumAge = Number((input.participantAgeRange as Record<string, unknown> | undefined)?.minimum);
+  const maximumAge = Number((input.participantAgeRange as Record<string, unknown> | undefined)?.maximum);
+  const approximateLatitude = optionalCoordinate(publicLocation.approximateLatitude, -90, 90);
+  const approximateLongitude = optionalCoordinate(publicLocation.approximateLongitude, -180, 180);
+  const latitude = optionalCoordinate(privateLocation.latitude, -90, 90);
+  const longitude = optionalCoordinate(privateLocation.longitude, -180, 180);
+  const errors: string[] = [];
+
+  if (Number.isNaN(startsAt.getTime())) errors.push("Choose a valid event start time.");
+  if (approximateLatitude === undefined || approximateLongitude === undefined || latitude === undefined || longitude === undefined) errors.push("Coordinates must use valid latitude and longitude ranges.");
+  if (new Set(levels).size !== levels.length || levels.length !== (Array.isArray(input.experienceLevels) ? input.experienceLevels.length : 0)) errors.push("Choose valid experience levels without duplicates.");
+
+  const data: EventCreationInput = {
+    sport: typeof input.sport === "string" ? input.sport.trim() : "",
+    title: typeof input.title === "string" ? input.title.trim() : "",
+    description: typeof input.description === "string" ? input.description.trim() : "",
+    startsAt,
+    timeZone: typeof input.timeZone === "string" ? input.timeZone.trim() : "",
+    durationMinutes,
+    capacity,
+    language: typeof input.language === "string" ? input.language.trim() : "",
+    participantAgeRange: { minimum: minimumAge, maximum: maximumAge },
+    experienceLevels: levels,
+    location: {
+      public: {
+        city: typeof publicLocation.city === "string" ? publicLocation.city.trim() : "",
+        countryCode: typeof publicLocation.countryCode === "string" ? publicLocation.countryCode.trim().toUpperCase() : "",
+        areaLabel: typeof publicLocation.areaLabel === "string" ? publicLocation.areaLabel.trim() : "",
+        approximateLatitude: approximateLatitude ?? null,
+        approximateLongitude: approximateLongitude ?? null,
+      },
+      private: {
+        venueName: typeof privateLocation.venueName === "string" ? privateLocation.venueName.trim() : "",
+        address: typeof privateLocation.address === "string" ? privateLocation.address.trim() : "",
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        instructions: typeof privateLocation.instructions === "string" ? privateLocation.instructions.trim() : undefined,
+      },
+    },
+  };
+
+  const draft: SportEvent = { ...data, id: "validation", hostId: "validation", status: "draft" };
+  errors.push(...validateEventForPublishing(draft, now));
+  if (!/^[A-Z]{2}$/.test(data.location.public.countryCode)) errors.push("Country code must contain two letters.");
+  if (data.location.public.city.length < 1 || data.location.public.city.length > 100) errors.push("Choose a valid city.");
+  if (data.location.private.venueName.length < 1 || data.location.private.venueName.length > 120) errors.push("Choose a valid venue name.");
+  if ((data.location.private.instructions?.length ?? 0) > 500) errors.push("Arrival instructions must be 500 characters or fewer.");
+  return errors.length > 0 ? { valid: false, errors: [...new Set(errors)] } : { valid: true, data };
+}
+
 function normalized(value: string): string {
   return value.trim().toLocaleLowerCase("en");
 }
@@ -95,7 +170,13 @@ export function validateEventForPublishing(event: SportEvent, now = new Date()):
   if (event.status !== "draft") errors.push("Only draft events can be published.");
   if (!event.title.trim() || event.title.trim().length > 100) errors.push("Event title must contain 1 to 100 characters.");
   if (!event.sport.trim() || event.sport.trim().length > 60) errors.push("Sport must contain 1 to 60 characters.");
+  if (event.description.trim().length < 20 || event.description.trim().length > 1000) errors.push("Event description must contain 20 to 1000 characters.");
   if (event.startsAt.getTime() <= now.getTime()) errors.push("Event must start in the future.");
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: event.timeZone }).format(now);
+  } catch {
+    errors.push("Choose a valid IANA time zone.");
+  }
   if (event.durationMinutes < 15 || event.durationMinutes > 480) errors.push("Event duration must be between 15 and 480 minutes.");
   if (event.capacity < MIN_EVENT_CAPACITY || event.capacity > MAX_EVENT_CAPACITY) errors.push(`Event capacity must be between ${MIN_EVENT_CAPACITY} and ${MAX_EVENT_CAPACITY}.`);
   if (event.experienceLevels.length === 0) errors.push("Select at least one experience level.");

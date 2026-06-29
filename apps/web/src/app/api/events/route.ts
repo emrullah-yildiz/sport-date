@@ -1,0 +1,75 @@
+import crypto from "node:crypto";
+
+import { validateEventCreation } from "@sport-date/domain";
+import { NextResponse } from "next/server";
+
+import { getDatabase } from "@/lib/db";
+import { getCurrentUser } from "@/lib/session";
+
+export const runtime = "nodejs";
+
+function isTrustedBrowserMutation(request: Request): boolean {
+  const fetchSite = request.headers.get("sec-fetch-site");
+  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none") return false;
+  const origin = request.headers.get("origin");
+  return !origin || origin === new URL(request.url).origin;
+}
+
+export async function POST(request: Request) {
+  if (!isTrustedBrowserMutation(request)) {
+    return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
+  }
+  const host = await getCurrentUser();
+  if (!host) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
+  }
+  const validation = validateEventCreation(body);
+  if (!validation.valid) {
+    return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
+  }
+
+  const event = validation.data;
+  const eventId = crypto.randomUUID();
+  const experienceLevels = JSON.stringify(event.experienceLevels);
+  const sql = getDatabase();
+  const results = await sql.transaction((transaction) => [
+    transaction`
+      INSERT INTO events (
+        id, host_user_id, sport, title, description, starts_at, time_zone,
+        duration_minutes, capacity, language, minimum_age, maximum_age,
+        experience_levels, public_city, public_country_code, public_area_label,
+        public_approximate_latitude, public_approximate_longitude, status
+      )
+      VALUES (
+        ${eventId}::uuid, ${host.id}, ${event.sport}, ${event.title}, ${event.description},
+        ${event.startsAt.toISOString()}::timestamptz, ${event.timeZone}, ${event.durationMinutes},
+        ${event.capacity}, ${event.language}, ${event.participantAgeRange.minimum},
+        ${event.participantAgeRange.maximum},
+        ARRAY(SELECT jsonb_array_elements_text(${experienceLevels}::jsonb)),
+        ${event.location.public.city}, ${event.location.public.countryCode},
+        ${event.location.public.areaLabel}, ${event.location.public.approximateLatitude},
+        ${event.location.public.approximateLongitude}, 'published'
+      )
+      RETURNING id
+    `,
+    transaction`
+      INSERT INTO event_private_locations (
+        event_id, venue_name, address, precise_latitude, precise_longitude, arrival_instructions
+      )
+      VALUES (
+        ${eventId}::uuid, ${event.location.private.venueName}, ${event.location.private.address},
+        ${event.location.private.latitude}, ${event.location.private.longitude},
+        ${event.location.private.instructions ?? null}
+      )
+    `,
+  ]);
+
+  if (results[0].length === 0) return NextResponse.json({ error: "Event could not be created." }, { status: 500 });
+  return NextResponse.json({ success: true, eventId }, { status: 201 });
+}
+

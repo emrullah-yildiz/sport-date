@@ -12,7 +12,7 @@
 
 - [x] Define and test event lifecycle, capacity, adult age range, location, language, experience, blocking, cancellation, and visibility rules.
 - [x] Implement authenticated profile editing with server-derived ownership and shared validation.
-- [ ] Implement host event creation and private/public location separation.
+- [x] Implement host event creation with separate public event and private meeting-location persistence.
 - [ ] Implement discovery eligibility and filters.
 - [ ] Implement request, accept, skip, third-skip decline, cancellation, and capacity invariants.
 - [ ] Add event room authorization without real-time chat initially.
