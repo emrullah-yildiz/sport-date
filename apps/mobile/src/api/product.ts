@@ -112,6 +112,24 @@ export async function decideMobileHostRequest(eventId: string, requestId: string
   return readJson(response);
 }
 
+export async function markMobileEventUpdateSeen(eventId: string, updateId: string): Promise<void> {
+  const response = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/updates/${encodeURIComponent(updateId)}/seen`, { method: "POST" });
+  await readJson(response);
+}
+
+export async function saveMobileEventUpdateIntent(
+  eventId: string,
+  updateId: string,
+  response: "still_in" | "unsure" | "cannot_make",
+): Promise<void> {
+  const request = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/updates/${encodeURIComponent(updateId)}/intent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ response }),
+  });
+  await readJson(request);
+}
+
 export async function loadMobileDevices(): Promise<MobileDeviceSession[]> {
   const response = await mobileApiFetch("/api/mobile/devices");
   return (await readJson<{ devices: MobileDeviceSession[] }>(response)).devices;
