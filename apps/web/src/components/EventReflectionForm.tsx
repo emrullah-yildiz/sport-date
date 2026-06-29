@@ -28,9 +28,9 @@ export default function EventReflectionForm({ eventId, reflection }: { eventId: 
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Reflection could not be saved.");
-      setMessage(attendance === "attended"
+      setMessage(result.qualifiedForProgress
         ? "Move recorded. Your private Movement Arc has advanced."
-        : "Reflection saved. No penalty or public score is applied.");
+        : "Reflection saved. This does not advance your Movement Arc, and no penalty or public score is applied.");
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Reflection could not be saved.");

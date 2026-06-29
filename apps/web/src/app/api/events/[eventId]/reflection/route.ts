@@ -22,5 +22,10 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
 
   const saved = await saveEventReflection(eventId, user.id, validation.data);
   if (!saved) return NextResponse.json({ error: "Reflection opens after the event ends for hosts and accepted participants." }, { status: 409 });
-  return NextResponse.json({ success: true, attendance: saved.attendance, wouldJoinAgain: saved.wouldJoinAgain });
+  return NextResponse.json({
+    success: true,
+    attendance: saved.attendance,
+    wouldJoinAgain: saved.wouldJoinAgain,
+    qualifiedForProgress: saved.qualifiedForProgress,
+  });
 }

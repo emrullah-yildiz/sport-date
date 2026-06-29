@@ -4,8 +4,13 @@ import type { EventReflectionInput } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
 
+export function qualifiesReflectionForProgress(attendance: EventReflectionInput["attendance"]): boolean {
+  return attendance === "attended";
+}
+
 export async function saveEventReflection(eventId: string, userId: string, reflection: EventReflectionInput) {
   const sql = getDatabase();
+  const qualifiedForProgress = qualifiesReflectionForProgress(reflection.attendance);
   const rows = await sql`
     WITH eligible_event AS (
       SELECT id FROM events
@@ -24,18 +29,22 @@ export async function saveEventReflection(eventId: string, userId: string, refle
       RETURNING id
     ), saved_reflection AS (
       INSERT INTO event_reflections (event_id, user_id, attendance, would_join_again, qualified_for_progress)
-      SELECT id, ${userId}, ${reflection.attendance}, ${reflection.wouldJoinAgain}, TRUE
+      SELECT id, ${userId}, ${reflection.attendance}, ${reflection.wouldJoinAgain}, ${qualifiedForProgress}
       FROM eligible_event
       ON CONFLICT (event_id, user_id) DO UPDATE SET
         attendance = EXCLUDED.attendance,
         would_join_again = EXCLUDED.would_join_again,
-        qualified_for_progress = TRUE,
+        qualified_for_progress = EXCLUDED.qualified_for_progress,
         updated_at = NOW()
-      RETURNING event_id, attendance, would_join_again
+      RETURNING event_id, attendance, would_join_again, qualified_for_progress
     )
-    SELECT event_id, attendance, would_join_again FROM saved_reflection
+    SELECT event_id, attendance, would_join_again, qualified_for_progress FROM saved_reflection
   `;
   const row = rows[0];
-  return row ? { eventId: String(row.event_id), attendance: row.attendance, wouldJoinAgain: row.would_join_again } : null;
+  return row ? {
+    eventId: String(row.event_id),
+    attendance: row.attendance,
+    wouldJoinAgain: row.would_join_again,
+    qualifiedForProgress: Boolean(row.qualified_for_progress),
+  } : null;
 }
-
