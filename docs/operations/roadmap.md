@@ -57,7 +57,7 @@
 
 ## Launch gates
 
-- Qualified European counsel reviews terms, privacy, consent, moderation, age assurance, and launch-country obligations.
+- Qualified European counsel reviews terms, privacy, consent, moderation, age assurance, and launch-country obligations. Reviewable draft artifacts now exist in `docs/legal/drafts/` (Privacy Notice, Terms of Service, consent/disclosure copy), grounded in the implemented data flows and clearly labelled DRAFT-for-counsel; engaging counsel (owner Gate 2) is still required to review and approve them.
 - Security review covers authentication, authorization, location, media, messaging, abuse, secrets, and incident response.
 - A real moderation owner and escalation channel exist.
 - Production infrastructure, monitoring, backup, recovery, email, and domain ownership are approved.

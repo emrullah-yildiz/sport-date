@@ -2,6 +2,13 @@
 
 This document is product and compliance preparation, not legal advice. A qualified lawyer must review the final policy, lawful bases, retention periods, notices, and operational procedure for the selected launch countries.
 
+> **Reviewable draft artifacts for counsel.** The GDPR-baseline draft set in
+> `docs/legal/drafts/` (Privacy Notice, Terms of Service, and consent/disclosure
+> copy) turns this preparation into reviewable documents. Those drafts are clearly
+> labelled "DRAFT — requires qualified EU counsel review", are grounded in the data
+> flows and retention matrix below, and must not contradict this document. Start at
+> `docs/legal/drafts/README.md`.
+
 ## Official baseline
 
 The European Commission describes rights to information, access, rectification, erasure, restriction, portability, objection, and safeguards around automated decisions. Electronic access requests should generally receive a commonly used electronic form. Erasure is not absolute where processing remains necessary for specified legal reasons.
