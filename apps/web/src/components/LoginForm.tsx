@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import ForgotPasswordPanel from "./ForgotPasswordPanel";
+
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,17 +41,33 @@ export default function LoginForm() {
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="login-email">Email</label>
-          <input id="login-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} />
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
         </div>
         <div className="form-group">
           <label htmlFor="login-password">Password</label>
-          <input id="login-password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
+          <input
+            id="login-password"
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
         </div>
         {error ? <p className="error-message" role="alert">{error}</p> : null}
-        <button className="btn-primary" type="submit" disabled={submitting}>{submitting ? "Signing in…" : "Sign in"}</button>
+        <button className="btn-primary" type="submit" disabled={submitting}>
+          {submitting ? "Signing in..." : "Sign in"}
+        </button>
       </form>
+      <ForgotPasswordPanel />
       <p className="auth-switch">New here? <Link href="/signup">Create a private beta profile</Link></p>
     </div>
   );
 }
-

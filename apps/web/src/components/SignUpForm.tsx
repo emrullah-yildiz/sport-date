@@ -82,7 +82,7 @@ export default function SignUpForm() {
         <div className="signup-card signup-success">
           <p className="step-indicator">Account created</p>
           <h1>Welcome to Sport Date.</h1>
-          <p>Check your inbox when email verification becomes available. Your profile is not public yet.</p>
+          <p>Email verification delivery is not active yet. Your profile remains private, and you will be able to prepare verification from account security once delivery is approved.</p>
           <a className="btn-primary success-link" href="/profile">View your private profile</a>
         </div>
       </div>

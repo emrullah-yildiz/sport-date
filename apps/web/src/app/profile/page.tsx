@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import EmailVerificationControls from "@/components/EmailVerificationControls";
 import LogoutButton from "@/components/LogoutButton";
 import PrivacyControls from "@/components/PrivacyControls";
 import EditProfileForm from "@/components/EditProfileForm";
@@ -42,7 +43,7 @@ export default async function ProfilePage() {
           <p className="panel-label">Connection</p>
           <h2 className="capitalize">{user.seeking}</h2>
           <p>{user.email}</p>
-          <span className={`verification-state ${user.emailVerified ? "verified" : "pending"}`}>{user.emailVerified ? "Email verified" : "Email verification pending"}</span>
+          <EmailVerificationControls emailVerified={user.emailVerified} />
         </article>
         <article className="profile-panel profile-sports">
           <p className="panel-label">Your movement</p>

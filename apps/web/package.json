@@ -10,7 +10,7 @@
     "db:cleanup-sessions": "node --env-file-if-exists=../../.env ./scripts/cleanup-sessions.mjs",
     "test": "vitest run",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
