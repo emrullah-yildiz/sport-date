@@ -184,8 +184,10 @@ export type EventRoom = Readonly<{
   viewerRequest: { id: string; status: DiscoveryRequest["status"] } | null;
   host: { userId: string; firstName: string };
   reflection: { attendance: "attended" | "left_early" | "did_not_attend"; wouldJoinAgain: "yes" | "no" | "prefer_not_to_say" } | null;
+  latestUpdateId: string | null;
+  viewerHasSeenLatestUpdate: boolean;
   updates: ReadonlyArray<EventUpdateNotice>;
-  participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string }>;
+  participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string; seenLatestUpdate: boolean | null }>;
 }>;
 
 export type MemberEventSummary = Readonly<{
@@ -246,8 +248,25 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   const room = rooms[0];
   if (!room) return null;
 
+  const updates = await sql`
+    SELECT id, changed_fields, created_at
+    FROM event_update_notices
+    WHERE event_id = ${eventId}::uuid
+    ORDER BY created_at DESC
+    LIMIT 10
+  ` as unknown as EventUpdateNoticeRow[];
+
+  const latestUpdateId = updates[0]?.id ?? null;
   const participants = await sql`
-    SELECT member.id AS user_id, member.first_name, sport.skill_level
+    SELECT
+      member.id AS user_id,
+      member.first_name,
+      sport.skill_level,
+      ${latestUpdateId}::uuid IS NOT NULL
+        AND EXISTS (
+          SELECT 1 FROM event_update_notice_receipts
+          WHERE notice_id = ${latestUpdateId}::uuid AND viewer_user_id = member.id
+        ) AS seen_latest_update
     FROM event_participants AS participant
     JOIN users AS member ON member.id = participant.user_id AND member.account_status = 'active'
     JOIN events ON events.id = participant.event_id
@@ -260,14 +279,8 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
            OR (blocker_user_id = member.id AND blocked_user_id = ${userId})
       )
     ORDER BY participant.seat_number
-  ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string }>;
-  const updates = await sql`
-    SELECT id, changed_fields, created_at
-    FROM event_update_notices
-    WHERE event_id = ${eventId}::uuid
-    ORDER BY created_at DESC
-    LIMIT 10
-  ` as unknown as EventUpdateNoticeRow[];
+  ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string; seen_latest_update: boolean }>;
+
   return {
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
     timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
@@ -279,13 +292,20 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     reflection: room.attendance && room.would_join_again
       ? { attendance: room.attendance, wouldJoinAgain: room.would_join_again }
       : null,
+    latestUpdateId,
+    viewerHasSeenLatestUpdate: room.is_host ? true : (latestUpdateId ? (participants.find((participant) => String(participant.user_id) === userId)?.seen_latest_update ?? false) : true),
     updates: updates.map((update) => ({
       id: update.id,
       changedFields: update.changed_fields,
       summary: summarizeEventUpdate(update.changed_fields),
       createdAt: update.created_at,
     })),
-    participants: participants.map((participant) => ({ userId: String(participant.user_id), firstName: participant.first_name, skillLevel: participant.skill_level })),
+    participants: participants.map((participant) => ({
+      userId: String(participant.user_id),
+      firstName: participant.first_name,
+      skillLevel: participant.skill_level,
+      seenLatestUpdate: latestUpdateId ? participant.seen_latest_update : null,
+    })),
   };
 }
 

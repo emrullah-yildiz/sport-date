@@ -37,13 +37,15 @@ describe("mobile event room route", () => {
       viewerRequest: { id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", status: "accepted" },
       host: { userId: "11", firstName: "Mira" },
       reflection: null,
+      latestUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      viewerHasSeenLatestUpdate: false,
       updates: [{
         id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         changedFields: ["startsAt", "privateLocation", "arrivalInstructions"],
         summary: "start time, exact venue, and arrival instructions updated by the host.",
         createdAt: "2026-07-08T10:00:00.000Z",
       }],
-      participants: [{ userId: "7", firstName: "Alex", skillLevel: "intermediate" }],
+      participants: [{ userId: "7", firstName: "Alex", skillLevel: "intermediate", seenLatestUpdate: false }],
     } as never);
     vi.mocked(getHostJoinRequests).mockResolvedValue([] as never);
 
@@ -57,6 +59,8 @@ describe("mobile event room route", () => {
       room: {
         id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
         viewerUserId: "7",
+        latestUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+        viewerHasSeenLatestUpdate: false,
         updates: [{
           id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
           changedFields: ["startsAt", "privateLocation", "arrivalInstructions"],

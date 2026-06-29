@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import EventReflectionForm from "@/components/EventReflectionForm";
+import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
 import { EVENT_UPDATE_FIELD_LABELS } from "@/lib/event-updates";
@@ -20,6 +21,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
     timeStyle: "short",
     timeZone: room.timeZone,
   }).format(new Date(room.startsAt));
+  const latestSeenCount = room.participants.filter((participant) => participant.seenLatestUpdate).length;
 
   return (
     <main className="room-page">
@@ -48,7 +50,11 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
               </li>
             ))}
           </ol>
-          {room.isHost ? <small>Every update listed here is also visible to accepted participants inside the room.</small> : null}
+          {room.isHost
+            ? <small>{latestSeenCount} of {room.participants.length} accepted {room.participants.length === 1 ? "member has" : "members have"} opened the newest update.</small>
+            : room.latestUpdateId
+              ? <EventUpdateSeenPing eventId={room.id} updateId={room.latestUpdateId} alreadySeen={room.viewerHasSeenLatestUpdate} />
+              : null}
         </section>
       ) : null}
       <section className="room-grid">
@@ -72,7 +78,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
             {room.participants.map((participant, index) => (
               <span key={`${participant.firstName}-${index}`}>
                 <strong>{participant.firstName}</strong>
-                <small>{participant.skillLevel}</small>
+                <small>{room.isHost && room.latestUpdateId ? (participant.seenLatestUpdate ? "opened latest update" : "latest update unseen") : participant.skillLevel}</small>
                 {participant.userId !== user.id ? <ReportSafetyControls eventId={room.id} subjectUserId={participant.userId} subjectName={participant.firstName} /> : null}
               </span>
             ))}

@@ -63,7 +63,7 @@ The first event room is a read-only coordination surface plus leave control for 
 - Exact location is changed after it was disclosed.
 - Event completes with a no-show, safety concern, or report.
 
-The current implementation lets a host edit a future draft or published event in place as long as the new capacity does not fall below already accepted seats. Each material edit creates an in-product room update entry visible to the host and accepted participants so time, venue, and arrival changes remain auditable inside the product. The preview still does not deliver out-of-product notifications, so hosts must not treat edits as if members were automatically informed outside Sport Date.
+The current implementation lets a host edit a future draft or published event in place as long as the new capacity does not fall below already accepted seats. Each material edit creates an in-product room update entry visible to the host and accepted participants so time, venue, and arrival changes remain auditable inside the product. Accepted participants mark the newest update as seen when they open the room, and the host can see who has and has not opened that newest change. The preview still does not deliver out-of-product notifications, so hosts must not treat edits as if members were automatically informed outside Sport Date.
 
 ## Instrumentation
 
