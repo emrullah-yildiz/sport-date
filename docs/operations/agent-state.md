@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Add explicitly role-gated moderator case transitions, decision notices, and appeal outcomes without creating a general-purpose admin backdoor.
+Add role-gated appeal review and outcome notices with enforced separation from the original decision maker.
 
 ## Completed and verified
 
@@ -15,12 +15,15 @@ Add explicitly role-gated moderator case transitions, decision notices, and appe
 - Documented response priorities, evidence handling, appeals, staffing gates, and EU Digital Services Act preparation boundaries.
 - Added a private member Safety Center with report states, reporter-safe decision notices, deadline enforcement, and one structured appeal per case.
 - Extended account export to decision notices and member-submitted appeals.
-- Thirty-six tests pass; all workspaces type-check; lint and the production web build pass.
+- Added live-role-gated staff queues and case transitions with no self-promotion endpoint, no precise-location query, and revocation rechecks inside mutations.
+- Added final decision notices with a named rule or legal basis, immutable audit events, and a six-month appeal window.
+- Documented privileged role provisioning, revocation, and access review requirements.
+- Thirty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add role-gated moderator case transitions and immutable decision audit events.
-2. Add role-gated appeal review with outcome notices and separation-of-review safeguards.
+1. Add role-gated appeal review with outcome notices and separation-of-review safeguards.
+2. Add evidence-preservation references and access logging without accepting file uploads yet.
 3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 
 ## Owner blockers

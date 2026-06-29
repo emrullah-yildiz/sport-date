@@ -51,6 +51,7 @@ export default async function SafetyCenterPage() {
                 <section className="safety-decision">
                   <p className="panel-label">Decision notice</p>
                   <h3>{displayLabel(safetyCase.decision.code)}</h3>
+                  <p><strong>Basis:</strong> {safetyCase.decision.basis}</p>
                   <p>{safetyCase.decision.summary}</p>
                   <small>Decided {new Date(safetyCase.decision.decidedAt).toLocaleDateString()} · Appeal by {new Date(safetyCase.decision.appealDeadline).toLocaleDateString()}</small>
                 </section>

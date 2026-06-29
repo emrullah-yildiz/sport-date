@@ -25,7 +25,8 @@
 - [x] Implement block/report paths, immediate access revocation, and append-only moderation audit records before messaging.
 - [x] Design operational response levels, evidence handling, decisions, appeals, staffing gates, and transparency measures.
 - [x] Add a member Safety Center with report status, decision notices, deadline enforcement, and one structured appeal per case.
-- [ ] Add explicitly role-gated moderator queues, case transitions, decision notices, and appeal outcomes.
+- [x] Add explicitly role-gated moderator queues, case transitions, and reporter-safe decision notices.
+- [ ] Add role-gated appeal outcomes with separation-of-review safeguards.
 - [ ] Research and choose one launch city and two or three sports.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.

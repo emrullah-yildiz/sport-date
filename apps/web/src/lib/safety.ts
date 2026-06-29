@@ -9,7 +9,7 @@ export type MemberSafetyCase = Readonly<{
   priority: "standard" | "urgent" | "critical";
   createdAt: string;
   event: { id: string; title: string; sport: string } | null;
-  decision: { code: string; summary: string; decidedAt: string; appealDeadline: string } | null;
+  decision: { code: string; basis: string; summary: string; decidedAt: string; appealDeadline: string } | null;
   appeal: { status: "open" | "reviewing" | "upheld" | "modified" | "reversed"; createdAt: string; outcomeSummary: string | null } | null;
   canAppeal: boolean;
 }>;
@@ -24,6 +24,7 @@ type MemberSafetyCaseRow = {
   event_title: string | null;
   event_sport: string | null;
   decision_code: string | null;
+  decision_basis: string | null;
   decision_summary: string | null;
   decided_at: string | null;
   appeal_deadline: string | null;
@@ -38,7 +39,7 @@ export async function getMemberSafetyCases(userId: string): Promise<MemberSafety
   const rows = await sql`
     SELECT report.id, report.category, report.status, report.priority, report.created_at,
       events.id AS event_id, events.title AS event_title, events.sport AS event_sport,
-      report.decision_code, report.decision_summary, report.decided_at, report.appeal_deadline,
+      report.decision_code, report.decision_basis, report.decision_summary, report.decided_at, report.appeal_deadline,
       appeal.status AS appeal_status, appeal.created_at AS appeal_created_at, appeal.outcome_summary,
       (report.status IN ('actioned', 'dismissed') AND report.decision_summary IS NOT NULL
         AND report.appeal_deadline >= NOW() AND appeal.id IS NULL) AS can_appeal
@@ -59,8 +60,8 @@ export async function getMemberSafetyCases(userId: string): Promise<MemberSafety
     event: row.event_id && row.event_title && row.event_sport
       ? { id: row.event_id, title: row.event_title, sport: row.event_sport }
       : null,
-    decision: row.decision_code && row.decision_summary && row.decided_at && row.appeal_deadline
-      ? { code: row.decision_code, summary: row.decision_summary, decidedAt: row.decided_at, appealDeadline: row.appeal_deadline }
+    decision: row.decision_code && row.decision_basis && row.decision_summary && row.decided_at && row.appeal_deadline
+      ? { code: row.decision_code, basis: row.decision_basis, summary: row.decision_summary, decidedAt: row.decided_at, appealDeadline: row.appeal_deadline }
       : null,
     appeal: row.appeal_status && row.appeal_created_at
       ? { status: row.appeal_status, createdAt: row.appeal_created_at, outcomeSummary: row.outcome_summary }

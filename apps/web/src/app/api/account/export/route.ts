@@ -84,7 +84,7 @@ export async function GET() {
   `;
   const safetyReports = await sql`
     SELECT id, reported_user_id, event_id, category, details, status, priority,
-      decision_code, decision_summary, decided_at, appeal_deadline, created_at, updated_at
+      decision_code, decision_basis, decision_summary, decided_at, appeal_deadline, created_at, updated_at
     FROM safety_reports WHERE reporter_user_id = ${user.id} ORDER BY created_at
   `;
   const safetyAppeals = await sql`

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityForSafetyCategory, validateSafetyAppeal, validateSafetyReport } from "./safety";
+import { priorityForSafetyCategory, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
 
 describe("safety reports", () => {
   it("prioritizes immediate physical and minor-safety risks", () => {
@@ -38,5 +38,25 @@ describe("safety appeals", () => {
       valid: false,
       errors: ["Explain the appeal using 20 to 2000 characters."],
     });
+  });
+});
+
+describe("moderation case updates", () => {
+  it("accepts a reporter-safe final decision", () => {
+    expect(validateModerationCaseUpdate({
+      status: "actioned",
+      decisionCode: "warning",
+      decisionBasis: "Community Conduct Rule 2",
+      decisionSummary: "We reviewed the report and issued a formal conduct warning.",
+    }).valid).toBe(true);
+  });
+
+  it("rejects action details on a non-final state", () => {
+    expect(validateModerationCaseUpdate({ status: "investigating", decisionCode: "warning", decisionBasis: "Community Conduct Rule 2", decisionSummary: "Not final yet but this is long enough." }).valid).toBe(false);
+  });
+
+  it("keeps dismissed and actioned decision codes consistent", () => {
+    expect(validateModerationCaseUpdate({ status: "dismissed", decisionCode: "warning", decisionBasis: "Community Conduct Rule 2", decisionSummary: "This decision summary is sufficiently detailed." }).valid).toBe(false);
+    expect(validateModerationCaseUpdate({ status: "actioned", decisionCode: "no_action", decisionBasis: "Community Conduct Rule 2", decisionSummary: "This decision summary is sufficiently detailed." }).valid).toBe(false);
   });
 });
