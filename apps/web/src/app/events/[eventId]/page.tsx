@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import HostCancelEventControl from "@/components/HostCancelEventControl";
+import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import { getHostEvent, getHostJoinRequests } from "@/lib/events";
@@ -31,6 +32,7 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
         <p>Hosting here means protecting the exact location, responding without humiliation, and cancelling early if the format is no longer real. Host status is not safety certification.</p>
         <Link href="/hosting-guidelines">Review the Hosting Guidelines</Link>
       </section>
+      <HostEditEventForm event={event} />
       <HostCancelEventControl eventId={event.id} />
       <section className="host-requests"><p className="panel-label">Join requests</p><h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>{requests.length === 0 ? <p>Compatible members can now discover this invitation and request a place.</p> : <div className="host-request-list">{requests.map((request) => <article className={`host-request ${request.status}`} key={request.id}><div><strong>{request.requester.firstName}, {request.requester.age}</strong><span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span></div>{request.requester.bio ? <p>{request.requester.bio}</p> : null}{request.introduction ? <blockquote>{request.introduction}</blockquote> : null}<footer><span className="capitalize">{request.status}</span>{request.status === "pending" ? <HostRequestDecision eventId={event.id} requestId={request.id} skipCount={request.skipCount} /> : null}</footer><ReportSafetyControls eventId={event.id} subjectUserId={request.requesterId} subjectName={request.requester.firstName} /></article>)}</div>}</section>
     </main>

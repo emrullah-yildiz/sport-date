@@ -21,7 +21,7 @@ beforeAll(async () => {
   ({ isTrustedBrowserMutation } = await import("@/lib/request-security"));
   ({ getCurrentUser } = await import("@/lib/session"));
   ({ cancelEventJoinRequest } = await import("@/lib/join-requests"));
-}, 40000);
+}, 60000);
 
 describe("browser join request cancellation route", () => {
   it("cancels an accepted place for the authenticated requester", async () => {

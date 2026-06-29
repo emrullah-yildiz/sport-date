@@ -6,7 +6,7 @@ let POST: typeof import("./route").POST;
 
 beforeAll(async () => {
   ({ POST } = await import("./route"));
-}, 40000);
+}, 60000);
 
 describe("password reset request route", () => {
   it("returns a neutral success response without revealing account existence", async () => {

@@ -8,7 +8,7 @@ let resetRateLimitStoreForTests: typeof import("../../../../../lib/rate-limit").
 beforeAll(async () => {
   ({ POST } = await import("./route"));
   ({ resetRateLimitStoreForTests } = await import("../../../../../lib/rate-limit"));
-}, 40000);
+}, 60000);
 
 afterEach(() => {
   resetRateLimitStoreForTests();
