@@ -9,9 +9,15 @@ import {
   isValidPasswordResetToken,
   validatePasswordStrength,
 } from "@/lib/auth";
+import {
+  buildEmailVerificationDraft,
+  buildPasswordResetDraft,
+  type AuthEmailDraft,
+  resolveAuthEmailOrigin,
+} from "@/lib/auth-email-content";
 import { getDatabase } from "@/lib/db";
 
-type DeliveryState = "unconfigured";
+type DeliveryState = "unconfigured" | "ready";
 type VerificationRequestState = "created" | "already_verified";
 type VerificationConfirmState = "verified" | "already_verified" | "invalid" | "expired";
 type PasswordResetConfirmState = "reset" | "invalid" | "expired";
@@ -33,12 +39,38 @@ type PasswordResetTokenRow = {
   invalidated_reason: string | null;
 };
 
+export type AuthEmailDeliveryPreparation = Readonly<{
+  state: DeliveryState;
+  origin: string | null;
+  draft: AuthEmailDraft | null;
+}>;
+
 function deliveryState(): DeliveryState {
-  return "unconfigured";
+  return resolveAuthEmailOrigin() ? "ready" : "unconfigured";
 }
 
 export function isEmailDeliveryConfigured(): boolean {
-  return process.env.EMAIL_DELIVERY_ENABLED === "true";
+  return process.env.EMAIL_DELIVERY_ENABLED === "true" && !!resolveAuthEmailOrigin();
+}
+
+function buildVerificationDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): AuthEmailDeliveryPreparation {
+  const origin = resolveAuthEmailOrigin();
+  if (!origin) return { state: "unconfigured", origin: null, draft: null };
+  return {
+    state: "ready",
+    origin,
+    draft: buildEmailVerificationDraft({ origin, email, token: rawToken, expiresAt }),
+  };
+}
+
+function buildPasswordResetDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): AuthEmailDeliveryPreparation {
+  const origin = resolveAuthEmailOrigin();
+  if (!origin) return { state: "unconfigured", origin: null, draft: null };
+  return {
+    state: "ready",
+    origin,
+    draft: buildPasswordResetDraft({ origin, email, token: rawToken, expiresAt }),
+  };
 }
 
 export async function issueEmailVerificationTokenForUser(
@@ -87,13 +119,13 @@ export async function issueEmailVerificationTokenForUser(
   if (!row?.inserted_id) {
     return {
       state: row?.email_verified ? "already_verified" : "created",
-      delivery: deliveryState(),
-    } satisfies { state: VerificationRequestState; delivery: DeliveryState };
+      delivery: { state: deliveryState(), origin: resolveAuthEmailOrigin(), draft: null },
+    } satisfies { state: VerificationRequestState; delivery: AuthEmailDeliveryPreparation };
   }
 
   return {
     state: "created" as const,
-    delivery: deliveryState(),
+    delivery: buildVerificationDeliveryPreparation(email, token.token, token.expiresAt),
   };
 }
 
@@ -134,7 +166,7 @@ export async function requestPasswordResetTokenForEmail(
     FROM target_user
   `;
 
-  return { delivery: deliveryState() };
+  return { delivery: buildPasswordResetDeliveryPreparation(email, token.token, token.expiresAt) };
 }
 
 export async function confirmEmailVerificationToken(

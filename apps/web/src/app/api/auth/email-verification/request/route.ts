@@ -30,8 +30,11 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({
       success: true,
-      delivery: result.delivery,
-      message: "A verification flow has been prepared. Delivery remains disabled until an approved email provider is configured.",
+      delivery: result.delivery.state,
+      message:
+        result.delivery.state === "ready"
+          ? "A verification flow has been prepared and the delivery payload is ready for a transactional provider."
+          : "A verification flow has been prepared. Delivery remains disabled until an approved email provider is configured.",
     }, { status: 202 });
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {

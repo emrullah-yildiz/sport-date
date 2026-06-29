@@ -236,6 +236,12 @@ Password reset email:
 - include ignore-this-email instruction
 - no marketing content
 
+Implementation note:
+
+- email-link composition should use one canonical public origin from environment configuration, not request headers;
+- the adapter boundary should receive structured payloads containing `to`, `subject`, `text`, `html`, expiry, and the exact action URL for `/verify-email` or `/reset-password`;
+- request routes must not expose raw tokens in JSON responses even when delivery remains unconfigured.
+
 ## Audit and export
 
 Include in audit:
