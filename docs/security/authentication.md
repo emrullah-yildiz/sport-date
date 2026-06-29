@@ -86,7 +86,7 @@ A completed email verification proves one thing only: at the moment of confirmat
 - **Threat:** an attacker uses the unauthenticated reset-request endpoint as an oracle to learn whether an email has an account, is deletion-pending, is verified, or was throttled.
 - **Control:** `POST /api/auth/password-reset/request` returns one fixed 202 body (`GENERIC_SUCCESS_MESSAGE`) for every outcome — account exists, account missing, database not configured, and unexpected throw all map to the identical neutral response. Token creation runs inside an SQL `WITH target_user AS (… WHERE account_status = 'active')` that simply inserts nothing when no active user matches, so timing and response are independent of existence. The verification-request route is authenticated and so is not an enumeration oracle; it returns `already_verified` only to the already-authenticated owner.
 - **Verified by:** route test "returns the identical response whether or not the account exists (enumeration neutrality)" plus "stays neutral even when the database is not configured" and "stays neutral even when token preparation throws unexpectedly".
-- **Residual risk:** the database branch is constant-response but not constant-time — a determined attacker measuring latency between the insert path and the no-op path could still infer existence. Closing this fully needs either constant-time padding or shared edge rate limiting that makes timing attacks impractical; tracked with the edge rate-limit gate. Login already uses a dummy hash for the same reason; the two surfaces should be reviewed together before launch.
+- **Residual risk:** the database branch is constant-response but is only *floored*, not constant-time — see the consolidated "Account-enumeration posture" section below for the unified stance across login and reset, the bounded timing floor now applied to this path, and what remains deferred to the edge gate.
 
 ### Reset → full session revocation boundary
 
@@ -126,3 +126,34 @@ A completed email verification proves one thing only: at the moment of confirmat
 - **Shared edge/gateway rate limiting (infrastructure/owner gate):** replace per-process throttles so resend/confirm abuse controls survive restarts and scale across replicas; this also hardens the residual reset-request timing channel.
 - **Email provider selection and enablement (owner + counsel gate):** required before any real delivery; keep the adapter the single seam.
 - **Retention and lawful basis for `requested_ip_hash` and token audit rows (counsel gate):** confirm before launch.
+
+## Account-enumeration posture
+
+This is the single consolidated stance for account enumeration across every authentication surface. It supersedes the per-surface notes above for the question "can an outsider learn whether an email has an account?" Three surfaces can leak account existence: login, the unauthenticated password-reset request, and registration. Verification request is authenticated and only ever answers its own owner, so it is not an enumeration oracle.
+
+### What we defend at the body level, everywhere
+
+Response *content* never distinguishes "account exists" from "account does not exist":
+
+- **Login** returns one generic `Email or password is incorrect.` (401) for an unknown email, a wrong password, and a non-active account alike (`apps/web/src/app/api/auth/login/route.ts`). It never says "no such account".
+- **Reset request** returns one fixed neutral 202 body (`GENERIC_SUCCESS_MESSAGE`) for account-exists, account-missing, database-not-configured, and unexpected-throw, and reuses that same body for the 429 throttle response so throttling is not itself a signal (`apps/web/src/app/api/auth/password-reset/request/route.ts`). The SQL is written as `INSERT ... SELECT ... FROM target_user` so the no-match case simply inserts nothing rather than branching.
+- **Registration** rejects a duplicate email, which is an unavoidable existence signal for any system that enforces unique accounts; this is accepted and bounded by registration rate limits rather than hidden, because a usable signup flow must tell a person their email is already taken.
+
+Body-level neutrality is the primary, fully-implemented defense and is covered by tests (login generic-error tests; reset-request enumeration-neutrality tests including the database-failure and unexpected-throw cases).
+
+### Where a timing channel remains, and how each surface treats it
+
+Body neutrality does not by itself equalize *latency*. The two surfaces handle the timing dimension differently because their dominant cost differs:
+
+- **Login is equalized by a real dummy-hash comparison.** When no user row is found, login still runs `verifyPassword` against a constant `DUMMY_PASSWORD_HASH` (bcrypt cost 12, ~hundreds of ms). Because that bcrypt comparison dominates the request and runs on both the exists and missing paths, the exists/missing latency difference is collapsed by genuine equivalent work, not an artificial sleep. This is the strongest form of the defense and needs no change.
+- **Reset request has no natural dominant operation**, so the insert path (account exists → a row is written) and the no-op path (no match → nothing written) differ in latency. As of this cycle the reset-request path is held to a **bounded artificial-delay floor** (`RESET_REQUEST_MIN_DURATION_MS`, 350ms) in `requestPasswordResetTokenForEmail` via the `holdUntilMinimumDuration` helper. Success and error outcomes are both padded (errors are padded, then re-thrown so the route still maps them to the identical neutral 202), so the *common-case* difference between the insert and no-op paths — and a fast database-not-configured rejection — falls below one observable floor.
+
+### Explicit decision: floor now, full constant-time deferred to the edge gate
+
+We deliberately chose a **bounded floor now** over either (a) doing nothing until the edge gate, or (b) attempting true constant-time padding in-app:
+
+- A floor is a small, low-risk, well-tested change that meaningfully reduces the common-case timing channel without needing any infrastructure. It is the honest middle option and is verified by `auth-email.test.ts` ("enumeration timing floor") asserting both the exists and no-op paths are held to the floor *and* that the neutral return contract is unchanged.
+- A floor is **not** a constant-time guarantee. It caps the observable *minimum*; work that legitimately exceeds the floor (a slow database, a slow provider send once delivery is enabled) still varies, and a determined attacker with many samples and a low-noise network path could still extract signal. Choosing a floor high enough to dominate every real-world insert is environment-dependent and cannot be tuned correctly without the real PostgreSQL instance (itself a gated dependency), so forcing a "true" constant-time implementation now would be guesswork that risks both correctness and a degraded experience for real members.
+- **Full closure is deferred to shared edge/gateway rate limiting** (an owner/infrastructure gate). Per-IP/per-account limits that survive restarts and coordinate across replicas make the large sample counts a timing attack needs impractical, which is the proportionate place to finish the job. Until that gate lands, the residual is: body-neutral everywhere, login timing-equalized by real work, reset-request timing-floored as a partial mitigation, registration existence-signal accepted and rate-limited.
+
+This posture must not be overstated in product copy or to the owner: enumeration is *reduced*, not eliminated, until the edge gate is in place.

@@ -17,6 +17,7 @@ let confirmEmailVerificationToken: typeof import("./auth-email").confirmEmailVer
 let confirmPasswordResetToken: typeof import("./auth-email").confirmPasswordResetToken;
 let issueEmailVerificationTokenForUser: typeof import("./auth-email").issueEmailVerificationTokenForUser;
 let requestPasswordResetTokenForEmail: typeof import("./auth-email").requestPasswordResetTokenForEmail;
+let setResetRequestMinDurationForTests: typeof import("./auth-email").setResetRequestMinDurationForTests;
 
 beforeEach(async () => {
   vi.resetModules();
@@ -31,7 +32,10 @@ beforeEach(async () => {
     confirmPasswordResetToken,
     issueEmailVerificationTokenForUser,
     requestPasswordResetTokenForEmail,
+    setResetRequestMinDurationForTests,
   } = await import("./auth-email"));
+  // Keep the timing-floor out of unrelated assertions; the floor has dedicated coverage below.
+  setResetRequestMinDurationForTests(0);
 });
 
 /**
@@ -250,5 +254,37 @@ describe("requesting password reset tokens", () => {
     );
     expect(insertCall).toBeDefined();
     expect(insertCall!.slice(1)).toContain(null);
+  });
+
+  describe("enumeration timing floor", () => {
+    it("holds the request to the configured minimum duration while preserving the neutral preparation", async () => {
+      setResetRequestMinDurationForTests(350);
+      const { sql } = buildSqlMock([[]]);
+      vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+      const startedAt = Date.now();
+      const result = await requestPasswordResetTokenForEmail("ana@example.com", "203.0.113.7");
+      const elapsed = Date.now() - startedAt;
+
+      // The floor must be honoured (small slack for timer scheduling)...
+      expect(elapsed).toBeGreaterThanOrEqual(340);
+      // ...without altering the neutral return contract the route relies on.
+      expect(result).toEqual({
+        delivery: { state: "unconfigured", origin: null, draft: null, provider: "disabled", messageId: null },
+      });
+    });
+
+    it("applies the same floor to the account-missing no-op path", async () => {
+      setResetRequestMinDurationForTests(350);
+      // Empty user lookup => the INSERT ... SELECT FROM target_user inserts nothing.
+      const { sql } = buildSqlMock([[]]);
+      vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+      const startedAt = Date.now();
+      await requestPasswordResetTokenForEmail("nobody@example.com", "203.0.113.7");
+      const elapsed = Date.now() - startedAt;
+
+      expect(elapsed).toBeGreaterThanOrEqual(340);
+    });
   });
 });

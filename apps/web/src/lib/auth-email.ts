@@ -18,6 +18,39 @@ import {
 import { canSendAuthEmails, dispatchAuthEmail, resolveAuthEmailProvider } from "@/lib/auth-email-delivery";
 import { getDatabase } from "@/lib/db";
 
+// Minimum wall-clock duration the unauthenticated reset-request path is held to,
+// so the common-case difference between the account-exists insert path and the
+// account-missing no-op path is collapsed below one observable floor. This is a
+// bounded mitigation, not a constant-time guarantee: work that legitimately
+// exceeds the floor still varies, and closing the channel fully is deferred to
+// shared edge/gateway rate limiting (see the enumeration-posture doc). Kept small
+// enough not to degrade a real member's experience.
+const RESET_REQUEST_MIN_DURATION_MS = 350;
+
+// Overridable only so tests can run the floor at 0ms (fast) or assert that the
+// floor is honoured deterministically. Production never calls the setter.
+let resetRequestMinDurationMs = RESET_REQUEST_MIN_DURATION_MS;
+
+export function setResetRequestMinDurationForTests(ms: number): void {
+  resetRequestMinDurationMs = ms;
+}
+
+export function resetResetRequestMinDurationForTests(): void {
+  resetRequestMinDurationMs = RESET_REQUEST_MIN_DURATION_MS;
+}
+
+async function holdUntilMinimumDuration<T>(
+  startedAtMs: number,
+  minDurationMs: number,
+  result: T,
+  now: () => number = Date.now,
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+): Promise<T> {
+  const remaining = minDurationMs - (now() - startedAtMs);
+  if (remaining > 0) await sleep(remaining);
+  return result;
+}
+
 type DeliveryState = "unconfigured" | "ready" | "simulated";
 type VerificationRequestState = "created" | "already_verified";
 type VerificationConfirmState = "verified" | "already_verified" | "invalid" | "expired";
@@ -165,6 +198,22 @@ export async function requestPasswordResetTokenForEmail(
   requestIp: string,
   now = new Date(),
 ) {
+  // Hold every outcome of the unauthenticated reset-request to a shared minimum
+  // duration so the account-exists insert path and the account-missing no-op path
+  // (and a fast database-not-configured rejection) are not trivially separable by
+  // latency. Errors are padded too, then re-thrown so the route still maps them to
+  // the same neutral 202 body.
+  const startedAtMs = Date.now();
+  try {
+    const result = await runPasswordResetTokenRequest(email, requestIp, now);
+    return await holdUntilMinimumDuration(startedAtMs, resetRequestMinDurationMs, result);
+  } catch (error) {
+    await holdUntilMinimumDuration(startedAtMs, resetRequestMinDurationMs, null);
+    throw error;
+  }
+}
+
+async function runPasswordResetTokenRequest(email: string, requestIp: string, now: Date) {
   const token = createPasswordResetToken(now);
   const nowIso = now.toISOString();
   const ipHash = requestIp && requestIp !== "unknown" ? hashSessionToken(requestIp) : null;
