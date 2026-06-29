@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Build a local, non-collecting preview of the Bucharest research landing experience so the owner can review the real proposition before approving outreach or data collection.
+Audit the remaining launch gates against the implemented web/mobile product and turn the highest-priority unblocked gap into the next tested slice.
 
 ## Completed and verified
 
@@ -45,13 +45,14 @@ Build a local, non-collecting preview of the Bucharest research landing experien
 - Researched Bucharest local sport supply and recommended an Aviatorilor-Herastrau to Aurel Vlaicu-Floreasca validation corridor with run/run-walk and four-person indoor padel.
 - Documented evidence limits, bouldering fallback, founding-host requirements, phased validation thresholds, kill criteria, and behavior-led member and host interview scripts.
 - Prepared bilingual member and host recruitment copy, channel-specific organic drafts, privacy-aware form fields, campaign tags, decision signals, and a publication checklist without contacting or publishing to anyone.
+- Added a local-only, noindex, non-collecting Bucharest research landing preview for owner review and verified that the mobile layout no longer overflows the viewport.
 - Verified the production web build and Android Hermes bundle after device-management integration.
 - Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Build a local-only, non-collecting Bucharest research landing preview for owner review.
-2. Add an approved data boundary only after the research notice, inbox, retention, and owner authorization exist.
+1. Audit the remaining launch gates and choose the highest-value unblocked implementation slice.
+2. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
 3. Add outbound safety decision delivery after an approved email provider exists.
 
 ## Owner blockers

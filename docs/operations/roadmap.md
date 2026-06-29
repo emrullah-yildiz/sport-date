@@ -29,6 +29,7 @@
 - [x] Add role-gated appeal outcomes with separation-of-review safeguards.
 - [x] Add purpose-limited evidence references and case-access logging without accepting file uploads.
 - [x] Research Bucharest and recommend a corridor plus two-sport validation wedge without treating it as the owner's final choice.
+- [x] Build a local-only, noindex, non-collecting Bucharest research landing preview for owner review.
 - [ ] Validate or reject the Aviatorilor-Herastrau / Aurel Vlaicu-Floreasca run-walk and padel wedge through interviews and host commitments.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.
