@@ -22,12 +22,13 @@ vi.mock("server-only", () => ({}));
 //   c. An application DELETE of an audit row is still a no-op (the surviving
 //      ON DELETE DO INSTEAD NOTHING rule swallows it; the row remains).
 //
-// Coverage: moderation_audit_log (FK actor_user_id) and role_audit_log (FKs
-// target_user_id + actor_user_id) are exercised directly. The two remaining
-// audit tables (moderation_case_access_log.actor_user_id,
-// moderation_evidence_references.created_by_user_id) share the identical shared
-// trigger + identical surviving no_delete rule and are asserted by inference;
-// migration 019 was verified to install the same trigger/function on all four.
+// Coverage: ALL FOUR append-only audit tables that carry the shared trigger are
+// now exercised DIRECTLY against real SQL:
+//   - moderation_audit_log         (FK actor_user_id)
+//   - role_audit_log               (FKs target_user_id + actor_user_id)
+//   - moderation_case_access_log   (FK actor_user_id)
+//   - moderation_evidence_references (FK created_by_user_id)
+// The previous "by inference" gap for the last two tables is closed here.
 //
 // Non-destructive design: all rows created here are sentinel rows keyed to
 // `int-test+...@sport-date.invalid` emails and a single sentinel safety_report;
@@ -50,6 +51,8 @@ describe.skipIf(!enabled)("audit append-only erasure (real SQL, migration 019)",
   const createdReportIds: string[] = [];
   const createdModerationAuditIds: Array<string | number> = [];
   const createdRoleAuditIds: Array<string | number> = [];
+  const createdCaseAccessIds: Array<string | number> = [];
+  const createdEvidenceIds: string[] = [];
 
   async function insertUser(tag: string): Promise<string> {
     const rows = (await sql`
@@ -105,6 +108,24 @@ describe.skipIf(!enabled)("audit append-only erasure (real SQL, migration 019)",
       await sql`ALTER TABLE role_audit_log ENABLE RULE role_audit_no_delete`;
     }
     createdRoleAuditIds.length = 0;
+
+    if (createdCaseAccessIds.length > 0) {
+      await sql`ALTER TABLE moderation_case_access_log DISABLE RULE moderation_case_access_no_delete`;
+      for (const accessId of createdCaseAccessIds) {
+        await sql`DELETE FROM moderation_case_access_log WHERE id = ${accessId}`;
+      }
+      await sql`ALTER TABLE moderation_case_access_log ENABLE RULE moderation_case_access_no_delete`;
+    }
+    createdCaseAccessIds.length = 0;
+
+    if (createdEvidenceIds.length > 0) {
+      await sql`ALTER TABLE moderation_evidence_references DISABLE RULE moderation_evidence_no_delete`;
+      for (const evidenceId of createdEvidenceIds) {
+        await sql`DELETE FROM moderation_evidence_references WHERE id = ${evidenceId}`;
+      }
+      await sql`ALTER TABLE moderation_evidence_references ENABLE RULE moderation_evidence_no_delete`;
+    }
+    createdEvidenceIds.length = 0;
 
     for (const reportId of createdReportIds) {
       await sql`DELETE FROM safety_reports WHERE id = ${reportId}`;
@@ -225,6 +246,137 @@ describe.skipIf(!enabled)("audit append-only erasure (real SQL, migration 019)",
     // (c) An application DELETE of the audit row is a no-op (row remains).
     await sql`DELETE FROM role_audit_log WHERE id = ${auditId}`;
     const stillThere = await sql`SELECT 1 FROM role_audit_log WHERE id = ${auditId}`;
+    expect(stillThere).toHaveLength(1);
+  });
+
+  it("moderation_case_access_log: referenced actor can be hard-deleted, the access row survives with actor_user_id nulled and all else unchanged", async () => {
+    // FK graph: a reported user -> a safety_report (report_id, ON DELETE RESTRICT)
+    // + an actor user (actor_user_id, ON DELETE SET NULL). access_type 'case_view'
+    // requires report_id NOT NULL (table CHECK), so we attach the access row to the report.
+    const reportedUser = await insertUser("access-reported");
+    const actorUser = await insertUser("access-actor");
+    const reportId = await insertSafetyReport(reportedUser);
+
+    const inserted = (await sql`
+      INSERT INTO moderation_case_access_log (report_id, actor_user_id, access_type, purpose, metadata)
+      VALUES (${reportId}, ${actorUser}, ${"case_view"}, ${"case_review"}, ${JSON.stringify({ note: "sentinel-access" })})
+      RETURNING id, created_at
+    `) as Array<{ id: string | number; created_at: string }>;
+    const accessId = inserted[0].id;
+    createdCaseAccessIds.push(accessId);
+    const originalCreatedAt = inserted[0].created_at;
+
+    // (a) The actor user is now hard-deletable even though an access row references it.
+    await expect(sql`DELETE FROM users WHERE id = ${actorUser}`).resolves.toBeDefined();
+    const gone = await sql`SELECT 1 FROM users WHERE id = ${actorUser}`;
+    expect(gone).toHaveLength(0);
+
+    // The access row survives; only actor_user_id is now NULL; everything else unchanged.
+    const after = (await sql`
+      SELECT actor_user_id, access_type, purpose, report_id, metadata, created_at
+      FROM moderation_case_access_log WHERE id = ${accessId}
+    `) as Array<{
+      actor_user_id: string | number | null;
+      access_type: string;
+      purpose: string;
+      report_id: string;
+      metadata: unknown;
+      created_at: string;
+    }>;
+    expect(after).toHaveLength(1);
+    expect(after[0].actor_user_id).toBeNull();
+    expect(after[0].access_type).toBe("case_view");
+    expect(after[0].purpose).toBe("case_review");
+    expect(after[0].report_id).toBe(reportId);
+    expect(after[0].metadata).toEqual({ note: "sentinel-access" });
+    expect(new Date(after[0].created_at).getTime()).toBe(new Date(originalCreatedAt).getTime());
+
+    // (b) An application UPDATE of a non-user-ref column is still rejected.
+    await expect(
+      sql`UPDATE moderation_case_access_log SET purpose = ${"quality_assurance"} WHERE id = ${accessId}`,
+    ).rejects.toThrow();
+
+    // Setting the user-ref column to a NON-null value is also rejected.
+    await expect(
+      sql`UPDATE moderation_case_access_log SET actor_user_id = ${reportedUser} WHERE id = ${accessId}`,
+    ).rejects.toThrow();
+
+    // (c) An application DELETE of the access row is a no-op (row remains).
+    await sql`DELETE FROM moderation_case_access_log WHERE id = ${accessId}`;
+    const stillThere = await sql`SELECT 1 FROM moderation_case_access_log WHERE id = ${accessId}`;
+    expect(stillThere).toHaveLength(1);
+  });
+
+  it("moderation_evidence_references: referenced creator can be hard-deleted, the reference row survives with created_by_user_id nulled and all else unchanged", async () => {
+    // FK graph: a reported user -> a safety_report (report_id, ON DELETE RESTRICT)
+    // + a creator user (created_by_user_id, ON DELETE SET NULL). All other columns
+    // are NOT NULL with length/range CHECKs, satisfied with sentinel values.
+    const reportedUser = await insertUser("evidence-reported");
+    const creatorUser = await insertUser("evidence-creator");
+    const reportId = await insertSafetyReport(reportedUser);
+
+    const evidenceId = crypto.randomUUID();
+    const retentionReviewAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
+    const inserted = (await sql`
+      INSERT INTO moderation_evidence_references (
+        id, report_id, created_by_user_id, source_type, sensitivity,
+        label, reference_key, preservation_purpose, retention_review_at
+      ) VALUES (
+        ${evidenceId}, ${reportId}, ${creatorUser}, ${"system_record"}, ${"restricted"},
+        ${"Sentinel evidence label"}, ${"sentinel-reference-key-001"},
+        ${"Integration sentinel preservation purpose for the audit-erasure test."},
+        ${retentionReviewAt}
+      )
+      RETURNING id, created_at
+    `) as Array<{ id: string; created_at: string }>;
+    createdEvidenceIds.push(evidenceId);
+    const originalCreatedAt = inserted[0].created_at;
+
+    // (a) The creator user is now hard-deletable even though a reference row references it.
+    await expect(sql`DELETE FROM users WHERE id = ${creatorUser}`).resolves.toBeDefined();
+    const gone = await sql`SELECT 1 FROM users WHERE id = ${creatorUser}`;
+    expect(gone).toHaveLength(0);
+
+    // The reference row survives; only created_by_user_id is now NULL; everything else unchanged.
+    const after = (await sql`
+      SELECT created_by_user_id, source_type, sensitivity, label, reference_key,
+             preservation_purpose, report_id, created_at
+      FROM moderation_evidence_references WHERE id = ${evidenceId}
+    `) as Array<{
+      created_by_user_id: string | number | null;
+      source_type: string;
+      sensitivity: string;
+      label: string;
+      reference_key: string;
+      preservation_purpose: string;
+      report_id: string;
+      created_at: string;
+    }>;
+    expect(after).toHaveLength(1);
+    expect(after[0].created_by_user_id).toBeNull();
+    expect(after[0].source_type).toBe("system_record");
+    expect(after[0].sensitivity).toBe("restricted");
+    expect(after[0].label).toBe("Sentinel evidence label");
+    expect(after[0].reference_key).toBe("sentinel-reference-key-001");
+    expect(after[0].preservation_purpose).toBe(
+      "Integration sentinel preservation purpose for the audit-erasure test.",
+    );
+    expect(after[0].report_id).toBe(reportId);
+    expect(new Date(after[0].created_at).getTime()).toBe(new Date(originalCreatedAt).getTime());
+
+    // (b) An application UPDATE of a non-user-ref column is still rejected.
+    await expect(
+      sql`UPDATE moderation_evidence_references SET label = ${"Tampered evidence label"} WHERE id = ${evidenceId}`,
+    ).rejects.toThrow();
+
+    // Setting the user-ref column to a NON-null value is also rejected.
+    await expect(
+      sql`UPDATE moderation_evidence_references SET created_by_user_id = ${reportedUser} WHERE id = ${evidenceId}`,
+    ).rejects.toThrow();
+
+    // (c) An application DELETE of the reference row is a no-op (row remains).
+    await sql`DELETE FROM moderation_evidence_references WHERE id = ${evidenceId}`;
+    const stillThere = await sql`SELECT 1 FROM moderation_evidence_references WHERE id = ${evidenceId}`;
     expect(stillThere).toHaveLength(1);
   });
 });
