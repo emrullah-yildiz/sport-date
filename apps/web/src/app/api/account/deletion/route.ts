@@ -48,6 +48,19 @@ export async function POST(request: Request) {
       FROM new_request
       WHERE users.id = new_request.user_id AND users.account_status = 'active'
       RETURNING users.id
+    ), cancelled_hosted_events AS (
+      UPDATE events SET status = 'cancelled', updated_at = NOW()
+      FROM updated_user
+      WHERE events.host_user_id = updated_user.id AND events.status IN ('draft', 'published')
+    ), removed_participation AS (
+      DELETE FROM event_participants
+      USING updated_user
+      WHERE event_participants.user_id = updated_user.id
+    ), cancelled_join_requests AS (
+      UPDATE join_requests SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
+      FROM updated_user
+      WHERE join_requests.requester_user_id = updated_user.id
+        AND join_requests.status IN ('pending', 'accepted')
     ), revoked_sessions AS (
       DELETE FROM sessions
       USING updated_user

@@ -54,6 +54,35 @@ export async function GET() {
   const account = rows[0];
   if (!account) return NextResponse.json({ error: "Account not found." }, { status: 404 });
 
+  const hostedEvents = await sql`
+    SELECT events.id, events.sport, events.title, events.description, events.starts_at,
+      events.time_zone, events.duration_minutes, events.capacity, events.language,
+      events.minimum_age, events.maximum_age, events.experience_levels, events.status,
+      events.public_city, events.public_country_code, events.public_area_label,
+      private_location.venue_name, private_location.address, private_location.arrival_instructions,
+      events.created_at, events.updated_at
+    FROM events
+    JOIN event_private_locations AS private_location ON private_location.event_id = events.id
+    WHERE events.host_user_id = ${user.id}
+    ORDER BY events.created_at
+  `;
+  const joinRequests = await sql`
+    SELECT request.id, request.event_id, request.status, request.skip_count, request.introduction,
+      request.requested_at, request.responded_at, request.cancelled_at,
+      events.title AS event_title, events.sport, events.starts_at,
+      events.public_city, events.public_area_label,
+      participant.seat_number, private_location.venue_name, private_location.address,
+      private_location.arrival_instructions
+    FROM join_requests AS request
+    JOIN events ON events.id = request.event_id
+    LEFT JOIN event_participants AS participant
+      ON participant.event_id = request.event_id AND participant.user_id = request.requester_user_id
+    LEFT JOIN event_private_locations AS private_location
+      ON private_location.event_id = participant.event_id
+    WHERE request.requester_user_id = ${user.id}
+    ORDER BY request.requested_at
+  `;
+
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
     VALUES (${crypto.randomUUID()}::uuid, ${user.id}, 'access_export', 'completed', NOW())
@@ -79,6 +108,8 @@ export async function GET() {
       updatedAt: account.updated_at,
       sports: account.sports,
     },
+    hostedEvents,
+    joinRequestsAndAcceptedParticipation: joinRequests,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 
@@ -89,4 +120,3 @@ export async function GET() {
     },
   });
 }
-

@@ -2,21 +2,21 @@
 
 ## Current outcome
 
-Extend machine-readable account export and deletion-processing coverage to hosted events, join requests, and accepted participation before introducing reports or messaging.
+Implement member blocking, safety reports, and immutable moderation audit records before any open messaging capability.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
-- Completed account authentication, privacy controls, profile editing, event creation, discovery, and join decisions.
-- Added server-authorized event rooms for hosts and accepted participants, with exact logistics and participant visibility revoked by cancellation or blocking.
-- Kept open messaging out until report/block and moderation operations exist.
+- Completed the account, event, discovery, request, and authorized room loops.
+- Extended account export to hosted events, join requests, accepted seats, and precise locations already disclosed.
+- Deletion requests now immediately cancel hosted events, close active requests, remove accepted seats, revoke room/location access, and revoke sessions.
 - Thirty-one tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Extend privacy export and deletion processing to events, requests, and participation.
-2. Implement block/report paths and moderation audit records.
-3. Design operational response levels, evidence handling, and appeals before messaging.
+1. Implement block/report paths and moderation audit records.
+2. Design operational response levels, evidence handling, and appeals.
+3. Add purpose-limited room coordination messages only after moderation gates pass.
 
 ## Owner blockers
 
@@ -29,7 +29,7 @@ Extend machine-readable account export and deletion-processing coverage to hoste
 
 - “Sport Date” is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
-- Cancelled or declined requests cannot be reopened in the current MVP.
+- Deletion finalization and vendor/backup propagation remain operational launch gates.
 - Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.
 

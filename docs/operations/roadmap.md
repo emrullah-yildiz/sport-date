@@ -16,7 +16,8 @@
 - [x] Implement privacy-preserving discovery eligibility and city, sport, language, and time filters.
 - [x] Implement request, accept, skip, third-skip decline, requester cancellation, and atomic seat-capacity invariants.
 - [x] Add server-authorized event rooms for hosts and accepted participants without open messaging.
-- [ ] Extend access/export/deletion coverage as event, request, room, report, and message data is introduced.
+- [x] Extend access/export/deletion coverage to events, join requests, accepted seats, and disclosed meeting details.
+- [ ] Extend access/export/deletion coverage again when reports and messages are introduced.
 
 ## Then: safety and local launch
 
