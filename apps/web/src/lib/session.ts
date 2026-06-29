@@ -11,6 +11,7 @@ export const AUTH_COOKIE_NAME = "auth_token";
 export type SessionUser = Readonly<{
   id: string;
   email: string;
+  age: number;
   firstName: string;
   lastName: string;
   location: string;
@@ -28,6 +29,7 @@ export type SessionUser = Readonly<{
 type SessionUserRow = {
   id: string | number;
   email: string;
+  age: number;
   first_name: string;
   last_name: string;
   location: string;
@@ -68,7 +70,9 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const sql = getDatabase();
   const rows = await sql`
     SELECT
-      users.id, users.email, users.first_name, users.last_name, users.location,
+      users.id, users.email,
+      DATE_PART('year', AGE(CURRENT_DATE, users.date_of_birth))::integer AS age,
+      users.first_name, users.last_name, users.location,
       users.bio, users.languages, users.seeking, users.email_verified,
       COALESCE(
         jsonb_agg(
@@ -95,6 +99,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   return {
     id: String(row.id),
     email: row.email,
+    age: row.age,
     firstName: row.first_name,
     lastName: row.last_name,
     location: row.location,

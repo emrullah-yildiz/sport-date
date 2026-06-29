@@ -2,21 +2,21 @@
 
 ## Current outcome
 
-Implement discovery eligibility and filters while guaranteeing that discovery queries cannot retrieve private meeting locations or reveal block relationships.
+Implement join requests and host decisions with atomic capacity enforcement, dignified skip behavior, requester cancellation, and precise-location access only after acceptance.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
 - Completed account authentication, privacy controls, and profile editing.
-- Defined and tested event lifecycle, eligibility, blocking, capacity, and precise-location visibility rules.
-- Added authenticated event creation, shared/server validation, separate public and private location tables, and a host view that makes the privacy boundary visible.
+- Added privacy-first host event creation with separate exact-location persistence.
+- Added discovery filtered by the member's sport/skill plus optional city, sport, language, and time; mutual blocks silently remove events, and discovery never joins private locations.
 - Twenty-six tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Implement privacy-preserving event discovery and filters.
-2. Implement join request, accept, skip, third-skip decline, cancellation, and atomic capacity enforcement.
-3. Add event-room authorization without real-time chat.
+1. Implement request, accept, skip, third-skip decline, cancellation, and atomic capacity enforcement.
+2. Add event-room authorization without real-time chat.
+3. Extend privacy export/deletion coverage to events and requests.
 
 ## Owner blockers
 
@@ -29,7 +29,7 @@ Implement discovery eligibility and filters while guaranteeing that discovery qu
 
 - “Sport Date” is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
-- Coordinates remain optional until a reviewed map/geocoding provider is selected; area and exact address are still separated.
-- Event age ranges require fairness and launch-country review before production.
+- Discovery intentionally shows no reason when blocking makes an event unavailable.
+- Capacity cannot be presented as live until join decisions are persisted atomically.
 - No social, safety, verification, or traction claims may exceed implemented evidence.
 

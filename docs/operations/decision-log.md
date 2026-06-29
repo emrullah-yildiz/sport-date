@@ -20,6 +20,10 @@ A deletion request immediately locks the profile and revokes sessions, then ente
 
 Store discoverable event fields and exact meeting locations in separate tables. Public discovery queries must not join the private table. Only host, accepted-participant, or explicitly authorized audited moderation paths may retrieve precise meeting data.
 
+## 2026-06-29 — Mutual blocks disappear from discovery without explanation
+
+Exclude an event when either the requester or host has blocked the other. Return no block-specific reason or placeholder card, preventing discovery behavior from revealing the relationship.
+
 ## Open decisions
 
 - Final product and company name.
