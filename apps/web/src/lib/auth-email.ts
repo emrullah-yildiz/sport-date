@@ -169,7 +169,7 @@ export async function issueEmailVerificationTokenForUser(
       RETURNING id
     )
     SELECT
-      COALESCE((SELECT id FROM inserted LIMIT 1), '') AS inserted_id,
+      COALESCE((SELECT id::text FROM inserted LIMIT 1), '') AS inserted_id,
       COALESCE((SELECT email_verified FROM target_user LIMIT 1), FALSE) AS email_verified
   `;
 

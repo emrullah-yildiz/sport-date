@@ -9,6 +9,8 @@
 - [x] Add app-layer rate limits to authentication and high-leverage mutation paths.
 - [x] Email verification and password reset implemented with provider-gated, default-disabled delivery and a tested single-use token core; sending real emails still requires an owner-approved email provider.
 - [x] Draft and implement account export, re-authenticated deletion request, request audit, consent boundary, and retention states.
+- [x] Add opt-in real-SQL integration tests for the verification/reset token flows (single-use, sibling invalidation, expiry, reset session-revocation, IP-hash, enumeration neutrality).
+- [ ] Fix the audit-immutability vs `ON DELETE SET NULL` conflict that blocks hard-deleting a `users` row across four append-only audit tables (GDPR right-to-erasure); preserve append-only immutability while allowing the FK's system SET-NULL.
 
 ## Next: complete event loop
 

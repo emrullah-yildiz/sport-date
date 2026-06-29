@@ -9,6 +9,7 @@
     "db:migrate": "node --env-file-if-exists=../../.env ./scripts/migrate.mjs",
     "db:cleanup-sessions": "node --env-file-if-exists=../../.env ./scripts/cleanup-sessions.mjs",
     "test": "vitest run",
+    "test:integration": "node --env-file-if-exists=../../.env ./scripts/test-integration.mjs",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit"
   },
