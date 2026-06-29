@@ -22,6 +22,7 @@ counsel is explicitly permitted; representing these as final or approved is not
 | `privacy-notice.draft.md` | Member-facing privacy notice, mapped onto the **actually implemented** data inventory (the `apps/web/db/*.sql` schema, the export/deletion code, the auth/token data) | Lawful bases; Article 9 special-category position for a dating-capable service; final retention durations; international transfers; processor list/DPAs; Article 22 characterisation of safety-report routing |
 | `terms-of-service.draft.md` | Terms describing the service as built, with honest "we do not verify / do not guarantee safety / are not the event organiser" clauses | Consumer-law enforceability; intermediary/host-liability; DSA notice-and-action; liability within mandatory-rights limits; governing law |
 | `consent-copy.draft.md` | The real member-facing copy for each consent/disclosure moment (signup acceptance, email verification, opt-in product updates, location disclosure, reporting, deletion, the "seeking" field) | Acceptance mechanism; valid consent + e-marketing rules; transactional/marketing separation; DSA acknowledgement; Article 9 for the "seeking = dating" choice |
+| `safety-community-guidelines.draft.md` | Member-facing safety & community guidelines (referenced by the Terms draft §4/§6), describing who the product is for, expected conduct at real meetups, prohibited conduct, the safety tools that **actually exist** (block/report/evidence-without-uploads), the real report→decision→appeal lifecycle, what the product does **not** promise, and the emergency boundary | DSA notice-and-action mapping; jurisdiction-specific conduct/illegal-content definitions; the **named safety owner** (Gate 5) and any response-time commitment; emergency guidance per country; appeal-window confirmation; age-assurance adequacy |
 
 ## Design principles these drafts follow
 
@@ -36,6 +37,9 @@ counsel is explicitly permitted; representing these as final or approved is not
 3. **Decisions left to counsel/owner are marked, not faked.** `[COUNSEL: …]` and
    `[OWNER: …]` markers flag the controller identity, jurisdiction, retention
    durations, lawful bases, transfers, and DSA scope — these are *not* invented.
+   The safety guidelines add a `[SAFETY-OWNER: …]` marker for decisions that wait on
+   the named safety owner (owner Gate 5), such as staffing the human review steps and
+   any response-time commitment.
 4. **Internally consistent and cross-referenced.** The three drafts and the
    existing `docs/legal/privacy-rights-preparation.md`,
    `docs/security/authentication.md`, `docs/security/threat-model.md`, and
