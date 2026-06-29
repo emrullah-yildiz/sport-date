@@ -1,7 +1,12 @@
 import {
   calculateMovementProgress,
+  FEEDBACK_CATEGORIES,
+  FEEDBACK_SEVERITIES,
   SAFETY_REPORT_CATEGORIES,
   type EventReflectionInput,
+  type FeedbackCategory,
+  type FeedbackSeverity,
+  type FeedbackTicketInput,
   type SafetyReportCategory,
 } from "@sport-date/domain";
 import { StatusBar } from "expo-status-bar";
@@ -9,9 +14,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { loginMobile, logoutMobile, mobileApiConfigured, restoreMobileMember } from "./src/auth/session";
-import { blockMobileMember, cancelMobileEventRequest, decideMobileHostRequest, loadMobileDevices, loadMobileProduct, loadMobileRoom, reportMobileSafety, requestMobileEvent, revokeMobileDevice, saveMobileReflection, type MobileDeviceSession, type MobileHostRequest, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
+import { blockMobileMember, cancelMobileEventRequest, decideMobileHostRequest, loadMobileDevices, loadMobileFeedback, loadMobileProduct, loadMobileRoom, reportMobileSafety, requestMobileEvent, revokeMobileDevice, saveMobileReflection, submitMobileFeedback, type MobileDeviceSession, type MobileFeedbackTicket, type MobileHostRequest, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
 
-type Tab = "discover" | "event" | "arc";
+type Tab = "discover" | "event" | "arc" | "feedback";
 
 const events = [
   { icon: "↗", sport: "Tennis", place: "Tineretului · approximate area", time: "Today · 19:00", color: "#dff59e" },
@@ -35,6 +40,7 @@ export default function App() {
   const [authState, setAuthState] = useState<"checking" | "signed_out" | "signed_in" | "prototype">(configured ? "checking" : "prototype");
   const [memberName, setMemberName] = useState("");
   const [tab, setTab] = useState<Tab>("discover");
+  const [feedbackOrigin, setFeedbackOrigin] = useState("Discover");
   const [draftAttendance, setDraftAttendance] = useState<EventReflectionInput["attendance"]>("attended");
   const [draftAgain, setDraftAgain] = useState<EventReflectionInput["wouldJoinAgain"]>("prefer_not_to_say");
   const [reflection, setReflection] = useState<EventReflectionInput | null>(null);
@@ -100,12 +106,12 @@ export default function App() {
           <View style={[styles.prototypeBanner, authState === "signed_in" && styles.liveBanner]}><Text style={[styles.prototypeText, authState === "signed_in" && styles.liveBannerText]}>{authState === "signed_in" ? "LIVE PRIVATE BETA DATA" : "INTERACTION PROTOTYPE · NOT SYNCED"}</Text></View>
           {authState === "signed_in" ? <View style={styles.sessionRow}><Text style={styles.sessionText}>Signed in as {memberName}</Text><View style={styles.sessionActions}><DeviceManager /><Pressable accessibilityRole="button" onPress={() => logoutMobile().finally(() => { setMemberName(""); setAuthState("signed_out"); })}><Text style={styles.sessionAction}>Sign out</Text></Pressable></View></View> : null}
           <View style={styles.header}>
-            <View><Text style={styles.overline}>SPORT DATE</Text><Text style={styles.title}>{tab === "discover" ? "Move. Meet. Repeat." : tab === "event" ? "After the movement." : "Your Movement Arc."}</Text></View>
+            <View><Text style={styles.overline}>SPORT DATE</Text><Text style={styles.title}>{tab === "discover" ? "Move. Meet. Repeat." : tab === "event" ? "After the movement." : tab === "arc" ? "Your Movement Arc." : "Help us find the rough edges."}</Text></View>
             <View style={styles.avatar}><Text style={styles.avatarText}>A</Text></View>
           </View>
 
-          {authState === "signed_in" && (productState === "loading" || productState === "idle") ? <StateCard title="Loading your movement" body="Fetching approximate discovery, your event access, and private progress." loading /> : null}
-          {authState === "signed_in" && productState === "error" ? <StateCard title="The connection lost its rhythm" body={productError} action="Try again" onAction={() => void reloadProduct()} /> : null}
+          {authState === "signed_in" && tab !== "feedback" && (productState === "loading" || productState === "idle") ? <StateCard title="Loading your movement" body="Fetching approximate discovery, your event access, and private progress." loading /> : null}
+          {authState === "signed_in" && tab !== "feedback" && productState === "error" ? <StateCard title="The connection lost its rhythm" body={productError} action="Try again" onAction={() => void reloadProduct()} /> : null}
           {(authState !== "signed_in" || productState === "ready") && tab === "discover" ? <DiscoverScreen
             live={authState === "signed_in"}
             items={authState === "signed_in" ? (product?.discovery ?? []).map((event) => ({
@@ -142,12 +148,14 @@ export default function App() {
             : <StateCard title="No event-day room yet" body="Accepted and hosted events will appear here without exposing an address in discovery." action="Discover events" onAction={() => setTab("discover")} />
             : <EventDayScreen live={false} eventId="" eventTitle="An easy evening rally" eventMeta="Tennis · Tineretului · four places" venue={null} hasEnded attendance={draftAttendance} wouldJoinAgain={draftAgain} saved={reflection !== null} onAttendance={setDraftAttendance} onAgain={setDraftAgain} onSave={() => { setReflection({ attendance: draftAttendance, wouldJoinAgain: draftAgain }); setTab("arc"); }} onSafetyComplete={async () => undefined} safetyPeople={[]} hostRequests={[]} onHostDecision={async () => undefined} /> : null}
           {(authState !== "signed_in" || productState === "ready") && tab === "arc" ? <ArcScreen progress={authState === "signed_in" && product ? product.progress : progress} hasReflection={authState === "signed_in" ? (product?.progress.attendedMoves ?? 0) > 0 : reflection !== null} live={authState === "signed_in"} onFindMove={() => setTab("discover")} /> : null}
+          {authState === "signed_in" && tab === "feedback" ? <FeedbackScreen initialScreen={feedbackOrigin} /> : null}
         </ScrollView>
 
         <View style={styles.tabBar} accessibilityRole="tablist">
           <TabButton label="Discover" active={tab === "discover"} onPress={() => setTab("discover")} />
           <TabButton label="Event day" active={tab === "event"} onPress={() => setTab("event")} />
           <TabButton label="My arc" active={tab === "arc"} onPress={() => setTab("arc")} />
+          {authState === "signed_in" ? <TabButton label="Feedback" active={tab === "feedback"} onPress={() => { if (tab !== "feedback") setFeedbackOrigin(tab === "event" ? "Event day" : tab === "arc" ? "My arc" : "Discover"); setTab("feedback"); }} /> : null}
         </View>
       </View>
     </SafeAreaView>
@@ -327,6 +335,124 @@ function SafetyControls({ eventId, subjectUserId, subjectName, onComplete }: { e
   </>;
 }
 
+const feedbackCategoryLabels: Record<FeedbackCategory, string> = {
+  bug: "Something broke",
+  missing_feature: "Something is missing",
+  usability: "Hard to use",
+  accessibility: "Accessibility",
+  performance: "Slow or unreliable",
+  content: "Words or information",
+  suggestion: "An idea",
+  other: "Something else",
+};
+const feedbackSeverityLabels: Record<FeedbackSeverity, string> = {
+  low: "Small friction",
+  medium: "Slowed me down",
+  high: "Blocked my task",
+  blocker: "Could not continue",
+};
+const feedbackStatusLabels: Record<MobileFeedbackTicket["status"], string> = {
+  open: "Shared",
+  in_progress: "Being reviewed",
+  resolved: "Addressed",
+  closed: "Closed",
+};
+
+function FeedbackScreen({ initialScreen }: { initialScreen: string }) {
+  const [category, setCategory] = useState<FeedbackCategory>("bug");
+  const [severity, setSeverity] = useState<FeedbackSeverity>("low");
+  const [summary, setSummary] = useState("");
+  const [details, setDetails] = useState("");
+  const [currentPath, setCurrentPath] = useState(initialScreen);
+  const [expectedOutcome, setExpectedOutcome] = useState("");
+  const [actualOutcome, setActualOutcome] = useState("");
+  const [tickets, setTickets] = useState<MobileFeedbackTicket[]>([]);
+  const [historyState, setHistoryState] = useState<"loading" | "ready" | "error">("loading");
+  const [historyError, setHistoryError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  const load = useCallback(async () => {
+    setHistoryState("loading"); setHistoryError("");
+    try { setTickets(await loadMobileFeedback()); setHistoryState("ready"); }
+    catch (error) { setHistoryError(error instanceof Error ? error.message : "Your feedback could not be loaded."); setHistoryState("error"); }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
+
+  const canSubmit = summary.trim().length >= 10 && details.trim().length >= 20 && currentPath.trim().length > 0;
+  async function submit() {
+    setSubmitting(true); setSubmitMessage("");
+    const feedback: FeedbackTicketInput = {
+      category, surface: "mobile", summary, details, currentPath,
+      expectedOutcome: expectedOutcome.trim() || null,
+      actualOutcome: actualOutcome.trim() || null,
+      severity,
+    };
+    try {
+      const ticket = await submitMobileFeedback(feedback);
+      setTickets((current) => [ticket, ...current.filter((item) => item.id !== ticket.id)]);
+      setSummary(""); setDetails(""); setExpectedOutcome(""); setActualOutcome(""); setSeverity("low");
+      setSubmitMessage("Thank you. Your product feedback is now with the team.");
+      setHistoryState("ready");
+    } catch (error) { setSubmitMessage(error instanceof Error ? error.message : "Your feedback could not be shared."); }
+    finally { setSubmitting(false); }
+  }
+
+  return <>
+    <View style={styles.feedbackSafetyRoute} accessibilityRole="summary">
+      <Text style={styles.feedbackSafetyTitle}>This is for product feedback</Text>
+      <Text style={styles.feedbackSafetyBody}>If this concerns another member or an event, use the Safety button beside that person so it reaches the private safety review path. If anyone is in immediate danger, contact local emergency services.</Text>
+    </View>
+    <View style={styles.feedbackPanel}>
+      <Text style={styles.feedbackPanelOverline}>NEW FEEDBACK · PHONE APP</Text>
+      <Text style={styles.feedbackPanelTitle}>What happened?</Text>
+      <Text style={styles.feedbackIntro}>A short, specific example is perfect. You can keep this comfortably one-handed.</Text>
+      <View style={styles.feedbackPrivacy}>
+        <Text style={styles.feedbackPrivacyTitle}>Keep private details out.</Text>
+        <Text style={styles.feedbackPrivacyBody}>Do not include exact addresses, contact or payment details, health information, private messages, passwords, tokens, coordinates, or map pins.</Text>
+      </View>
+
+      <Text style={styles.choiceLabel}>WHAT KIND OF FEEDBACK IS THIS?</Text>
+      <View style={styles.choiceRow}>{FEEDBACK_CATEGORIES.map((value) => <Pressable key={value} accessibilityRole="radio" accessibilityLabel={feedbackCategoryLabels[value]} accessibilityState={{ checked: category === value }} onPress={() => setCategory(value)} style={[styles.choice, category === value && styles.choiceSelected]}><Text style={[styles.choiceText, category === value && styles.choiceTextSelected]}>{feedbackCategoryLabels[value]}</Text></Pressable>)}</View>
+
+      <Text style={styles.feedbackFieldLabel}>Short summary</Text>
+      <TextInput accessibilityLabel="Feedback short summary" value={summary} onChangeText={setSummary} maxLength={160} placeholder="I could not cancel my request" placeholderTextColor="#8b958e" style={styles.feedbackInput} />
+      <Text style={styles.feedbackHint}>10–160 characters</Text>
+
+      <Text style={styles.feedbackFieldLabel}>What were you trying to do?</Text>
+      <TextInput accessibilityLabel="Feedback experience details" multiline numberOfLines={5} value={details} onChangeText={setDetails} maxLength={4000} placeholder="Describe the steps you took without including anyone's private information." placeholderTextColor="#8b958e" style={[styles.feedbackInput, styles.feedbackTextArea]} />
+      <Text style={styles.feedbackHint}>At least 20 characters</Text>
+
+      <Text style={styles.feedbackFieldLabel}>Screen where it happened</Text>
+      <TextInput accessibilityLabel="Affected app screen" value={currentPath} onChangeText={setCurrentPath} maxLength={200} placeholder="For example: Event day" placeholderTextColor="#8b958e" style={styles.feedbackInput} />
+
+      <Text style={styles.feedbackFieldLabel}>What did you expect? (optional)</Text>
+      <TextInput accessibilityLabel="Expected outcome" multiline numberOfLines={3} value={expectedOutcome} onChangeText={setExpectedOutcome} maxLength={1000} placeholder="What should the app have done?" placeholderTextColor="#8b958e" style={[styles.feedbackInput, styles.feedbackSmallArea]} />
+
+      <Text style={styles.feedbackFieldLabel}>What happened instead? (optional)</Text>
+      <TextInput accessibilityLabel="Actual outcome" multiline numberOfLines={3} value={actualOutcome} onChangeText={setActualOutcome} maxLength={1000} placeholder="What did you see or experience?" placeholderTextColor="#8b958e" style={[styles.feedbackInput, styles.feedbackSmallArea]} />
+
+      <Text style={styles.choiceLabel}>HOW MUCH DID THIS AFFECT YOU?</Text>
+      <View style={styles.choiceRow}>{FEEDBACK_SEVERITIES.map((value) => <Pressable key={value} accessibilityRole="radio" accessibilityLabel={feedbackSeverityLabels[value]} accessibilityState={{ checked: severity === value }} onPress={() => setSeverity(value)} style={[styles.choice, severity === value && styles.choiceSelected]}><Text style={[styles.choiceText, severity === value && styles.choiceTextSelected]}>{feedbackSeverityLabels[value]}</Text></Pressable>)}</View>
+
+      <Pressable accessibilityRole="button" accessibilityState={{ disabled: submitting || !canSubmit, busy: submitting }} disabled={submitting || !canSubmit} onPress={() => void submit()} style={[styles.saveButton, (submitting || !canSubmit) && styles.disabled]}><Text style={styles.saveButtonText}>{submitting ? "Sharing..." : "Share product feedback"}</Text></Pressable>
+      {submitMessage ? <Text accessibilityLiveRegion="polite" style={styles.feedbackMessage}>{submitMessage}</Text> : null}
+    </View>
+
+    <View style={styles.feedbackHistory} accessibilityState={{ busy: historyState === "loading" }}>
+      <View style={styles.feedbackHistoryHeader}><View><Text style={styles.feedbackPanelOverline}>YOUR FEEDBACK</Text><Text style={styles.feedbackHistoryTitle}>What you've shared</Text></View>{historyState === "ready" ? <Text accessibilityLabel={`${tickets.length} feedback tickets`} style={styles.feedbackCount}>{tickets.length}</Text> : null}</View>
+      {historyState === "loading" ? <View style={styles.feedbackHistoryState}><ActivityIndicator color="#17241d" /><Text style={styles.feedbackHint}>Loading your feedback...</Text></View> : null}
+      {historyState === "error" ? <View style={styles.feedbackHistoryState}><Text accessibilityLiveRegion="assertive" style={styles.feedbackMessage}>{historyError}</Text><Pressable accessibilityRole="button" onPress={() => void load()} style={styles.stateAction}><Text style={styles.stateActionText}>Try again</Text></Pressable></View> : null}
+      {historyState === "ready" && tickets.length === 0 ? <View style={styles.feedbackHistoryState}><Text style={styles.feedbackEmptyTitle}>Nothing shared yet.</Text><Text style={styles.feedbackHint}>Once you send feedback, its status will appear here.</Text></View> : null}
+      {historyState === "ready" ? tickets.map((ticket) => <View key={ticket.id} accessibilityLabel={`${ticket.summary}, ${feedbackStatusLabels[ticket.status]}`} style={styles.feedbackTicket}>
+        <View style={styles.feedbackTicketMeta}><Text style={styles.feedbackTicketCategory}>{feedbackCategoryLabels[ticket.category]}</Text><Text style={styles.feedbackTicketStatus}>{feedbackStatusLabels[ticket.status]}</Text></View>
+        <Text style={styles.feedbackTicketTitle}>{ticket.summary}</Text>
+        <Text style={styles.feedbackTicketDetail}>{ticket.currentPath} · {feedbackSeverityLabels[ticket.severity]} · {new Date(ticket.createdAt).toLocaleDateString()}</Text>
+      </View>) : null}
+    </View>
+  </>;
+}
+
 function DeviceManager() {
   const [open, setOpen] = useState(false);
   const [devices, setDevices] = useState<MobileDeviceSession[]>([]);
@@ -377,6 +503,11 @@ const styles = StyleSheet.create({
   arcCard: { alignItems: "center", padding: 24, borderRadius: 28, backgroundColor: "#17241d" }, arcOrbit: { width: 172, height: 172, borderRadius: 86, borderWidth: 1, borderColor: "#708068", alignItems: "center", justifyContent: "center", marginVertical: 10 }, arcOrbitInner: { width: 124, height: 124, borderRadius: 62, borderWidth: 8, borderColor: "#c9f458", alignItems: "center", justifyContent: "center" }, arcCount: { color: "white", fontSize: 46, fontWeight: "900", lineHeight: 48 }, arcCountLabel: { color: "#9caaa0", fontSize: 8, fontWeight: "900", letterSpacing: 1.3 }, arcOverline: { color: "#c9f458", fontSize: 9, fontWeight: "900", letterSpacing: 1.3, marginTop: 22 }, arcTitle: { color: "white", fontSize: 35, fontWeight: "900", letterSpacing: -1, marginTop: 5 }, arcTrack: { width: "100%", height: 7, borderRadius: 4, overflow: "hidden", backgroundColor: "#34423a", marginTop: 24 }, arcTrackFill: { height: "100%", borderRadius: 4, backgroundColor: "#ff7b5f" }, arcStory: { color: "#d5ded8", textAlign: "center", fontSize: 13, lineHeight: 19, marginTop: 14 }, arcRule: { width: "100%", padding: 16, borderRadius: 15, backgroundColor: "#26352d", marginTop: 24 }, arcRuleTitle: { color: "#c9f458", fontSize: 11, fontWeight: "900" }, arcRuleBody: { color: "#aebbb2", fontSize: 10, lineHeight: 16, marginTop: 6 }, arcButton: { width: "100%", alignItems: "center", borderRadius: 14, backgroundColor: "#c9f458", paddingVertical: 15, marginTop: 14 }, arcButtonText: { color: "#17241d", fontWeight: "900" },
   tabBar: { position: "absolute", left: 14, right: 14, bottom: 14, flexDirection: "row", justifyContent: "space-around", borderRadius: 22, paddingVertical: 11, backgroundColor: "#17241d" }, tab: { flex: 1, alignItems: "center", gap: 5 }, tabDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "transparent" }, tabDotActive: { backgroundColor: "#c9f458" }, tabText: { color: "#829087", fontSize: 10, fontWeight: "800" }, tabTextActive: { color: "white" },
   stateCard: { alignItems: "flex-start", padding: 22, borderRadius: 22, backgroundColor: "white", gap: 9 }, stateTitle: { color: "#17241d", fontSize: 20, fontWeight: "900" }, stateBody: { color: "#657168", fontSize: 12, lineHeight: 18 }, stateAction: { borderRadius: 11, backgroundColor: "#c9f458", paddingHorizontal: 13, paddingVertical: 10, marginTop: 6 }, stateActionText: { color: "#17241d", fontSize: 11, fontWeight: "900" },
+  feedbackSafetyRoute: { padding: 17, borderRadius: 18, borderWidth: 1, borderColor: "#e6b9aa", backgroundColor: "#fff3ed", marginBottom: 12 }, feedbackSafetyTitle: { color: "#713b31", fontSize: 13, fontWeight: "900" }, feedbackSafetyBody: { color: "#713b31", fontSize: 10, lineHeight: 16, marginTop: 6 },
+  feedbackPanel: { padding: 20, borderRadius: 24, backgroundColor: "white" }, feedbackPanelOverline: { color: "#657168", fontSize: 8, fontWeight: "900", letterSpacing: 1.1 }, feedbackPanelTitle: { color: "#17241d", fontSize: 25, fontWeight: "900", letterSpacing: -.6, marginTop: 6 }, feedbackIntro: { color: "#657168", fontSize: 11, lineHeight: 17, marginTop: 7 },
+  feedbackPrivacy: { padding: 14, borderRadius: 13, backgroundColor: "#eef5da", marginVertical: 17 }, feedbackPrivacyTitle: { color: "#31411f", fontSize: 11, fontWeight: "900" }, feedbackPrivacyBody: { color: "#526057", fontSize: 9, lineHeight: 14, marginTop: 4 },
+  feedbackFieldLabel: { color: "#34443a", fontSize: 11, fontWeight: "900", marginTop: 13, marginBottom: 7 }, feedbackInput: { minHeight: 48, borderWidth: 1, borderColor: "#d1d7d2", borderRadius: 13, paddingHorizontal: 13, paddingVertical: 11, backgroundColor: "#fbfcfa", color: "#17241d" }, feedbackTextArea: { minHeight: 120, textAlignVertical: "top" }, feedbackSmallArea: { minHeight: 82, textAlignVertical: "top" }, feedbackHint: { color: "#7e8a82", fontSize: 9, lineHeight: 14, marginTop: 5 }, feedbackMessage: { color: "#435039", fontSize: 10, lineHeight: 15, marginTop: 11 },
+  feedbackHistory: { padding: 20, borderRadius: 24, backgroundColor: "#e9e4d8", marginTop: 12 }, feedbackHistoryHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }, feedbackHistoryTitle: { color: "#17241d", fontSize: 20, fontWeight: "900", marginTop: 5 }, feedbackCount: { minWidth: 31, paddingVertical: 7, borderRadius: 16, overflow: "hidden", backgroundColor: "#17241d", color: "white", textAlign: "center", fontSize: 10, fontWeight: "900" }, feedbackHistoryState: { alignItems: "flex-start", paddingVertical: 20, gap: 5 }, feedbackEmptyTitle: { color: "#17241d", fontSize: 12, fontWeight: "900" }, feedbackTicket: { padding: 15, borderRadius: 15, backgroundColor: "white", marginTop: 10 }, feedbackTicketMeta: { flexDirection: "row", justifyContent: "space-between", gap: 10 }, feedbackTicketCategory: { flex: 1, color: "#657168", fontSize: 8, fontWeight: "900", textTransform: "uppercase", letterSpacing: .6 }, feedbackTicketStatus: { color: "#713b31", fontSize: 8, fontWeight: "900" }, feedbackTicketTitle: { color: "#17241d", fontSize: 13, fontWeight: "900", marginTop: 9 }, feedbackTicketDetail: { color: "#657168", fontSize: 9, lineHeight: 14, marginTop: 6 },
   modalBackdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(12,20,15,.5)" }, safetyModal: { maxHeight: "92%", borderTopLeftRadius: 28, borderTopRightRadius: 28, backgroundColor: "#f4f0e7", overflow: "hidden" }, safetyModalContent: { padding: 22, paddingBottom: 42 }, safetyModalHeader: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }, safetyModalOverline: { color: "#8f5a4b", fontSize: 8, fontWeight: "900", letterSpacing: 1.2 }, safetyModalTitle: { color: "#17241d", fontSize: 30, fontWeight: "900", marginTop: 5 }, modalClose: { color: "#657168", fontSize: 11, fontWeight: "900", padding: 8 }, safetyModalBody: { color: "#657168", fontSize: 11, lineHeight: 17, marginTop: 14 }, blockButton: { alignItems: "center", borderRadius: 12, paddingVertical: 13, backgroundColor: "#ffe0d4", marginVertical: 16 }, blockButtonText: { color: "#713b31", fontSize: 11, fontWeight: "900" }, reportInput: { minHeight: 120, borderWidth: 1, borderColor: "#d1d7d2", borderRadius: 14, padding: 13, backgroundColor: "white", color: "#17241d", textAlignVertical: "top" }, checkRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 14 }, checkbox: { width: 18, height: 18, borderWidth: 1, borderColor: "#879189", borderRadius: 5 }, checkboxChecked: { borderWidth: 5, borderColor: "#17241d", backgroundColor: "#c9f458" }, checkText: { flex: 1, color: "#526057", fontSize: 10, lineHeight: 15 }, reportButton: { alignItems: "center", borderRadius: 12, paddingVertical: 14, backgroundColor: "#ff7b5f", marginTop: 16 }, reportButtonText: { color: "#32110b", fontSize: 11, fontWeight: "900" }, disabled: { opacity: .45 }, emergencyText: { color: "#713b31", fontSize: 9, lineHeight: 14, marginTop: 13 }, safetyResult: { padding: 11, borderRadius: 10, backgroundColor: "white", color: "#435039", fontSize: 10, lineHeight: 15, marginTop: 11 },
   deviceLoading: { marginTop: 24 }, deviceCard: { padding: 16, borderRadius: 14, backgroundColor: "white", marginTop: 10 }, deviceName: { color: "#17241d", fontSize: 13, fontWeight: "900" }, deviceMeta: { color: "#657168", fontSize: 9, lineHeight: 14, marginTop: 5 },
 });

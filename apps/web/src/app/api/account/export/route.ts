@@ -107,6 +107,11 @@ export async function GET() {
     SELECT device_name, access_expires_at, refresh_expires_at, last_used_at, created_at, revoked_at
     FROM mobile_sessions WHERE user_id = ${user.id} ORDER BY created_at
   `;
+  const productFeedback = await sql`
+    SELECT id, category, surface, summary, details, current_path, expected_outcome,
+      actual_outcome, severity, status, created_at, updated_at
+    FROM feedback_tickets WHERE reporter_user_id = ${user.id} ORDER BY created_at
+  `;
 
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
@@ -140,6 +145,7 @@ export async function GET() {
     memberBlocksCreated: blocks,
     privateEventReflections: eventReflections,
     mobileDeviceSessions: mobileDevices,
+    productFeedbackSubmitted: productFeedback,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 

@@ -48,8 +48,10 @@ Design and implement scheduled cleanup for expired browser sessions, mobile sess
 - Added a local-only, noindex, non-collecting Bucharest research landing preview for owner review and verified that the mobile layout no longer overflows the viewport.
 - Added tested app-wide browser response hardening with CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS, then verified the headers from a running production build.
 - Added tested app-layer rate limiting for browser login/signup, mobile login/refresh, join-request creation, and safety-report creation, including `429` retry metadata and a workspace Vitest config for alias-aware server-route tests.
+- Added a repository-local Customer Experience Agent with privacy-safe ticket deduplication, separate parallel implementation ownership, and independent customer-perspective retesting.
+- Added authenticated web and mobile product-feedback submission, private member-only history, shared bounded validation, explicit Safety Center routing, and account-export/deletion coverage.
 - Verified the production web build and Android Hermes bundle after device-management integration.
-- The web workspace test suite passes; all workspaces type-check; lint and the production web build pass.
+- Seventy-one tests pass; all workspaces type-check; full lint and the production web build pass; the Android Hermes export completes with 583 modules.
 
 ## Next three outcomes
 
@@ -71,5 +73,7 @@ Design and implement scheduled cleanup for expired browser sessions, mobile sess
 - Third skip currently means automatic decline and awaits confirmation.
 - Deletion finalization and vendor/backup propagation remain operational launch gates.
 - Shared edge or gateway rate limiting is still an operational launch gate even though the in-app baseline now exists.
+- Product feedback has no cross-member staff queue until access ownership and retention are approved; coding agents use the separate repository-local feedback queue.
+- End-to-end feedback rejection and accessibility behavior still needs an isolated signed-in fixture plus physical-device or browser assistive-technology testing.
 - Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.

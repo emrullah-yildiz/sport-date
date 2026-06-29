@@ -49,6 +49,12 @@
 - [x] Add member-facing web/mobile device-session review and remote revocation without exposing credentials or installation identifiers.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
+## Product learning: customer perspective
+
+- [x] Add a repository-local customer experience agent with privacy-safe ticket deduplication, parallel implementation handoff, and independent retesting.
+- [x] Add authenticated web and mobile product-feedback submission with private member history and a clear Safety Center boundary.
+- [ ] Add role-gated internal feedback triage only after an accountable owner, access policy, and retention period are approved.
+
 ## Launch gates
 
 - Qualified European counsel reviews terms, privacy, consent, moderation, age assurance, and launch-country obligations.

@@ -74,6 +74,10 @@ Emit one restrictive header policy across every web route instead of relying on 
 
 Do not wait for edge credentials to add all abuse controls. Add an app-layer baseline now for browser login/signup, mobile login/refresh, join-request creation, and safety-report creation, keyed by IP plus actor identity where possible. Keep the design honest: this reduces abuse pressure during development but does not replace shared production enforcement.
 
+## 2026-06-29 - Product feedback is private and separate from safety reporting
+
+Let authenticated members submit bounded product-experience feedback from web and mobile and see only their own history. Derive ownership from the authenticated session, exclude a safety category, warn against sensitive content, and route urgent or member-specific concerns to the Safety Center. Include feedback in account export and remove it with the owning account; do not expose a cross-member triage queue until a separately authorized staff boundary and retention policy exist.
+
 ## Open decisions
 
 - Final product and company name.

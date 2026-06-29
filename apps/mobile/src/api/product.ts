@@ -1,4 +1,4 @@
-import type { EventReflectionInput, MovementProgress, SafetyReportInput } from "@sport-date/domain";
+import type { EventReflectionInput, FeedbackTicketInput, MovementProgress, SafetyReportInput } from "@sport-date/domain";
 
 import { MobileSessionError, mobileApiFetch } from "../auth/session";
 
@@ -34,6 +34,11 @@ export type MobileProductData = { discovery: MobileDiscoveryEvent[]; events: Mob
 export type MobileDeviceSession = {
   id: string; deviceName: string; lastUsedAt: string; refreshExpiresAt: string;
   revokedAt: string | null; current: boolean; active: boolean;
+};
+export type MobileFeedbackTicket = FeedbackTicketInput & {
+  id: string;
+  status: "open" | "in_progress" | "resolved" | "closed";
+  createdAt: string;
 };
 
 async function readJson<T>(response: Response): Promise<T> {
@@ -111,4 +116,16 @@ export async function revokeMobileDevice(sessionId: string): Promise<void> {
     method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId }),
   });
   await readJson(response);
+}
+
+export async function loadMobileFeedback(): Promise<MobileFeedbackTicket[]> {
+  const response = await mobileApiFetch("/api/mobile/feedback");
+  return (await readJson<{ tickets: MobileFeedbackTicket[] }>(response)).tickets;
+}
+
+export async function submitMobileFeedback(feedback: FeedbackTicketInput): Promise<MobileFeedbackTicket> {
+  const response = await mobileApiFetch("/api/mobile/feedback", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(feedback),
+  });
+  return (await readJson<{ ticket: MobileFeedbackTicket }>(response)).ticket;
 }
