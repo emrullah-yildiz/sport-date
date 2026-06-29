@@ -1,10 +1,10 @@
-import type { EventReflectionInput, MovementProgress } from "@sport-date/domain";
+import type { EventReflectionInput, MovementProgress, SafetyReportInput } from "@sport-date/domain";
 
 import { MobileSessionError, mobileApiFetch } from "../auth/session";
 
 export type MobileDiscoveryEvent = {
   id: string; sport: string; title: string; startsAt: string; timeZone: string;
-  areaLabel: string; city: string; placesRemaining: number; hostFirstName: string;
+  areaLabel: string; city: string; placesRemaining: number; hostUserId: string; hostFirstName: string;
   request: { id: string; status: "pending" | "accepted" | "declined" | "cancelled"; skipCount: number } | null;
 };
 export type MobileMemberEvent = {
@@ -15,8 +15,16 @@ export type MobileMemberEvent = {
 export type MobileRoom = {
   id: string; title: string; sport: string; startsAt: string; timeZone: string;
   hasEnded: boolean; venueName: string; address: string; instructions: string | null; isHost: boolean;
+  viewerUserId: string;
+  host: { userId: string; firstName: string };
   reflection: EventReflectionInput | null;
   participants: Array<{ userId: string; firstName: string; skillLevel: string }>;
+  hostRequests: MobileHostRequest[];
+};
+export type MobileHostRequest = {
+  id: string; status: "pending" | "accepted" | "declined" | "cancelled"; skipCount: number;
+  introduction: string; requesterId: string; requestedAt: string;
+  requester: { firstName: string; age: number; bio: string; languages: string[]; skillLevel: string };
 };
 export type MobileProgress = MovementProgress & {
   hostedMoves: number; joinedMoves: number;
@@ -66,4 +74,25 @@ export async function requestMobileEvent(eventId: string, introduction = ""): Pr
 export async function cancelMobileEventRequest(eventId: string, requestId: string): Promise<void> {
   const response = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/requests/${encodeURIComponent(requestId)}`, { method: "DELETE" });
   await readJson(response);
+}
+
+export async function blockMobileMember(blockedUserId: string): Promise<void> {
+  const response = await mobileApiFetch("/api/mobile/safety/blocks", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ blockedUserId }),
+  });
+  await readJson(response);
+}
+
+export async function reportMobileSafety(report: SafetyReportInput): Promise<{ message: string; priority: string }> {
+  const response = await mobileApiFetch("/api/mobile/safety/reports", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(report),
+  });
+  return readJson(response);
+}
+
+export async function decideMobileHostRequest(eventId: string, requestId: string, action: "accept" | "skip"): Promise<{ status: string; skipCount: number }> {
+  const response = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/requests/${encodeURIComponent(requestId)}/decision`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }),
+  });
+  return readJson(response);
 }

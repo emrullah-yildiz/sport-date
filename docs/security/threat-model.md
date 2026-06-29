@@ -36,3 +36,4 @@
 - Token exfiltration through configuration: permit only relative `/api/mobile/` paths in authenticated fetches and require an HTTPS `EXPO_PUBLIC_API_URL` outside local development. Public Expo environment values must never contain secrets.
 - Residual risk: a compromised device process can steal both binding and tokens; production requires anomaly detection, rate limiting, app-integrity review, and an incident-revocation procedure.
 - Native discovery receives approximate locations only. Exact room logistics use the existing host/accepted-participant authorization and are fetched only for the selected event-day view; they are not persisted by the application client.
+- Native blocking/reporting and host decisions reuse the same server actions as web. Client state never grants a seat, verifies a report relationship, or decides whether exact room access survives a block.

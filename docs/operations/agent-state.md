@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Add native block/report paths and host request decisions with immediate access revocation and the maximum-three-skip rule.
+Add member-facing device-session review and remote revocation across web and mobile.
 
 ## Completed and verified
 
@@ -37,13 +37,17 @@ Add native block/report paths and host request decisions with immediate access r
 - Verified a 582-module Android Hermes bundle after live product-data integration.
 - Added native join requests and pending/accepted cancellation through shared web/mobile server mutations, including capacity, compatibility, mutual-block, seat-removal, destructive confirmation, and conflict refresh.
 - Verified the Android Hermes bundle after native request mutation integration.
+- Added shared web/native block and structured-report actions with immediate request, seat, room, and exact-location revocation.
+- Added native host pending-request cards and shared accept/skip decisions with atomic numbered seats and third-skip decline.
+- Added independently focusable mobile safety controls, emergency limitations, conflict refresh, and reporting for discovered hosts, pending requesters, room hosts, and other participants.
+- Verified the production web build and Android Hermes bundle after native safety and host-decision integration.
 - Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add native block/report paths and host request decisions with maximum-three-skip behavior.
-2. Add member-facing device-session review and remote revocation.
-3. Add outbound safety decision delivery after an approved email provider exists.
+1. Add member-facing device-session review and remote revocation.
+2. Add outbound safety decision delivery after an approved email provider exists.
+3. Add purpose-limited room coordination messages only after named moderation staffing exists.
 
 ## Owner blockers
 

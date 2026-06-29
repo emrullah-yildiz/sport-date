@@ -41,7 +41,8 @@
 - [x] Implement and threat-model separate revocable native sessions with SecureStore, short access tokens, rotating refresh tokens, and reuse revocation.
 - [x] Replace signed-in mobile demo state with native-authorized live approximate discovery, accepted/host room, reflection, and Movement Arc data.
 - [x] Add native join requests and requester cancellation with shared capacity, compatibility, block, seat-removal, and conflict recovery.
-- [ ] Add native host decisions, blocking, and reporting with web-equivalent recovery.
+- [x] Add native host decisions, blocking, and reporting with shared access revocation, audited reports, atomic seats, and maximum-three-skip recovery.
+- [ ] Add member-facing native device-session review and remote revocation.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
 ## Launch gates

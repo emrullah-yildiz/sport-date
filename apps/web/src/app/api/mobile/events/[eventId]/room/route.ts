@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getEventRoom } from "@/lib/events";
+import { getEventRoom, getHostJoinRequests } from "@/lib/events";
 import { getMobileSession } from "@/lib/mobile-session";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -12,6 +12,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ even
   if (!UUID_PATTERN.test(eventId)) return NextResponse.json({ error: "Event room not found." }, { status: 404 });
   const room = await getEventRoom(eventId, session.user.id);
   if (!room) return NextResponse.json({ error: "Event room not found." }, { status: 404, headers: { "Cache-Control": "no-store" } });
-  return NextResponse.json({ room }, { headers: { "Cache-Control": "no-store" } });
+  const hostRequests = room.isHost ? await getHostJoinRequests(eventId, session.user.id) : [];
+  return NextResponse.json({ room: { ...room, viewerUserId: session.user.id, hostRequests } }, { headers: { "Cache-Control": "no-store" } });
 }
-

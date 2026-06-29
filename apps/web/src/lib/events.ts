@@ -180,6 +180,7 @@ export async function getAcceptedEventLocation(
 export type EventRoom = Readonly<{
   id: string; title: string; sport: string; startsAt: string; timeZone: string; hasEnded: boolean;
   venueName: string; address: string; instructions: string | null; isHost: boolean;
+  host: { userId: string; firstName: string };
   reflection: { attendance: "attended" | "left_early" | "did_not_attend"; wouldJoinAgain: "yes" | "no" | "prefer_not_to_say" } | null;
   participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string }>;
 }>;
@@ -193,6 +194,7 @@ export type MemberEventSummary = Readonly<{
 type EventRoomRow = {
   id: string; title: string; sport: string; starts_at: string; time_zone: string;
   venue_name: string; address: string; arrival_instructions: string | null; is_host: boolean;
+  host_user_id: string | number; host_first_name: string;
   has_ended: boolean; attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
   would_join_again: NonNullable<EventRoom["reflection"]>["wouldJoinAgain"] | null;
 };
@@ -203,11 +205,13 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   const rooms = await sql`
     SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
       location.venue_name, location.address, location.arrival_instructions,
+      events.host_user_id, host.first_name AS host_first_name,
       (events.host_user_id = ${userId}) AS is_host,
       (events.starts_at + (events.duration_minutes * INTERVAL '1 minute') <= NOW()) AS has_ended,
       reflection.attendance, reflection.would_join_again
     FROM events
     JOIN event_private_locations AS location ON location.event_id = events.id
+    JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
     LEFT JOIN event_reflections AS reflection ON reflection.event_id = events.id AND reflection.user_id = ${userId}
     WHERE events.id = ${eventId}::uuid AND events.status IN ('published', 'completed')
       AND (
@@ -249,6 +253,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
     timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
     instructions: room.arrival_instructions, isHost: room.is_host, hasEnded: room.has_ended,
+    host: { userId: String(room.host_user_id), firstName: room.host_first_name },
     reflection: room.attendance && room.would_join_again
       ? { attendance: room.attendance, wouldJoinAgain: room.would_join_again }
       : null,

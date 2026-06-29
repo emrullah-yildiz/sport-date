@@ -43,9 +43,17 @@ The native app must not reuse browser-cookie assumptions. Before replacing proto
 
 - logout, expiry, device loss, account deletion, and role/access revocation behavior;
 - member-facing device-session review and remote revocation;
-- native host-decision, block, and report mutations with web-equivalent authorization and recovery;
+- member-facing native device-session review and remote revocation;
 - no precise-location caching outside the authorized event-room lifecycle;
 - loading, offline, retry, stale-session, and partial-submit recovery;
 - privacy export/deletion coverage identical to web.
+
+## Implemented native safety and host parity
+
+- Discovered hosts, pending requesters, the accepted-room host, and other room participants expose independently focusable safety controls.
+- Immediate block requires confirmation and uses the shared server action to remove seats, cancel active requests, and revoke exact room access without identifying the blocker.
+- Structured reports collect category and 20–2000 character facts, can block in the same audited transaction, and repeat the emergency-service limitation.
+- Host rooms include pending requester context and web-equivalent accept/skip controls. Acceptance uses the atomic numbered-seat invariant; the third skip privately declines.
+- Mutation conflicts refresh authoritative product and room data. Native controls do not use optimistic access or capacity state.
 
 Production app identifiers, signing, push credentials, store accounts, terms acceptance, and deployment require owner authorization.
