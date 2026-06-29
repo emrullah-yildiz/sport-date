@@ -2,11 +2,13 @@ import { validateProfileUpdate } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getDatabase } from "@/lib/db";
+import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
 export const runtime = "nodejs";
 
 export async function PATCH(request: Request) {
+  if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 

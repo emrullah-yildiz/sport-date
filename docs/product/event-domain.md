@@ -47,6 +47,8 @@ Authorization must be derived server-side from the event and participation recor
 
 Join requests begin pending. The host may accept or skip. The third skip currently becomes a decline. Acceptance must be atomic with capacity enforcement so two simultaneous decisions cannot overfill an event. Cancellation by requester or host must close precise-location access immediately where practical.
 
+The implementation assigns accepted participants unique numbered seats bounded by event capacity. Pending and declined requesters never receive the private-location query path. A requester who cancels an accepted place loses that seat and precise-location access.
+
 ## Required failure and recovery states
 
 - Event fills while a request is being submitted.
@@ -69,4 +71,3 @@ Record product events without precise coordinates or message contents:
 - safety report category and response timing in the moderation system.
 
 Analytics identifiers, retention, consent or lawful basis, and access controls require privacy review before production instrumentation.
-

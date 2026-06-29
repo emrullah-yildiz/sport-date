@@ -2,21 +2,21 @@
 
 ## Current outcome
 
-Implement join requests and host decisions with atomic capacity enforcement, dignified skip behavior, requester cancellation, and precise-location access only after acceptance.
+Add event-room authorization without real-time chat, giving hosts and accepted participants a secure coordination surface while excluding pending, declined, cancelled, blocked, and unrelated users.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
-- Completed account authentication, privacy controls, and profile editing.
-- Added privacy-first host event creation with separate exact-location persistence.
-- Added discovery filtered by the member's sport/skill plus optional city, sport, language, and time; mutual blocks silently remove events, and discovery never joins private locations.
-- Twenty-six tests pass; all workspaces type-check; lint and the production web build pass.
+- Completed account authentication, privacy controls, profile editing, event creation, and discovery.
+- Implemented join requests, optional introductions, dignified requester states, host accept/skip decisions, third-skip decline, and requester cancellation.
+- Accepted participants claim unique numbered seats atomically; only accepted participants can query exact meeting details.
+- Cookie-authenticated mutations now share cross-site request checks. Thirty-one tests pass; all workspaces type-check; lint and production build pass.
 
 ## Next three outcomes
 
-1. Implement request, accept, skip, third-skip decline, cancellation, and atomic capacity enforcement.
-2. Add event-room authorization without real-time chat.
-3. Extend privacy export/deletion coverage to events and requests.
+1. Add the authorized event room without real-time chat.
+2. Extend privacy export/deletion coverage to events, requests, and participation.
+3. Implement block/report paths and moderation audit records before messaging.
 
 ## Owner blockers
 
@@ -29,7 +29,7 @@ Implement join requests and host decisions with atomic capacity enforcement, dig
 
 - “Sport Date” is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
-- Discovery intentionally shows no reason when blocking makes an event unavailable.
-- Capacity cannot be presented as live until join decisions are persisted atomically.
+- Cancelled or declined requests cannot be reopened in the current MVP.
+- Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.
 

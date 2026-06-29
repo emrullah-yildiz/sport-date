@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashSessionToken, verifyPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { AUTH_COOKIE_NAME, setSessionCookie } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -13,6 +14,7 @@ const DUMMY_PASSWORD_HASH = "$2b$12$Ad/rUVoyWWEHpeHc7A7mX.CJ5QzyE20ylxhB323v6GK1
 type LoginUserRow = { id: string | number; email: string; password_hash: string; account_status: string };
 
 export async function POST(request: Request) {
+  if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   try {
     const validation = validateLogin(await request.json());
     if (!validation.valid) {

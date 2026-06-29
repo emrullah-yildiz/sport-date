@@ -4,16 +4,10 @@ import { validateEventCreation } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getDatabase } from "@/lib/db";
+import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
 export const runtime = "nodejs";
-
-function isTrustedBrowserMutation(request: Request): boolean {
-  const fetchSite = request.headers.get("sec-fetch-site");
-  if (fetchSite && fetchSite !== "same-origin" && fetchSite !== "none") return false;
-  const origin = request.headers.get("origin");
-  return !origin || origin === new URL(request.url).origin;
-}
 
 export async function POST(request: Request) {
   if (!isTrustedBrowserMutation(request)) {
@@ -72,4 +66,3 @@ export async function POST(request: Request) {
   if (results[0].length === 0) return NextResponse.json({ error: "Event could not be created." }, { status: 500 });
   return NextResponse.json({ success: true, eventId }, { status: 201 });
 }
-

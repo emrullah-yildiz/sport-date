@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   acceptJoinRequest,
+  cancelJoinRequest,
   InvalidJoinRequestTransition,
   MAX_EVENT_REQUEST_SKIPS,
   skipJoinRequest,
@@ -55,5 +56,15 @@ describe("join request decisions", () => {
       InvalidJoinRequestTransition,
     );
   });
-});
 
+  it("allows a requester to cancel pending or accepted participation", () => {
+    expect(cancelJoinRequest(pendingRequest(), new Date()).status).toBe("cancelled");
+    const accepted = acceptJoinRequest(pendingRequest(), new Date());
+    expect(cancelJoinRequest(accepted, new Date()).decisionReason).toBe("requester_cancelled");
+  });
+
+  it("does not cancel an already declined request", () => {
+    const declined = skipJoinRequest(skipJoinRequest(skipJoinRequest(pendingRequest(), new Date()), new Date()), new Date());
+    expect(() => cancelJoinRequest(declined, new Date())).toThrow(InvalidJoinRequestTransition);
+  });
+});

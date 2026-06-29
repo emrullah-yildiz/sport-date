@@ -1,6 +1,6 @@
 export const MAX_EVENT_REQUEST_SKIPS = 3 as const;
 
-export type JoinRequestStatus = "pending" | "accepted" | "declined";
+export type JoinRequestStatus = "pending" | "accepted" | "declined" | "cancelled";
 
 export type JoinRequest = Readonly<{
   id: string;
@@ -9,7 +9,7 @@ export type JoinRequest = Readonly<{
   status: JoinRequestStatus;
   skipCount: number;
   decidedAt?: Date;
-  decisionReason?: "accepted" | "maximum_skips_reached";
+  decisionReason?: "accepted" | "maximum_skips_reached" | "requester_cancelled";
 }>;
 
 export class InvalidJoinRequestTransition extends Error {
@@ -62,3 +62,9 @@ export function skipJoinRequest(
   return { ...request, skipCount };
 }
 
+export function cancelJoinRequest(request: JoinRequest, decidedAt: Date): JoinRequest {
+  if (request.status !== "pending" && request.status !== "accepted") {
+    throw new InvalidJoinRequestTransition(`Cannot cancel a join request with status ${request.status}.`);
+  }
+  return { ...request, status: "cancelled", decidedAt, decisionReason: "requester_cancelled" };
+}

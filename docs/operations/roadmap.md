@@ -14,7 +14,7 @@
 - [x] Implement authenticated profile editing with server-derived ownership and shared validation.
 - [x] Implement host event creation with separate public event and private meeting-location persistence.
 - [x] Implement privacy-preserving discovery eligibility and city, sport, language, and time filters.
-- [ ] Implement request, accept, skip, third-skip decline, cancellation, and capacity invariants.
+- [x] Implement request, accept, skip, third-skip decline, requester cancellation, and atomic seat-capacity invariants.
 - [ ] Add event room authorization without real-time chat initially.
 - [ ] Extend access/export/deletion coverage as event, request, room, report, and message data is introduced.
 

@@ -24,6 +24,10 @@ Store discoverable event fields and exact meeting locations in separate tables. 
 
 Exclude an event when either the requester or host has blocked the other. Return no block-specific reason or placeholder card, preventing discovery behavior from revealing the relationship.
 
+## 2026-06-29 — Event capacity is enforced with unique numbered seats
+
+Accepting a request atomically claims the lowest available numbered seat under unique database constraints. Concurrent accept attempts cannot create more participant rows than the event capacity; a losing conflict leaves the request pending instead of overfilling the event.
+
 ## Open decisions
 
 - Final product and company name.

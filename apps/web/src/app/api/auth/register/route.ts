@@ -3,11 +3,13 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { setSessionCookie } from "@/lib/session";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   try {
     const validation = validateRegistration(await request.json());
     if (!validation.valid) {

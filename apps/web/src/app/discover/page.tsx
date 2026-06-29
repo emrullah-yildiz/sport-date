@@ -39,11 +39,10 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         ) : (
           <div className="discovery-grid">{events.map((event) => {
             const startsAt = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: event.timeZone }).format(new Date(event.startsAt));
-            return <article className="discovery-card" key={event.id}><div className="discovery-card-top"><span>{event.sport}</span><span>{event.areaLabel}, {event.city}</span></div><h3>{event.title}</h3><p>{event.description}</p><div className="discovery-meta"><span>{startsAt}</span><span>{event.durationMinutes} min</span><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div><footer><span>Hosted by {event.hostFirstName}</span><button type="button" disabled>Requests coming next</button></footer></article>;
+            return <article className="discovery-card" key={event.id}><div className="discovery-card-top"><span>{event.sport}</span><span>{event.areaLabel}, {event.city}</span></div><h3>{event.title}</h3><p>{event.description}</p><div className="discovery-meta"><span>{startsAt}</span><span>{event.placesRemaining} places</span><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div><footer><span>{event.request ? `Request: ${event.request.status}` : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer></article>;
           })}</div>
         )}
       </section>
     </main>
   );
 }
-

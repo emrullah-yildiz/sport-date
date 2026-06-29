@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { getHostEvent } from "@/lib/events";
+import HostRequestDecision from "@/components/HostRequestDecision";
+import { getHostEvent, getHostJoinRequests } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
 export default async function HostEventPage({ params }: { params: Promise<{ eventId: string }> }) {
@@ -10,6 +11,7 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
   const { eventId } = await params;
   const event = await getHostEvent(eventId, host.id);
   if (!event) notFound();
+  const requests = await getHostJoinRequests(eventId, host.id);
   const startsAt = new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeStyle: "short", timeZone: event.timeZone }).format(new Date(event.startsAt));
 
   return (
@@ -20,8 +22,7 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
         <article className="host-location-card public"><p className="panel-label">Discovery sees</p><h2>{event.publicLocation.areaLabel}</h2><p>{event.publicLocation.city}, {event.publicLocation.countryCode}</p><small>No exact venue or address is included in public event data.</small></article>
         <article className="host-location-card private"><p className="panel-label">Accepted people see</p><h2>{event.privateLocation.venueName}</h2><p>{event.privateLocation.address}</p>{event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}</article>
       </section>
-      <section className="host-next"><p className="panel-label">What happens next</p><h2>Requests will arrive here.</h2><p>The request queue is the next product slice. Until then, this event cannot accept real participants.</p></section>
+      <section className="host-requests"><p className="panel-label">Join requests</p><h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>{requests.length === 0 ? <p>Compatible members can now discover this invitation and request a place.</p> : <div className="host-request-list">{requests.map((request) => <article className={`host-request ${request.status}`} key={request.id}><div><strong>{request.requester.firstName}, {request.requester.age}</strong><span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span></div>{request.requester.bio ? <p>{request.requester.bio}</p> : null}{request.introduction ? <blockquote>{request.introduction}</blockquote> : null}<footer><span className="capitalize">{request.status}</span>{request.status === "pending" ? <HostRequestDecision eventId={event.id} requestId={request.id} skipCount={request.skipCount} /> : null}</footer></article>)}</div>}</section>
     </main>
   );
 }
-

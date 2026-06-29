@@ -13,6 +13,7 @@
 - Login uses a generic credential error and a dummy password hash to reduce account-enumeration timing differences.
 - Login rotates an existing browser session; logout revokes the server record and expires the cookie.
 - The private profile page resolves the user from a live, unexpired, server-side session.
+- Cookie-authenticated mutation endpoints reject cross-site browser fetch metadata and mismatched Origin headers.
 
 ## Required before external registration
 

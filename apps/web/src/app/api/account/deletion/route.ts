@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { verifyPassword } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
+import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { clearSessionCookie, getCurrentUser } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -11,6 +12,7 @@ export const runtime = "nodejs";
 type PasswordRow = { password_hash: string };
 
 export async function POST(request: Request) {
+  if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
