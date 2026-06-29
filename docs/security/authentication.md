@@ -14,6 +14,7 @@
 - Login rotates an existing browser session; logout revokes the server record and expires the cookie.
 - The private profile page resolves the user from a live, unexpired, server-side session.
 - Cookie-authenticated mutation endpoints reject cross-site browser fetch metadata and mismatched Origin headers.
+- The web app emits restrictive browser security headers for every route: CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS.
 - Native sessions use separate random opaque credentials: a 15-minute access token and a rotating refresh token with a fixed 30-day family lifetime. Only SHA-256 hashes are stored.
 - Native refresh rotation stores spent refresh hashes; reuse revokes the server-side session family.
 - Native access requires the current access token and hashed installation UUID. Account deletion revokes all active native sessions immediately.

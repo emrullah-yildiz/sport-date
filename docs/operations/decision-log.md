@@ -66,6 +66,10 @@ Mobile device management can remotely revoke other sessions but cannot revoke th
 
 Treat Bucharest as a research hypothesis. First test the Aviatorilor-Herastrau to Aurel Vlaicu-Floreasca corridor with recurring beginner-friendly run/run-walk and four-person indoor padel formats. Running tests low-friction demand; padel tests the bounded social encounter. Keep bouldering as the replacement if padel economics fail. Do not add neighborhoods, sports, or paid acquisition before four credible hosts and repeated event supply exist.
 
+## 2026-06-29 - Harden the web surface before external traffic
+
+Emit one restrictive header policy across every web route instead of relying on route-by-route discipline. Deny framing, keep a self-only baseline CSP, disable unnecessary browser capabilities, prefer strict cross-origin isolation headers, and add HSTS only in production.
+
 ## Open decisions
 
 - Final product and company name.

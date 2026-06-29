@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Audit the remaining launch gates against the implemented web/mobile product and turn the highest-priority unblocked gap into the next tested slice.
+Design and implement abuse-aware rate limiting for authentication and high-leverage mutation paths so launch security does not rely only on documentation and manual response.
 
 ## Completed and verified
 
@@ -46,12 +46,13 @@ Audit the remaining launch gates against the implemented web/mobile product and 
 - Documented evidence limits, bouldering fallback, founding-host requirements, phased validation thresholds, kill criteria, and behavior-led member and host interview scripts.
 - Prepared bilingual member and host recruitment copy, channel-specific organic drafts, privacy-aware form fields, campaign tags, decision signals, and a publication checklist without contacting or publishing to anyone.
 - Added a local-only, noindex, non-collecting Bucharest research landing preview for owner review and verified that the mobile layout no longer overflows the viewport.
+- Added tested app-wide browser response hardening with CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS, then verified the headers from a running production build.
 - Verified the production web build and Android Hermes bundle after device-management integration.
 - Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Audit the remaining launch gates and choose the highest-value unblocked implementation slice.
+1. Design and implement abuse-aware rate limiting for authentication and high-leverage mutation paths.
 2. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
 3. Add outbound safety decision delivery after an approved email provider exists.
 
@@ -68,5 +69,6 @@ Audit the remaining launch gates against the implemented web/mobile product and 
 - "Sport Date" is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
 - Deletion finalization and vendor/backup propagation remain operational launch gates.
+- Edge or gateway rate limiting is still an implementation gap, not just a documented requirement.
 - Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.

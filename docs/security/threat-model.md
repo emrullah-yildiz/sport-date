@@ -13,6 +13,7 @@
 
 - Approximate location before acceptance; precise meeting details only for authorized participants.
 - Server-side authorization for every profile, event, request, room, and moderation operation.
+- Restrictive browser response headers across the web app: CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS.
 - Rate limits and abuse detection around discovery, requests, messaging, and authentication.
 - Blocking and reporting available throughout the core journey.
 - Immutable audit records for moderation and privileged actions.
