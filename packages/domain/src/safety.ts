@@ -38,6 +38,21 @@ export type ModerationAppealUpdateValidation =
   | { valid: true; status: ModerationAppealStatus; outcomeSummary: string | null }
   | { valid: false; errors: readonly string[] };
 
+export const EVIDENCE_SOURCE_TYPES = ["system_record", "member_statement", "external_case", "law_enforcement_request"] as const;
+export const EVIDENCE_SENSITIVITIES = ["restricted", "high"] as const;
+export const EVIDENCE_REVIEW_DAYS = [30, 90, 180] as const;
+export type EvidenceReferenceValidation =
+  | {
+    valid: true;
+    sourceType: (typeof EVIDENCE_SOURCE_TYPES)[number];
+    sensitivity: (typeof EVIDENCE_SENSITIVITIES)[number];
+    label: string;
+    referenceKey: string;
+    preservationPurpose: string;
+    reviewAfterDays: (typeof EVIDENCE_REVIEW_DAYS)[number];
+  }
+  | { valid: false; errors: readonly string[] };
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const USER_ID_PATTERN = /^\d+$/;
 
@@ -123,4 +138,34 @@ export function validateModerationAppealUpdate(raw: unknown): ModerationAppealUp
   }
   if (errors.length > 0) return { valid: false, errors };
   return { valid: true, status: status as ModerationAppealStatus, outcomeSummary: final ? outcomeSummary : null };
+}
+
+export function validateEvidenceReference(raw: unknown): EvidenceReferenceValidation {
+  if (!raw || typeof raw !== "object") return { valid: false, errors: ["Evidence reference is required."] };
+  const input = raw as Record<string, unknown>;
+  const sourceType = input.sourceType;
+  const sensitivity = input.sensitivity;
+  const label = typeof input.label === "string" ? input.label.trim() : "";
+  const referenceKey = typeof input.referenceKey === "string" ? input.referenceKey.trim() : "";
+  const preservationPurpose = typeof input.preservationPurpose === "string" ? input.preservationPurpose.trim() : "";
+  const reviewAfterDays = input.reviewAfterDays;
+  const errors: string[] = [];
+  if (!EVIDENCE_SOURCE_TYPES.includes(sourceType as (typeof EVIDENCE_SOURCE_TYPES)[number])) errors.push("Choose a valid evidence source.");
+  if (!EVIDENCE_SENSITIVITIES.includes(sensitivity as (typeof EVIDENCE_SENSITIVITIES)[number])) errors.push("Choose a valid sensitivity.");
+  if (label.length < 10 || label.length > 160) errors.push("Describe the reference using 10 to 160 characters.");
+  if (referenceKey.length < 8 || referenceKey.length > 200 || !/^[A-Za-z0-9][A-Za-z0-9._:/#-]+$/.test(referenceKey)) {
+    errors.push("Use an opaque 8 to 200 character locator without spaces, query strings, or credentials.");
+  }
+  if (preservationPurpose.length < 20 || preservationPurpose.length > 500) errors.push("State the preservation purpose using 20 to 500 characters.");
+  if (!EVIDENCE_REVIEW_DAYS.includes(reviewAfterDays as (typeof EVIDENCE_REVIEW_DAYS)[number])) errors.push("Choose a valid retention review interval.");
+  if (errors.length > 0) return { valid: false, errors };
+  return {
+    valid: true,
+    sourceType: sourceType as (typeof EVIDENCE_SOURCE_TYPES)[number],
+    sensitivity: sensitivity as (typeof EVIDENCE_SENSITIVITIES)[number],
+    label,
+    referenceKey,
+    preservationPurpose,
+    reviewAfterDays: reviewAfterDays as (typeof EVIDENCE_REVIEW_DAYS)[number],
+  };
 }

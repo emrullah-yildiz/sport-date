@@ -27,11 +27,18 @@
 - [x] Add a member Safety Center with report status, decision notices, deadline enforcement, and one structured appeal per case.
 - [x] Add explicitly role-gated moderator queues, case transitions, and reporter-safe decision notices.
 - [x] Add role-gated appeal outcomes with separation-of-review safeguards.
-- [ ] Add purpose-limited evidence references and case-access logging without accepting file uploads.
+- [x] Add purpose-limited evidence references and case-access logging without accepting file uploads.
 - [ ] Research and choose one launch city and two or three sports.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.
 - [ ] Prepare final brand screen, social account packet, launch content, and measurement plan.
+
+## Product energy: encounter-based progression
+
+- [ ] Define and test a progression model that rewards reliable hosting, completed events, useful reflection, and returning to move together.
+- [ ] Implement a responsive web progress surface using real product records, with calm empty and recovery states.
+- [ ] Carry the same event-day progress cues into mobile after the shared domain rules are proven.
+- [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
 ## Launch gates
 

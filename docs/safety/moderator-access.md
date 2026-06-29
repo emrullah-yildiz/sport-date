@@ -11,6 +11,8 @@ Moderator access is privileged production access, not an account setting. The ap
 - A final decision requires a decision code, named policy or legal basis, and reporter-safe explanation. It is published to the member Safety Center with a six-month appeal window, subject to counsel review for the launch jurisdictions and service classification.
 - Final cases cannot be edited through the current workflow.
 - An appeal can be reviewed only by an active moderator other than the actor recorded on the original decision audit. The server enforces this again inside the locked appeal mutation.
+- Queue views, sensitive case views, and evidence-reference creation are appended to an immutable access log with a defined purpose. The queue itself exposes metadata only.
+- Evidence references are immutable opaque locators. The application does not accept evidence files or copied evidence content.
 
 ## Provisioning runbook
 
@@ -25,6 +27,7 @@ Do not paste production member IDs, credentials, connection strings, or grant co
 - Review active roles before beta launch and at least monthly while operating.
 - Revoke immediately when duties change, employment ends, training expires, or compromise is suspected.
 - Compare active roles to the append-only role audit and investigate mismatches.
+- Review case-access logs for unexplained browsing, unusual volume, and access outside assigned duties.
 - Test that a revoked session loses the queue and cannot mutate a case.
 - Keep moderator and database-operator access separate where staffing permits.
 - Maintain at least two trained moderators before enabling decisions so an appeal can receive a genuinely separate review.

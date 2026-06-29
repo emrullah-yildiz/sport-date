@@ -36,6 +36,10 @@ Do not enable member messaging merely because room authorization exists. Require
 
 An active moderator cannot review an appeal against a decision they issued. Enforce separation in the queue and again inside the locked database mutation. Preserve the original decision and publish the appeal outcome separately instead of rewriting history.
 
+## 2026-06-29 - Gamification rewards real encounters, not app consumption
+
+Use progression to make reliable participation, good hosting, completed movement, reflection, and meeting again feel tangible. Do not award points for profile browsing, requests sent, host skips, rejection, reports avoided, daily login streaks, or time on screen. Progress must be derived from trustworthy product records and must never pressure a member to attend an unsafe event.
+
 ## Open decisions
 
 - Final product and company name.

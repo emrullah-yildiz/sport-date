@@ -64,6 +64,8 @@ Every state or action change must append to the moderation audit log. Existing a
 - Define secure upload, malware scanning, encryption, deletion, and lawful-basis rules before accepting attachments.
 - Provide a separate path for law-enforcement or emergency requests; ordinary moderators must not improvise disclosures.
 
+The implemented evidence register stores immutable references only: source type, sensitivity, human-readable label, opaque locator, preservation purpose, and retention-review date. It does not accept files, copied messages, token-bearing URLs, credentials, or precise locations. Opening the metadata queue, opening a sensitive case, and creating an evidence reference each append a separate immutable access event. Queue cards no longer return report narratives or identities.
+
 ## Appeals
 
 The product needs a decision notice with decision ID, affected rule or legal basis, action, effective period, meaningful explanation, appeal deadline, and appeal route. Appeals need their own status, reviewer, outcome, rationale, and immutable audit event. An appeal never restores contact between blocked members automatically.

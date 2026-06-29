@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Add purpose-limited evidence references and moderation case-access logging without accepting file uploads.
+Define and implement encounter-based web progression that makes real, reliable participation feel alive without rewarding screen time or rejection behavior.
 
 ## Completed and verified
 
@@ -19,11 +19,14 @@ Add purpose-limited evidence references and moderation case-access logging witho
 - Added final decision notices with a named rule or legal basis, immutable audit events, and a six-month appeal window.
 - Documented privileged role provisioning, revocation, and access review requirements.
 - Added role-gated appeal review and reporter-visible outcomes, with database-enforced separation from the original decision-maker.
-- Forty-one tests pass; all workspaces type-check; lint and the production web build pass.
+- Replaced sensitive moderation queue cards with metadata-only triage and audited case-specific access.
+- Added immutable, purpose-limited evidence references with no file or copied-content ingestion and explicit retention-review dates.
+- Added immutable access events for queue views, case views, and evidence-reference creation.
+- Forty-three tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add evidence-preservation references and case-access logging without accepting file uploads yet.
+1. Define and implement safe encounter-based progression on the web using existing verified event records.
 2. Add outbound decision-notification delivery after an approved email provider exists.
 3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityForSafetyCategory, validateModerationAppealUpdate, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
+import { priorityForSafetyCategory, validateEvidenceReference, validateModerationAppealUpdate, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
 
 describe("safety reports", () => {
   it("prioritizes immediate physical and minor-safety risks", () => {
@@ -72,5 +72,31 @@ describe("moderation appeal updates", () => {
       status: "reversed",
       outcomeSummary: "A separate reviewer reconsidered the context and reversed the original decision.",
     }).valid).toBe(true);
+  });
+});
+
+describe("moderation evidence references", () => {
+  it("accepts an opaque locator with a review interval and purpose", () => {
+    expect(validateEvidenceReference({
+      sourceType: "system_record",
+      sensitivity: "restricted",
+      label: "Join request record captured at intake",
+      referenceKey: "join_request:2c3b5c84-6926-4ba6-b926-5ceaf9e01399",
+      preservationPurpose: "Preserve the event participation state while the safety report is reviewed.",
+      reviewAfterDays: 90,
+    }).valid).toBe(true);
+  });
+
+  it("rejects copied URLs, thin purposes, and arbitrary review periods", () => {
+    const result = validateEvidenceReference({
+      sourceType: "external_case",
+      sensitivity: "restricted",
+      label: "Support case",
+      referenceKey: "https://support.example/case?id=secret",
+      preservationPurpose: "Keep it.",
+      reviewAfterDays: 365,
+    });
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors).toHaveLength(3);
   });
 });
