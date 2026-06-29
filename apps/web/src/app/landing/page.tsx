@@ -76,6 +76,10 @@ export default function LandingPage() {
             <p className="eyebrow">Safety is product work</p>
             <h2 className="section-title">Built for real-world meetings.</h2>
             <div className="why-grid">{safetyFeatures.map((feature) => <article className="why-card" key={feature.title}><span className="why-icon">{feature.icon}</span><h3>{feature.title}</h3><p>{feature.description}</p></article>)}</div>
+            <div className="trust-preview-callout">
+              <p>Want the honest version of our trust posture?</p>
+              <Link href="/trust">Read the Trust preview</Link>
+            </div>
           </div>
         </Reveal>
       </section>
@@ -88,6 +92,7 @@ export default function LandingPage() {
         <div className="landing-footer-shell">
           <p>Preview-era product boundaries, not final legal approval.</p>
           <nav aria-label="Legal links">
+            <Link href="/trust">Trust preview</Link>
             <Link href="/terms">Terms preview</Link>
             <Link href="/privacy">Privacy Notice preview</Link>
             <Link href="/safety-guidelines">Safety Guidelines</Link>

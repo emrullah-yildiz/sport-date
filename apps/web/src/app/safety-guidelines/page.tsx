@@ -57,7 +57,7 @@ export default function SafetyGuidelinesPage() {
 
       <section className="legal-disclaimer">
         <p>
-          Use these guidelines together with the <Link href="/terms">Terms preview</Link> and <Link href="/privacy">Privacy Notice preview</Link>.
+          Use these guidelines together with the <Link href="/trust">Trust preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/privacy">Privacy Notice preview</Link>.
         </p>
       </section>
     </main>

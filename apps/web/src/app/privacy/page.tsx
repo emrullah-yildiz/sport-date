@@ -62,7 +62,7 @@ export default function PrivacyPage() {
           Deeper operational preparation exists internally, but this page is the current member-facing summary of what the preview actually does today.
         </p>
         <p>
-          For current product behavior, also read the <Link href="/terms">Terms preview</Link> and <Link href="/safety-guidelines">Safety Guidelines</Link>.
+          For current product behavior, also read the <Link href="/trust">Trust preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link>.
         </p>
       </section>
     </main>

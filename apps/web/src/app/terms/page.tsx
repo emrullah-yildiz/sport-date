@@ -58,7 +58,7 @@ export default function TermsPage() {
 
       <section className="legal-disclaimer">
         <p>
-          Read the current <Link href="/privacy">Privacy Notice preview</Link> and <Link href="/safety-guidelines">Safety Guidelines</Link> alongside this page.
+          Read the current <Link href="/trust">Trust preview</Link>, <Link href="/privacy">Privacy Notice preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link> alongside this page.
         </p>
       </section>
     </main>
