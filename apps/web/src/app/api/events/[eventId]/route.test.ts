@@ -94,7 +94,9 @@ describe("browser host event cancellation route", () => {
     await expect(response.json()).resolves.toEqual({
       success: true,
       eventId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-      message: "Event updated.",
+      severity: "critical",
+      changedFields: ["title", "description", "startsAt", "privateLocation", "arrivalInstructions"],
+      message: "Critical event update saved.",
     });
   });
 

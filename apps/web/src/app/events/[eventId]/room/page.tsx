@@ -5,7 +5,7 @@ import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
-import { EVENT_UPDATE_FIELD_LABELS } from "@/lib/event-updates";
+import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
@@ -37,7 +37,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       {room.updates.length > 0 ? (
         <section className="room-updates">
           <p className="panel-label">Host updates</p>
-          <h2>{room.updates[0].summary}</h2>
+          <h2>{room.updates[0].severity === "critical" ? "Critical host change" : room.updates[0].summary}</h2>
           <p>The room always shows the latest authoritative version of the plan. Accepted members can use this timeline to see what changed.</p>
           <ol>
             {room.updates.map((update) => (
@@ -46,7 +46,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
                   <strong>{new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: room.timeZone }).format(new Date(update.createdAt))}</strong>
                   <p>{update.summary}</p>
                 </div>
-                <small>{update.changedFields.map((field) => EVENT_UPDATE_FIELD_LABELS[field]).join(" · ")}</small>
+                <small>{eventUpdateSeverityLabel(update.severity)} · {update.changedFields.map((field) => EVENT_UPDATE_FIELD_LABELS[field]).join(" · ")}</small>
               </li>
             ))}
           </ol>

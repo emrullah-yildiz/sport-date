@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getDatabase } from "@/lib/db";
-import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice } from "@/lib/event-updates";
+import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice, type EventUpdateSeverity } from "@/lib/event-updates";
 
 export type HostEvent = Readonly<{
   id: string; sport: string; title: string; description: string; startsAt: string;
@@ -207,6 +207,7 @@ type EventRoomRow = {
 
 type EventUpdateNoticeRow = {
   id: string;
+  severity: EventUpdateSeverity;
   changed_fields: EventUpdateField[];
   created_at: string;
 };
@@ -249,7 +250,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   if (!room) return null;
 
   const updates = await sql`
-    SELECT id, changed_fields, created_at
+    SELECT id, severity, changed_fields, created_at
     FROM event_update_notices
     WHERE event_id = ${eventId}::uuid
     ORDER BY created_at DESC
@@ -296,6 +297,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     viewerHasSeenLatestUpdate: room.is_host ? true : (latestUpdateId ? (participants.find((participant) => String(participant.user_id) === userId)?.seen_latest_update ?? false) : true),
     updates: updates.map((update) => ({
       id: update.id,
+      severity: update.severity,
       changedFields: update.changed_fields,
       summary: summarizeEventUpdate(update.changed_fields),
       createdAt: update.created_at,

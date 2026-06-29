@@ -88,9 +88,13 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const result = await response.json();
+      const result = await response.json() as { error?: string; severity?: "routine" | "critical" };
       if (!response.ok) throw new Error(result.error || "Event update failed.");
-      setMessage("Event updated. Accepted members keep access, but any changed details are now authoritative.");
+      setMessage(
+        result.severity === "critical"
+          ? "Critical update saved. Accepted members will see the newest change flagged when they open the room."
+          : "Event updated. Accepted members keep access, but any changed details are now authoritative.",
+      );
       window.location.reload();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Event update failed.");
@@ -140,9 +144,9 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
           <label>Exact address<input name="address" defaultValue={event.privateLocation.address} required maxLength={300} /></label>
         </div>
         <label>Arrival instructions<textarea name="instructions" defaultValue={event.privateLocation.instructions ?? ""} rows={3} maxLength={500} /></label>
-        <p className="field-help">Editing updates the event in place. It does not send out-of-product notifications, so only publish changes you are prepared to own inside the current preview boundary.</p>
+        <p className="field-help">Editing updates the event in place. Time, venue, area, duration, and arrival changes are treated as critical inside the room. Nothing sends out-of-product notifications yet, so only publish changes you are prepared to own inside the current preview boundary.</p>
         {message ? <p role="status">{message}</p> : null}
-        <button className="privacy-action" type="submit" disabled={submitting || experienceLevels.length === 0}>{submitting ? "Saving…" : "Save event changes"}</button>
+        <button className="privacy-action" type="submit" disabled={submitting || experienceLevels.length === 0}>{submitting ? "Saving..." : "Save event changes"}</button>
       </form>
     </details>
   );

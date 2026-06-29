@@ -41,6 +41,7 @@ describe("mobile event room route", () => {
       viewerHasSeenLatestUpdate: false,
       updates: [{
         id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+        severity: "critical",
         changedFields: ["startsAt", "privateLocation", "arrivalInstructions"],
         summary: "start time, exact venue, and arrival instructions updated by the host.",
         createdAt: "2026-07-08T10:00:00.000Z",
@@ -63,6 +64,7 @@ describe("mobile event room route", () => {
         viewerHasSeenLatestUpdate: false,
         updates: [{
           id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+          severity: "critical",
           changedFields: ["startsAt", "privateLocation", "arrivalInstructions"],
           summary: "start time, exact venue, and arrival instructions updated by the host.",
         }],

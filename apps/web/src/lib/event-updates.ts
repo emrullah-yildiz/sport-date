@@ -14,13 +14,23 @@ export const EVENT_UPDATE_FIELD_LABELS = {
 } as const;
 
 export type EventUpdateField = keyof typeof EVENT_UPDATE_FIELD_LABELS;
+export type EventUpdateSeverity = "routine" | "critical";
 
 export type EventUpdateNotice = Readonly<{
   id: string;
+  severity: EventUpdateSeverity;
   changedFields: EventUpdateField[];
   summary: string;
   createdAt: string;
 }>;
+
+const CRITICAL_EVENT_UPDATE_FIELDS: readonly EventUpdateField[] = [
+  "startsAt",
+  "durationMinutes",
+  "publicLocation",
+  "privateLocation",
+  "arrivalInstructions",
+] as const;
 
 function joinLabels(labels: string[]) {
   if (labels.length <= 1) return labels[0] ?? "details";
@@ -34,4 +44,12 @@ export function summarizeEventUpdate(changedFields: readonly EventUpdateField[])
     .filter((label, index, values) => values.indexOf(label) === index);
 
   return `${joinLabels(labels)} updated by the host.`;
+}
+
+export function classifyEventUpdateSeverity(changedFields: readonly EventUpdateField[]): EventUpdateSeverity {
+  return changedFields.some((field) => CRITICAL_EVENT_UPDATE_FIELDS.includes(field)) ? "critical" : "routine";
+}
+
+export function eventUpdateSeverityLabel(severity: EventUpdateSeverity) {
+  return severity === "critical" ? "critical change" : "routine change";
 }

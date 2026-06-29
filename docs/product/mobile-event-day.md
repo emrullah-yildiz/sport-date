@@ -31,7 +31,7 @@ The prototype is visibly labelled `INTERACTION PROTOTYPE · NOT SYNCED`. Its eve
 - Signed-in discovery loads compatible events through native bearer authorization and displays only approximate area data.
 - The event-day selector loads hosted and accepted events without exact addresses in the list.
 - Opening one authorized event fetches its exact venue and address through the same server-side room authorization used by web. Leaving the tab clears the in-memory room object.
-- Authorized room payloads now include recent host update history plus latest-update seen state so native event-day surfaces can show when time, venue, or arrival details changed and can confirm when the participant opened the newest change.
+- Authorized room payloads now include recent host update history plus latest-update seen state so native event-day surfaces can show when time, venue, or arrival details changed, distinguish critical changes, and confirm when the participant opened the newest change.
 - Finished events accept private native reflections through the shared server mutation and refresh the live Movement Arc.
 - Loading, empty, expired-access, retryable network failure, room-access loss, and reflection-submit states have explicit UI.
 - Live discovery can create a request through the same compatibility, time, capacity, and mutual-block query as web.

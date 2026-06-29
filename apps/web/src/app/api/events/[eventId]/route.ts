@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { type EventCreationInput, validateEventCreation } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
-import { type EventUpdateField } from "@/lib/event-updates";
+import { classifyEventUpdateSeverity, type EventUpdateField } from "@/lib/event-updates";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -122,6 +122,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
 
   const experienceLevels = JSON.stringify(event.experienceLevels);
   const changedFields = getChangedFields(current, event);
+  const severity = classifyEventUpdateSeverity(changedFields);
   const changedFieldsJson = JSON.stringify(changedFields);
   const results = await sql.transaction((transaction) => [
     transaction`
@@ -160,12 +161,13 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
     `,
     changedFields.length > 0
       ? transaction`
-        INSERT INTO event_update_notices (id, event_id, actor_user_id, changed_fields)
+        INSERT INTO event_update_notices (id, event_id, actor_user_id, changed_fields, severity)
         VALUES (
           ${crypto.randomUUID()}::uuid,
           ${eventId}::uuid,
           ${host.id},
-          ARRAY(SELECT jsonb_array_elements_text(${changedFieldsJson}::jsonb))
+          ARRAY(SELECT jsonb_array_elements_text(${changedFieldsJson}::jsonb)),
+          ${severity}
         )
         RETURNING id
       `
@@ -176,7 +178,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
     return NextResponse.json({ error: "Event cannot be updated. Check whether it has started, been cancelled, or already has more accepted participants than the new capacity allows." }, { status: 409 });
   }
 
-  return NextResponse.json({ success: true, eventId, message: "Event updated." });
+  return NextResponse.json({
+    success: true,
+    eventId,
+    severity,
+    changedFields,
+    message: severity === "critical"
+      ? "Critical event update saved."
+      : "Event updated.",
+  });
 }
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ eventId: string }> }) {
