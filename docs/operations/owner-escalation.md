@@ -18,6 +18,7 @@ A note on honesty: nothing below is urgent in a fabricated sense. The product is
 - **Alternative B:** stay in development preview with no production infrastructure until member/host validation (Gate 3 / roadmap interviews) produces evidence of demand — cheapest, but blocks every other technical launch gate indefinitely.
 - **Consequence of delay:** the app cannot be deployed, the cleanup job cannot be scheduled, edge rate limiting and the integration test DB have nowhere to live, and real email cannot be delivered. No user impact today (nothing is live); the cost is that the entire production readiness track is parked.
 - **Exact action requested:** approve a provider set (or confirm Alternative B), create the accounts under owner ownership, and supply credentials via a secret manager the agent can be granted scoped access to. Confirm the intended deployment region.
+- **Operational readiness (2026-06-30):** the ratified Vercel/Neon/Upstash/Sentry stack now has a concrete first-deploy / migrations / rollback / rotation / backup / incident procedure in `docs/operations/deployment-runbook.md`. It marks the still-undecided owner items — named on-call owner, RTO/RPO targets, rotation cadence, alert routing — as `[OWNER:]`/`[COUNSEL:]` rather than inventing them.
 
 ---
 
