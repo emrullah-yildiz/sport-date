@@ -22,7 +22,8 @@
 - The Expo client stores its installation UUID and token pair with SecureStore using device-only, unlocked-device accessibility, serializes refresh calls, and clears local credentials on refresh failure.
 - Web and mobile device-management surfaces expose non-secret lifecycle metadata. Web can revoke any native device; mobile identifies itself and can revoke other devices, while current-device termination uses sign-out.
 - Native login, refresh, logout, and a minimal authenticated member endpoint are implemented. Mobile routes never accept the browser session cookie as native authorization.
-- A runnable cleanup command removes expired browser sessions, expired mobile session families, and spent refresh-token history; `--dry-run` reports counts before deletion.
+- A runnable cleanup command removes expired browser sessions, expired mobile session families, spent refresh-token history, expired email-verification tokens, and expired or consumed password-reset tokens; `--dry-run` reports counts before deletion.
+- Provider-independent email-verification and password-reset scaffolding now exists: token tables, token hashing, confirm routes, reset-driven session revocation, resend/request throttles, and neutral unauthenticated reset-request responses. Delivery remains disabled until an approved email provider is configured.
 
 ## Required before external registration
 

@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import { NextResponse } from "next/server";
 
+import { revokeOutstandingAuthTokensForUser } from "@/lib/auth-email";
 import { verifyPassword } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
@@ -76,6 +77,8 @@ export async function POST(request: Request) {
   if (requests.length === 0) {
     return NextResponse.json({ error: "A deletion request is already pending." }, { status: 409 });
   }
+
+  await revokeOutstandingAuthTokensForUser(user.id);
 
   const response = NextResponse.json({
     success: true,

@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { createMobileSessionTokens, createSession, hashPassword, hashSessionToken, isValidMobileAccessToken, isValidMobileDeviceId, isValidMobileRefreshToken, verifyPassword } from "./auth";
+import {
+  createEmailVerificationToken,
+  createMobileSessionTokens,
+  createPasswordResetToken,
+  createSession,
+  hashPassword,
+  hashSessionToken,
+  isValidEmailVerificationToken,
+  isValidMobileAccessToken,
+  isValidMobileDeviceId,
+  isValidMobileRefreshToken,
+  isValidPasswordResetToken,
+  validatePasswordStrength,
+  verifyPassword,
+} from "./auth";
 
 describe("password security", () => {
   it("accepts the original password and rejects a different one", async () => {
@@ -44,5 +58,28 @@ describe("opaque sessions", () => {
     expect(isValidMobileAccessToken("sda_short")).toBe(false);
     expect(isValidMobileDeviceId("device-1")).toBe(false);
     expect(isValidMobileDeviceId("2c3b5c84-6926-4ba6-b926-5ceaf9e01399")).toBe(true);
+  });
+
+  it("creates separate verification and password reset tokens", () => {
+    const now = new Date("2026-06-29T10:00:00.000Z");
+    const verification = createEmailVerificationToken(now);
+    const reset = createPasswordResetToken(now);
+    expect(verification.token).toMatch(/^sdv_[A-Za-z0-9_-]{43}$/);
+    expect(reset.token).toMatch(/^sdp_[A-Za-z0-9_-]{43}$/);
+    expect(verification.expiresAt.toISOString()).toBe("2026-06-30T10:00:00.000Z");
+    expect(reset.expiresAt.toISOString()).toBe("2026-06-29T11:00:00.000Z");
+    expect(isValidEmailVerificationToken(verification.token)).toBe(true);
+    expect(isValidPasswordResetToken(reset.token)).toBe(true);
+    expect(isValidEmailVerificationToken(reset.token)).toBe(false);
+  });
+});
+
+describe("password strength boundary", () => {
+  it("matches the registration password rules", () => {
+    expect(validatePasswordStrength("short")).toContain("Password must be at least 12 characters.");
+    expect(validatePasswordStrength("alllowercase123")).toContain(
+      "Password must include upper-case, lower-case, and numeric characters.",
+    );
+    expect(validatePasswordStrength("LongEnough123")).toEqual([]);
   });
 });

@@ -7,7 +7,13 @@ describe("session cleanup", () => {
     const calls: Array<{ text: string; values: unknown[] }> = [];
     const sql = async (strings: TemplateStringsArray, ...values: unknown[]) => {
       calls.push({ text: strings.join("?"), values });
-      return [{ browser_sessions: "2", mobile_sessions: 3, refresh_token_history: "4" }];
+      return [{
+        browser_sessions: "2",
+        mobile_sessions: 3,
+        refresh_token_history: "4",
+        email_verification_tokens: "5",
+        password_reset_tokens: 6,
+      }];
     };
 
     const result = await cleanupExpiredSessionResidue(sql, {
@@ -24,6 +30,8 @@ describe("session cleanup", () => {
       browserSessions: 2,
       mobileSessions: 3,
       refreshTokenHistory: 4,
+      emailVerificationTokens: 5,
+      passwordResetTokens: 6,
     });
   });
 
@@ -31,7 +39,13 @@ describe("session cleanup", () => {
     const calls: Array<{ text: string; values: unknown[] }> = [];
     const sql = async (strings: TemplateStringsArray, ...values: unknown[]) => {
       calls.push({ text: strings.join("?"), values });
-      return [{ browser_sessions: 1, mobile_sessions: "5", refresh_token_history: 7 }];
+      return [{
+        browser_sessions: 1,
+        mobile_sessions: "5",
+        refresh_token_history: 7,
+        email_verification_tokens: "8",
+        password_reset_tokens: 9,
+      }];
     };
 
     const result = await cleanupExpiredSessionResidue(sql, {
@@ -42,12 +56,16 @@ describe("session cleanup", () => {
     expect(calls[0].text).toContain("DELETE FROM mobile_refresh_token_history");
     expect(calls[0].text).toContain("DELETE FROM mobile_sessions");
     expect(calls[0].text).toContain("DELETE FROM sessions");
+    expect(calls[0].text).toContain("DELETE FROM email_verification_tokens");
+    expect(calls[0].text).toContain("DELETE FROM password_reset_tokens");
     expect(result).toEqual({
       mode: "delete",
       runAt: "2026-06-29T12:00:00.000Z",
       browserSessions: 1,
       mobileSessions: 5,
       refreshTokenHistory: 7,
+      emailVerificationTokens: 8,
+      passwordResetTokens: 9,
     });
   });
 });

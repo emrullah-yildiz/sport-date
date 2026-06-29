@@ -159,6 +159,31 @@ export function safetyReportRateLimitRules(request: Request, userId: string): re
   ];
 }
 
+export function verificationRequestRateLimitRules(request: Request, userId: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "verification-request-ip-hour", limit: 3, windowMs: 60 * 60 * 1000, key: `ip:${ip}` },
+    { name: "verification-request-user-hour", limit: 3, windowMs: 60 * 60 * 1000, key: `user:${userId}` },
+    { name: "verification-request-user-day", limit: 6, windowMs: 24 * 60 * 60 * 1000, key: `user:${userId}` },
+  ];
+}
+
+export function passwordResetRequestRateLimitRules(request: Request, email: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "password-reset-request-ip", limit: 10, windowMs: 60 * 60 * 1000, key: `ip:${ip}` },
+    { name: "password-reset-request-email", limit: 3, windowMs: 60 * 60 * 1000, key: `email:${email}` },
+  ];
+}
+
+export function authTokenConfirmRateLimitRules(request: Request, token: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "auth-token-confirm-ip", limit: 10, windowMs: 60 * 60 * 1000, key: `ip:${ip}` },
+    { name: "auth-token-confirm-token", limit: 5, windowMs: 60 * 60 * 1000, key: `token:${token}` },
+  ];
+}
+
 export function resetRateLimitStoreForTests(): void {
   store.clear();
   mutationCount = 0;
