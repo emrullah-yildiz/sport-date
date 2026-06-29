@@ -83,6 +83,17 @@ export default function LandingPage() {
       <section className="cta-section">
         <div className="cta-card"><h2>Ready to find your next game?</h2><p>Build a private beta profile and help shape the experience.</p><Link href="/signup" className="btn-cta">Create a profile</Link></div>
       </section>
+
+      <footer className="landing-footer">
+        <div className="landing-footer-shell">
+          <p>Preview-era product boundaries, not final legal approval.</p>
+          <nav aria-label="Legal links">
+            <Link href="/terms">Terms preview</Link>
+            <Link href="/privacy">Privacy Notice preview</Link>
+            <Link href="/safety-guidelines">Safety Guidelines</Link>
+          </nav>
+        </div>
+      </footer>
     </main>
   );
 }

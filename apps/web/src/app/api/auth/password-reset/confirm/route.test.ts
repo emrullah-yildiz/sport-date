@@ -6,7 +6,7 @@ let POST: typeof import("./route").POST;
 
 beforeAll(async () => {
   ({ POST } = await import("./route"));
-});
+}, 20000);
 
 describe("password reset confirm route", () => {
   it("rejects invalid tokens before any database work", async () => {

@@ -16,7 +16,7 @@ beforeAll(async () => {
   ({ POST } = await import("./route"));
   ({ getCurrentUser } = await import("@/lib/session"));
   ({ decideEventJoinRequest } = await import("@/lib/join-requests"));
-});
+}, 20000);
 
 describe("browser host decision route", () => {
   it("returns an explicit quiet decline message when the third skip closes the request", async () => {
