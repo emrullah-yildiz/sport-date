@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Define and implement encounter-based web progression that makes real, reliable participation feel alive without rewarding screen time or rejection behavior.
+Carry the tested Movement Arc rules and post-event reflection into the mobile event-day experience.
 
 ## Completed and verified
 
@@ -22,11 +22,14 @@ Define and implement encounter-based web progression that makes real, reliable p
 - Replaced sensitive moderation queue cards with metadata-only triage and audited case-specific access.
 - Added immutable, purpose-limited evidence references with no file or copied-content ingestion and explicit retention-review dates.
 - Added immutable access events for queue views, case views, and evidence-reference creation.
-- Forty-three tests pass; all workspaces type-check; lint and the production web build pass.
+- Added private post-event attendance and willingness-to-join-again reflection for hosts with real participants and accepted members.
+- Added a responsive private Movement Arc with five bounded stages, no leaderboard or streaks, and progress derived only from qualified self-confirmed attendance.
+- Extended account export to private event reflections and documented the privacy, abuse, correction, and measurement boundaries.
+- Forty-seven tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Define and implement safe encounter-based progression on the web using existing verified event records.
+1. Carry shared reflection and Movement Arc rules into the mobile event-day experience.
 2. Add outbound decision-notification delivery after an approved email provider exists.
 3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 

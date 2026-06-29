@@ -38,6 +38,7 @@ Direct account and profile identifiers are erased. Aggregated product statistics
 - An audit record for completed access exports.
 - Export coverage for hosted events, requests, accepted seats, and precise meeting details already disclosed to the member.
 - Export coverage for safety reports, reporter-visible decision notices, appeals submitted, and member blocks created, excluding security secrets and internal case material requiring rights-of-others review.
+- Export coverage for private attendance and willingness-to-join-again reflections, including whether each reflection qualified for the private Movement Arc.
 - Password re-authentication before requesting deletion.
 - Immediate transition to `deletion_pending` and revocation of every session.
 - Immediate cancellation of hosted events, closure of pending/accepted requests, and removal of accepted seats when deletion is requested.
@@ -52,6 +53,7 @@ Final durations are deliberately unset until the launch country, infrastructure,
 | Account/profile | Provide the member service | Erase after approved deletion request | Operational response window and exceptions |
 | Sessions | Authenticate devices | Delete at logout/rotation/expiry | Automated cleanup frequency |
 | Event participation | Coordinate and secure events | Minimise, aggregate, erase, or restrict | Safety and dispute window |
+| Private event reflections | Personal progress and product outcome learning | Erase, aggregate, or restrict | Lawful basis, analytics boundary, and retention period |
 | Messages | Participant coordination and safety | Erase or restrict | User expectations, report preservation, dispute window |
 | Reports/audit | Investigate abuse and defend rights | Restrict, then erase or irreversibly anonymise | Lawful basis and retention period |
 | Backups | Recovery and resilience | Expire through backup rotation | Provider and recovery schedule |

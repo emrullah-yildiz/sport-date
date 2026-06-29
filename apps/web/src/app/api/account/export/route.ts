@@ -99,6 +99,10 @@ export async function GET() {
     SELECT blocked_user_id, created_at FROM user_blocks
     WHERE blocker_user_id = ${user.id} ORDER BY created_at
   `;
+  const eventReflections = await sql`
+    SELECT event_id, attendance, would_join_again, qualified_for_progress, created_at, updated_at
+    FROM event_reflections WHERE user_id = ${user.id} ORDER BY created_at
+  `;
 
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
@@ -130,6 +134,7 @@ export async function GET() {
     safetyReportsSubmitted: safetyReports,
     safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
+    privateEventReflections: eventReflections,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 

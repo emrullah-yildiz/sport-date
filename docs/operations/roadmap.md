@@ -35,8 +35,8 @@
 
 ## Product energy: encounter-based progression
 
-- [ ] Define and test a progression model that rewards reliable hosting, completed events, useful reflection, and returning to move together.
-- [ ] Implement a responsive web progress surface using real product records, with calm empty and recovery states.
+- [x] Define and test a progression model that rewards qualified self-confirmed attendance, useful reflection, and real hosted/joined events.
+- [x] Implement a responsive web progress surface using real product records, with calm empty and recovery states.
 - [ ] Carry the same event-day progress cues into mobile after the shared domain rules are proven.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 

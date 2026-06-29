@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import LogoutButton from "@/components/LogoutButton";
 import PrivacyControls from "@/components/PrivacyControls";
 import EditProfileForm from "@/components/EditProfileForm";
+import MovementArc from "@/components/MovementArc";
+import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata = { title: "Your profile — Sport Date" };
@@ -11,6 +13,7 @@ export const metadata = { title: "Your profile — Sport Date" };
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+  const movementProgress = await getMemberMovementProgress(user.id);
 
   return (
     <main className="profile-page">
@@ -45,6 +48,7 @@ export default async function ProfilePage() {
           <div className="profile-sport-list">{user.sports.map((sport) => <div className="profile-sport" key={sport.name}><strong>{sport.name}</strong><span>{sport.skillLevel} · {sport.frequency}</span></div>)}</div>
         </article>
       </section>
+      <MovementArc progress={movementProgress} />
       <EditProfileForm profile={user} />
       <PrivacyControls />
     </main>

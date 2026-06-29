@@ -13,6 +13,8 @@ An event is a small, time-bound invitation to meet through one sport. It must co
 
 Capacity fullness is derived from accepted participants rather than stored as a competing status. Publishing requires a future start, duration between 15 minutes and 8 hours, capacity between 2 and 20, at least one experience level, one event language, an adult age range, an approximate area, and private meeting details.
 
+Submitting an eligible post-event reflection transitions a past published event to `completed`. The host qualifies for reflection only when at least one accepted participant exists; accepted participants qualify through their server-side seat. Reflection never opens before the scheduled duration ends.
+
 ## Eligibility
 
 A request is eligible only when:
