@@ -173,3 +173,67 @@ export async function getAcceptedEventLocation(
   ` as unknown as Array<{ venue_name: string; address: string; arrival_instructions: string | null }>;
   return rows[0] ? { venueName: rows[0].venue_name, address: rows[0].address, instructions: rows[0].arrival_instructions } : null;
 }
+
+export type EventRoom = Readonly<{
+  id: string; title: string; sport: string; startsAt: string; timeZone: string;
+  venueName: string; address: string; instructions: string | null; isHost: boolean;
+  participants: ReadonlyArray<{ firstName: string; skillLevel: string }>;
+}>;
+
+type EventRoomRow = {
+  id: string; title: string; sport: string; starts_at: string; time_zone: string;
+  venue_name: string; address: string; arrival_instructions: string | null; is_host: boolean;
+};
+
+export async function getEventRoom(eventId: string, userId: string): Promise<EventRoom | null> {
+  if (!UUID_PATTERN.test(eventId)) return null;
+  const sql = getDatabase();
+  const rooms = await sql`
+    SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
+      location.venue_name, location.address, location.arrival_instructions,
+      (events.host_user_id = ${userId}) AS is_host
+    FROM events
+    JOIN event_private_locations AS location ON location.event_id = events.id
+    WHERE events.id = ${eventId}::uuid AND events.status = 'published'
+      AND (
+        events.host_user_id = ${userId}
+        OR EXISTS (
+          SELECT 1 FROM event_participants
+          WHERE event_id = events.id AND user_id = ${userId}
+        )
+      )
+      AND (
+        events.host_user_id = ${userId}
+        OR NOT EXISTS (
+          SELECT 1 FROM user_blocks
+          WHERE (blocker_user_id = ${userId} AND blocked_user_id = events.host_user_id)
+             OR (blocker_user_id = events.host_user_id AND blocked_user_id = ${userId})
+        )
+      )
+    LIMIT 1
+  ` as unknown as EventRoomRow[];
+  const room = rooms[0];
+  if (!room) return null;
+
+  const participants = await sql`
+    SELECT member.first_name, sport.skill_level
+    FROM event_participants AS participant
+    JOIN users AS member ON member.id = participant.user_id AND member.account_status = 'active'
+    JOIN events ON events.id = participant.event_id
+    JOIN user_sports AS sport ON sport.user_id = member.id AND LOWER(sport.sport) = LOWER(events.sport)
+    WHERE participant.event_id = ${eventId}::uuid
+      AND NOT EXISTS (
+        SELECT 1 FROM user_blocks
+        WHERE (blocker_user_id = events.host_user_id AND blocked_user_id = member.id)
+           OR (blocker_user_id = ${userId} AND blocked_user_id = member.id)
+           OR (blocker_user_id = member.id AND blocked_user_id = ${userId})
+      )
+    ORDER BY participant.seat_number
+  ` as unknown as Array<{ first_name: string; skill_level: string }>;
+  return {
+    id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
+    timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
+    instructions: room.arrival_instructions, isHost: room.is_host,
+    participants: participants.map((participant) => ({ firstName: participant.first_name, skillLevel: participant.skill_level })),
+  };
+}

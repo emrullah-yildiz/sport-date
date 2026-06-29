@@ -2,21 +2,21 @@
 
 ## Current outcome
 
-Add event-room authorization without real-time chat, giving hosts and accepted participants a secure coordination surface while excluding pending, declined, cancelled, blocked, and unrelated users.
+Extend machine-readable account export and deletion-processing coverage to hosted events, join requests, and accepted participation before introducing reports or messaging.
 
 ## Completed and verified
 
 - Established and validated the autonomous Product Studio operating system.
-- Completed account authentication, privacy controls, profile editing, event creation, and discovery.
-- Implemented join requests, optional introductions, dignified requester states, host accept/skip decisions, third-skip decline, and requester cancellation.
-- Accepted participants claim unique numbered seats atomically; only accepted participants can query exact meeting details.
-- Cookie-authenticated mutations now share cross-site request checks. Thirty-one tests pass; all workspaces type-check; lint and production build pass.
+- Completed account authentication, privacy controls, profile editing, event creation, discovery, and join decisions.
+- Added server-authorized event rooms for hosts and accepted participants, with exact logistics and participant visibility revoked by cancellation or blocking.
+- Kept open messaging out until report/block and moderation operations exist.
+- Thirty-one tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add the authorized event room without real-time chat.
-2. Extend privacy export/deletion coverage to events, requests, and participation.
-3. Implement block/report paths and moderation audit records before messaging.
+1. Extend privacy export and deletion processing to events, requests, and participation.
+2. Implement block/report paths and moderation audit records.
+3. Design operational response levels, evidence handling, and appeals before messaging.
 
 ## Owner blockers
 
