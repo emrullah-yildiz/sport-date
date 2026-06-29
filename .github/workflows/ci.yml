@@ -1,9 +1,11 @@
 name: CI
 
-# Stack-agnostic verification gate. Runs the hermetic suite only — the
-# database-backed integration tests self-skip unless RUN_DB_INTEGRATION=1, so no
-# secrets are required here. A separate integration job can be added later, gated
-# on a Neon test-branch connection string in repository secrets.
+# Two gates:
+#  - verify: always runs the hermetic suite (typecheck + tests); the DB-backed
+#    integration tests self-skip without RUN_DB_INTEGRATION, so no secrets needed.
+#  - integration: migrates a disposable Neon TEST branch and runs the real-SQL
+#    integration tests. It activates only once the `TEST_DATABASE_URL` repository
+#    secret exists; until then every DB step self-skips and the job passes.
 on:
   push:
     branches: [main]
@@ -21,3 +23,30 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: verify
+    env:
+      # Empty string when the secret is unset; the steps below skip on empty.
+      TEST_DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Migrate the test database
+        if: ${{ env.TEST_DATABASE_URL != '' }}
+        run: npm run db:migrate --workspace @sport-date/web
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      - name: Run real-SQL integration tests
+        if: ${{ env.TEST_DATABASE_URL != '' }}
+        run: npm run test:integration --workspace @sport-date/web
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      - name: No test database configured
+        if: ${{ env.TEST_DATABASE_URL == '' }}
+        run: echo "TEST_DATABASE_URL secret not set — skipping DB integration tests."
