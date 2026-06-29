@@ -1,5 +1,9 @@
 # Production infrastructure plan (owner Gate 1)
 
+> **DEPLOYED 2026-06-30.** Live at `https://sport-date-gray.vercel.app` (Vercel project `sport-date`, Frankfurt). Neon project `old-shadow-24384252` with `production` (clean, 19 migrations), `test`, and `dev` branches; local `.env` points at `dev`. Production env set: `DATABASE_URL` (Neon prod, pooled), `CRON_SECRET`, `EMAIL_DELIVERY_ENABLED=false`, `APP_PUBLIC_ORIGIN`/`NEXT_PUBLIC_APP_ORIGIN`. Health (`/api/health`), readiness (`/api/health/ready` → DB OK), and the protected daily session-cleanup cron (`/api/internal/session-cleanup`, `0 3 * * *`) all verified live. **Still pending:** Vercel↔GitHub auto-deploy (needs the Vercel GitHub App installed on the repo — currently deploying via `vercel deploy --prod`), `TEST_DATABASE_URL` CI secret, Upstash + Sentry env vars, and the launch gates below (this is production *infrastructure*, not yet clearance to onboard real users).
+
+
+
 Decisions and trade-offs for the first European deployment. The agent has made the
 calls below; the owner ratifies (or vetoes the one flagged fork) and provisions
 the accounts under owner ownership. Nothing here has been provisioned, deployed,
