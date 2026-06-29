@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Carry the tested Movement Arc rules and post-event reflection into the mobile event-day experience.
+Design and implement secure native session transport so mobile can replace declared prototype state with live event, reflection, and Movement Arc data.
 
 ## Completed and verified
 
@@ -25,11 +25,14 @@ Carry the tested Movement Arc rules and post-event reflection into the mobile ev
 - Added private post-event attendance and willingness-to-join-again reflection for hosts with real participants and accepted members.
 - Added a responsive private Movement Arc with five bounded stages, no leaderboard or streaks, and progress derived only from qualified self-confirmed attendance.
 - Extended account export to private event reflections and documented the privacy, abuse, correction, and measurement boundaries.
+- Added a clearly labelled Expo event-day interaction prototype with discovery, private reflection, and a shared-rule Movement Arc.
+- Verified Expo SDK 56 configuration, mobile TypeScript, and a 571-module Android Hermes production bundle.
+- Reviewed and documented the remaining moderate Expo build-chain advisories; no high or critical audit findings are present.
 - Forty-seven tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Carry shared reflection and Movement Arc rules into the mobile event-day experience.
+1. Implement revocable device-scoped native sessions and live mobile API transport without exposing precise-location data.
 2. Add outbound decision-notification delivery after an approved email provider exists.
 3. Add purpose-limited room coordination messages only after moderation staffing gates pass.
 

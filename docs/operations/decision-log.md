@@ -40,6 +40,10 @@ An active moderator cannot review an appeal against a decision they issued. Enfo
 
 Use progression to make reliable participation, good hosting, completed movement, reflection, and meeting again feel tangible. Do not award points for profile browsing, requests sent, host skips, rejection, reports avoided, daily login streaks, or time on screen. Progress must be derived from trustworthy product records and must never pressure a member to attend an unsafe event.
 
+## 2026-06-29 - Mobile prototypes must declare when they are not synced
+
+Keep the Expo interaction prototype visibly labelled until secure native session transport and live API integration exist. Do not let polished local state imply a real account, persisted reflection, or production readiness. Native clients must not copy browser-cookie assumptions.
+
 ## Open decisions
 
 - Final product and company name.
