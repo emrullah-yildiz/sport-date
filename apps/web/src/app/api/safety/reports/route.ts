@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   const reporter = await getCurrentUser();
   if (!reporter) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "safety:reports",
     safetyReportRateLimitRules(request, reporter.id),
     "Too many reports in a short period. Please wait before submitting another.",

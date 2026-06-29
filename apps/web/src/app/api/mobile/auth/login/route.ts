@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const email = normalizeRateLimitKeyPart((body as Record<string, unknown>)?.email);
     const deviceId = typeof body?.deviceId === "string" ? body.deviceId.trim() : "";
-    const limited = enforceRateLimit(
+    const limited = await enforceRateLimit(
       "mobile:auth:login",
       mobileAuthRateLimitRules(request, email, deviceId),
       "Too many mobile login attempts. Please wait before trying again.",

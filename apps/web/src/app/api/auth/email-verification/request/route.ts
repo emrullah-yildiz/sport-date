@@ -16,7 +16,7 @@ export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
 
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "auth:email-verification:request",
     verificationRequestRateLimitRules(request, user.id),
     "Too many verification email requests. Please wait before trying again.",

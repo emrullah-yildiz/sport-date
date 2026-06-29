@@ -9,7 +9,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 export async function POST(request: Request, { params }: { params: Promise<{ eventId: string }> }) {
   const session = await getMobileSession(request);
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "mobile:events:join-request",
     joinRequestRateLimitRules(request, session.user.id),
     "Too many join requests in a short period. Please wait before trying again.",

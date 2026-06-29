@@ -24,60 +24,196 @@ type RateLimitHit = Readonly<{
 /**
  * Storage seam for the fixed-window counters.
  *
- * The limiter only needs these four synchronous primitives over a keyed window
- * record: read it, create/overwrite it, bump its count, and sweep expired keys.
- * The default implementation below is the in-process `Map` the limiter has always
- * used — no behavior change. This interface exists so a durable, cross-replica
- * backing store can drop in later WITHOUT touching the consume/enforce logic.
+ * The limiter needs three primitives over a keyed window record: read the
+ * current window (`peek`), create-or-increment it for the active window
+ * (`bump`), and sweep expired keys (`sweepExpired`) plus a test reset (`clear`).
+ * Every method is async because the durable backing store (Upstash Redis over
+ * its REST API, Gate 6) is necessarily async; the in-memory default below
+ * resolves immediately and so is behavior-identical to the synchronous Map the
+ * limiter has always used.
  *
- * Gate 6 (Upstash Redis, see docs/operations/infrastructure-plan.md) will add an
- * adapter that mirrors the email-delivery seam: env-gated on
- * UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN, talking to Upstash over its
- * REST API via `fetch` (e.g. INCR + PEXPIRE for an atomic window bump), and
- * falling back to this in-memory store when those vars are unset. That adapter
- * is necessarily async, so the consume path would gain an async variant at that
- * point; the in-memory default stays synchronous and is what every current test
- * exercises. No Redis code, no new dependency, and no env gating is added here —
- * this commit is purely the seam.
+ * The consume logic in `consumeRateLimit` is deliberately split into a read
+ * phase (peek every rule, decide block) and a commit phase (bump every rule
+ * only when NOT blocked). This preserves the original fixed-window semantics
+ * exactly — a blocked request never increments any counter — for both the
+ * in-memory and the Upstash store. `bump` is the atomic create-or-increment;
+ * for Upstash it is a single pipelined INCR + PEXPIRE.
  */
 export type RateLimitStore = {
-  get(key: string): StoredWindow | undefined;
-  set(key: string, window: StoredWindow): void;
-  increment(key: string): void;
-  sweepExpired(nowMs: number): void;
-  clear(): void;
+  /** Read the current window for `key`, or undefined if none is stored. */
+  peek(key: string, nowMs: number): Promise<StoredWindow | undefined>;
+  /**
+   * Create-or-increment the active window for `key`. If no window exists or the
+   * stored window has expired at `nowMs`, start a fresh window of `windowMs`
+   * with count 1; otherwise increment the existing window's count.
+   */
+  bump(key: string, nowMs: number, windowMs: number): Promise<void>;
+  sweepExpired(nowMs: number): Promise<void>;
+  clear(): Promise<void>;
 };
 
 function createInMemoryRateLimitStore(): RateLimitStore {
   const windows = new Map<string, StoredWindow>();
   return {
-    get(key) {
+    async peek(key) {
       return windows.get(key);
     },
-    set(key, window) {
-      windows.set(key, window);
-    },
-    increment(key) {
+    async bump(key, nowMs, windowMs) {
       const entry = windows.get(key);
-      if (entry) entry.count += 1;
+      if (!entry || entry.resetAt <= nowMs) {
+        windows.set(key, { count: 1, resetAt: nowMs + windowMs });
+        return;
+      }
+      entry.count += 1;
     },
-    sweepExpired(nowMs) {
+    async sweepExpired(nowMs) {
       for (const [key, entry] of windows.entries()) {
         if (entry.resetAt <= nowMs) windows.delete(key);
       }
     },
-    clear() {
+    async clear() {
       windows.clear();
     },
   };
 }
 
-const store: RateLimitStore = createInMemoryRateLimitStore();
+type UpstashEnvironment = Readonly<Record<string, string | undefined>>;
+
+/**
+ * Upstash Redis REST adapter (Gate 6). Activated ONLY when BOTH
+ * UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are present; otherwise the
+ * in-memory store is used so dev/test/default behavior is untouched. Mirrors the
+ * env-gated, disabled-by-default email-delivery adapter seam.
+ *
+ * Each `bump` is a single atomic Upstash REST *pipeline* of INCR + PEXPIRE on
+ * the same key/window the in-memory store uses, so concurrent replicas share one
+ * counter. `peek` reads the counter (GET) and its TTL (PTTL) to reconstruct the
+ * { count, resetAt } shape the consume logic expects.
+ *
+ * GRACEFUL DEGRADATION (documented choice): on ANY Upstash error, non-2xx, or
+ * timeout, the adapter falls back to the in-process in-memory limiter for that
+ * single operation and logs ONE warning. It never fails OPEN to unlimited — an
+ * Upstash outage degrades shared enforcement to per-process enforcement, but
+ * abuse protection is never silently disabled.
+ */
+function createUpstashRateLimitStore(
+  url: string,
+  token: string,
+  fallback: RateLimitStore,
+  fetchImpl: typeof fetch = fetch,
+  timeoutMs = 1_000,
+): RateLimitStore {
+  const base = url.replace(/\/+$/, "");
+  let warned = false;
+
+  function warnOnce(error: unknown): void {
+    if (warned) return;
+    warned = true;
+    console.warn(
+      "Upstash rate-limit store unavailable; falling back to in-memory enforcement for this process.",
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+
+  // Upstash REST pipeline: POST /pipeline with a JSON array of command arrays.
+  // Each element of the returned array is { result } | { error }. We treat any
+  // transport failure, non-2xx, embedded { error }, or timeout as a failure and
+  // let the caller fall back.
+  async function pipeline(commands: (string | number)[][]): Promise<unknown[]> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetchImpl(`${base}/pipeline`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(commands),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`Upstash responded ${response.status}`);
+      }
+      const payload = (await response.json()) as unknown;
+      if (!Array.isArray(payload)) {
+        throw new Error("Upstash pipeline returned a non-array payload");
+      }
+      for (const entry of payload) {
+        if (entry && typeof entry === "object" && "error" in entry && entry.error != null) {
+          throw new Error(`Upstash command error: ${String((entry as { error: unknown }).error)}`);
+        }
+      }
+      return payload;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  return {
+    async peek(key, nowMs) {
+      try {
+        const results = await pipeline([
+          ["GET", key],
+          ["PTTL", key],
+        ]);
+        const rawCount = (results[0] as { result?: unknown } | undefined)?.result ?? null;
+        const rawTtl = (results[1] as { result?: unknown } | undefined)?.result ?? null;
+        if (rawCount == null) return undefined;
+        const count = Number(rawCount);
+        const ttl = Number(rawTtl);
+        // PTTL: -2 = key missing, -1 = no expiry. Without a positive TTL we
+        // cannot reconstruct resetAt, so treat the window as absent (the next
+        // bump will (re)establish it with an expiry).
+        if (!Number.isFinite(count) || !Number.isFinite(ttl) || ttl <= 0) return undefined;
+        return { count, resetAt: nowMs + ttl };
+      } catch (error) {
+        warnOnce(error);
+        return fallback.peek(key, nowMs);
+      }
+    },
+    async bump(key, nowMs, windowMs) {
+      try {
+        // Atomic fixed-window bump: INCR creates the key at 1 (or increments an
+        // existing window) and PEXPIRE arms/refreshes its expiry. Both run in
+        // one pipeline so a single key advance is one round trip. PEXPIRE every
+        // time keeps the window length stable across the window's lifetime
+        // (fixed window: the key is whole-key-expired, then recreated).
+        await pipeline([
+          ["INCR", key],
+          ["PEXPIRE", key, windowMs],
+        ]);
+      } catch (error) {
+        warnOnce(error);
+        await fallback.bump(key, nowMs, windowMs);
+      }
+    },
+    async sweepExpired(nowMs) {
+      // Upstash expires keys itself; only the in-memory fallback needs sweeping.
+      await fallback.sweepExpired(nowMs);
+    },
+    async clear() {
+      await fallback.clear();
+    },
+  };
+}
+
+function resolveRateLimitStore(env: UpstashEnvironment = process.env): RateLimitStore {
+  const fallback = createInMemoryRateLimitStore();
+  const url = env.UPSTASH_REDIS_REST_URL;
+  const token = env.UPSTASH_REDIS_REST_TOKEN;
+  if (url && token) {
+    return createUpstashRateLimitStore(url, token, fallback);
+  }
+  return fallback;
+}
+
+let store: RateLimitStore = resolveRateLimitStore();
 let mutationCount = 0;
 
-function maybeCleanup(nowMs: number): void {
+async function maybeCleanup(nowMs: number): Promise<void> {
   mutationCount += 1;
-  if (mutationCount % 250 === 0) store.sweepExpired(nowMs);
+  if (mutationCount % 250 === 0) await store.sweepExpired(nowMs);
 }
 
 function firstForwardedIp(value: string | null): string {
@@ -100,17 +236,17 @@ function windowKey(scope: string, rule: RateLimitRule): string {
   return `${scope}:${rule.name}:${hashSessionToken(rule.key)}`;
 }
 
-export function consumeRateLimit(
+export async function consumeRateLimit(
   scope: string,
   rules: readonly RateLimitRule[],
   nowMs = Date.now(),
-): { ok: true } | { ok: false; hit: RateLimitHit } {
-  maybeCleanup(nowMs);
+): Promise<{ ok: true } | { ok: false; hit: RateLimitHit }> {
+  await maybeCleanup(nowMs);
 
   let blockingHit: RateLimitHit | null = null;
   for (const rule of rules) {
     const key = windowKey(scope, rule);
-    const entry = store.get(key);
+    const entry = await store.peek(key, nowMs);
     if (entry && entry.resetAt > nowMs && entry.count >= rule.limit) {
       const retryAfterSeconds = Math.max(1, Math.ceil((entry.resetAt - nowMs) / 1000));
       if (!blockingHit || retryAfterSeconds > blockingHit.retryAfterSeconds) {
@@ -123,24 +259,19 @@ export function consumeRateLimit(
 
   for (const rule of rules) {
     const key = windowKey(scope, rule);
-    const entry = store.get(key);
-    if (!entry || entry.resetAt <= nowMs) {
-      store.set(key, { count: 1, resetAt: nowMs + rule.windowMs });
-      continue;
-    }
-    store.increment(key);
+    await store.bump(key, nowMs, rule.windowMs);
   }
 
   return { ok: true };
 }
 
-export function enforceRateLimit(
+export async function enforceRateLimit(
   scope: string,
   rules: readonly RateLimitRule[],
   message: string,
   nowMs = Date.now(),
-): NextResponse | null {
-  const result = consumeRateLimit(scope, rules, nowMs);
+): Promise<NextResponse | null> {
+  const result = await consumeRateLimit(scope, rules, nowMs);
   if (result.ok) return null;
   return NextResponse.json(
     { error: message },
@@ -229,12 +360,30 @@ export function authTokenConfirmRateLimitRules(request: Request, token: string):
   ];
 }
 
-export function resetRateLimitStoreForTests(): void {
-  store.clear();
+export async function resetRateLimitStoreForTests(): Promise<void> {
+  await store.clear();
   mutationCount = 0;
 }
 
-// Exported for the future Gate 6 Upstash adapter (and its tests) to construct a
-// fresh in-memory fallback store; the module-level default above is created the
-// same way. Not used by the runtime path beyond that default today.
-export { createInMemoryRateLimitStore };
+/**
+ * Test-only seam to swap the active store (e.g. an Upstash adapter built over a
+ * mocked `fetch`). Returns the previous store so a test can restore it. The
+ * runtime path never calls this; the module-level default is chosen once by
+ * `resolveRateLimitStore` from the environment.
+ */
+export function setRateLimitStoreForTests(next: RateLimitStore): RateLimitStore {
+  const previous = store;
+  store = next;
+  mutationCount = 0;
+  return previous;
+}
+
+// Exported for the Gate 6 Upstash adapter and its tests: construct a fresh
+// in-memory fallback store, build the env-gated Upstash adapter directly (with
+// an injectable `fetch` for tests), and resolve the env-selected store. The
+// module-level default above is created the same way via `resolveRateLimitStore`.
+export {
+  createInMemoryRateLimitStore,
+  createUpstashRateLimitStore,
+  resolveRateLimitStore,
+};

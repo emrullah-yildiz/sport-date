@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   catch { return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 }); }
   const input = body as Record<string, unknown>;
   const deviceId = typeof input.deviceId === "string" ? input.deviceId.trim() : "";
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "mobile:auth:refresh",
     mobileRefreshRateLimitRules(request, deviceId),
     "Too many session refresh attempts. Please sign in again in a few minutes.",

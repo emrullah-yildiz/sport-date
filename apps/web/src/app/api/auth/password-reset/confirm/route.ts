@@ -22,7 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
 
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "auth:password-reset:confirm",
     authTokenConfirmRateLimitRules(request, token),
     "Too many password reset attempts. Please wait before trying again.",

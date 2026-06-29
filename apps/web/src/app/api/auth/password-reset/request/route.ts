@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
 
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "auth:password-reset:request",
     passwordResetRequestRateLimitRules(request, email),
     GENERIC_SUCCESS_MESSAGE,

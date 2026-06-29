@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const email = normalizeRateLimitKeyPart((body as Record<string, unknown>)?.email);
-    const limited = enforceRateLimit(
+    const limited = await enforceRateLimit(
       "auth:register",
       browserRegistrationRateLimitRules(request, email),
       "Too many signup attempts. Please wait before trying again.",

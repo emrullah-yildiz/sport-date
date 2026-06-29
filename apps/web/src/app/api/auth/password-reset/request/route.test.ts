@@ -24,7 +24,7 @@ function postRequest(body: unknown, headers: Record<string, string> = {}): Reque
 
 beforeEach(async () => {
   vi.clearAllMocks();
-  resetRateLimitStoreForTests();
+  await resetRateLimitStoreForTests();
   vi.mocked(requestPasswordResetTokenForEmail).mockResolvedValue({} as never);
   ({ POST } = await import("./route"));
 }, 60000);

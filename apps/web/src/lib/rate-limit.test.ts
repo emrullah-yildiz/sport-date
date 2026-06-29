@@ -17,8 +17,8 @@ beforeAll(async () => {
   resetRateLimitStoreForTests = mod.resetRateLimitStoreForTests;
 }, 40000);
 
-afterEach(() => {
-  resetRateLimitStoreForTests();
+afterEach(async () => {
+  await resetRateLimitStoreForTests();
 });
 
 describe("rate limiting", () => {
@@ -36,19 +36,19 @@ describe("rate limiting", () => {
     expect(normalizeRateLimitKeyPart(undefined)).toBe("");
   });
 
-  it("blocks once the configured fixed window is exhausted and resets after expiry", () => {
+  it("blocks once the configured fixed window is exhausted and resets after expiry", async () => {
     const rules = [{ name: "login-email", limit: 2, windowMs: 60_000, key: "email:ana@example.com" }] as const;
-    expect(consumeRateLimit("auth:login", rules, 1_000)).toEqual({ ok: true });
-    expect(consumeRateLimit("auth:login", rules, 2_000)).toEqual({ ok: true });
-    expect(consumeRateLimit("auth:login", rules, 3_000)).toEqual({
+    expect(await consumeRateLimit("auth:login", rules, 1_000)).toEqual({ ok: true });
+    expect(await consumeRateLimit("auth:login", rules, 2_000)).toEqual({ ok: true });
+    expect(await consumeRateLimit("auth:login", rules, 3_000)).toEqual({
       ok: false,
       hit: { name: "login-email", retryAfterSeconds: 58 },
     });
-    expect(consumeRateLimit("auth:login", rules, 62_000)).toEqual({ ok: true });
+    expect(await consumeRateLimit("auth:login", rules, 62_000)).toEqual({ ok: true });
   });
 
-  it("returns a 429 response with retry metadata", () => {
-    const first = enforceRateLimit(
+  it("returns a 429 response with retry metadata", async () => {
+    const first = await enforceRateLimit(
       "auth:login",
       [{ name: "login-ip", limit: 1, windowMs: 60_000, key: "ip:198.51.100.2" }],
       "Too many login attempts.",
@@ -56,7 +56,7 @@ describe("rate limiting", () => {
     );
     expect(first).toBeNull();
 
-    const limited = enforceRateLimit(
+    const limited = await enforceRateLimit(
       "auth:login",
       [{ name: "login-ip", limit: 1, windowMs: 60_000, key: "ip:198.51.100.2" }],
       "Too many login attempts.",

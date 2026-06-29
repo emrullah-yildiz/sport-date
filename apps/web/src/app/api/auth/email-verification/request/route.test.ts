@@ -30,7 +30,7 @@ function postRequest(body: unknown, headers: Record<string, string> = {}): Reque
 
 beforeEach(async () => {
   vi.clearAllMocks();
-  resetRateLimitStoreForTests();
+  await resetRateLimitStoreForTests();
   ({ POST } = await import("./route"));
 }, 60000);
 

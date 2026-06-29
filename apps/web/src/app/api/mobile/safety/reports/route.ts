@@ -8,7 +8,7 @@ import { createSafetyReport } from "@/lib/safety-actions";
 export async function POST(request: Request) {
   const session = await getMobileSession(request);
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "mobile:safety:reports",
     safetyReportRateLimitRules(request, session.user.id),
     "Too many reports in a short period. Please wait before submitting another.",

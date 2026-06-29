@@ -11,7 +11,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
   if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   const requester = await getCurrentUser();
   if (!requester) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-  const limited = enforceRateLimit(
+  const limited = await enforceRateLimit(
     "events:join-request",
     joinRequestRateLimitRules(request, requester.id),
     "Too many join requests in a short period. Please wait before trying again.",

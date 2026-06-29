@@ -10,8 +10,8 @@ beforeAll(async () => {
   ({ resetRateLimitStoreForTests } = await import("../../../../../lib/rate-limit"));
 }, 60000);
 
-afterEach(() => {
-  resetRateLimitStoreForTests();
+afterEach(async () => {
+  await resetRateLimitStoreForTests();
 });
 
 describe("mobile refresh rate limiting", () => {

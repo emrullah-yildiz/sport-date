@@ -7,6 +7,7 @@
 - [x] Login, logout, server-side session lookup, rotation, and protected profile route.
 - [x] Emit restrictive browser security headers across the web app.
 - [x] Add app-layer rate limits to authentication and high-leverage mutation paths.
+- [x] Gate 6 shared/distributed rate limiting: async `RateLimitStore` seam plus an env-gated Upstash Redis REST adapter (atomic pipeline `INCR`+`PEXPIRE`, no new dependency) that activates when `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` are set and gracefully degrades to the behavior-identical in-memory limiter on any error (never to unlimited). Code-complete and unit-tested with mocked `fetch`; activates automatically once the owner provisions the Upstash store (a real-Upstash opt-in integration test is the remaining follow-up).
 - [x] Email verification and password reset implemented with provider-gated, default-disabled delivery and a tested single-use token core; sending real emails still requires an owner-approved email provider.
 - [x] Draft and implement account export, re-authenticated deletion request, request audit, consent boundary, and retention states.
 - [x] Add opt-in real-SQL integration tests for the verification/reset token flows (single-use, sibling invalidation, expiry, reset session-revocation, IP-hash, enumeration neutrality).
