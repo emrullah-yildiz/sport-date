@@ -43,7 +43,7 @@ The native app must not reuse browser-cookie assumptions. Before replacing proto
 
 - logout, expiry, device loss, account deletion, and role/access revocation behavior;
 - member-facing device-session review and remote revocation;
-- scheduled expired native-session and spent-refresh-history cleanup;
+- production scheduling for expired native-session and spent-refresh-history cleanup;
 - no precise-location caching outside the authorized event-room lifecycle;
 - loading, offline, retry, stale-session, and partial-submit recovery;
 - privacy export/deletion coverage identical to web.

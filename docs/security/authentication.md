@@ -22,13 +22,14 @@
 - The Expo client stores its installation UUID and token pair with SecureStore using device-only, unlocked-device accessibility, serializes refresh calls, and clears local credentials on refresh failure.
 - Web and mobile device-management surfaces expose non-secret lifecycle metadata. Web can revoke any native device; mobile identifies itself and can revoke other devices, while current-device termination uses sign-out.
 - Native login, refresh, logout, and a minimal authenticated member endpoint are implemented. Mobile routes never accept the browser session cookie as native authorization.
+- A runnable cleanup command removes expired browser sessions, expired mobile session families, and spent refresh-token history; `--dry-run` reports counts before deletion.
 
 ## Required before external registration
 
 - Shared rate limiting at the edge or gateway, including IP and normalized-account controls that survive process restarts and scale beyond one app instance.
 - Email verification and resend throttling.
-- Scheduled expired-session cleanup and password-reset flows.
-- Scheduled cleanup for expired native sessions and spent-token history.
+- Scheduled password-reset flows.
+- Production scheduling for the session-cleanup job after infrastructure ownership is approved.
 - CSRF review for every state-changing cookie-authenticated endpoint.
 - Effective Terms, Privacy Notice, and Safety Guidelines reviewed for the selected launch country.
 - Abuse monitoring and an incident-response path.
@@ -39,6 +40,8 @@ Until these gates are complete, the signup flow is a development preview and mus
 ## Current rate-limit boundary
 
 The implemented limiter is an in-app baseline, not a full production abuse-control perimeter. It does not yet use a shared backing store, global edge counter, ASN reputation, CAPTCHA, anomaly scoring, or operator controls. Production launch still requires shared enforcement after infrastructure selection so abuse controls remain effective across replicas and restarts.
+
+The cleanup command expects the current schema to exist. If a target database is behind, run `npm run db:migrate --workspace @sport-date/web` before using `npm run db:cleanup-sessions --workspace @sport-date/web`.
 
 ## Native-session limits
 
