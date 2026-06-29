@@ -38,7 +38,10 @@ describe("mobile event room route", () => {
       host: { userId: "11", firstName: "Mira" },
       reflection: null,
       latestUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+      latestCriticalUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
       viewerHasSeenLatestUpdate: false,
+      viewerCriticalUpdateIntent: null,
+      criticalUpdateResponseCounts: { stillIn: 0, unsure: 0, cannotMake: 0 },
       updates: [{
         id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         severity: "critical",
@@ -46,7 +49,7 @@ describe("mobile event room route", () => {
         summary: "start time, exact venue, and arrival instructions updated by the host.",
         createdAt: "2026-07-08T10:00:00.000Z",
       }],
-      participants: [{ userId: "7", firstName: "Alex", skillLevel: "intermediate", seenLatestUpdate: false }],
+      participants: [{ userId: "7", firstName: "Alex", skillLevel: "intermediate", seenLatestUpdate: false, criticalUpdateIntent: null }],
     } as never);
     vi.mocked(getHostJoinRequests).mockResolvedValue([] as never);
 
@@ -61,7 +64,10 @@ describe("mobile event room route", () => {
         id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
         viewerUserId: "7",
         latestUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
+        latestCriticalUpdateId: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
         viewerHasSeenLatestUpdate: false,
+        viewerCriticalUpdateIntent: null,
+        criticalUpdateResponseCounts: { stillIn: 0, unsure: 0, cannotMake: 0 },
         updates: [{
           id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc",
           severity: "critical",

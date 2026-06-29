@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import EventReflectionForm from "@/components/EventReflectionForm";
+import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
@@ -57,6 +58,21 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
               : null}
         </section>
       ) : null}
+      {room.latestCriticalUpdateId ? (
+        room.isHost ? (
+          <section className="room-update-recovery">
+            <p className="panel-label">After the critical change</p>
+            <h2>Who still intends to come?</h2>
+            <div>
+              <article><strong>{room.criticalUpdateResponseCounts.stillIn}</strong><span>still in</span></article>
+              <article><strong>{room.criticalUpdateResponseCounts.unsure}</strong><span>unsure</span></article>
+              <article><strong>{room.criticalUpdateResponseCounts.cannotMake}</strong><span>cannot make it</span></article>
+            </div>
+          </section>
+        ) : (
+          <EventUpdateAttendanceIntentControl eventId={room.id} updateId={room.latestCriticalUpdateId} currentIntent={room.viewerCriticalUpdateIntent} />
+        )
+      ) : null}
       <section className="room-grid">
         <article className="room-meeting">
           <p className="panel-label">Where you are meeting</p>
@@ -78,7 +94,19 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
             {room.participants.map((participant, index) => (
               <span key={`${participant.firstName}-${index}`}>
                 <strong>{participant.firstName}</strong>
-                <small>{room.isHost && room.latestUpdateId ? (participant.seenLatestUpdate ? "opened latest update" : "latest update unseen") : participant.skillLevel}</small>
+                <small>
+                  {room.isHost && room.latestCriticalUpdateId
+                    ? participant.criticalUpdateIntent === "still_in"
+                      ? "still in after change"
+                      : participant.criticalUpdateIntent === "unsure"
+                        ? "unsure after change"
+                        : participant.criticalUpdateIntent === "cannot_make"
+                          ? "cannot make it"
+                          : "no response yet"
+                    : room.isHost && room.latestUpdateId
+                      ? (participant.seenLatestUpdate ? "opened latest update" : "latest update unseen")
+                      : participant.skillLevel}
+                </small>
                 {participant.userId !== user.id ? <ReportSafetyControls eventId={room.id} subjectUserId={participant.userId} subjectName={participant.firstName} /> : null}
               </span>
             ))}

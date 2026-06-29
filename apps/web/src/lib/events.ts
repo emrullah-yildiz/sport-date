@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getDatabase } from "@/lib/db";
+import { type EventUpdateAttendanceIntent } from "@/lib/event-update-intents";
 import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice, type EventUpdateSeverity } from "@/lib/event-updates";
 
 export type HostEvent = Readonly<{
@@ -185,9 +186,12 @@ export type EventRoom = Readonly<{
   host: { userId: string; firstName: string };
   reflection: { attendance: "attended" | "left_early" | "did_not_attend"; wouldJoinAgain: "yes" | "no" | "prefer_not_to_say" } | null;
   latestUpdateId: string | null;
+  latestCriticalUpdateId: string | null;
   viewerHasSeenLatestUpdate: boolean;
+  viewerCriticalUpdateIntent: EventUpdateAttendanceIntent | null;
+  criticalUpdateResponseCounts: Readonly<{ stillIn: number; unsure: number; cannotMake: number }>;
   updates: ReadonlyArray<EventUpdateNotice>;
-  participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string; seenLatestUpdate: boolean | null }>;
+  participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string; seenLatestUpdate: boolean | null; criticalUpdateIntent: EventUpdateAttendanceIntent | null }>;
 }>;
 
 export type MemberEventSummary = Readonly<{
@@ -258,6 +262,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   ` as unknown as EventUpdateNoticeRow[];
 
   const latestUpdateId = updates[0]?.id ?? null;
+  const latestCriticalUpdateId = updates[0]?.severity === "critical" ? updates[0].id : null;
   const participants = await sql`
     SELECT
       member.id AS user_id,
@@ -267,7 +272,13 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
         AND EXISTS (
           SELECT 1 FROM event_update_notice_receipts
           WHERE notice_id = ${latestUpdateId}::uuid AND viewer_user_id = member.id
-        ) AS seen_latest_update
+        ) AS seen_latest_update,
+      (
+        SELECT response
+        FROM event_update_attendance_intents
+        WHERE notice_id = ${latestCriticalUpdateId}::uuid AND participant_user_id = member.id
+        LIMIT 1
+      ) AS critical_update_intent
     FROM event_participants AS participant
     JOIN users AS member ON member.id = participant.user_id AND member.account_status = 'active'
     JOIN events ON events.id = participant.event_id
@@ -280,7 +291,17 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
            OR (blocker_user_id = member.id AND blocked_user_id = ${userId})
       )
     ORDER BY participant.seat_number
-  ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string; seen_latest_update: boolean }>;
+  ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string; seen_latest_update: boolean; critical_update_intent: EventUpdateAttendanceIntent | null }>;
+
+  const criticalUpdateResponseCounts = participants.reduce(
+    (counts, participant) => {
+      if (participant.critical_update_intent === "still_in") counts.stillIn += 1;
+      else if (participant.critical_update_intent === "unsure") counts.unsure += 1;
+      else if (participant.critical_update_intent === "cannot_make") counts.cannotMake += 1;
+      return counts;
+    },
+    { stillIn: 0, unsure: 0, cannotMake: 0 },
+  );
 
   return {
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
@@ -294,7 +315,10 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
       ? { attendance: room.attendance, wouldJoinAgain: room.would_join_again }
       : null,
     latestUpdateId,
+    latestCriticalUpdateId,
     viewerHasSeenLatestUpdate: room.is_host ? true : (latestUpdateId ? (participants.find((participant) => String(participant.user_id) === userId)?.seen_latest_update ?? false) : true),
+    viewerCriticalUpdateIntent: latestCriticalUpdateId ? (participants.find((participant) => String(participant.user_id) === userId)?.critical_update_intent ?? null) : null,
+    criticalUpdateResponseCounts,
     updates: updates.map((update) => ({
       id: update.id,
       severity: update.severity,
@@ -307,6 +331,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
       firstName: participant.first_name,
       skillLevel: participant.skill_level,
       seenLatestUpdate: latestUpdateId ? participant.seen_latest_update : null,
+      criticalUpdateIntent: latestCriticalUpdateId ? participant.critical_update_intent : null,
     })),
   };
 }
