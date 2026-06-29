@@ -22,7 +22,7 @@ Members will browse events by sport, experience, language, approximate location,
 
 1. A host creates an event with real timing, level, language, approximate area, and a separately stored precise meeting point.
 2. Before publishing, the host sees explicit guidance that host status is not safety certification or moderation authority.
-3. After publishing, the host can review requests, protect exact-location access, and cancel or update the invitation if the format is no longer real.
+3. After publishing, the host can review requests, protect exact-location access, and cancel the invitation if the format is no longer real.
 
 ## Safety
 

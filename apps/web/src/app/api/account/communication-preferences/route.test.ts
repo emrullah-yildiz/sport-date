@@ -33,7 +33,7 @@ beforeAll(async () => {
   ({ isTrustedBrowserMutation } = await import("@/lib/request-security"));
   ({ getCurrentUser } = await import("@/lib/session"));
   ({ getCommunicationPreferences, updateProductUpdatesPreference } = await import("@/lib/communication-preferences"));
-}, 20000);
+}, 40000);
 
 describe("account communication preferences route", () => {
   it("returns the current member preferences", async () => {

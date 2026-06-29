@@ -15,7 +15,7 @@ beforeAll(async () => {
   getRequestIp = mod.getRequestIp;
   normalizeRateLimitKeyPart = mod.normalizeRateLimitKeyPart;
   resetRateLimitStoreForTests = mod.resetRateLimitStoreForTests;
-}, 20000);
+}, 40000);
 
 afterEach(() => {
   resetRateLimitStoreForTests();

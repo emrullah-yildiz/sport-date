@@ -49,7 +49,7 @@ Authorization must be derived server-side from the event and participation recor
 
 Join requests begin pending. The host may accept or skip. The third skip currently becomes a decline. Acceptance must be atomic with capacity enforcement so two simultaneous decisions cannot overfill an event. Cancellation by requester or host must close precise-location access immediately where practical.
 
-The implementation assigns accepted participants unique numbered seats bounded by event capacity. Pending and declined requesters never receive the private-location query path. A requester who cancels an accepted place loses that seat and precise-location access.
+The implementation assigns accepted participants unique numbered seats bounded by event capacity. Pending and declined requesters never receive the private-location query path. A requester who cancels an accepted place loses that seat and precise-location access. A host cancellation closes active join requests, removes accepted seats, and revokes room access in the same product operation.
 
 The first event room is a read-only coordination surface plus leave control for accepted participants. The host and currently accepted, unblocked participants can access exact logistics and a filtered participant list. Accepted participants can also cancel from the room itself, which immediately removes the seat and precise-location access. Pending, declined, cancelled, blocked, and unrelated accounts receive no room. Open messaging remains intentionally absent until block/report, moderation evidence, and response operations exist.
 
