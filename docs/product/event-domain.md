@@ -51,7 +51,7 @@ Join requests begin pending. The host may accept or skip. The third skip current
 
 The implementation assigns accepted participants unique numbered seats bounded by event capacity. Pending and declined requesters never receive the private-location query path. A requester who cancels an accepted place loses that seat and precise-location access.
 
-The first event room is a read-only coordination surface. The host and currently accepted, unblocked participants can access exact logistics and a filtered participant list. Pending, declined, cancelled, blocked, and unrelated accounts receive no room. Open messaging remains intentionally absent until block/report, moderation evidence, and response operations exist.
+The first event room is a read-only coordination surface plus leave control for accepted participants. The host and currently accepted, unblocked participants can access exact logistics and a filtered participant list. Accepted participants can also cancel from the room itself, which immediately removes the seat and precise-location access. Pending, declined, cancelled, blocked, and unrelated accounts receive no room. Open messaging remains intentionally absent until block/report, moderation evidence, and response operations exist.
 
 ## Required failure and recovery states
 

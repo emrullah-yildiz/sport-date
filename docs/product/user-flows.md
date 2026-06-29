@@ -16,6 +16,7 @@ Members will browse events by sport, experience, language, approximate location,
 2. The host accepts or skips the request.
 3. A third skip currently becomes a quiet decline for that event only; this is a reversible product assumption awaiting owner confirmation.
 4. Accepted participants gain access to the event room and precise meeting instructions.
+5. An accepted participant can later cancel from the browser event detail, browser room, or mobile event-day surface; that action removes the seat and precise-location access immediately.
 
 ## Safety
 
