@@ -30,20 +30,20 @@ export async function POST(request: Request) {
   try {
     const result = await confirmEmailVerificationToken(token);
     if (result.state === "verified") {
-      return NextResponse.json({ success: true, message: "Email verified." });
+      return NextResponse.json({ success: true, state: "verified", message: "Email verified." });
     }
     if (result.state === "already_verified") {
-      return NextResponse.json({ success: true, message: "Email was already verified." });
+      return NextResponse.json({ success: true, state: "already_verified", message: "Email was already verified." });
     }
     if (result.state === "expired") {
-      return NextResponse.json({ error: "This verification link expired. Request a new one." }, { status: 410 });
+      return NextResponse.json({ state: "expired", error: "This verification link expired. Request a new one." }, { status: 410 });
     }
-    return NextResponse.json({ error: "This verification link is invalid." }, { status: 400 });
+    return NextResponse.json({ state: "invalid", error: "This verification link is invalid." }, { status: 400 });
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {
-      return NextResponse.json({ error: "Verification is not connected yet. Please try again later." }, { status: 503 });
+      return NextResponse.json({ state: "unavailable", error: "Verification is not connected yet. Please try again later." }, { status: 503 });
     }
     console.error("Email verification confirm failed:", error);
-    return NextResponse.json({ error: "Email verification could not be completed." }, { status: 500 });
+    return NextResponse.json({ state: "error", error: "Email verification could not be completed." }, { status: 500 });
   }
 }

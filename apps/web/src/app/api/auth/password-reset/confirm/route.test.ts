@@ -8,20 +8,20 @@ beforeAll(async () => {
   ({ POST } = await import("./route"));
 });
 
-describe("email verification confirm route", () => {
+describe("password reset confirm route", () => {
   it("rejects invalid tokens before any database work", async () => {
     const response = await POST(
-      new Request("https://sportdate.example/api/auth/email-verification/confirm", {
+      new Request("https://sportdate.example/api/auth/password-reset/confirm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: "invalid-token" }),
+        body: JSON.stringify({ token: "invalid-token", password: "LongEnough123" }),
       }),
     );
 
     expect(response.status).toBe(400);
     await expect(response.json()).resolves.toEqual({
       state: "invalid",
-      error: "This verification link is invalid.",
+      error: "This reset link is invalid.",
     });
   });
 });

@@ -32,23 +32,24 @@ export async function POST(request: Request) {
   try {
     const result = await confirmPasswordResetToken(token, password);
     if (result.state === "validation_error") {
-      return NextResponse.json({ error: result.errors[0], errors: result.errors }, { status: 400 });
+      return NextResponse.json({ state: "validation_error", error: result.errors[0], errors: result.errors }, { status: 400 });
     }
     if (result.state === "reset") {
       return NextResponse.json({
         success: true,
+        state: "reset",
         message: "Password updated. Other signed-in devices were signed out.",
       });
     }
     if (result.state === "expired") {
-      return NextResponse.json({ error: "This reset link expired. Request a new one." }, { status: 410 });
+      return NextResponse.json({ state: "expired", error: "This reset link expired. Request a new one." }, { status: 410 });
     }
-    return NextResponse.json({ error: "This reset link is invalid." }, { status: 400 });
+    return NextResponse.json({ state: "invalid", error: "This reset link is invalid." }, { status: 400 });
   } catch (error) {
     if (error instanceof DatabaseNotConfiguredError) {
-      return NextResponse.json({ error: "Password reset is not connected yet. Please try again later." }, { status: 503 });
+      return NextResponse.json({ state: "unavailable", error: "Password reset is not connected yet. Please try again later." }, { status: 503 });
     }
     console.error("Password reset confirm failed:", error);
-    return NextResponse.json({ error: "Password reset could not be completed." }, { status: 500 });
+    return NextResponse.json({ state: "error", error: "Password reset could not be completed." }, { status: 500 });
   }
 }
