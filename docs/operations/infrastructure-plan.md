@@ -25,6 +25,8 @@ have.
 | CI | **GitHub Actions** | n/a | Hermetic typecheck + tests now (`.github/workflows/ci.yml`); an integration job against a Neon **test** branch can be added once its connection string is a repo secret. | n/a |
 | Domain | **Deferred to brand (Gate 3)** | n/a | Run on the Vercel URL until the brand/name is chosen; registering a domain now risks naming a product that may pivot. | n/a |
 
+> **Resolved 2026-06-30:** the owner ratified **Vercel**. The EU-sovereign alternative below is retained only as the fallback if counsel (Gate 2) later objects to a US-incorporated processor.
+
 ### The one fork worth your explicit call
 
 **Vercel (US-incorporated PaaS, EU compute) vs an EU-sovereign host (Hetzner VPS or Fly.io `fra`).**
