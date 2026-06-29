@@ -43,7 +43,7 @@ The native app must not reuse browser-cookie assumptions. Before replacing proto
 
 - logout, expiry, device loss, account deletion, and role/access revocation behavior;
 - member-facing device-session review and remote revocation;
-- member-facing native device-session review and remote revocation;
+- scheduled expired native-session and spent-refresh-history cleanup;
 - no precise-location caching outside the authorized event-room lifecycle;
 - loading, offline, retry, stale-session, and partial-submit recovery;
 - privacy export/deletion coverage identical to web.
@@ -55,5 +55,11 @@ The native app must not reuse browser-cookie assumptions. Before replacing proto
 - Structured reports collect category and 20–2000 character facts, can block in the same audited transaction, and repeat the emergency-service limitation.
 - Host rooms include pending requester context and web-equivalent accept/skip controls. Acceptance uses the atomic numbered-seat invariant; the third skip privately declines.
 - Mutation conflicts refresh authoritative product and room data. Native controls do not use optimistic access or capacity state.
+
+## Implemented device control
+
+- Web profile security lists active, expired, and revoked mobile sessions with device label, last use, and expiry, and can revoke any active native session.
+- Mobile identifies its current session, can remotely revoke other active devices, and directs current-device termination through sign-out.
+- Neither surface receives token hashes, installation UUID hashes, access tokens, or refresh tokens.
 
 Production app identifiers, signing, push credentials, store accounts, terms acceptance, and deployment require owner authorization.

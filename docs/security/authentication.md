@@ -18,6 +18,7 @@
 - Native refresh rotation stores spent refresh hashes; reuse revokes the server-side session family.
 - Native access requires the current access token and hashed installation UUID. Account deletion revokes all active native sessions immediately.
 - The Expo client stores its installation UUID and token pair with SecureStore using device-only, unlocked-device accessibility, serializes refresh calls, and clears local credentials on refresh failure.
+- Web and mobile device-management surfaces expose non-secret lifecycle metadata. Web can revoke any native device; mobile identifies itself and can revoke other devices, while current-device termination uses sign-out.
 - Native login, refresh, logout, and a minimal authenticated member endpoint are implemented. Mobile routes never accept the browser session cookie as native authorization.
 
 ## Required before external registration
@@ -25,7 +26,7 @@
 - Rate limiting at the edge or gateway, including IP and normalized-account controls.
 - Email verification and resend throttling.
 - Scheduled expired-session cleanup and password-reset flows.
-- Member-facing native device-session review/revocation and scheduled cleanup for native session and spent-token history.
+- Scheduled cleanup for expired native sessions and spent-token history.
 - CSRF review for every state-changing cookie-authenticated endpoint.
 - Effective Terms, Privacy Notice, and Safety Guidelines reviewed for the selected launch country.
 - Abuse monitoring and an incident-response path.

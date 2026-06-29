@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { loginMobile, logoutMobile, mobileApiConfigured, restoreMobileMember } from "./src/auth/session";
-import { blockMobileMember, cancelMobileEventRequest, decideMobileHostRequest, loadMobileProduct, loadMobileRoom, reportMobileSafety, requestMobileEvent, saveMobileReflection, type MobileHostRequest, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
+import { blockMobileMember, cancelMobileEventRequest, decideMobileHostRequest, loadMobileDevices, loadMobileProduct, loadMobileRoom, reportMobileSafety, requestMobileEvent, revokeMobileDevice, saveMobileReflection, type MobileDeviceSession, type MobileHostRequest, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
 
 type Tab = "discover" | "event" | "arc";
 
@@ -98,7 +98,7 @@ export default function App() {
       <View style={styles.appShell}>
         <ScrollView contentContainerStyle={styles.screen}>
           <View style={[styles.prototypeBanner, authState === "signed_in" && styles.liveBanner]}><Text style={[styles.prototypeText, authState === "signed_in" && styles.liveBannerText]}>{authState === "signed_in" ? "LIVE PRIVATE BETA DATA" : "INTERACTION PROTOTYPE · NOT SYNCED"}</Text></View>
-          {authState === "signed_in" ? <View style={styles.sessionRow}><Text style={styles.sessionText}>Signed in as {memberName}</Text><Pressable accessibilityRole="button" onPress={() => logoutMobile().finally(() => { setMemberName(""); setAuthState("signed_out"); })}><Text style={styles.sessionAction}>Sign out</Text></Pressable></View> : null}
+          {authState === "signed_in" ? <View style={styles.sessionRow}><Text style={styles.sessionText}>Signed in as {memberName}</Text><View style={styles.sessionActions}><DeviceManager /><Pressable accessibilityRole="button" onPress={() => logoutMobile().finally(() => { setMemberName(""); setAuthState("signed_out"); })}><Text style={styles.sessionAction}>Sign out</Text></Pressable></View></View> : null}
           <View style={styles.header}>
             <View><Text style={styles.overline}>SPORT DATE</Text><Text style={styles.title}>{tab === "discover" ? "Move. Meet. Repeat." : tab === "event" ? "After the movement." : "Your Movement Arc."}</Text></View>
             <View style={styles.avatar}><Text style={styles.avatarText}>A</Text></View>
@@ -327,6 +327,34 @@ function SafetyControls({ eventId, subjectUserId, subjectName, onComplete }: { e
   </>;
 }
 
+function DeviceManager() {
+  const [open, setOpen] = useState(false);
+  const [devices, setDevices] = useState<MobileDeviceSession[]>([]);
+  const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [message, setMessage] = useState("");
+  async function load() {
+    setState("loading"); setMessage("");
+    try { setDevices(await loadMobileDevices()); setState("ready"); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Devices could not be loaded."); setState("error"); }
+  }
+  function show() { setOpen(true); void load(); }
+  async function revoke(device: MobileDeviceSession) {
+    try { await revokeMobileDevice(device.id); await load(); setMessage(`${device.deviceName} was revoked.`); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Device could not be revoked."); }
+  }
+  return <>
+    <Pressable accessibilityRole="button" onPress={show}><Text style={styles.sessionAction}>Devices</Text></Pressable>
+    <Modal visible={open} transparent animationType="slide" onRequestClose={() => setOpen(false)}><View style={styles.modalBackdrop}><View style={styles.safetyModal}><ScrollView contentContainerStyle={styles.safetyModalContent}>
+      <View style={styles.safetyModalHeader}><View><Text style={styles.safetyModalOverline}>ACCOUNT SECURITY</Text><Text style={styles.safetyModalTitle}>Mobile devices</Text></View><Pressable accessibilityRole="button" onPress={() => setOpen(false)}><Text style={styles.modalClose}>Close</Text></Pressable></View>
+      <Text style={styles.safetyModalBody}>Revoke devices you no longer recognize. Tokens and hashes are never shown here.</Text>
+      {state === "loading" ? <ActivityIndicator color="#17241d" style={styles.deviceLoading} /> : null}
+      {state === "error" ? <Pressable accessibilityRole="button" onPress={() => void load()} style={styles.stateAction}><Text style={styles.stateActionText}>Try again</Text></Pressable> : null}
+      {state === "ready" ? devices.map((device) => <View key={device.id} style={styles.deviceCard}><View><Text style={styles.deviceName}>{device.deviceName}</Text><Text style={styles.deviceMeta}>{device.current ? "This device" : device.active ? "Active" : device.revokedAt ? "Revoked" : "Expired"} · last used {new Date(device.lastUsedAt).toLocaleString()}</Text></View>{device.active && !device.current ? <Pressable accessibilityRole="button" onPress={() => Alert.alert(`Revoke ${device.deviceName}?`, "That device must sign in again.", [{ text: "Cancel", style: "cancel" }, { text: "Revoke", style: "destructive", onPress: () => void revoke(device) }])} style={styles.blockButton}><Text style={styles.blockButtonText}>Revoke device</Text></Pressable> : null}</View>) : null}
+      {message ? <Text accessibilityLiveRegion="polite" style={styles.safetyResult}>{message}</Text> : null}
+    </ScrollView></View></View></Modal>
+  </>;
+}
+
 function TabButton({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
   return <Pressable accessibilityRole="tab" accessibilityState={{ selected: active }} onPress={onPress} style={styles.tab}><View style={[styles.tabDot, active && styles.tabDotActive]} /><Text style={[styles.tabText, active && styles.tabTextActive]}>{label}</Text></Pressable>;
 }
@@ -337,7 +365,7 @@ const styles = StyleSheet.create({
   loginScreen: { flex: 1, justifyContent: "center", paddingHorizontal: 25 }, loginOverline: { color: "#657168", fontSize: 10, fontWeight: "900", letterSpacing: 1.4 }, loginTitle: { maxWidth: 330, color: "#17241d", fontSize: 42, lineHeight: 42, fontWeight: "900", letterSpacing: -1.8, marginTop: 10 }, loginBody: { color: "#657168", fontSize: 12, lineHeight: 19, marginTop: 15, marginBottom: 26 }, loginInput: { minHeight: 52, borderWidth: 1, borderColor: "#d1d7d2", borderRadius: 15, paddingHorizontal: 15, backgroundColor: "white", color: "#17241d", marginBottom: 10 }, loginButton: { minHeight: 52, alignItems: "center", justifyContent: "center", borderRadius: 15, backgroundColor: "#17241d", marginTop: 3 }, loginButtonText: { color: "#c9f458", fontWeight: "900" }, loginError: { color: "#8f2a2a", fontSize: 11, lineHeight: 16, marginTop: 12 },
   prototypeBanner: { alignSelf: "flex-start", borderRadius: 20, backgroundColor: "#ffe0d4", paddingHorizontal: 10, paddingVertical: 6, marginBottom: 18 }, prototypeText: { color: "#713b31", fontSize: 8, fontWeight: "900", letterSpacing: 1 },
   liveBanner: { backgroundColor: "#dff59e" }, liveBannerText: { color: "#31411f" },
-  sessionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: -8, marginBottom: 19 }, sessionText: { color: "#657168", fontSize: 10, fontWeight: "700" }, sessionAction: { color: "#713b31", fontSize: 10, fontWeight: "900" },
+  sessionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: -8, marginBottom: 19 }, sessionText: { color: "#657168", fontSize: 10, fontWeight: "700" }, sessionActions: { flexDirection: "row", gap: 14 }, sessionAction: { color: "#713b31", fontSize: 10, fontWeight: "900" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }, overline: { color: "#657168", fontSize: 10, fontWeight: "800", letterSpacing: 1.4 }, title: { maxWidth: 280, color: "#17241d", fontSize: 30, fontWeight: "900", letterSpacing: -1.2, marginTop: 5 }, avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#17241d", alignItems: "center", justifyContent: "center" }, avatarText: { color: "#c9f458", fontWeight: "900" },
   filterRow: { flexDirection: "row", gap: 9, marginBottom: 34 }, filter: { borderWidth: 1, borderColor: "#c8cdc8", borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10 }, activeFilter: { borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: "#17241d" }, filterText: { color: "#526057", fontSize: 12, fontWeight: "700" }, activeFilterText: { color: "white", fontSize: 12, fontWeight: "800" }, sectionTitle: { color: "#17241d", fontSize: 20, fontWeight: "900", marginBottom: 14 },
   card: { flexDirection: "row", alignItems: "center", backgroundColor: "white", borderRadius: 22, padding: 14, marginBottom: 11 }, eventIcon: { width: 62, height: 72, borderRadius: 17, alignItems: "center", justifyContent: "center" }, eventIconText: { color: "#17241d", fontSize: 25, fontWeight: "900" }, eventCopy: { flex: 1, paddingHorizontal: 14 }, eventTitle: { fontSize: 17, fontWeight: "900", color: "#17241d" }, eventPlace: { color: "#707b73", fontSize: 11, marginTop: 5 }, eventTime: { color: "#314b3a", fontSize: 11, fontWeight: "800", marginTop: 6 }, eventFootnote: { color: "#879189", fontSize: 9, marginTop: 5 }, requestButton: { alignSelf: "flex-start", borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: "#c9f458", marginTop: 10 }, requestButtonSecondary: { backgroundColor: "#ffe0d4" }, requestButtonText: { color: "#17241d", fontSize: 9, fontWeight: "900" }, requestClosed: { color: "#8f5a4b", fontSize: 9, fontWeight: "900", textTransform: "capitalize", marginTop: 9 }, liveMessage: { padding: 12, borderRadius: 11, backgroundColor: "#eef5da", color: "#435039", fontSize: 10, lineHeight: 15 }, liveLimit: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 10 }, arrow: { color: "#627067", fontSize: 28 }, createButton: { backgroundColor: "#c9f458", borderRadius: 18, alignItems: "center", paddingVertical: 17, marginTop: 16 }, createButtonText: { color: "#17241d", fontWeight: "900", fontSize: 15 }, pressed: { opacity: .72 },
@@ -350,4 +378,5 @@ const styles = StyleSheet.create({
   tabBar: { position: "absolute", left: 14, right: 14, bottom: 14, flexDirection: "row", justifyContent: "space-around", borderRadius: 22, paddingVertical: 11, backgroundColor: "#17241d" }, tab: { flex: 1, alignItems: "center", gap: 5 }, tabDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "transparent" }, tabDotActive: { backgroundColor: "#c9f458" }, tabText: { color: "#829087", fontSize: 10, fontWeight: "800" }, tabTextActive: { color: "white" },
   stateCard: { alignItems: "flex-start", padding: 22, borderRadius: 22, backgroundColor: "white", gap: 9 }, stateTitle: { color: "#17241d", fontSize: 20, fontWeight: "900" }, stateBody: { color: "#657168", fontSize: 12, lineHeight: 18 }, stateAction: { borderRadius: 11, backgroundColor: "#c9f458", paddingHorizontal: 13, paddingVertical: 10, marginTop: 6 }, stateActionText: { color: "#17241d", fontSize: 11, fontWeight: "900" },
   modalBackdrop: { flex: 1, justifyContent: "flex-end", backgroundColor: "rgba(12,20,15,.5)" }, safetyModal: { maxHeight: "92%", borderTopLeftRadius: 28, borderTopRightRadius: 28, backgroundColor: "#f4f0e7", overflow: "hidden" }, safetyModalContent: { padding: 22, paddingBottom: 42 }, safetyModalHeader: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" }, safetyModalOverline: { color: "#8f5a4b", fontSize: 8, fontWeight: "900", letterSpacing: 1.2 }, safetyModalTitle: { color: "#17241d", fontSize: 30, fontWeight: "900", marginTop: 5 }, modalClose: { color: "#657168", fontSize: 11, fontWeight: "900", padding: 8 }, safetyModalBody: { color: "#657168", fontSize: 11, lineHeight: 17, marginTop: 14 }, blockButton: { alignItems: "center", borderRadius: 12, paddingVertical: 13, backgroundColor: "#ffe0d4", marginVertical: 16 }, blockButtonText: { color: "#713b31", fontSize: 11, fontWeight: "900" }, reportInput: { minHeight: 120, borderWidth: 1, borderColor: "#d1d7d2", borderRadius: 14, padding: 13, backgroundColor: "white", color: "#17241d", textAlignVertical: "top" }, checkRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 14 }, checkbox: { width: 18, height: 18, borderWidth: 1, borderColor: "#879189", borderRadius: 5 }, checkboxChecked: { borderWidth: 5, borderColor: "#17241d", backgroundColor: "#c9f458" }, checkText: { flex: 1, color: "#526057", fontSize: 10, lineHeight: 15 }, reportButton: { alignItems: "center", borderRadius: 12, paddingVertical: 14, backgroundColor: "#ff7b5f", marginTop: 16 }, reportButtonText: { color: "#32110b", fontSize: 11, fontWeight: "900" }, disabled: { opacity: .45 }, emergencyText: { color: "#713b31", fontSize: 9, lineHeight: 14, marginTop: 13 }, safetyResult: { padding: 11, borderRadius: 10, backgroundColor: "white", color: "#435039", fontSize: 10, lineHeight: 15, marginTop: 11 },
+  deviceLoading: { marginTop: 24 }, deviceCard: { padding: 16, borderRadius: 14, backgroundColor: "white", marginTop: 10 }, deviceName: { color: "#17241d", fontSize: 13, fontWeight: "900" }, deviceMeta: { color: "#657168", fontSize: 9, lineHeight: 14, marginTop: 5 },
 });

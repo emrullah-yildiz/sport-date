@@ -31,6 +31,10 @@ export type MobileProgress = MovementProgress & {
   recentMoves: Array<{ eventId: string; title: string; sport: string; startsAt: string; role: "host" | "participant" }>;
 };
 export type MobileProductData = { discovery: MobileDiscoveryEvent[]; events: MobileMemberEvent[]; progress: MobileProgress };
+export type MobileDeviceSession = {
+  id: string; deviceName: string; lastUsedAt: string; refreshExpiresAt: string;
+  revokedAt: string | null; current: boolean; active: boolean;
+};
 
 async function readJson<T>(response: Response): Promise<T> {
   const body = await response.json() as T & { error?: string };
@@ -95,4 +99,16 @@ export async function decideMobileHostRequest(eventId: string, requestId: string
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }),
   });
   return readJson(response);
+}
+
+export async function loadMobileDevices(): Promise<MobileDeviceSession[]> {
+  const response = await mobileApiFetch("/api/mobile/devices");
+  return (await readJson<{ devices: MobileDeviceSession[] }>(response)).devices;
+}
+
+export async function revokeMobileDevice(sessionId: string): Promise<void> {
+  const response = await mobileApiFetch("/api/mobile/devices", {
+    method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sessionId }),
+  });
+  await readJson(response);
 }

@@ -5,6 +5,7 @@ import LogoutButton from "@/components/LogoutButton";
 import PrivacyControls from "@/components/PrivacyControls";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
+import MobileSessionControls from "@/components/MobileSessionControls";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser } from "@/lib/session";
 
@@ -49,6 +50,7 @@ export default async function ProfilePage() {
         </article>
       </section>
       <MovementArc progress={movementProgress} />
+      <MobileSessionControls />
       <EditProfileForm profile={user} />
       <PrivacyControls />
     </main>

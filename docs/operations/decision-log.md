@@ -58,6 +58,10 @@ Native request and cancellation controls became eligible once they reused the we
 
 Block, report, request, cancel, accept, and skip behavior must not fork by client. Browser and native routes authenticate differently but call the same authorization and database actions, preserving immediate access revocation, report relationship checks, numbered-seat capacity, and maximum-three-skip behavior.
 
+## 2026-06-29 - Current mobile device exits through sign-out
+
+Mobile device management can remotely revoke other sessions but cannot revoke the session authorizing its own request; current-device termination uses the logout path so the server revocation and SecureStore deletion run together. Web may revoke any native session for account recovery.
+
 ## Open decisions
 
 - Final product and company name.

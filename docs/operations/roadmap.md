@@ -42,7 +42,7 @@
 - [x] Replace signed-in mobile demo state with native-authorized live approximate discovery, accepted/host room, reflection, and Movement Arc data.
 - [x] Add native join requests and requester cancellation with shared capacity, compatibility, block, seat-removal, and conflict recovery.
 - [x] Add native host decisions, blocking, and reporting with shared access revocation, audited reports, atomic seats, and maximum-three-skip recovery.
-- [ ] Add member-facing native device-session review and remote revocation.
+- [x] Add member-facing web/mobile device-session review and remote revocation without exposing credentials or installation identifiers.
 - [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
 
 ## Launch gates
