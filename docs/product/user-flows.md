@@ -18,6 +18,12 @@ Members will browse events by sport, experience, language, approximate location,
 4. Accepted participants gain access to the event room and precise meeting instructions.
 5. An accepted participant can later cancel from the browser event detail, browser room, or mobile event-day surface; that action removes the seat and precise-location access immediately.
 
+## Host setup
+
+1. A host creates an event with real timing, level, language, approximate area, and a separately stored precise meeting point.
+2. Before publishing, the host sees explicit guidance that host status is not safety certification or moderation authority.
+3. After publishing, the host can review requests, protect exact-location access, and cancel or update the invitation if the format is no longer real.
+
 ## Safety
 
 Blocking and reporting must be available from profiles, events, rooms, and messages. Messaging and private meeting details are restricted to accepted event participants. Moderation actions require an audit trail.

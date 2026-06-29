@@ -24,6 +24,12 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
         <article className="host-location-card public"><p className="panel-label">Discovery sees</p><h2>{event.publicLocation.areaLabel}</h2><p>{event.publicLocation.city}, {event.publicLocation.countryCode}</p><small>No exact venue or address is included in public event data.</small></article>
         <article className="host-location-card private"><p className="panel-label">Accepted people see</p><h2>{event.privateLocation.venueName}</h2><p>{event.privateLocation.address}</p>{event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}</article>
       </section>
+      <section className="host-next host-guidance">
+        <p className="panel-label">Host boundary</p>
+        <h2>Keep the invitation honest after it goes live.</h2>
+        <p>Hosting here means protecting the exact location, responding without humiliation, and cancelling early if the format is no longer real. Host status is not safety certification.</p>
+        <Link href="/hosting-guidelines">Review the Hosting Guidelines</Link>
+      </section>
       <section className="host-requests"><p className="panel-label">Join requests</p><h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>{requests.length === 0 ? <p>Compatible members can now discover this invitation and request a place.</p> : <div className="host-request-list">{requests.map((request) => <article className={`host-request ${request.status}`} key={request.id}><div><strong>{request.requester.firstName}, {request.requester.age}</strong><span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span></div>{request.requester.bio ? <p>{request.requester.bio}</p> : null}{request.introduction ? <blockquote>{request.introduction}</blockquote> : null}<footer><span className="capitalize">{request.status}</span>{request.status === "pending" ? <HostRequestDecision eventId={event.id} requestId={request.id} skipCount={request.skipCount} /> : null}</footer><ReportSafetyControls eventId={event.id} subjectUserId={request.requesterId} subjectName={request.requester.firstName} /></article>)}</div>}</section>
     </main>
   );
