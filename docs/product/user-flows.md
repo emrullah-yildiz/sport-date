@@ -16,7 +16,7 @@ Members will browse events by sport, experience, language, approximate location,
 2. The host accepts or skips the request.
 3. A third skip currently becomes a quiet decline for that event only; this is a reversible product assumption awaiting owner confirmation.
 4. Accepted participants gain access to the event room, precise meeting instructions, and in-product host update history for later event edits. Time, venue, area, duration, and arrival changes appear as critical changes. Opening the room marks the newest host update as seen, and the newest critical change can be answered with still-in / unsure / cannot-make intent.
-5. The host event surface translates those recovery responses into concrete guidance about whether the event still honestly exists, needs reshaping, or should be cancelled early, and points to pending requests as the first replacement path when relevant.
+5. The host event surface translates those recovery responses into concrete guidance about whether the event still honestly exists, needs reshaping, or should be cancelled early, then brings pending requests to the top of the queue as the first replacement path when relevant.
 6. An accepted participant can later cancel from the browser event detail, browser room, or mobile event-day surface; that action removes the seat and precise-location access immediately.
 
 ## Host setup

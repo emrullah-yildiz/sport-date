@@ -5,7 +5,8 @@ import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
-import { getEventRoom, getHostEvent, getHostJoinRequests } from "@/lib/events";
+import { getEventRoom, getHostEvent, getHostJoinRequests, type HostJoinRequest } from "@/lib/events";
+import { summarizeHostRequestQueue } from "@/lib/join-request-policy";
 import { getCurrentUser } from "@/lib/session";
 
 function getRecoveryGuidance(
@@ -51,37 +52,161 @@ function getRecoveryGuidance(
   };
 }
 
+function renderRequestCard(eventId: string, request: HostJoinRequest) {
+  return (
+    <article className={`host-request ${request.status}`} key={request.id}>
+      <div>
+        <strong>{request.requester.firstName}, {request.requester.age}</strong>
+        <span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span>
+      </div>
+      {request.requester.bio ? <p>{request.requester.bio}</p> : null}
+      {request.introduction ? <blockquote>{request.introduction}</blockquote> : null}
+      <footer>
+        <span className="capitalize">{request.status}</span>
+        {request.status === "pending" ? <HostRequestDecision eventId={eventId} requestId={request.id} skipCount={request.skipCount} /> : null}
+      </footer>
+      <ReportSafetyControls eventId={eventId} subjectUserId={request.requesterId} subjectName={request.requester.firstName} />
+    </article>
+  );
+}
+
 export default async function HostEventPage({ params }: { params: Promise<{ eventId: string }> }) {
   const host = await getCurrentUser();
   if (!host) redirect("/login");
+
   const { eventId } = await params;
   const event = await getHostEvent(eventId, host.id);
   if (!event) notFound();
+
   const requests = await getHostJoinRequests(eventId, host.id);
   const room = await getEventRoom(eventId, host.id);
-  const startsAt = new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeStyle: "short", timeZone: event.timeZone }).format(new Date(event.startsAt));
-  const pendingRequestCount = requests.filter((request) => request.status === "pending").length;
-  const recovery = room?.latestCriticalUpdateId ? getRecoveryGuidance(room.criticalUpdateResponseCounts, pendingRequestCount) : null;
+  const startsAt = new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "full",
+    timeStyle: "short",
+    timeZone: event.timeZone,
+  }).format(new Date(event.startsAt));
+
+  const pendingRequests = requests.filter((request) => request.status === "pending");
+  const acceptedRequests = requests.filter((request) => request.status === "accepted");
+  const closedRequests = requests.filter((request) => request.status === "declined" || request.status === "cancelled");
+  const requestQueue = summarizeHostRequestQueue(requests);
+  const recovery = room?.latestCriticalUpdateId
+    ? getRecoveryGuidance(room.criticalUpdateResponseCounts, requestQueue.pendingCount)
+    : null;
 
   return (
     <main className="host-event-page">
-      <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><Link href="/events/new">Host another</Link></nav>
-      <header className="host-event-hero"><p className="eyebrow">Published · {event.sport}</p><h1>{event.title}</h1><p>{event.description}</p><div className="event-facts"><span>{startsAt}</span><span>{event.durationMinutes} minutes</span><span>{event.capacity} total places</span><span>{event.minimumAge}–{event.maximumAge}</span><span>{event.language}</span></div></header>
-      <div className="host-room-link"><Link href={`/events/${event.id}/room`}>Open the event room →</Link></div>
-      {room?.latestCriticalUpdateId ? <section className="host-recovery-card"><p className="panel-label">Recovery after a critical change</p><h2>{recovery?.title}</h2><p>{recovery?.body}</p><div><span>{room.criticalUpdateResponseCounts.stillIn} still in</span><span>{room.criticalUpdateResponseCounts.unsure} unsure</span><span>{room.criticalUpdateResponseCounts.cannotMake} cannot make it</span></div>{recovery?.replacement ? <p>{recovery.replacement}</p> : null}<small>Use the room to watch responses, review pending requests before widening the invitation again, and cancel early if the plan no longer honestly exists.</small></section> : null}
+      <nav className="profile-nav">
+        <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/events/new">Host another</Link>
+      </nav>
+
+      <header className="host-event-hero">
+        <p className="eyebrow">Published · {event.sport}</p>
+        <h1>{event.title}</h1>
+        <p>{event.description}</p>
+        <div className="event-facts">
+          <span>{startsAt}</span>
+          <span>{event.durationMinutes} minutes</span>
+          <span>{event.capacity} total places</span>
+          <span>{event.minimumAge}–{event.maximumAge}</span>
+          <span>{event.language}</span>
+        </div>
+      </header>
+
+      <div className="host-room-link">
+        <Link href={`/events/${event.id}/room`}>Open the event room →</Link>
+      </div>
+
+      {room?.latestCriticalUpdateId ? (
+        <section className="host-recovery-card">
+          <p className="panel-label">Recovery after a critical change</p>
+          <h2>{recovery?.title}</h2>
+          <p>{recovery?.body}</p>
+          <div>
+            <span>{room.criticalUpdateResponseCounts.stillIn} still in</span>
+            <span>{room.criticalUpdateResponseCounts.unsure} unsure</span>
+            <span>{room.criticalUpdateResponseCounts.cannotMake} cannot make it</span>
+          </div>
+          {recovery?.replacement ? <p>{recovery.replacement}</p> : null}
+          <small>Use the room to watch responses, review pending requests before widening the invitation again, and cancel early if the plan no longer honestly exists.</small>
+        </section>
+      ) : null}
+
       <section className="host-location-grid">
-        <article className="host-location-card public"><p className="panel-label">Discovery sees</p><h2>{event.publicLocation.areaLabel}</h2><p>{event.publicLocation.city}, {event.publicLocation.countryCode}</p><small>No exact venue or address is included in public event data.</small></article>
-        <article className="host-location-card private"><p className="panel-label">Accepted people see</p><h2>{event.privateLocation.venueName}</h2><p>{event.privateLocation.address}</p>{event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}</article>
+        <article className="host-location-card public">
+          <p className="panel-label">Discovery sees</p>
+          <h2>{event.publicLocation.areaLabel}</h2>
+          <p>{event.publicLocation.city}, {event.publicLocation.countryCode}</p>
+          <small>No exact venue or address is included in public event data.</small>
+        </article>
+        <article className="host-location-card private">
+          <p className="panel-label">Accepted people see</p>
+          <h2>{event.privateLocation.venueName}</h2>
+          <p>{event.privateLocation.address}</p>
+          {event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}
+        </article>
       </section>
+
       <section className="host-next host-guidance">
         <p className="panel-label">Host boundary</p>
         <h2>Keep the invitation honest after it goes live.</h2>
         <p>Hosting here means protecting the exact location, responding without humiliation, and cancelling early if the format is no longer real. Host status is not safety certification.</p>
         <Link href="/hosting-guidelines">Review the Hosting Guidelines</Link>
       </section>
+
       <HostEditEventForm event={event} />
       <HostCancelEventControl eventId={event.id} />
-      <section className="host-requests"><p className="panel-label">Join requests</p><h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>{requests.length === 0 ? <p>Compatible members can now discover this invitation and request a place.</p> : <div className="host-request-list">{requests.map((request) => <article className={`host-request ${request.status}`} key={request.id}><div><strong>{request.requester.firstName}, {request.requester.age}</strong><span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span></div>{request.requester.bio ? <p>{request.requester.bio}</p> : null}{request.introduction ? <blockquote>{request.introduction}</blockquote> : null}<footer><span className="capitalize">{request.status}</span>{request.status === "pending" ? <HostRequestDecision eventId={event.id} requestId={request.id} skipCount={request.skipCount} /> : null}</footer><ReportSafetyControls eventId={event.id} subjectUserId={request.requesterId} subjectName={request.requester.firstName} /></article>)}</div>}</section>
+
+      <section className="host-requests">
+        <p className="panel-label">Join requests</p>
+        <h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>
+
+        {requests.length === 0 ? (
+          <p>Compatible members can now discover this invitation and request a place.</p>
+        ) : (
+          <>
+            <div className="host-request-summary">
+              <span>{requestQueue.pendingCount} pending</span>
+              <span>{requestQueue.acceptedCount} accepted</span>
+              <span>{requestQueue.closedCount} closed</span>
+            </div>
+
+            <div className="host-request-sections">
+              <section className="host-request-section">
+                <div className="host-request-section-copy">
+                  <h3>{requestQueue.pendingHeadline}</h3>
+                  {requestQueue.pendingBody ? <p>{requestQueue.pendingBody}</p> : null}
+                </div>
+
+                {pendingRequests.length > 0
+                  ? <div className="host-request-list">{pendingRequests.map((request) => renderRequestCard(event.id, request))}</div>
+                  : <p className="host-request-empty">There is nothing waiting for a host decision right now.</p>}
+              </section>
+
+              {acceptedRequests.length > 0 ? (
+                <section className="host-request-section">
+                  <div className="host-request-section-copy">
+                    <h3>Already in the group</h3>
+                    <p>These people already have room access and precise meeting details.</p>
+                  </div>
+                  <div className="host-request-list">{acceptedRequests.map((request) => renderRequestCard(event.id, request))}</div>
+                </section>
+              ) : null}
+
+              {closedRequests.length > 0 ? (
+                <section className="host-request-section">
+                  <div className="host-request-section-copy">
+                    <h3>Already resolved</h3>
+                    <p>Closed requests stay visible for context, but they no longer need host action.</p>
+                  </div>
+                  <div className="host-request-list">{closedRequests.map((request) => renderRequestCard(event.id, request))}</div>
+                </section>
+              ) : null}
+            </div>
+          </>
+        )}
+      </section>
     </main>
   );
 }
