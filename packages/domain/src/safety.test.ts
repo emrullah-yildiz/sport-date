@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityForSafetyCategory, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
+import { priorityForSafetyCategory, validateModerationAppealUpdate, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
 
 describe("safety reports", () => {
   it("prioritizes immediate physical and minor-safety risks", () => {
@@ -58,5 +58,19 @@ describe("moderation case updates", () => {
   it("keeps dismissed and actioned decision codes consistent", () => {
     expect(validateModerationCaseUpdate({ status: "dismissed", decisionCode: "warning", decisionBasis: "Community Conduct Rule 2", decisionSummary: "This decision summary is sufficiently detailed." }).valid).toBe(false);
     expect(validateModerationCaseUpdate({ status: "actioned", decisionCode: "no_action", decisionBasis: "Community Conduct Rule 2", decisionSummary: "This decision summary is sufficiently detailed." }).valid).toBe(false);
+  });
+});
+
+describe("moderation appeal updates", () => {
+  it("accepts review without a premature outcome", () => {
+    expect(validateModerationAppealUpdate({ status: "reviewing" })).toEqual({ valid: true, status: "reviewing", outcomeSummary: null });
+  });
+
+  it("requires a reporter-safe final outcome", () => {
+    expect(validateModerationAppealUpdate({ status: "reversed", outcomeSummary: "Too short" }).valid).toBe(false);
+    expect(validateModerationAppealUpdate({
+      status: "reversed",
+      outcomeSummary: "A separate reviewer reconsidered the context and reversed the original decision.",
+    }).valid).toBe(true);
   });
 });

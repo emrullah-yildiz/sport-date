@@ -18,6 +18,7 @@ export type ModerationQueueCase = Readonly<{
   reporter: { id: string; firstName: string } | null;
   subject: { id: string; firstName: string } | null;
   event: { id: string; title: string; sport: string; city: string; area: string } | null;
+  appeal: { id: string; reason: string; status: "open" | "reviewing" | "upheld" | "modified" | "reversed"; createdAt: string; outcomeSummary: string | null; canReview: boolean } | null;
 }>;
 
 type RoleRow = { role: ModeratorSession["roles"][number] };
@@ -28,6 +29,9 @@ type QueueRow = {
   reported_user_id: string | number | null; subject_first_name: string | null;
   event_id: string | null; event_title: string | null; event_sport: string | null;
   public_city: string | null; public_area_label: string | null;
+  appeal_id: string | null; appeal_reason: string | null;
+  appeal_status: NonNullable<ModerationQueueCase["appeal"]>["status"] | null;
+  appeal_created_at: string | null; appeal_outcome_summary: string | null; can_review_appeal: boolean;
 };
 
 export async function getModeratorSession(): Promise<ModeratorSession | null> {
@@ -51,11 +55,20 @@ export async function getModerationQueue(moderator: ModeratorSession): Promise<M
       report.reporter_user_id, reporter.first_name AS reporter_first_name,
       report.reported_user_id, subject.first_name AS subject_first_name,
       events.id AS event_id, events.title AS event_title, events.sport AS event_sport,
-      events.public_city, events.public_area_label
+      events.public_city, events.public_area_label,
+      appeal.id AS appeal_id, appeal.reason AS appeal_reason, appeal.status AS appeal_status,
+      appeal.created_at AS appeal_created_at, appeal.outcome_summary AS appeal_outcome_summary,
+      (appeal.status IN ('open', 'reviewing') AND EXISTS (
+        SELECT 1 FROM moderation_audit_log AS decision_audit
+        WHERE decision_audit.report_id = report.id
+          AND decision_audit.action = 'decision_notice_published'
+          AND decision_audit.actor_user_id IS DISTINCT FROM ${moderator.user.id}
+      )) AS can_review_appeal
     FROM safety_reports AS report
     LEFT JOIN users AS reporter ON reporter.id = report.reporter_user_id
     LEFT JOIN users AS subject ON subject.id = report.reported_user_id
     LEFT JOIN events ON events.id = report.event_id
+    LEFT JOIN moderation_appeals AS appeal ON appeal.report_id = report.id
     WHERE EXISTS (
       SELECT 1 FROM user_roles
       WHERE user_id = ${moderator.user.id} AND revoked_at IS NULL
@@ -78,6 +91,9 @@ export async function getModerationQueue(moderator: ModeratorSession): Promise<M
       : null,
     event: row.event_id && row.event_title && row.event_sport && row.public_city && row.public_area_label
       ? { id: row.event_id, title: row.event_title, sport: row.event_sport, city: row.public_city, area: row.public_area_label }
+      : null,
+    appeal: row.appeal_id && row.appeal_reason && row.appeal_status && row.appeal_created_at
+      ? { id: row.appeal_id, reason: row.appeal_reason, status: row.appeal_status, createdAt: row.appeal_created_at, outcomeSummary: row.appeal_outcome_summary, canReview: row.can_review_appeal }
       : null,
   }));
 }

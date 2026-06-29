@@ -32,6 +32,11 @@ export type ModerationDecisionCode = (typeof MODERATION_DECISION_CODES)[number];
 export type ModerationCaseUpdateValidation =
   | { valid: true; status: ModerationCaseStatus; decisionCode: ModerationDecisionCode | null; decisionBasis: string | null; decisionSummary: string | null }
   | { valid: false; errors: readonly string[] };
+export const MODERATION_APPEAL_STATUSES = ["reviewing", "upheld", "modified", "reversed"] as const;
+export type ModerationAppealStatus = (typeof MODERATION_APPEAL_STATUSES)[number];
+export type ModerationAppealUpdateValidation =
+  | { valid: true; status: ModerationAppealStatus; outcomeSummary: string | null }
+  | { valid: false; errors: readonly string[] };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const USER_ID_PATTERN = /^\d+$/;
@@ -101,4 +106,21 @@ export function validateModerationCaseUpdate(raw: unknown): ModerationCaseUpdate
     decisionBasis: terminal ? decisionBasis : null,
     decisionSummary: terminal ? decisionSummary : null,
   };
+}
+
+export function validateModerationAppealUpdate(raw: unknown): ModerationAppealUpdateValidation {
+  if (!raw || typeof raw !== "object") return { valid: false, errors: ["Appeal update is required."] };
+  const input = raw as Record<string, unknown>;
+  const status = input.status;
+  const outcomeSummary = typeof input.outcomeSummary === "string" ? input.outcomeSummary.trim() : "";
+  const errors: string[] = [];
+  if (!MODERATION_APPEAL_STATUSES.includes(status as ModerationAppealStatus)) errors.push("Choose a valid appeal status.");
+  const final = status === "upheld" || status === "modified" || status === "reversed";
+  if (final && (outcomeSummary.length < 20 || outcomeSummary.length > 2000)) {
+    errors.push("Write a reporter-safe appeal outcome using 20 to 2000 characters.");
+  } else if (!final && outcomeSummary) {
+    errors.push("Only a final appeal state can include an outcome notice.");
+  }
+  if (errors.length > 0) return { valid: false, errors };
+  return { valid: true, status: status as ModerationAppealStatus, outcomeSummary: final ? outcomeSummary : null };
 }

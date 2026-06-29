@@ -32,6 +32,10 @@ Accepting a request atomically claims the lowest available numbered seat under u
 
 Do not enable member messaging merely because room authorization exists. Require accessible reporting, immediate blocking, append-only case audit, evidence policy, staffed critical escalation, decision notices, and appeals first. Automated priority routes cases but never constitutes a finding.
 
+## 2026-06-29 - Appeal reviewers must be independent
+
+An active moderator cannot review an appeal against a decision they issued. Enforce separation in the queue and again inside the locked database mutation. Preserve the original decision and publish the appeal outcome separately instead of rewriting history.
+
 ## Open decisions
 
 - Final product and company name.

@@ -26,7 +26,8 @@
 - [x] Design operational response levels, evidence handling, decisions, appeals, staffing gates, and transparency measures.
 - [x] Add a member Safety Center with report status, decision notices, deadline enforcement, and one structured appeal per case.
 - [x] Add explicitly role-gated moderator queues, case transitions, and reporter-safe decision notices.
-- [ ] Add role-gated appeal outcomes with separation-of-review safeguards.
+- [x] Add role-gated appeal outcomes with separation-of-review safeguards.
+- [ ] Add purpose-limited evidence references and case-access logging without accepting file uploads.
 - [ ] Research and choose one launch city and two or three sports.
 - [ ] Interview prospective members and founding hosts; owner participation is required for real outreach.
 - [ ] Validate positioning and landing conversion without fabricated social proof.

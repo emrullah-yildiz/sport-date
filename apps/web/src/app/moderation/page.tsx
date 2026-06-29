@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import ModerationAppealForm from "@/components/ModerationAppealForm";
 import ModerationCaseForm from "@/components/ModerationCaseForm";
 import { getModerationQueue, getModeratorSession } from "@/lib/moderation";
 
@@ -36,6 +37,16 @@ export default async function ModerationQueuePage() {
               <div><dt>Event context</dt><dd>{moderationCase.event ? `${moderationCase.event.sport} · ${moderationCase.event.title} · ${moderationCase.event.area}, ${moderationCase.event.city}` : "Unavailable"}</dd></div>
               <div><dt>Received</dt><dd>{new Date(moderationCase.createdAt).toLocaleString()}</dd></div>
             </dl>
+            {moderationCase.appeal ? <section className="moderation-appeal-review">
+              <p className="panel-label">Appeal {moderationCase.appeal.status}</p>
+              <blockquote>{moderationCase.appeal.reason}</blockquote>
+              {moderationCase.appeal.outcomeSummary ? <p>{moderationCase.appeal.outcomeSummary}</p> : null}
+              {(moderationCase.appeal.status === "open" || moderationCase.appeal.status === "reviewing")
+                ? moderationCase.appeal.canReview
+                  ? <ModerationAppealForm appealId={moderationCase.appeal.id} currentStatus={moderationCase.appeal.status} />
+                  : <p className="moderation-final">Separation enforced: the original decision-maker cannot review this appeal.</p>
+                : null}
+            </section> : null}
             {moderationCase.status === "actioned" || moderationCase.status === "dismissed"
               ? <p className="moderation-final">Final decision already issued. Changes require a future authorized review workflow.</p>
               : <ModerationCaseForm reportId={moderationCase.id} />}

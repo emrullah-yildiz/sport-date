@@ -10,6 +10,7 @@ Moderator access is privileged production access, not an account setting. The ap
 - Unauthorized people receive no staff queue. Exact event locations are never queried by the queue.
 - A final decision requires a decision code, named policy or legal basis, and reporter-safe explanation. It is published to the member Safety Center with a six-month appeal window, subject to counsel review for the launch jurisdictions and service classification.
 - Final cases cannot be edited through the current workflow.
+- An appeal can be reviewed only by an active moderator other than the actor recorded on the original decision audit. The server enforces this again inside the locked appeal mutation.
 
 ## Provisioning runbook
 
@@ -26,5 +27,6 @@ Do not paste production member IDs, credentials, connection strings, or grant co
 - Compare active roles to the append-only role audit and investigate mismatches.
 - Test that a revoked session loses the queue and cannot mutate a case.
 - Keep moderator and database-operator access separate where staffing permits.
+- Maintain at least two trained moderators before enabling decisions so an appeal can receive a genuinely separate review.
 
 No role should be provisioned until a named safety owner accepts responsibility for review quality, escalation, privacy, and appeals.
