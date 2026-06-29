@@ -47,7 +47,7 @@
 - [x] Add native join requests and requester cancellation with shared capacity, compatibility, block, seat-removal, and conflict recovery.
 - [x] Add native host decisions, blocking, and reporting with shared access revocation, audited reports, atomic seats, and maximum-three-skip recovery.
 - [x] Add member-facing web/mobile device-session review and remote revocation without exposing credentials or installation identifiers.
-- [ ] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app.
+- [x] Never reward swipes, skip decisions, rejection, report suppression, compulsive streaks, or time spent in the app. Guarded by an explicit regression suite (`packages/domain/src/progress-never-rewards.test.ts` and additions to `apps/web/src/lib/reflections.test.ts`): progression is a pure function of the attended-move count, the one qualification predicate accepts only `attended`, and inflating any prohibited signal leaves the arc unchanged versus baseline. Behaviour was not altered; none of the prohibited signals are even representable as inputs to the progression math.
 
 ## Product learning: customer perspective
 
