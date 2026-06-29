@@ -29,12 +29,38 @@ describe("browser host event cancellation route", () => {
   it("updates a host-owned event before it starts", async () => {
     vi.mocked(isTrustedBrowserMutation).mockReturnValue(true);
     vi.mocked(getCurrentUser).mockResolvedValue({ id: "11111111-1111-4111-8111-111111111111" } as never);
+
     const sql = Object.assign(
-      vi.fn(),
+      vi.fn().mockResolvedValue([{
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        accepted_count: 1,
+        sport: "Tennis",
+        title: "Evening rally",
+        description: "A relaxed rally with room for newcomers and a calmer check-in.",
+        starts_at: "2026-07-10T16:00:00.000Z",
+        time_zone: "Europe/Bucharest",
+        duration_minutes: 90,
+        capacity: 4,
+        language: "English",
+        minimum_age: 24,
+        maximum_age: 38,
+        experience_levels: ["beginner", "intermediate"],
+        public_city: "Bucharest",
+        public_country_code: "RO",
+        public_area_label: "Floreasca",
+        public_approximate_latitude: null,
+        public_approximate_longitude: null,
+        venue_name: "Court 1",
+        address: "Old address",
+        precise_latitude: null,
+        precise_longitude: null,
+        arrival_instructions: "Meet by reception.",
+      }]),
       {
         transaction: vi.fn().mockResolvedValue([
           [{ id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
           [{ event_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
+          [{ id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd" }],
         ]),
       },
     );

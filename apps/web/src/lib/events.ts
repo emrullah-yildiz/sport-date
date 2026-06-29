@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getDatabase } from "@/lib/db";
+import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice } from "@/lib/event-updates";
 
 export type HostEvent = Readonly<{
   id: string; sport: string; title: string; description: string; startsAt: string;
@@ -183,6 +184,7 @@ export type EventRoom = Readonly<{
   viewerRequest: { id: string; status: DiscoveryRequest["status"] } | null;
   host: { userId: string; firstName: string };
   reflection: { attendance: "attended" | "left_early" | "did_not_attend"; wouldJoinAgain: "yes" | "no" | "prefer_not_to_say" } | null;
+  updates: ReadonlyArray<EventUpdateNotice>;
   participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string }>;
 }>;
 
@@ -199,6 +201,12 @@ type EventRoomRow = {
   viewer_request_id: string | null; viewer_request_status: DiscoveryRequest["status"] | null;
   has_ended: boolean; attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
   would_join_again: NonNullable<EventRoom["reflection"]>["wouldJoinAgain"] | null;
+};
+
+type EventUpdateNoticeRow = {
+  id: string;
+  changed_fields: EventUpdateField[];
+  created_at: string;
 };
 
 export async function getEventRoom(eventId: string, userId: string): Promise<EventRoom | null> {
@@ -253,6 +261,13 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
       )
     ORDER BY participant.seat_number
   ` as unknown as Array<{ user_id: string | number; first_name: string; skill_level: string }>;
+  const updates = await sql`
+    SELECT id, changed_fields, created_at
+    FROM event_update_notices
+    WHERE event_id = ${eventId}::uuid
+    ORDER BY created_at DESC
+    LIMIT 10
+  ` as unknown as EventUpdateNoticeRow[];
   return {
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
     timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
@@ -264,6 +279,12 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     reflection: room.attendance && room.would_join_again
       ? { attendance: room.attendance, wouldJoinAgain: room.would_join_again }
       : null,
+    updates: updates.map((update) => ({
+      id: update.id,
+      changedFields: update.changed_fields,
+      summary: summarizeEventUpdate(update.changed_fields),
+      createdAt: update.created_at,
+    })),
     participants: participants.map((participant) => ({ userId: String(participant.user_id), firstName: participant.first_name, skillLevel: participant.skill_level })),
   };
 }
