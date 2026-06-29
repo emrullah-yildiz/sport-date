@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export default function PrivacyControls() {
@@ -25,7 +26,7 @@ export default function PrivacyControls() {
       link.download = "sport-date-account.json";
       link.click();
       URL.revokeObjectURL(url);
-      setMessage("Your machine-readable account export is ready.");
+      setMessage("Your machine-readable account export is ready. It reflects the current preview boundary described in the Privacy Notice preview.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Export failed.");
     } finally {
@@ -58,12 +59,17 @@ export default function PrivacyControls() {
       <div>
         <p className="panel-label">Privacy controls</p>
         <h2 id="privacy-title">Your data should leave as easily as you arrived.</h2>
-        <p>Download the profile information currently held by Sport Date in a machine-readable JSON file.</p>
+        <p>
+          Download the information currently held by Sport Date in a machine-readable JSON file, or start a deletion request that immediately locks your profile while final handling follows the applicable legal and retention review.
+        </p>
+        <p className="privacy-inline-note">
+          Read the <Link href="/privacy">Privacy Notice preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link> for the current member-facing boundary.
+        </p>
         <button className="privacy-action" type="button" onClick={downloadExport} disabled={exporting}>{exporting ? "Preparing export…" : "Download my data"}</button>
       </div>
       <details className="deletion-control">
         <summary>Request account deletion</summary>
-        <p>This immediately locks your profile and signs out every session. Final erasure is processed under the applicable retention and legal requirements.</p>
+        <p>This immediately locks your profile and signs out every session. Final erasure is processed under the applicable retention and legal requirements described in the Privacy Notice preview.</p>
         <form onSubmit={requestDeletion}>
           <label htmlFor="deletion-password">Current password</label>
           <input id="deletion-password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} />
@@ -76,4 +82,3 @@ export default function PrivacyControls() {
     </section>
   );
 }
-
