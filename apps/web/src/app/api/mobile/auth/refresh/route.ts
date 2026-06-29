@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createMobileSessionTokens, hashSessionToken } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 import { isMobileClientRequest, validMobileDeviceId, validMobileRefreshToken } from "@/lib/mobile-session";
+import { enforceRateLimit, mobileRefreshRateLimitRules } from "@/lib/rate-limit";
 
 type RefreshRow = { session_id: string; refresh_expires_at: string; reused: boolean };
 
@@ -12,12 +13,19 @@ export async function POST(request: Request) {
   try { body = await request.json(); }
   catch { return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 }); }
   const input = body as Record<string, unknown>;
+  const deviceId = typeof input.deviceId === "string" ? input.deviceId.trim() : "";
+  const limited = enforceRateLimit(
+    "mobile:auth:refresh",
+    mobileRefreshRateLimitRules(request, deviceId),
+    "Too many session refresh attempts. Please sign in again in a few minutes.",
+  );
+  if (limited) return limited;
   if (!validMobileDeviceId(input.deviceId) || !validMobileRefreshToken(input.refreshToken)) {
     return NextResponse.json({ error: "Session refresh is invalid." }, { status: 401 });
   }
 
   const oldRefreshHash = hashSessionToken(input.refreshToken);
-  const deviceIdHash = hashSessionToken(input.deviceId);
+  const deviceIdHash = hashSessionToken(deviceId);
   const next = createMobileSessionTokens();
   const sql = getDatabase();
   const rows = await sql`
@@ -67,4 +75,3 @@ export async function POST(request: Request) {
     refreshExpiresAt: result.refresh_expires_at,
   }, { headers: { "Cache-Control": "no-store" } });
 }
-

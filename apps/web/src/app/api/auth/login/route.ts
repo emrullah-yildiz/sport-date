@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashSessionToken, verifyPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { browserAuthRateLimitRules, enforceRateLimit, normalizeRateLimitKeyPart } from "@/lib/rate-limit";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { AUTH_COOKIE_NAME, setSessionCookie } from "@/lib/session";
 
@@ -16,7 +17,15 @@ type LoginUserRow = { id: string | number; email: string; password_hash: string;
 export async function POST(request: Request) {
   if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   try {
-    const validation = validateLogin(await request.json());
+    const body = await request.json();
+    const email = normalizeRateLimitKeyPart((body as Record<string, unknown>)?.email);
+    const limited = enforceRateLimit(
+      "auth:login",
+      browserAuthRateLimitRules(request, email),
+      "Too many login attempts. Please wait before trying again.",
+    );
+    if (limited) return limited;
+    const validation = validateLogin(body);
     if (!validation.valid) {
       return NextResponse.json({ error: validation.errors[0] }, { status: 400 });
     }

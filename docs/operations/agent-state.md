@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Design and implement abuse-aware rate limiting for authentication and high-leverage mutation paths so launch security does not rely only on documentation and manual response.
+Design and implement scheduled cleanup for expired browser sessions, mobile sessions, and spent refresh-token history so launch security and privacy do not depend on unbounded credential residue.
 
 ## Completed and verified
 
@@ -47,12 +47,13 @@ Design and implement abuse-aware rate limiting for authentication and high-lever
 - Prepared bilingual member and host recruitment copy, channel-specific organic drafts, privacy-aware form fields, campaign tags, decision signals, and a publication checklist without contacting or publishing to anyone.
 - Added a local-only, noindex, non-collecting Bucharest research landing preview for owner review and verified that the mobile layout no longer overflows the viewport.
 - Added tested app-wide browser response hardening with CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS, then verified the headers from a running production build.
+- Added tested app-layer rate limiting for browser login/signup, mobile login/refresh, join-request creation, and safety-report creation, including `429` retry metadata and a workspace Vitest config for alias-aware server-route tests.
 - Verified the production web build and Android Hermes bundle after device-management integration.
-- Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
+- The web workspace test suite passes; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Design and implement abuse-aware rate limiting for authentication and high-leverage mutation paths.
+1. Design and implement scheduled cleanup for expired browser sessions, mobile sessions, and spent refresh-token history.
 2. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
 3. Add outbound safety decision delivery after an approved email provider exists.
 
@@ -69,6 +70,6 @@ Design and implement abuse-aware rate limiting for authentication and high-lever
 - "Sport Date" is a working name; Bucharest is a research hypothesis.
 - Third skip currently means automatic decline and awaits confirmation.
 - Deletion finalization and vendor/backup propagation remain operational launch gates.
-- Edge or gateway rate limiting is still an implementation gap, not just a documented requirement.
+- Shared edge or gateway rate limiting is still an operational launch gate even though the in-app baseline now exists.
 - Database-level integration tests still require an isolated PostgreSQL test instance.
 - No social, safety, verification, or traction claims may exceed implemented evidence.

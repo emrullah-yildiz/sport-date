@@ -2,11 +2,18 @@ import { validateSafetyReport } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getMobileSession } from "@/lib/mobile-session";
+import { enforceRateLimit, safetyReportRateLimitRules } from "@/lib/rate-limit";
 import { createSafetyReport } from "@/lib/safety-actions";
 
 export async function POST(request: Request) {
   const session = await getMobileSession(request);
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
+  const limited = enforceRateLimit(
+    "mobile:safety:reports",
+    safetyReportRateLimitRules(request, session.user.id),
+    "Too many reports in a short period. Please wait before submitting another.",
+  );
+  if (limited) return limited;
   let body: unknown;
   try { body = await request.json(); }
   catch { return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 }); }

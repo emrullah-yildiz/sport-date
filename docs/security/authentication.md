@@ -15,6 +15,7 @@
 - The private profile page resolves the user from a live, unexpired, server-side session.
 - Cookie-authenticated mutation endpoints reject cross-site browser fetch metadata and mismatched Origin headers.
 - The web app emits restrictive browser security headers for every route: CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS.
+- The web app applies app-layer fixed-window throttles to browser login/signup, mobile login/refresh, join-request creation, and safety-report creation using IP-plus-identity buckets and `429` responses with retry metadata.
 - Native sessions use separate random opaque credentials: a 15-minute access token and a rotating refresh token with a fixed 30-day family lifetime. Only SHA-256 hashes are stored.
 - Native refresh rotation stores spent refresh hashes; reuse revokes the server-side session family.
 - Native access requires the current access token and hashed installation UUID. Account deletion revokes all active native sessions immediately.
@@ -24,7 +25,7 @@
 
 ## Required before external registration
 
-- Rate limiting at the edge or gateway, including IP and normalized-account controls.
+- Shared rate limiting at the edge or gateway, including IP and normalized-account controls that survive process restarts and scale beyond one app instance.
 - Email verification and resend throttling.
 - Scheduled expired-session cleanup and password-reset flows.
 - Scheduled cleanup for expired native sessions and spent-token history.
@@ -34,6 +35,10 @@
 - Integration tests against an isolated PostgreSQL database.
 
 Until these gates are complete, the signup flow is a development preview and must not be promoted to real users.
+
+## Current rate-limit boundary
+
+The implemented limiter is an in-app baseline, not a full production abuse-control perimeter. It does not yet use a shared backing store, global edge counter, ASN reputation, CAPTCHA, anomaly scoring, or operator controls. Production launch still requires shared enforcement after infrastructure selection so abuse controls remain effective across replicas and restarts.
 
 ## Native-session limits
 

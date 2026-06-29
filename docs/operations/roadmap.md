@@ -6,6 +6,7 @@
 - [x] Opaque hashed session creation and explicit database migration.
 - [x] Login, logout, server-side session lookup, rotation, and protected profile route.
 - [x] Emit restrictive browser security headers across the web app.
+- [x] Add app-layer rate limits to authentication and high-leverage mutation paths.
 - [ ] Email verification and password reset design; implementation requires an approved email provider.
 - [x] Draft and implement account export, re-authenticated deletion request, request audit, consent boundary, and retention states.
 

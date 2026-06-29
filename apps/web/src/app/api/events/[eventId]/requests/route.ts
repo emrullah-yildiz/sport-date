@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createEventJoinRequest } from "@/lib/join-requests";
+import { enforceRateLimit, joinRequestRateLimitRules } from "@/lib/rate-limit";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -10,6 +11,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
   if (!isTrustedBrowserMutation(request)) return NextResponse.json({ error: "Cross-site request rejected." }, { status: 403 });
   const requester = await getCurrentUser();
   if (!requester) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  const limited = enforceRateLimit(
+    "events:join-request",
+    joinRequestRateLimitRules(request, requester.id),
+    "Too many join requests in a short period. Please wait before trying again.",
+  );
+  if (limited) return limited;
   const { eventId } = await params;
   if (!UUID_PATTERN.test(eventId)) return NextResponse.json({ error: "Event not found." }, { status: 404 });
 

@@ -70,6 +70,10 @@ Treat Bucharest as a research hypothesis. First test the Aviatorilor-Herastrau t
 
 Emit one restrictive header policy across every web route instead of relying on route-by-route discipline. Deny framing, keep a self-only baseline CSP, disable unnecessary browser capabilities, prefer strict cross-origin isolation headers, and add HSTS only in production.
 
+## 2026-06-29 - Throttle abuse before infrastructure is finalized
+
+Do not wait for edge credentials to add all abuse controls. Add an app-layer baseline now for browser login/signup, mobile login/refresh, join-request creation, and safety-report creation, keyed by IP plus actor identity where possible. Keep the design honest: this reduces abuse pressure during development but does not replace shared production enforcement.
+
 ## Open decisions
 
 - Final product and company name.

@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { createMobileSessionTokens, hashSessionToken, verifyPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
 import { isMobileClientRequest, validMobileDeviceId } from "@/lib/mobile-session";
+import { enforceRateLimit, mobileAuthRateLimitRules, normalizeRateLimitKeyPart } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -14,8 +15,15 @@ export async function POST(request: Request) {
   if (!isMobileClientRequest(request)) return NextResponse.json({ error: "Mobile client headers required." }, { status: 400 });
   try {
     const body = await request.json();
+    const email = normalizeRateLimitKeyPart((body as Record<string, unknown>)?.email);
+    const deviceId = typeof body?.deviceId === "string" ? body.deviceId.trim() : "";
+    const limited = enforceRateLimit(
+      "mobile:auth:login",
+      mobileAuthRateLimitRules(request, email, deviceId),
+      "Too many mobile login attempts. Please wait before trying again.",
+    );
+    if (limited) return limited;
     const validation = validateLogin(body);
-    const deviceId = body?.deviceId;
     const deviceName = typeof body?.deviceName === "string" ? body.deviceName.trim() : "";
     if (!validation.valid || !validMobileDeviceId(deviceId) || deviceName.length < 2 || deviceName.length > 80) {
       return NextResponse.json({ error: validation.valid ? "Valid device information is required." : validation.errors[0] }, { status: 400 });

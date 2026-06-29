@@ -14,7 +14,8 @@
 - Approximate location before acceptance; precise meeting details only for authorized participants.
 - Server-side authorization for every profile, event, request, room, and moderation operation.
 - Restrictive browser response headers across the web app: CSP, frame denial, referrer policy, nosniff, COOP/CORP, permissions policy, and production HSTS.
-- Rate limits and abuse detection around discovery, requests, messaging, and authentication.
+- App-layer rate limits around authentication, session refresh, join requests, and safety reports.
+- Broader abuse detection and shared rate limits around discovery, requests, messaging, and authentication.
 - Blocking and reporting available throughout the core journey.
 - Immutable audit records for moderation and privileged actions.
 - Metadata-only moderation queues, purpose-labelled immutable case-access logs, and case-specific access before report narratives or identities are returned.
@@ -36,5 +37,6 @@
 - Session persistence after device loss or iOS reinstall: keep a fixed server expiry, account-deletion revocation, logout revocation, and a planned member device-management surface.
 - Token exfiltration through configuration: permit only relative `/api/mobile/` paths in authenticated fetches and require an HTTPS `EXPO_PUBLIC_API_URL` outside local development. Public Expo environment values must never contain secrets.
 - Residual risk: a compromised device process can steal both binding and tokens; production requires anomaly detection, rate limiting, app-integrity review, and an incident-revocation procedure.
+- Residual risk: the current limiter is per-process memory only. Production still needs shared counters and operator-visible abuse controls after infrastructure selection.
 - Native discovery receives approximate locations only. Exact room logistics use the existing host/accepted-participant authorization and are fetched only for the selected event-day view; they are not persisted by the application client.
 - Native blocking/reporting and host decisions reuse the same server actions as web. Client state never grants a seat, verifies a report relationship, or decides whether exact room access survives a block.
