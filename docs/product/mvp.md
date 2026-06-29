@@ -10,7 +10,7 @@ Adults in Europe who want to meet compatible people through a shared sport or ac
 2. A host creates an event with a sport, description, capacity, experience range, language, start time, duration, and meeting area.
 3. Eligible members discover the event without seeing a precise private meeting point.
 4. A member requests to join and may add a short introduction.
-5. The host accepts or skips the request. A member may be skipped at most three times for the same event; the exact post-limit state must be made explicit before launch.
+5. The host accepts or skips the request. A member may be skipped at most three times for the same event; the current implemented rule is that the third skip quietly declines the request for that event.
 6. Accepted members receive event details and can participate in a moderated event room.
 7. Members can block or report a profile, event, room, or message.
 
@@ -18,7 +18,7 @@ Adults in Europe who want to meet compatible people through a shared sport or ac
 
 - Launch country and initial city.
 - Whether the product optimizes first for dating, friendship, or both.
-- Confirm the reversible implementation assumption that the third skip automatically declines the request.
+- Confirm or revise the current implemented rule that the third skip quietly declines the request.
 - Revenue model and launch budget.
 - Final name, brand identity, and domain.
 

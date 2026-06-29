@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { hostSkipButtonLabel } from "@/lib/join-request-policy";
+
 export default function HostRequestDecision({ eventId, requestId, skipCount }: { eventId: string; requestId: string; skipCount: number }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -16,6 +18,5 @@ export default function HostRequestDecision({ eventId, requestId, skipCount }: {
     } catch (decisionError) { setError(decisionError instanceof Error ? decisionError.message : "Decision failed."); setSubmitting(false); }
   }
 
-  return <div className="host-decision"><button className="skip-request" type="button" onClick={() => decide("skip")} disabled={submitting}>Skip {skipCount > 0 ? `(${skipCount}/3)` : ""}</button><button className="accept-request" type="button" onClick={() => decide("accept")} disabled={submitting}>Accept</button>{error ? <p role="alert">{error}</p> : null}</div>;
+  return <div className="host-decision"><button className="skip-request" type="button" onClick={() => decide("skip")} disabled={submitting}>{hostSkipButtonLabel(skipCount)}</button><button className="accept-request" type="button" onClick={() => decide("accept")} disabled={submitting}>Accept</button>{skipCount >= 2 ? <p className="host-decision-note">This next skip closes the request quietly.</p> : null}{error ? <p role="alert">{error}</p> : null}</div>;
 }
-

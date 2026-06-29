@@ -3,6 +3,8 @@
 import type { DiscoveryRequest } from "@/lib/events";
 import { useState } from "react";
 
+import { declinedJoinRequestMessage } from "@/lib/join-request-policy";
+
 export default function JoinRequestControls({ eventId, request }: { eventId: string; request: DiscoveryRequest | null }) {
   const [introduction, setIntroduction] = useState("");
   const [message, setMessage] = useState("");
@@ -31,7 +33,7 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
 
   if (request?.status === "accepted") return <div className="join-state accepted"><strong>You have a place.</strong><p>The exact meeting point is now visible below.</p><button type="button" onClick={cancelRequest} disabled={submitting}>Cancel my place</button>{message ? <p role="alert">{message}</p> : null}</div>;
   if (request?.status === "pending") return <div className="join-state pending"><strong>Your request is with the host.</strong><p>You can cancel quietly at any time. Skip counts stay private.</p><button type="button" onClick={cancelRequest} disabled={submitting}>Cancel request</button>{message ? <p role="alert">{message}</p> : null}</div>;
-  if (request?.status === "declined") return <div className="join-state closed"><strong>Not this game.</strong><p>Your request is closed. No public rejection signal is added to your profile.</p></div>;
+  if (request?.status === "declined") return <div className="join-state closed"><strong>Not this game.</strong><p>{declinedJoinRequestMessage(request.skipCount)}</p></div>;
   if (request?.status === "cancelled") return <div className="join-state closed"><strong>Request cancelled.</strong><p>This invitation is closed for your account.</p></div>;
 
   return (
@@ -43,4 +45,3 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
     </div>
   );
 }
-

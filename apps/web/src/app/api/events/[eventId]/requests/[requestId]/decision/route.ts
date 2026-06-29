@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { decideEventJoinRequest } from "@/lib/join-requests";
+import { summarizeHostDecision } from "@/lib/join-request-policy";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -20,5 +21,5 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
   if (!action) return NextResponse.json({ error: "Choose accept or skip." }, { status: 400 });
   const decision = await decideEventJoinRequest(eventId, requestId, host.id, action);
   if (!decision) return NextResponse.json({ error: action === "accept" ? "No place is available or the request is no longer eligible." : "Request cannot be skipped." }, { status: 409 });
-  return NextResponse.json({ success: true, ...decision });
+  return NextResponse.json({ success: true, ...summarizeHostDecision(action, decision) });
 }

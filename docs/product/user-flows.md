@@ -14,10 +14,9 @@ Members will browse events by sport, experience, language, approximate location,
 
 1. An eligible adult requests a place and may include a short introduction.
 2. The host accepts or skips the request.
-3. A third skip currently becomes an automatic decline; this is a reversible product assumption awaiting owner confirmation.
+3. A third skip currently becomes a quiet decline for that event only; this is a reversible product assumption awaiting owner confirmation.
 4. Accepted participants gain access to the event room and precise meeting instructions.
 
 ## Safety
 
 Blocking and reporting must be available from profiles, events, rooms, and messages. Messaging and private meeting details are restricted to accepted event participants. Moderation actions require an audit trail.
-
