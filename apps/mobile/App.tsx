@@ -4,10 +4,10 @@ import {
 } from "@sport-date/domain";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { loginMobile, logoutMobile, mobileApiConfigured, restoreMobileMember } from "./src/auth/session";
-import { loadMobileProduct, loadMobileRoom, saveMobileReflection, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
+import { cancelMobileEventRequest, loadMobileProduct, loadMobileRoom, requestMobileEvent, saveMobileReflection, type MobileMemberEvent, type MobileProductData, type MobileRoom } from "./src/api/product";
 
 type Tab = "discover" | "event" | "arc";
 
@@ -104,9 +104,15 @@ export default function App() {
             items={authState === "signed_in" ? (product?.discovery ?? []).map((event) => ({
               id: event.id, icon: "↗", sport: event.sport, title: event.title,
               place: `${event.areaLabel}, ${event.city} · approximate`, time: new Date(event.startsAt).toLocaleString(), color: "#dff59e",
-              footnote: `${event.placesRemaining} places · hosted by ${event.hostFirstName}`,
-            })) : events.map((event) => ({ ...event, id: event.sport, title: event.sport, footnote: "Demo event" }))}
+              footnote: `${event.placesRemaining} places · hosted by ${event.hostFirstName}`, request: event.request,
+            })) : events.map((event) => ({ ...event, id: event.sport, title: event.sport, footnote: "Demo event", request: null }))}
             onOpenEvent={() => setTab("event")}
+            onRequestAction={async (event) => {
+              try {
+                if (event.request && (event.request.status === "pending" || event.request.status === "accepted")) await cancelMobileEventRequest(event.id, event.request.id);
+                else await requestMobileEvent(event.id);
+              } finally { await reloadProduct(); }
+            }}
           /> : null}
           {(authState !== "signed_in" || productState === "ready") && tab === "event" ? authState === "signed_in"
             ? product?.events.length ? <><EventSelector events={product.events} selectedId={selectedEventId} onSelect={setSelectedEventId} />{roomState === "loading" || roomState === "idle"
@@ -162,17 +168,31 @@ function LoginGate({ onSignedIn }: { onSignedIn: (firstName: string) => void }) 
   </View></SafeAreaView>;
 }
 
-type DisplayEvent = { id: string; icon: string; sport: string; title: string; place: string; time: string; color: string; footnote: string };
+type DisplayEvent = { id: string; icon: string; sport: string; title: string; place: string; time: string; color: string; footnote: string; request: { id: string; status: "pending" | "accepted" | "declined" | "cancelled" } | null };
 
-function DiscoverScreen({ items, live, onOpenEvent }: { items: DisplayEvent[]; live: boolean; onOpenEvent: () => void }) {
+function DiscoverScreen({ items, live, onOpenEvent, onRequestAction }: { items: DisplayEvent[]; live: boolean; onOpenEvent: () => void; onRequestAction: (event: DisplayEvent) => Promise<void> }) {
+  const [busyId, setBusyId] = useState("");
+  const [message, setMessage] = useState("");
+  async function mutate(event: DisplayEvent) {
+    const accepted = event.request?.status === "accepted";
+    const run = async () => {
+      setBusyId(event.id); setMessage("");
+      try { await onRequestAction(event); setMessage(event.request ? "Request cancelled. Event access has been refreshed." : "Request sent. The host can now accept or skip it."); }
+      catch (error) { setMessage(error instanceof Error ? error.message : "Request state changed. Live events were refreshed."); }
+      finally { setBusyId(""); }
+    };
+    if (accepted) Alert.alert("Cancel your accepted place?", "You will immediately lose the event room and exact meeting details.", [{ text: "Keep my place", style: "cancel" }, { text: "Cancel place", style: "destructive", onPress: () => void run() }]);
+    else await run();
+  }
   return <>
     <View style={styles.filterRow}><View style={styles.activeFilter}><Text style={styles.activeFilterText}>Nearby</Text></View><View style={styles.filter}><Text style={styles.filterText}>Today</Text></View><View style={styles.filter}><Text style={styles.filterText}>My level</Text></View></View>
     <Text style={styles.sectionTitle}>Made for your pace</Text>
     {items.length === 0 ? <StateCard title="No compatible events this week" body="Try a wider time window on web while mobile filters are being connected." /> : items.map((event, index) => <Pressable accessibilityRole="button" accessibilityLabel={`${event.sport}: ${event.title}`} accessibilityState={{ disabled: live }} disabled={live} onPress={!live && index === 0 ? onOpenEvent : undefined} key={event.id} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={[styles.eventIcon, { backgroundColor: event.color }]}><Text style={styles.eventIconText}>{event.icon}</Text></View>
-      <View style={styles.eventCopy}><Text style={styles.eventTitle}>{event.title}</Text><Text style={styles.eventPlace}>{event.sport} · {event.place}</Text><Text style={styles.eventTime}>{event.time}</Text><Text style={styles.eventFootnote}>{event.footnote}</Text></View>{live ? null : <Text style={styles.arrow}>›</Text>}
+      <View style={styles.eventCopy}><Text style={styles.eventTitle}>{event.title}</Text><Text style={styles.eventPlace}>{event.sport} · {event.place}</Text><Text style={styles.eventTime}>{event.time}</Text><Text style={styles.eventFootnote}>{event.footnote}</Text>{live ? event.request?.status === "declined" || event.request?.status === "cancelled" ? <Text style={styles.requestClosed}>Request {event.request.status}</Text> : <Pressable accessibilityRole="button" disabled={busyId === event.id} onPress={() => void mutate(event)} style={[styles.requestButton, event.request && styles.requestButtonSecondary]}><Text style={styles.requestButtonText}>{busyId === event.id ? "Refreshing..." : event.request?.status === "accepted" ? "Cancel accepted place" : event.request?.status === "pending" ? "Cancel pending request" : "Request a place"}</Text></Pressable> : null}</View>{live ? null : <Text style={styles.arrow}>›</Text>}
     </Pressable>)}
-    {live ? <Text style={styles.liveLimit}>Live discovery is read-only in this slice. Request controls remain on web until the native mutation flow receives abuse and recovery testing.</Text> : <Pressable accessibilityRole="button" style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}><Text style={styles.createButtonText}>＋ Create an event</Text></Pressable>}
+    {message ? <Text accessibilityLiveRegion="polite" style={styles.liveMessage}>{message}</Text> : null}
+    {live ? <Text style={styles.liveLimit}>Requests use the same capacity, compatibility, and mutual-block rules as web. Host decisions and reporting arrive in the next native safety slice.</Text> : <Pressable accessibilityRole="button" style={({ pressed }) => [styles.createButton, pressed && styles.pressed]}><Text style={styles.createButtonText}>＋ Create an event</Text></Pressable>}
   </>;
 }
 
@@ -242,7 +262,7 @@ const styles = StyleSheet.create({
   sessionRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: -8, marginBottom: 19 }, sessionText: { color: "#657168", fontSize: 10, fontWeight: "700" }, sessionAction: { color: "#713b31", fontSize: 10, fontWeight: "900" },
   header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }, overline: { color: "#657168", fontSize: 10, fontWeight: "800", letterSpacing: 1.4 }, title: { maxWidth: 280, color: "#17241d", fontSize: 30, fontWeight: "900", letterSpacing: -1.2, marginTop: 5 }, avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#17241d", alignItems: "center", justifyContent: "center" }, avatarText: { color: "#c9f458", fontWeight: "900" },
   filterRow: { flexDirection: "row", gap: 9, marginBottom: 34 }, filter: { borderWidth: 1, borderColor: "#c8cdc8", borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10 }, activeFilter: { borderRadius: 30, paddingHorizontal: 16, paddingVertical: 10, backgroundColor: "#17241d" }, filterText: { color: "#526057", fontSize: 12, fontWeight: "700" }, activeFilterText: { color: "white", fontSize: 12, fontWeight: "800" }, sectionTitle: { color: "#17241d", fontSize: 20, fontWeight: "900", marginBottom: 14 },
-  card: { flexDirection: "row", alignItems: "center", backgroundColor: "white", borderRadius: 22, padding: 14, marginBottom: 11 }, eventIcon: { width: 62, height: 72, borderRadius: 17, alignItems: "center", justifyContent: "center" }, eventIconText: { color: "#17241d", fontSize: 25, fontWeight: "900" }, eventCopy: { flex: 1, paddingHorizontal: 14 }, eventTitle: { fontSize: 17, fontWeight: "900", color: "#17241d" }, eventPlace: { color: "#707b73", fontSize: 11, marginTop: 5 }, eventTime: { color: "#314b3a", fontSize: 11, fontWeight: "800", marginTop: 6 }, eventFootnote: { color: "#879189", fontSize: 9, marginTop: 5 }, liveLimit: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 10 }, arrow: { color: "#627067", fontSize: 28 }, createButton: { backgroundColor: "#c9f458", borderRadius: 18, alignItems: "center", paddingVertical: 17, marginTop: 16 }, createButtonText: { color: "#17241d", fontWeight: "900", fontSize: 15 }, pressed: { opacity: .72 },
+  card: { flexDirection: "row", alignItems: "center", backgroundColor: "white", borderRadius: 22, padding: 14, marginBottom: 11 }, eventIcon: { width: 62, height: 72, borderRadius: 17, alignItems: "center", justifyContent: "center" }, eventIconText: { color: "#17241d", fontSize: 25, fontWeight: "900" }, eventCopy: { flex: 1, paddingHorizontal: 14 }, eventTitle: { fontSize: 17, fontWeight: "900", color: "#17241d" }, eventPlace: { color: "#707b73", fontSize: 11, marginTop: 5 }, eventTime: { color: "#314b3a", fontSize: 11, fontWeight: "800", marginTop: 6 }, eventFootnote: { color: "#879189", fontSize: 9, marginTop: 5 }, requestButton: { alignSelf: "flex-start", borderRadius: 10, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: "#c9f458", marginTop: 10 }, requestButtonSecondary: { backgroundColor: "#ffe0d4" }, requestButtonText: { color: "#17241d", fontSize: 9, fontWeight: "900" }, requestClosed: { color: "#8f5a4b", fontSize: 9, fontWeight: "900", textTransform: "capitalize", marginTop: 9 }, liveMessage: { padding: 12, borderRadius: 11, backgroundColor: "#eef5da", color: "#435039", fontSize: 10, lineHeight: 15 }, liveLimit: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 10 }, arrow: { color: "#627067", fontSize: 28 }, createButton: { backgroundColor: "#c9f458", borderRadius: 18, alignItems: "center", paddingVertical: 17, marginTop: 16 }, createButtonText: { color: "#17241d", fontWeight: "900", fontSize: 15 }, pressed: { opacity: .72 },
   eventHero: { padding: 22, borderRadius: 24, backgroundColor: "#17241d", marginBottom: 12 }, eventHeroOverline: { color: "#c9f458", fontSize: 9, fontWeight: "900", letterSpacing: 1.1 }, eventHeroTitle: { color: "white", fontSize: 30, lineHeight: 31, fontWeight: "900", letterSpacing: -1, marginTop: 30 }, eventHeroMeta: { color: "#b7c3bb", fontSize: 11, marginTop: 9 }, eventVenue: { color: "white", fontSize: 12, lineHeight: 18, fontWeight: "800", marginTop: 22 },
   eventSelector: { marginBottom: 8 }, eventChoice: { maxWidth: 190, borderWidth: 1, borderColor: "#c8d0ca", borderRadius: 13, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "white" }, eventChoiceSelected: { borderColor: "#17241d", backgroundColor: "#17241d" }, eventChoiceTitle: { maxWidth: 150, color: "#17241d", fontSize: 11, fontWeight: "900" }, eventChoiceMeta: { color: "#78837b", fontSize: 8, marginTop: 4 }, eventChoiceMetaSelected: { color: "#aebbb2" },
   reflectionCard: { padding: 22, borderRadius: 24, backgroundColor: "white" }, reflectionNumber: { color: "#ff7b5f", fontSize: 11, fontWeight: "900" }, reflectionTitle: { color: "#17241d", fontSize: 25, fontWeight: "900", letterSpacing: -.7, marginTop: 26 }, reflectionBody: { color: "#69766d", fontSize: 12, lineHeight: 18, marginTop: 8, marginBottom: 24 }, choiceLabel: { color: "#657168", fontSize: 9, fontWeight: "900", letterSpacing: 1, marginTop: 8, marginBottom: 9 }, choiceRow: { flexDirection: "row", flexWrap: "wrap", gap: 7, marginBottom: 14 }, choice: { borderWidth: 1, borderColor: "#d7ddd8", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 10 }, choiceSelected: { borderColor: "#17241d", backgroundColor: "#17241d" }, choiceText: { color: "#526057", fontSize: 11, fontWeight: "700" }, choiceTextSelected: { color: "white" }, saveButton: { alignItems: "center", borderRadius: 14, backgroundColor: "#c9f458", paddingVertical: 15, marginTop: 8 }, saveButtonText: { color: "#17241d", fontSize: 13, fontWeight: "900" }, inlineMessage: { color: "#314b3a", fontSize: 10, marginTop: 10 }, safetyNote: { color: "#7e8a82", fontSize: 10, lineHeight: 15, marginTop: 14 },

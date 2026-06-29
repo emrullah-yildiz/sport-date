@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Add native join requests and cancellation with capacity, block, retry, and conflict recovery equivalent to web.
+Add native block/report paths and host request decisions with immediate access revocation and the maximum-three-skip rule.
 
 ## Completed and verified
 
@@ -33,15 +33,17 @@ Add native join requests and cancellation with capacity, block, retry, and confl
 - Extended account export with native device-session metadata and documented remaining device-compromise and attestation risks.
 - Verified Expo SDK 56 configuration and a 581-module Android Hermes bundle after native auth integration.
 - Added native-authorized live approximate discovery, authorized hosted/accepted event selection, exact room access, private reflection, and live Movement Arc data.
-- Added explicit mobile loading, empty, retry, stale access, lost room access, and reflection submission states; live discovery remains read-only pending mutation parity.
+- Added explicit mobile loading, empty, retry, stale access, lost room access, and reflection submission states.
 - Verified a 582-module Android Hermes bundle after live product-data integration.
+- Added native join requests and pending/accepted cancellation through shared web/mobile server mutations, including capacity, compatibility, mutual-block, seat-removal, destructive confirmation, and conflict refresh.
+- Verified the Android Hermes bundle after native request mutation integration.
 - Forty-nine tests pass; all workspaces type-check; lint and the production web build pass.
 
 ## Next three outcomes
 
-1. Add native join requests and cancellation with web-equivalent capacity, block, and conflict recovery.
-2. Add native block/report paths and host request decisions.
-3. Add member-facing device-session review and remote revocation.
+1. Add native block/report paths and host request decisions with maximum-three-skip behavior.
+2. Add member-facing device-session review and remote revocation.
+3. Add outbound safety decision delivery after an approved email provider exists.
 
 ## Owner blockers
 

@@ -33,7 +33,9 @@ The prototype is visibly labelled `INTERACTION PROTOTYPE · NOT SYNCED`. Its eve
 - Opening one authorized event fetches its exact venue and address through the same server-side room authorization used by web. Leaving the tab clears the in-memory room object.
 - Finished events accept private native reflections through the shared server mutation and refresh the live Movement Arc.
 - Loading, empty, expired-access, retryable network failure, room-access loss, and reflection-submit states have explicit UI.
-- Live discovery remains read-only until native join-request controls receive equivalent capacity, abuse, cancellation, and recovery verification.
+- Live discovery can create a request through the same compatibility, time, capacity, and mutual-block query as web.
+- Pending and accepted requests can be cancelled through the shared server mutation. Cancelling an accepted place requires destructive confirmation and immediately removes the seat and room access.
+- Request conflicts refresh server state; declined or cancelled one-request-per-event states remain visibly closed rather than offering an impossible retry.
 
 ## Required live event integration
 
@@ -41,7 +43,7 @@ The native app must not reuse browser-cookie assumptions. Before replacing proto
 
 - logout, expiry, device loss, account deletion, and role/access revocation behavior;
 - member-facing device-session review and remote revocation;
-- native join-request, cancellation, host-decision, block, and report mutations with web-equivalent authorization and recovery;
+- native host-decision, block, and report mutations with web-equivalent authorization and recovery;
 - no precise-location caching outside the authorized event-room lifecycle;
 - loading, offline, retry, stale-session, and partial-submit recovery;
 - privacy export/deletion coverage identical to web.

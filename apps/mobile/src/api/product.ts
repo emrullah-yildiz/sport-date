@@ -5,6 +5,7 @@ import { MobileSessionError, mobileApiFetch } from "../auth/session";
 export type MobileDiscoveryEvent = {
   id: string; sport: string; title: string; startsAt: string; timeZone: string;
   areaLabel: string; city: string; placesRemaining: number; hostFirstName: string;
+  request: { id: string; status: "pending" | "accepted" | "declined" | "cancelled"; skipCount: number } | null;
 };
 export type MobileMemberEvent = {
   id: string; title: string; sport: string; startsAt: string; timeZone: string;
@@ -53,4 +54,16 @@ export async function saveMobileReflection(eventId: string, reflection: EventRef
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(reflection),
   });
   return (await readJson<{ reflection: EventReflectionInput }>(response)).reflection;
+}
+
+export async function requestMobileEvent(eventId: string, introduction = ""): Promise<void> {
+  const response = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/requests`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ introduction }),
+  });
+  await readJson(response);
+}
+
+export async function cancelMobileEventRequest(eventId: string, requestId: string): Promise<void> {
+  const response = await mobileApiFetch(`/api/mobile/events/${encodeURIComponent(eventId)}/requests/${encodeURIComponent(requestId)}`, { method: "DELETE" });
+  await readJson(response);
 }

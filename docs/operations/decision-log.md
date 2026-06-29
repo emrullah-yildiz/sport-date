@@ -52,6 +52,8 @@ Do not share browser cookies with native clients. Issue a short opaque access to
 
 Live mobile discovery may expose the same approximate compatible-event data as web, but request controls wait for native-authorized capacity conflicts, cancellation, blocking, reporting, and retry recovery. Polished buttons must not imply a safe mutation path before the server boundary exists.
 
+Native request and cancellation controls became eligible once they reused the web server mutation, refreshed authoritative state after conflicts, and warned before an accepted-place cancellation revoked exact room access. Host decisions and safety controls remain gated separately.
+
 ## Open decisions
 
 - Final product and company name.
