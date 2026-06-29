@@ -35,6 +35,88 @@ const againChoices: Array<{ value: EventReflectionInput["wouldJoinAgain"]; label
   { value: "prefer_not_to_say", label: "Prefer not to say" },
 ];
 
+function getHostRecoveryGuidance(
+  counts: { stillIn: number; unsure: number; cannotMake: number },
+  pendingRequestCount: number,
+) {
+  if (counts.cannotMake === 0 && counts.unsure === 0) {
+    return {
+      title: "The critical change has not shaken the group yet.",
+      body: "Keep watching the room and only make further edits if the plan materially changes again.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} still waiting if you later need to rebuild the group.` : null,
+    };
+  }
+
+  if (counts.stillIn === 0 && counts.unsure === 0 && counts.cannotMake > 0) {
+    return {
+      title: "No accepted member currently plans to come.",
+      body: "This invitation may no longer be real. Cancel early or move the plan to another day instead of hoping people still arrive.",
+      replacement: pendingRequestCount > 0 ? `Even with ${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request" : "requests"}, only continue if you are ready to rebuild the plan honestly around a new group.` : null,
+    };
+  }
+
+  if (counts.stillIn + counts.unsure < 2 && counts.cannotMake > 0) {
+    return {
+      title: "The group may have dropped below a viable size.",
+      body: "Decide quickly whether to cancel, substantially reshape the plan, or host only if the remaining group is still honest and safe.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} available if you need replacements, but accept only people who still fit the changed plan.` : null,
+    };
+  }
+
+  if (counts.cannotMake > 0) {
+    return {
+      title: "Some people dropped after the critical change.",
+      body: "The event may still work, but treat the remaining group as the new reality. Do not lower capacity below accepted seats; wait for members to leave or accept replacements honestly.",
+      replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} already in the funnel, so review those before widening the invitation again.` : "There are no pending requests waiting, so any rebuild depends on the current accepted group or future discovery.",
+    };
+  }
+
+  return {
+    title: "Some accepted members are unsure after the change.",
+    body: "Use the room as your decision surface and avoid assuming attendance until the unsure members answer more clearly or the plan changes again.",
+    replacement: pendingRequestCount > 0 ? `${pendingRequestCount} pending ${pendingRequestCount === 1 ? "request is" : "requests are"} available if the unsure group later falls through.` : null,
+  };
+}
+
+function summarizeHostRequestQueue(requests: MobileHostRequest[]) {
+  const pendingCount = requests.filter((request) => request.status === "pending").length;
+  const acceptedCount = requests.filter((request) => request.status === "accepted").length;
+  const closedCount = requests.filter((request) => request.status === "declined" || request.status === "cancelled").length;
+  const finalSkipPendingCount = requests.filter((request) => request.status === "pending" && request.skipCount >= 2).length;
+
+  if (pendingCount === 0) {
+    return {
+      pendingCount,
+      acceptedCount,
+      closedCount,
+      pendingHeadline: "No pending requests are waiting right now.",
+      pendingBody: null as string | null,
+    };
+  }
+
+  if (pendingCount === 1) {
+    return {
+      pendingCount,
+      acceptedCount,
+      closedCount,
+      pendingHeadline: "1 pending request is ready for a decision.",
+      pendingBody: finalSkipPendingCount > 0
+        ? "This request is already on its final skip, so the next pass will close it quietly."
+        : "Review this request here before widening discovery again.",
+    };
+  }
+
+  return {
+    pendingCount,
+    acceptedCount,
+    closedCount,
+    pendingHeadline: `${pendingCount} pending requests are ready for review.`,
+    pendingBody: finalSkipPendingCount > 0
+      ? `${finalSkipPendingCount} ${finalSkipPendingCount === 1 ? "request is" : "requests are"} already on the final skip, so the next pass would close ${finalSkipPendingCount === 1 ? "it" : "them"} quietly.`
+      : "Work through these requests before widening discovery again.",
+  };
+}
+
 export default function App() {
   const configured = mobileApiConfigured();
   const [authState, setAuthState] = useState<"checking" | "signed_out" | "signed_in" | "prototype">(configured ? "checking" : "prototype");
@@ -136,6 +218,7 @@ export default function App() {
               : <EventDayScreen
                 live eventId={room.id} eventTitle={room.title} eventMeta={`${room.sport} · ${room.isHost ? "hosting" : "accepted participant"}`}
                 venue={`${room.venueName} · ${room.address}`} hasEnded={room.hasEnded}
+                room={room}
                 attendance={draftAttendance}
                 wouldJoinAgain={draftAgain}
                 saved={room.reflection !== null} onAttendance={setDraftAttendance} onAgain={setDraftAgain}
@@ -217,8 +300,8 @@ function DiscoverScreen({ items, live, onOpenEvent, onRequestAction, onSafetyCom
   </>;
 }
 
-function EventDayScreen({ live, eventId, eventTitle, eventMeta, venue, hasEnded, attendance, wouldJoinAgain, saved, onAttendance, onAgain, onSave, safetyPeople, onSafetyComplete, hostRequests, onHostDecision }: {
-  live: boolean; eventId: string; eventTitle: string; eventMeta: string; venue: string | null; hasEnded: boolean;
+function EventDayScreen({ live, eventId, eventTitle, eventMeta, venue, hasEnded, room = null, attendance, wouldJoinAgain, saved, onAttendance, onAgain, onSave, safetyPeople, onSafetyComplete, hostRequests, onHostDecision }: {
+  live: boolean; eventId: string; eventTitle: string; eventMeta: string; venue: string | null; hasEnded: boolean; room?: MobileRoom | null;
   safetyPeople: Array<{ userId: string; firstName: string }>; onSafetyComplete: () => Promise<void>;
   hostRequests: MobileHostRequest[]; onHostDecision: (requestId: string, action: "accept" | "skip") => Promise<void>;
   attendance: EventReflectionInput["attendance"];
@@ -238,7 +321,8 @@ function EventDayScreen({ live, eventId, eventTitle, eventMeta, venue, hasEnded,
   }
   return <>
     <View style={styles.eventHero}><Text style={styles.eventHeroOverline}>{live ? "AUTHORIZED EVENT ROOM" : "DEMO EVENT · ENDED"}</Text><Text style={styles.eventHeroTitle}>{eventTitle}</Text><Text style={styles.eventHeroMeta}>{eventMeta}</Text>{venue ? <Text style={styles.eventVenue}>{venue}</Text> : null}</View>
-    {live && hostRequests.length > 0 ? <HostRequestList eventId={eventId} requests={hostRequests} onDecision={onHostDecision} onSafetyComplete={onSafetyComplete} /> : null}
+    {live && room?.isHost && room.latestCriticalUpdateId ? <HostRecoveryCard room={room} hostRequests={hostRequests} /> : null}
+    {live && room?.isHost && hostRequests.length > 0 ? <HostRequestList eventId={eventId} requests={hostRequests} onDecision={onHostDecision} onSafetyComplete={onSafetyComplete} /> : null}
     {live && safetyPeople.length > 0 ? <View style={styles.peopleSafety}><Text style={styles.choiceLabel}>PEOPLE AND SAFETY</Text>{safetyPeople.map((person) => <View key={person.userId} style={styles.personRow}><Text style={styles.personName}>{person.firstName}</Text><SafetyControls eventId={eventId} subjectUserId={person.userId} subjectName={person.firstName} onComplete={onSafetyComplete} /></View>)}</View> : null}
     {!hasEnded ? <StateCard title="The reflection opens after movement" body="Check the authorized logistics above. You can leave at any time and reporting remains separate from progress." /> : <View style={styles.reflectionCard}>
       <Text style={styles.reflectionNumber}>01</Text><Text style={styles.reflectionTitle}>What actually happened?</Text><Text style={styles.reflectionBody}>Private reflection only. This is not a public rating and it does not replace a safety report.</Text>
@@ -255,6 +339,13 @@ function ChoiceRow<T extends string>({ choices, selected, onSelect }: { choices:
   return <View style={styles.choiceRow}>{choices.map((choice) => <Pressable key={choice.value} accessibilityRole="radio" accessibilityState={{ checked: selected === choice.value }} onPress={() => onSelect(choice.value)} style={[styles.choice, selected === choice.value && styles.choiceSelected]}><Text style={[styles.choiceText, selected === choice.value && styles.choiceTextSelected]}>{choice.label}</Text></Pressable>)}</View>;
 }
 
+function HostRecoveryCard({ room, hostRequests }: { room: MobileRoom; hostRequests: MobileHostRequest[] }) {
+  const pendingCount = hostRequests.filter((request) => request.status === "pending").length;
+  const guidance = getHostRecoveryGuidance(room.criticalUpdateResponseCounts, pendingCount);
+
+  return <View style={styles.hostRecoveryCard}><Text style={styles.choiceLabel}>RECOVERY AFTER A CRITICAL CHANGE</Text><Text style={styles.hostRecoveryTitle}>{guidance.title}</Text><Text style={styles.hostRecoveryBody}>{guidance.body}</Text><View style={styles.hostRecoveryCounts}><View style={styles.hostRecoveryCount}><Text style={styles.hostRecoveryCountText}>{room.criticalUpdateResponseCounts.stillIn} still in</Text></View><View style={styles.hostRecoveryCount}><Text style={styles.hostRecoveryCountText}>{room.criticalUpdateResponseCounts.unsure} unsure</Text></View><View style={styles.hostRecoveryCount}><Text style={styles.hostRecoveryCountText}>{room.criticalUpdateResponseCounts.cannotMake} cannot make it</Text></View></View>{guidance.replacement ? <Text style={styles.hostRecoveryBody}>{guidance.replacement}</Text> : null}<Text style={styles.hostRecoveryNote}>Use the room to watch responses, review pending requests before widening the invitation again, and cancel early if the plan no longer honestly exists.</Text></View>;
+}
+
 function HostRequestList({ eventId, requests, onDecision, onSafetyComplete }: { eventId: string; requests: MobileHostRequest[]; onDecision: (requestId: string, action: "accept" | "skip") => Promise<void>; onSafetyComplete: () => Promise<void> }) {
   const [busyId, setBusyId] = useState("");
   const [message, setMessage] = useState("");
@@ -264,14 +355,16 @@ function HostRequestList({ eventId, requests, onDecision, onSafetyComplete }: { 
     catch (error) { setMessage(error instanceof Error ? error.message : "Request state changed and was refreshed."); }
     finally { setBusyId(""); }
   }
+  const summary = summarizeHostRequestQueue(requests);
   const pending = requests.filter((request) => request.status === "pending");
-  if (pending.length === 0) return null;
-  return <View style={styles.hostRequests}><Text style={styles.choiceLabel}>PENDING JOIN REQUESTS</Text>{pending.map((request) => <View key={request.id} style={styles.hostRequestCard}>
+  const accepted = requests.filter((request) => request.status === "accepted");
+  const closed = requests.filter((request) => request.status === "declined" || request.status === "cancelled");
+  return <View style={styles.hostRequests}><Text style={styles.choiceLabel}>HOST REQUEST QUEUE</Text><View style={styles.hostRequestSummary}><View style={styles.hostRequestSummaryPill}><Text style={styles.hostRequestSummaryText}>{summary.pendingCount} pending</Text></View><View style={styles.hostRequestSummaryPill}><Text style={styles.hostRequestSummaryText}>{summary.acceptedCount} accepted</Text></View><View style={styles.hostRequestSummaryPill}><Text style={styles.hostRequestSummaryText}>{summary.closedCount} closed</Text></View></View><View style={styles.hostRequestSection}><Text style={styles.hostRequestSectionTitle}>{summary.pendingHeadline}</Text>{summary.pendingBody ? <Text style={styles.hostRequestSectionBody}>{summary.pendingBody}</Text> : null}{pending.length === 0 ? <Text style={styles.hostRequestSectionBody}>There is nothing waiting for a host decision right now.</Text> : null}{pending.map((request) => <View key={request.id} style={styles.hostRequestCard}>
     <View><Text style={styles.hostRequestName}>{request.requester.firstName}, {request.requester.age}</Text><Text style={styles.hostRequestMeta}>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</Text></View>
-    {request.requester.bio ? <Text style={styles.hostRequestBody}>{request.requester.bio}</Text> : null}{request.introduction ? <Text style={styles.hostRequestIntro}>{request.introduction}</Text> : null}
+    {request.requester.bio ? <Text style={styles.hostRequestBody}>{request.requester.bio}</Text> : null}{request.introduction ? <Text style={styles.hostRequestIntro}>{request.introduction}</Text> : null}<Text style={styles.hostRequestStatus}>{request.status}</Text>
     <View style={styles.hostRequestActions}><Pressable accessibilityRole="button" disabled={busyId === request.id} onPress={() => void decide(request.id, "skip")} style={styles.skipButton}><Text style={styles.skipButtonText}>{request.skipCount >= 2 ? "Skip & decline" : `Skip ${request.skipCount + 1}/3`}</Text></Pressable><Pressable accessibilityRole="button" disabled={busyId === request.id} onPress={() => void decide(request.id, "accept")} style={styles.acceptButton}><Text style={styles.acceptButtonText}>{busyId === request.id ? "Refreshing..." : "Accept place"}</Text></Pressable></View>
     <SafetyControls eventId={eventId} subjectUserId={request.requesterId} subjectName={request.requester.firstName} onComplete={onSafetyComplete} />
-  </View>)}{message ? <Text accessibilityLiveRegion="polite" style={styles.liveMessage}>{message}</Text> : null}</View>;
+  </View>)}</View>{accepted.length > 0 ? <View style={styles.hostRequestSection}><Text style={styles.hostRequestSectionTitle}>Already in the group</Text><Text style={styles.hostRequestSectionBody}>These people already have room access and precise meeting details.</Text>{accepted.map((request) => <View key={request.id} style={styles.hostRequestCard}><View><Text style={styles.hostRequestName}>{request.requester.firstName}, {request.requester.age}</Text><Text style={styles.hostRequestMeta}>{request.requester.skillLevel} Â· {request.requester.languages.join(", ")}</Text></View>{request.requester.bio ? <Text style={styles.hostRequestBody}>{request.requester.bio}</Text> : null}{request.introduction ? <Text style={styles.hostRequestIntro}>{request.introduction}</Text> : null}<Text style={styles.hostRequestStatus}>{request.status}</Text><SafetyControls eventId={eventId} subjectUserId={request.requesterId} subjectName={request.requester.firstName} onComplete={onSafetyComplete} /></View>)}</View> : null}{closed.length > 0 ? <View style={styles.hostRequestSection}><Text style={styles.hostRequestSectionTitle}>Already resolved</Text><Text style={styles.hostRequestSectionBody}>Closed requests stay visible for context, but they no longer need host action.</Text>{closed.map((request) => <View key={request.id} style={styles.hostRequestCard}><View><Text style={styles.hostRequestName}>{request.requester.firstName}, {request.requester.age}</Text><Text style={styles.hostRequestMeta}>{request.requester.skillLevel} Â· {request.requester.languages.join(", ")}</Text></View>{request.requester.bio ? <Text style={styles.hostRequestBody}>{request.requester.bio}</Text> : null}{request.introduction ? <Text style={styles.hostRequestIntro}>{request.introduction}</Text> : null}<Text style={styles.hostRequestStatus}>{request.status}</Text><SafetyControls eventId={eventId} subjectUserId={request.requesterId} subjectName={request.requester.firstName} onComplete={onSafetyComplete} /></View>)}</View> : null}{message ? <Text accessibilityLiveRegion="polite" style={styles.liveMessage}>{message}</Text> : null}</View>;
 }
 
 function EventSelector({ events, selectedId, onSelect }: { events: MobileMemberEvent[]; selectedId: string; onSelect: (eventId: string) => void }) {
@@ -498,7 +591,8 @@ const styles = StyleSheet.create({
   eventHero: { padding: 22, borderRadius: 24, backgroundColor: "#17241d", marginBottom: 12 }, eventHeroOverline: { color: "#c9f458", fontSize: 9, fontWeight: "900", letterSpacing: 1.1 }, eventHeroTitle: { color: "white", fontSize: 30, lineHeight: 31, fontWeight: "900", letterSpacing: -1, marginTop: 30 }, eventHeroMeta: { color: "#b7c3bb", fontSize: 11, marginTop: 9 }, eventVenue: { color: "white", fontSize: 12, lineHeight: 18, fontWeight: "800", marginTop: 22 },
   eventSelector: { marginBottom: 8 }, eventChoice: { maxWidth: 190, borderWidth: 1, borderColor: "#c8d0ca", borderRadius: 13, paddingHorizontal: 12, paddingVertical: 10, backgroundColor: "white" }, eventChoiceSelected: { borderColor: "#17241d", backgroundColor: "#17241d" }, eventChoiceTitle: { maxWidth: 150, color: "#17241d", fontSize: 11, fontWeight: "900" }, eventChoiceMeta: { color: "#78837b", fontSize: 8, marginTop: 4 }, eventChoiceMetaSelected: { color: "#aebbb2" },
   peopleSafety: { padding: 18, borderRadius: 18, backgroundColor: "white", marginBottom: 12 }, personRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", borderTopWidth: 1, borderTopColor: "#edf0ed", paddingVertical: 11 }, personName: { color: "#17241d", fontSize: 12, fontWeight: "900" }, safetyButton: { alignSelf: "flex-start", borderWidth: 1, borderColor: "#e1b9ae", borderRadius: 9, paddingHorizontal: 9, paddingVertical: 6, marginTop: 8 }, safetyButtonText: { color: "#713b31", fontSize: 8, fontWeight: "900" },
-  hostRequests: { padding: 18, borderRadius: 18, backgroundColor: "white", marginBottom: 12 }, hostRequestCard: { paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#edf0ed" }, hostRequestName: { color: "#17241d", fontSize: 14, fontWeight: "900" }, hostRequestMeta: { color: "#657168", fontSize: 9, textTransform: "capitalize", marginTop: 4 }, hostRequestBody: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 9 }, hostRequestIntro: { color: "#34443a", fontSize: 11, lineHeight: 16, borderLeftWidth: 2, borderLeftColor: "#c9f458", paddingLeft: 9, marginTop: 9 }, hostRequestActions: { flexDirection: "row", gap: 8, marginTop: 12 }, skipButton: { borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9, backgroundColor: "#eeeae0" }, skipButtonText: { color: "#526057", fontSize: 9, fontWeight: "900" }, acceptButton: { borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9, backgroundColor: "#c9f458" }, acceptButtonText: { color: "#17241d", fontSize: 9, fontWeight: "900" },
+  hostRecoveryCard: { padding: 18, borderRadius: 18, backgroundColor: "#eef5da", marginBottom: 12 }, hostRecoveryTitle: { color: "#17241d", fontSize: 20, fontWeight: "900", marginTop: 6 }, hostRecoveryBody: { color: "#48533d", fontSize: 11, lineHeight: 17, marginTop: 8 }, hostRecoveryCounts: { flexDirection: "row", flexWrap: "wrap", gap: 7, marginTop: 12 }, hostRecoveryCount: { borderRadius: 999, backgroundColor: "rgba(255,255,255,.9)", paddingHorizontal: 10, paddingVertical: 8 }, hostRecoveryCountText: { color: "#31411f", fontSize: 9, fontWeight: "900" }, hostRecoveryNote: { color: "#48533d", fontSize: 10, lineHeight: 15, marginTop: 10 },
+  hostRequests: { padding: 18, borderRadius: 18, backgroundColor: "white", marginBottom: 12 }, hostRequestSummary: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }, hostRequestSummaryPill: { borderRadius: 999, backgroundColor: "#f4f0e7", paddingHorizontal: 10, paddingVertical: 8 }, hostRequestSummaryText: { color: "#526057", fontSize: 9, fontWeight: "900" }, hostRequestSection: { marginTop: 4, marginBottom: 12 }, hostRequestSectionTitle: { color: "#17241d", fontSize: 16, fontWeight: "900" }, hostRequestSectionBody: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 6 }, hostRequestCard: { paddingVertical: 14, borderTopWidth: 1, borderTopColor: "#edf0ed" }, hostRequestName: { color: "#17241d", fontSize: 14, fontWeight: "900" }, hostRequestMeta: { color: "#657168", fontSize: 9, textTransform: "capitalize", marginTop: 4 }, hostRequestBody: { color: "#657168", fontSize: 10, lineHeight: 15, marginTop: 9 }, hostRequestIntro: { color: "#34443a", fontSize: 11, lineHeight: 16, borderLeftWidth: 2, borderLeftColor: "#c9f458", paddingLeft: 9, marginTop: 9 }, hostRequestStatus: { color: "#7e8a82", fontSize: 9, fontWeight: "900", textTransform: "capitalize", marginTop: 10 }, hostRequestActions: { flexDirection: "row", gap: 8, marginTop: 12 }, skipButton: { borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9, backgroundColor: "#eeeae0" }, skipButtonText: { color: "#526057", fontSize: 9, fontWeight: "900" }, acceptButton: { borderRadius: 10, paddingHorizontal: 11, paddingVertical: 9, backgroundColor: "#c9f458" }, acceptButtonText: { color: "#17241d", fontSize: 9, fontWeight: "900" },
   reflectionCard: { padding: 22, borderRadius: 24, backgroundColor: "white" }, reflectionNumber: { color: "#ff7b5f", fontSize: 11, fontWeight: "900" }, reflectionTitle: { color: "#17241d", fontSize: 25, fontWeight: "900", letterSpacing: -.7, marginTop: 26 }, reflectionBody: { color: "#69766d", fontSize: 12, lineHeight: 18, marginTop: 8, marginBottom: 24 }, choiceLabel: { color: "#657168", fontSize: 9, fontWeight: "900", letterSpacing: 1, marginTop: 8, marginBottom: 9 }, choiceRow: { flexDirection: "row", flexWrap: "wrap", gap: 7, marginBottom: 14 }, choice: { borderWidth: 1, borderColor: "#d7ddd8", borderRadius: 20, paddingHorizontal: 12, paddingVertical: 10 }, choiceSelected: { borderColor: "#17241d", backgroundColor: "#17241d" }, choiceText: { color: "#526057", fontSize: 11, fontWeight: "700" }, choiceTextSelected: { color: "white" }, saveButton: { alignItems: "center", borderRadius: 14, backgroundColor: "#c9f458", paddingVertical: 15, marginTop: 8 }, saveButtonText: { color: "#17241d", fontSize: 13, fontWeight: "900" }, inlineMessage: { color: "#314b3a", fontSize: 10, marginTop: 10 }, safetyNote: { color: "#7e8a82", fontSize: 10, lineHeight: 15, marginTop: 14 },
   arcCard: { alignItems: "center", padding: 24, borderRadius: 28, backgroundColor: "#17241d" }, arcOrbit: { width: 172, height: 172, borderRadius: 86, borderWidth: 1, borderColor: "#708068", alignItems: "center", justifyContent: "center", marginVertical: 10 }, arcOrbitInner: { width: 124, height: 124, borderRadius: 62, borderWidth: 8, borderColor: "#c9f458", alignItems: "center", justifyContent: "center" }, arcCount: { color: "white", fontSize: 46, fontWeight: "900", lineHeight: 48 }, arcCountLabel: { color: "#9caaa0", fontSize: 8, fontWeight: "900", letterSpacing: 1.3 }, arcOverline: { color: "#c9f458", fontSize: 9, fontWeight: "900", letterSpacing: 1.3, marginTop: 22 }, arcTitle: { color: "white", fontSize: 35, fontWeight: "900", letterSpacing: -1, marginTop: 5 }, arcTrack: { width: "100%", height: 7, borderRadius: 4, overflow: "hidden", backgroundColor: "#34423a", marginTop: 24 }, arcTrackFill: { height: "100%", borderRadius: 4, backgroundColor: "#ff7b5f" }, arcStory: { color: "#d5ded8", textAlign: "center", fontSize: 13, lineHeight: 19, marginTop: 14 }, arcRule: { width: "100%", padding: 16, borderRadius: 15, backgroundColor: "#26352d", marginTop: 24 }, arcRuleTitle: { color: "#c9f458", fontSize: 11, fontWeight: "900" }, arcRuleBody: { color: "#aebbb2", fontSize: 10, lineHeight: 16, marginTop: 6 }, arcButton: { width: "100%", alignItems: "center", borderRadius: 14, backgroundColor: "#c9f458", paddingVertical: 15, marginTop: 14 }, arcButtonText: { color: "#17241d", fontWeight: "900" },
   tabBar: { position: "absolute", left: 14, right: 14, bottom: 14, flexDirection: "row", justifyContent: "space-around", borderRadius: 22, paddingVertical: 11, backgroundColor: "#17241d" }, tab: { flex: 1, alignItems: "center", gap: 5 }, tabDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: "transparent" }, tabDotActive: { backgroundColor: "#c9f458" }, tabText: { color: "#829087", fontSize: 10, fontWeight: "800" }, tabTextActive: { color: "white" },

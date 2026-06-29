@@ -16,9 +16,15 @@ export type MobileRoom = {
   id: string; title: string; sport: string; startsAt: string; timeZone: string;
   hasEnded: boolean; venueName: string; address: string; instructions: string | null; isHost: boolean;
   viewerUserId: string;
+  latestUpdateId: string | null;
+  latestCriticalUpdateId: string | null;
+  viewerHasSeenLatestUpdate: boolean;
+  viewerCriticalUpdateIntent: "still_in" | "unsure" | "cannot_make" | null;
+  criticalUpdateResponseCounts: { stillIn: number; unsure: number; cannotMake: number };
+  updates: Array<{ id: string; severity: "routine" | "critical"; changedFields: string[]; summary: string; createdAt: string }>;
   host: { userId: string; firstName: string };
   reflection: EventReflectionInput | null;
-  participants: Array<{ userId: string; firstName: string; skillLevel: string }>;
+  participants: Array<{ userId: string; firstName: string; skillLevel: string; seenLatestUpdate: boolean | null; criticalUpdateIntent: "still_in" | "unsure" | "cannot_make" | null }>;
   hostRequests: MobileHostRequest[];
 };
 export type MobileHostRequest = {
