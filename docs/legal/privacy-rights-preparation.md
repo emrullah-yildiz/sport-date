@@ -41,6 +41,7 @@ Direct account and profile identifiers are erased. Aggregated product statistics
 - Export coverage for private attendance and willingness-to-join-again reflections, including whether each reflection qualified for the private Movement Arc.
 - Export coverage for native device-session metadata such as device label, use time, expiry, and revocation, while excluding access and refresh tokens and hashes.
 - Export coverage for product-experience feedback submitted from web or mobile; feedback ownership is session-derived and records are deleted with the owning account.
+- Export coverage for separate optional product-update preference state and member-visible consent history.
 - Password re-authentication before requesting deletion.
 - Immediate transition to `deletion_pending` and revocation of every session.
 - Immediate cancellation of hosted events, closure of pending/accepted requests, and removal of accepted seats when deletion is requested.

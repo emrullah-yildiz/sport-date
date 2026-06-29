@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import EmailVerificationControls from "@/components/EmailVerificationControls";
 import LogoutButton from "@/components/LogoutButton";
 import PrivacyControls from "@/components/PrivacyControls";
+import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
+import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser } from "@/lib/session";
 
@@ -15,7 +17,10 @@ export const metadata = { title: "Your profile — Sport Date" };
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const movementProgress = await getMemberMovementProgress(user.id);
+  const [movementProgress, communicationPreferences] = await Promise.all([
+    getMemberMovementProgress(user.id),
+    getCommunicationPreferences(user.id),
+  ]);
 
   return (
     <main className="profile-page">
@@ -51,6 +56,7 @@ export default async function ProfilePage() {
         </article>
       </section>
       <MovementArc progress={movementProgress} />
+      <CommunicationPreferences preferences={communicationPreferences} />
       <MobileSessionControls />
       <EditProfileForm profile={user} />
       <PrivacyControls />

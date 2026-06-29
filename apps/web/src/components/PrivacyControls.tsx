@@ -63,7 +63,7 @@ export default function PrivacyControls() {
           Download the information currently held by Sport Date in a machine-readable JSON file, or start a deletion request that immediately locks your profile while final handling follows the applicable legal and retention review.
         </p>
         <p className="privacy-inline-note">
-          Read the <Link href="/privacy">Privacy Notice preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link> for the current member-facing boundary.
+          Read the <Link href="/privacy">Privacy Notice preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link> for the current member-facing boundary. Optional product-update preferences live separately so terms acceptance is not treated as marketing consent.
         </p>
         <button className="privacy-action" type="button" onClick={downloadExport} disabled={exporting}>{exporting ? "Preparing export…" : "Download my data"}</button>
       </div>

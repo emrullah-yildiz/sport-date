@@ -33,6 +33,7 @@ export default function PrivacyPage() {
           <ul className="legal-list">
             <li>Download a machine-readable account export from the profile privacy controls.</li>
             <li>Edit core profile information directly in-product.</li>
+            <li>Choose separately whether optional product and launch updates may be sent later; service and safety mail remain distinct from that preference.</li>
             <li>Request deletion, which immediately locks the profile and revokes sessions while final processing follows the applicable legal and retention review.</li>
             <li>Use blocking and reporting without giving up access to your own export rights.</li>
           </ul>

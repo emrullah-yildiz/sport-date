@@ -112,6 +112,18 @@ export async function GET() {
       actual_outcome, severity, status, created_at, updated_at
     FROM feedback_tickets WHERE reporter_user_id = ${user.id} ORDER BY created_at
   `;
+  const communicationPreferences = await sql`
+    SELECT product_updates_opt_in, product_updates_updated_at, product_updates_source
+    FROM communication_preferences
+    WHERE user_id = ${user.id}
+    LIMIT 1
+  `;
+  const communicationPreferenceHistory = await sql`
+    SELECT id, preference_key, previous_value, new_value, source, lawful_basis_note, created_at
+    FROM communication_preference_events
+    WHERE user_id = ${user.id}
+    ORDER BY created_at
+  `;
 
   await sql`
     INSERT INTO data_requests (id, user_id, request_type, status, completed_at)
@@ -146,6 +158,12 @@ export async function GET() {
     privateEventReflections: eventReflections,
     mobileDeviceSessions: mobileDevices,
     productFeedbackSubmitted: productFeedback,
+    communicationPreferences: communicationPreferences[0] ?? {
+      product_updates_opt_in: false,
+      product_updates_updated_at: null,
+      product_updates_source: "member_default",
+    },
+    communicationPreferenceHistory,
     excludedSecurityData: ["password hash", "session tokens and hashes"],
   };
 
