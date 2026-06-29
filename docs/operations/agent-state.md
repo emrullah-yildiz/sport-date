@@ -2,7 +2,7 @@
 
 ## Current outcome
 
-Design and implement scheduled cleanup for expired browser sessions, mobile sessions, and spent refresh-token history so launch security and privacy do not depend on unbounded credential residue.
+Harden the already-scaffolded email-verification and password-reset flows with direct unit tests of the security-sensitive token core (`apps/web/src/lib/auth-email.ts`), which previously had only thin pre-database route guards. Delivery stays provider-gated and disabled until an owner approves an email provider; no real emails are sent.
 
 ## Completed and verified
 
@@ -51,13 +51,16 @@ Design and implement scheduled cleanup for expired browser sessions, mobile sess
 - Added a repository-local Customer Experience Agent with privacy-safe ticket deduplication, separate parallel implementation ownership, and independent customer-perspective retesting.
 - Added authenticated web and mobile product-feedback submission, private member-only history, shared bounded validation, explicit Safety Center routing, and account-export/deletion coverage.
 - Verified the production web build and Android Hermes bundle after device-management integration.
-- Seventy-one tests pass; all workspaces type-check; full lint and the production web build pass; the Android Hermes export completes with 583 modules.
+- Implemented scheduled cleanup for expired browser sessions, spent mobile sessions, and outdated refresh-token history (`apps/web/src/lib/session-cleanup.mjs` with tests).
+- Scaffolded email-verification and password-reset: dedicated request/confirm routes, a provider-gated delivery adapter (disabled by default, optional console simulation), bilingual-ready email drafts, single-use hashed tokens, and account-deletion token revocation, all wired into web pages and the profile surface.
+- Added a direct unit suite for the verification/reset core: single-use consumption, expiry with no side effects, sibling-token invalidation, already-verified handling, requester-IP hashing instead of cleartext, and the reset boundary that deletes all browser sessions and revokes all mobile sessions.
+- One hundred twenty tests pass (73 web + 47 domain); all workspaces type-check.
 
 ## Next three outcomes
 
-1. Design and implement scheduled cleanup for expired browser sessions, mobile sessions, and spent refresh-token history.
-2. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
-3. Add outbound safety decision delivery after an approved email provider exists.
+1. Add direct unit coverage for the four verification/reset HTTP routes' success/expired/410/already-verified branches (only pre-database guard paths are covered today), plus the `email-verification/request` route which still has no test.
+2. Threat-model and document the email-verification and password-reset flows in `docs/security/authentication.md`: token entropy, single-use, expiry windows, enumeration neutrality, rate limits, and the reset session-revocation boundary; flag the email-provider selection as an owner gate.
+3. Add an approved research data boundary only after the research notice, inbox, retention, and owner authorization exist.
 
 ## Owner blockers
 

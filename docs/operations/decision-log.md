@@ -1,5 +1,9 @@
 # Decision log
 
+## 2026-06-29 - Test the auth-email security core directly, not just route guards
+
+The email-verification and password-reset routes only had thin tests covering pre-database guard rejections (CSRF, malformed token, invalid email). The security-sensitive persistence rules in `apps/web/src/lib/auth-email.ts` had no direct coverage. Added a focused unit suite asserting single-use token consumption, expiry without side effects, sibling-token invalidation, IP-hash-not-cleartext on reset requests, and the critical reset boundary that a completed password reset deletes all browser sessions and revokes all mobile sessions. The database is mocked at `@/lib/db` with a tagged-template `sql` whose `transaction` statements are recorded so side effects can be asserted without a live PostgreSQL instance; integration-level coverage still depends on the isolated test database gate.
+
 ## 2026-06-29 - Product operating principle
 
 Optimize for safe completed encounters and willingness to meet again, not swipes or screen time.
