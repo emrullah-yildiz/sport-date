@@ -32,8 +32,10 @@ export async function POST(request: Request) {
       success: true,
       delivery: result.delivery.state,
       message:
-        result.delivery.state === "ready"
-          ? "A verification flow has been prepared and the delivery payload is ready for a transactional provider."
+        result.delivery.state === "simulated"
+          ? "A verification flow has been prepared and simulated delivery is enabled for development."
+          : result.delivery.state === "ready"
+            ? "A verification flow has been prepared and the delivery payload is ready for a transactional provider."
           : "A verification flow has been prepared. Delivery remains disabled until an approved email provider is configured.",
     }, { status: 202 });
   } catch (error) {

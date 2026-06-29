@@ -15,9 +15,10 @@ import {
   type AuthEmailDraft,
   resolveAuthEmailOrigin,
 } from "@/lib/auth-email-content";
+import { canSendAuthEmails, dispatchAuthEmail, resolveAuthEmailProvider } from "@/lib/auth-email-delivery";
 import { getDatabase } from "@/lib/db";
 
-type DeliveryState = "unconfigured" | "ready";
+type DeliveryState = "unconfigured" | "ready" | "simulated";
 type VerificationRequestState = "created" | "already_verified";
 type VerificationConfirmState = "verified" | "already_verified" | "invalid" | "expired";
 type PasswordResetConfirmState = "reset" | "invalid" | "expired";
@@ -43,6 +44,8 @@ export type AuthEmailDeliveryPreparation = Readonly<{
   state: DeliveryState;
   origin: string | null;
   draft: AuthEmailDraft | null;
+  provider: "disabled" | "console";
+  messageId: string | null;
 }>;
 
 function deliveryState(): DeliveryState {
@@ -50,27 +53,49 @@ function deliveryState(): DeliveryState {
 }
 
 export function isEmailDeliveryConfigured(): boolean {
-  return process.env.EMAIL_DELIVERY_ENABLED === "true" && !!resolveAuthEmailOrigin();
+  return canSendAuthEmails() && !!resolveAuthEmailOrigin();
 }
 
-function buildVerificationDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): AuthEmailDeliveryPreparation {
-  const origin = resolveAuthEmailOrigin();
-  if (!origin) return { state: "unconfigured", origin: null, draft: null };
+async function finalizeDeliveryPreparation(
+  draft: AuthEmailDraft | null,
+  fallbackState: DeliveryState,
+  origin: string | null,
+): Promise<AuthEmailDeliveryPreparation> {
+  const provider = resolveAuthEmailProvider();
+  if (!draft) return { state: fallbackState, origin, draft: null, provider, messageId: null };
+
+  if (!isEmailDeliveryConfigured()) {
+    return { state: fallbackState, origin, draft, provider, messageId: null };
+  }
+
+  const dispatch = await dispatchAuthEmail(draft);
   return {
-    state: "ready",
+    state: dispatch.state === "simulated" ? "simulated" : fallbackState,
     origin,
-    draft: buildEmailVerificationDraft({ origin, email, token: rawToken, expiresAt }),
+    draft,
+    provider: dispatch.provider,
+    messageId: dispatch.messageId,
   };
 }
 
-function buildPasswordResetDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): AuthEmailDeliveryPreparation {
+async function buildVerificationDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): Promise<AuthEmailDeliveryPreparation> {
   const origin = resolveAuthEmailOrigin();
-  if (!origin) return { state: "unconfigured", origin: null, draft: null };
-  return {
-    state: "ready",
+  if (!origin) return { state: "unconfigured", origin: null, draft: null, provider: "disabled", messageId: null };
+  return finalizeDeliveryPreparation(
+    buildEmailVerificationDraft({ origin, email, token: rawToken, expiresAt }),
+    "ready",
     origin,
-    draft: buildPasswordResetDraft({ origin, email, token: rawToken, expiresAt }),
-  };
+  );
+}
+
+async function buildPasswordResetDeliveryPreparation(email: string, rawToken: string, expiresAt: Date): Promise<AuthEmailDeliveryPreparation> {
+  const origin = resolveAuthEmailOrigin();
+  if (!origin) return { state: "unconfigured", origin: null, draft: null, provider: "disabled", messageId: null };
+  return finalizeDeliveryPreparation(
+    buildPasswordResetDraft({ origin, email, token: rawToken, expiresAt }),
+    "ready",
+    origin,
+  );
 }
 
 export async function issueEmailVerificationTokenForUser(
@@ -119,13 +144,19 @@ export async function issueEmailVerificationTokenForUser(
   if (!row?.inserted_id) {
     return {
       state: row?.email_verified ? "already_verified" : "created",
-      delivery: { state: deliveryState(), origin: resolveAuthEmailOrigin(), draft: null },
+      delivery: {
+        state: deliveryState(),
+        origin: resolveAuthEmailOrigin(),
+        draft: null,
+        provider: resolveAuthEmailProvider(),
+        messageId: null,
+      },
     } satisfies { state: VerificationRequestState; delivery: AuthEmailDeliveryPreparation };
   }
 
   return {
     state: "created" as const,
-    delivery: buildVerificationDeliveryPreparation(email, token.token, token.expiresAt),
+    delivery: await buildVerificationDeliveryPreparation(email, token.token, token.expiresAt),
   };
 }
 
@@ -166,7 +197,7 @@ export async function requestPasswordResetTokenForEmail(
     FROM target_user
   `;
 
-  return { delivery: buildPasswordResetDeliveryPreparation(email, token.token, token.expiresAt) };
+  return { delivery: await buildPasswordResetDeliveryPreparation(email, token.token, token.expiresAt) };
 }
 
 export async function confirmEmailVerificationToken(

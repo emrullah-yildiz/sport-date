@@ -282,6 +282,12 @@ Any eventual email provider must support:
 
 The product integration should keep provider logic behind one adapter so domain rules, throttles, token rotation, and audit logic remain local to the app.
 
+Current implementation note:
+
+- the adapter seam exists now with delivery disabled by default;
+- a development-only console transport may be used to verify payload shape and link composition without external delivery;
+- production sending still requires approved provider credentials, privacy review, and explicit enablement.
+
 ## Implementation order once approved
 
 1. Add token tables and audit fields.
