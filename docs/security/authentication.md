@@ -37,6 +37,8 @@
 
 Until these gates are complete, the signup flow is a development preview and must not be promoted to real users.
 
+Provider-independent design for email verification and password reset lives in `docs/security/email-verification-reset-design.md`.
+
 ## Current rate-limit boundary
 
 The implemented limiter is an in-app baseline, not a full production abuse-control perimeter. It does not yet use a shared backing store, global edge counter, ASN reputation, CAPTCHA, anomaly scoring, or operator controls. Production launch still requires shared enforcement after infrastructure selection so abuse controls remain effective across replicas and restarts.
