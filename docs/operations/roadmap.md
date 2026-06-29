@@ -10,7 +10,7 @@
 - [x] Email verification and password reset implemented with provider-gated, default-disabled delivery and a tested single-use token core; sending real emails still requires an owner-approved email provider.
 - [x] Draft and implement account export, re-authenticated deletion request, request audit, consent boundary, and retention states.
 - [x] Add opt-in real-SQL integration tests for the verification/reset token flows (single-use, sibling invalidation, expiry, reset session-revocation, IP-hash, enumeration neutrality).
-- [ ] Fix the audit-immutability vs `ON DELETE SET NULL` conflict that blocks hard-deleting a `users` row across four append-only audit tables (GDPR right-to-erasure); preserve append-only immutability while allowing the FK's system SET-NULL.
+- [x] Fix the audit-immutability vs `ON DELETE SET NULL` conflict that blocks hard-deleting a `users` row across four append-only audit tables (GDPR right-to-erasure); preserve append-only immutability while allowing the FK's system SET-NULL. Migration `019_audit_append_only_allows_user_nulling.sql` replaces each `ON UPDATE … DO INSTEAD NOTHING` rule with a `BEFORE UPDATE` trigger that blocks every application edit except the FK's non-null→NULL clearing of the listed user-reference column(s); the `ON DELETE … DO INSTEAD NOTHING` rules stay, keeping audit rows app-undeletable. Proven against real SQL (`audit-erasure.integration.test.ts`): a referenced user is now hard-deletable, the audit row survives with the user-ref nulled and all else unchanged, and application UPDATE/DELETE of audit rows are still rejected.
 
 ## Next: complete event loop
 

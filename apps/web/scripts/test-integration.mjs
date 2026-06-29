@@ -6,7 +6,12 @@ import { spawnSync } from "node:child_process";
 
 const result = spawnSync(
   "npx",
-  ["vitest", "run", "src/lib/auth-email.integration.test.ts"],
+  [
+    "vitest",
+    "run",
+    "src/lib/auth-email.integration.test.ts",
+    "src/lib/audit-erasure.integration.test.ts",
+  ],
   {
     stdio: "inherit",
     env: { ...process.env, RUN_DB_INTEGRATION: "1" },
