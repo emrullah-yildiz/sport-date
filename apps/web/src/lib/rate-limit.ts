@@ -21,18 +21,63 @@ type RateLimitHit = Readonly<{
   retryAfterSeconds: number;
 }>;
 
-const store = new Map<string, StoredWindow>();
-let mutationCount = 0;
+/**
+ * Storage seam for the fixed-window counters.
+ *
+ * The limiter only needs these four synchronous primitives over a keyed window
+ * record: read it, create/overwrite it, bump its count, and sweep expired keys.
+ * The default implementation below is the in-process `Map` the limiter has always
+ * used — no behavior change. This interface exists so a durable, cross-replica
+ * backing store can drop in later WITHOUT touching the consume/enforce logic.
+ *
+ * Gate 6 (Upstash Redis, see docs/operations/infrastructure-plan.md) will add an
+ * adapter that mirrors the email-delivery seam: env-gated on
+ * UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN, talking to Upstash over its
+ * REST API via `fetch` (e.g. INCR + PEXPIRE for an atomic window bump), and
+ * falling back to this in-memory store when those vars are unset. That adapter
+ * is necessarily async, so the consume path would gain an async variant at that
+ * point; the in-memory default stays synchronous and is what every current test
+ * exercises. No Redis code, no new dependency, and no env gating is added here —
+ * this commit is purely the seam.
+ */
+export type RateLimitStore = {
+  get(key: string): StoredWindow | undefined;
+  set(key: string, window: StoredWindow): void;
+  increment(key: string): void;
+  sweepExpired(nowMs: number): void;
+  clear(): void;
+};
 
-function cleanupExpired(nowMs: number): void {
-  for (const [key, entry] of store.entries()) {
-    if (entry.resetAt <= nowMs) store.delete(key);
-  }
+function createInMemoryRateLimitStore(): RateLimitStore {
+  const windows = new Map<string, StoredWindow>();
+  return {
+    get(key) {
+      return windows.get(key);
+    },
+    set(key, window) {
+      windows.set(key, window);
+    },
+    increment(key) {
+      const entry = windows.get(key);
+      if (entry) entry.count += 1;
+    },
+    sweepExpired(nowMs) {
+      for (const [key, entry] of windows.entries()) {
+        if (entry.resetAt <= nowMs) windows.delete(key);
+      }
+    },
+    clear() {
+      windows.clear();
+    },
+  };
 }
+
+const store: RateLimitStore = createInMemoryRateLimitStore();
+let mutationCount = 0;
 
 function maybeCleanup(nowMs: number): void {
   mutationCount += 1;
-  if (mutationCount % 250 === 0) cleanupExpired(nowMs);
+  if (mutationCount % 250 === 0) store.sweepExpired(nowMs);
 }
 
 function firstForwardedIp(value: string | null): string {
@@ -83,7 +128,7 @@ export function consumeRateLimit(
       store.set(key, { count: 1, resetAt: nowMs + rule.windowMs });
       continue;
     }
-    entry.count += 1;
+    store.increment(key);
   }
 
   return { ok: true };
@@ -188,3 +233,8 @@ export function resetRateLimitStoreForTests(): void {
   store.clear();
   mutationCount = 0;
 }
+
+// Exported for the future Gate 6 Upstash adapter (and its tests) to construct a
+// fresh in-memory fallback store; the module-level default above is created the
+// same way. Not used by the runtime path beyond that default today.
+export { createInMemoryRateLimitStore };
