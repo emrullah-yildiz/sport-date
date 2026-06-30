@@ -4,13 +4,18 @@ function buildContentSecurityPolicy(nodeEnv: string): string {
   const scriptSrc = ["'self'", "'unsafe-inline'"];
   if (nodeEnv !== "production") scriptSrc.push("'unsafe-eval'");
 
+  // Allow the browser Sentry SDK to send error/trace events to the EU ingest
+  // endpoint (otherwise CSP blocks it and client-side monitoring is silently
+  // broken, throwing console errors on every page).
+  const connectSrc = ["'self'", "https://*.ingest.de.sentry.io"];
+
   return [
     "default-src 'self'",
     `script-src ${scriptSrc.join(" ")}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
-    "connect-src 'self'",
+    `connect-src ${connectSrc.join(" ")}`,
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
     "object-src 'none'",
