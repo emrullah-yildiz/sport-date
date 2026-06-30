@@ -16,9 +16,6 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.6.1",
-    "@react-three/postprocessing": "^3.0.4",
     "@sentry/nextjs": "^10.62.0",
     "@sport-date/domain": "*",
     "bcryptjs": "^3.0.3",
@@ -27,7 +24,6 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "server-only": "^0.0.1",
-    "three": "^0.185.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
