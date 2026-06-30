@@ -15,7 +15,16 @@ export async function createEventJoinRequest(eventId: string, requester: { id: s
     JOIN user_sports AS compatible_sport
       ON compatible_sport.user_id = candidate.id
       AND LOWER(compatible_sport.sport) = LOWER(events.sport)
-      AND compatible_sport.skill_level = ANY(events.experience_levels)
+      -- Inclusive skill matching (owner decision 2026-07-01, see events.ts
+      -- memberSkillMatchesEvent): a member matches when their skill rank is at
+      -- least the easiest level the event welcomes. Mirrors getDiscoverableEvents
+      -- so a member is never shown an event in discovery they cannot join here.
+      AND (CASE LOWER(compatible_sport.skill_level)
+        WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 0 END) >= (
+        SELECT MIN(CASE LOWER(level)
+          WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 99 END)
+        FROM UNNEST(events.experience_levels) AS level
+      )
     WHERE events.id = ${eventId}::uuid
       AND events.status = 'published' AND events.starts_at > NOW()
       AND events.host_user_id <> candidate.id

@@ -73,6 +73,42 @@ export function eventLanguageMatchesMemberPreference(
   return memberLanguages.some((language) => language.trim().toLowerCase() === eventLanguage.trim().toLowerCase());
 }
 
+/**
+ * Discovery skill-matching rule (owner decision 2026-07-01).
+ *
+ * Skill levels are ordered beginner (1) < intermediate (2) < advanced (3). An
+ * event lists the experience levels it welcomes (default `[beginner,
+ * intermediate]`). Matching is INCLUSIVE UPWARD: a member matches an event when
+ * their skill level is at least the EASIEST level the event welcomes — i.e. a
+ * stronger player can always join an easier game. The previous rule required an
+ * exact membership (`skill_level = ANY(experience_levels)`), which silently hid
+ * every default event from an `advanced` member and gave them an empty discover
+ * feed with no explanation (CX-20260701).
+ *
+ * What this does NOT do: it does not let an UNDER-qualified member into an event
+ * (a beginner still does not match an `advanced`-only event — the host listed the
+ * floor they want). It loosens ONLY the skill filter; age, location, language,
+ * capacity, blocks, and host-exclusion gating are untouched and enforced
+ * independently. This mirrors the SQL skill clause in `getDiscoverableEvents` and
+ * the join gate in `createEventJoinRequest` exactly so discovery and the
+ * request-to-join boundary can never drift (a member is never shown an event they
+ * would be barred from joining).
+ */
+const SKILL_RANK: Readonly<Record<string, number>> = { beginner: 1, intermediate: 2, advanced: 3 };
+
+export function memberSkillMatchesEvent(
+  memberSkill: string,
+  eventExperienceLevels: readonly string[],
+): boolean {
+  const memberRank = SKILL_RANK[memberSkill.trim().toLowerCase()];
+  if (memberRank === undefined) return false;
+  const welcomedRanks = eventExperienceLevels
+    .map((level) => SKILL_RANK[level.trim().toLowerCase()])
+    .filter((rank): rank is number => rank !== undefined);
+  if (welcomedRanks.length === 0) return false;
+  return memberRank >= Math.min(...welcomedRanks);
+}
+
 export async function getHostEvent(eventId: string, hostId: string): Promise<HostEvent | null> {
   if (!UUID_PATTERN.test(eventId)) return null;
   const sql = getDatabase();
@@ -118,7 +154,12 @@ export async function getDiscoverableEvents(
     JOIN user_sports AS compatible_sport
       ON compatible_sport.user_id = ${user.id}
       AND LOWER(compatible_sport.sport) = LOWER(events.sport)
-      AND compatible_sport.skill_level = ANY(events.experience_levels)
+      AND (CASE LOWER(compatible_sport.skill_level)
+        WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 0 END) >= (
+        SELECT MIN(CASE LOWER(level)
+          WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 99 END)
+        FROM UNNEST(events.experience_levels) AS level
+      )
     LEFT JOIN join_requests AS member_request
       ON member_request.event_id = events.id AND member_request.requester_user_id = ${user.id}
     WHERE events.status = 'published'

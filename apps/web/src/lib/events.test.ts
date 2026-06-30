@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { eventLanguageMatchesMemberPreference, selectHostedEvents, type MemberEventSummary } from "./events";
+import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, type MemberEventSummary } from "./events";
 
 // These cases pin the discovery language-preference rule that the SQL clause in
 // `getDiscoverableEvents` mirrors. The bug (CX-20260630): a brand-new member has
@@ -23,6 +23,53 @@ describe("discovery language preference", () => {
     expect(eventLanguageMatchesMemberPreference(["english"], "English")).toBe(true);
     expect(eventLanguageMatchesMemberPreference(["Romanian", "French"], "English")).toBe(false);
     expect(eventLanguageMatchesMemberPreference(["Romanian"], "English")).toBe(false);
+  });
+});
+
+// Pins the discovery skill-matching rule that the SQL skill clause in
+// `getDiscoverableEvents` (and the join gate in `createEventJoinRequest`) mirrors.
+// The bug (CX-20260701): events default to `experienceLevels=[beginner,
+// intermediate]` and the old `skill_level = ANY(experience_levels)` exact match
+// hid EVERY default event from an `advanced` member, leaving them an empty,
+// unexplained discover feed. The owner decision: inclusive upward matching — a
+// stronger player can join an easier game — without loosening any other gate.
+describe("discovery skill matching", () => {
+  const DEFAULT_EVENT = ["beginner", "intermediate"] as const;
+
+  it("shows a default-level (beginner/intermediate) event to an advanced member (the bug)", () => {
+    // The reported case: advanced skill previously matched no default event.
+    expect(memberSkillMatchesEvent("advanced", [...DEFAULT_EVENT])).toBe(true);
+  });
+
+  it("still matches the levels that already worked (no regression for beginner/intermediate)", () => {
+    expect(memberSkillMatchesEvent("beginner", [...DEFAULT_EVENT])).toBe(true);
+    expect(memberSkillMatchesEvent("intermediate", [...DEFAULT_EVENT])).toBe(true);
+  });
+
+  it("lets a stronger player into an easier game (matches up the ladder)", () => {
+    expect(memberSkillMatchesEvent("intermediate", ["beginner"])).toBe(true);
+    expect(memberSkillMatchesEvent("advanced", ["beginner"])).toBe(true);
+    expect(memberSkillMatchesEvent("advanced", ["intermediate"])).toBe(true);
+  });
+
+  it("does NOT admit an under-qualified member (the event's listed floor still gates)", () => {
+    // The fix loosens only UPWARD; a beginner is not slipped into an advanced-only
+    // game, so nothing the host barred by skill leaks in.
+    expect(memberSkillMatchesEvent("beginner", ["intermediate"])).toBe(false);
+    expect(memberSkillMatchesEvent("beginner", ["advanced"])).toBe(false);
+    expect(memberSkillMatchesEvent("intermediate", ["advanced"])).toBe(false);
+  });
+
+  it("matches the easiest welcomed level when an event lists a non-contiguous range", () => {
+    // Floor is the minimum welcomed level, so anyone at/above beginner matches.
+    expect(memberSkillMatchesEvent("intermediate", ["beginner", "advanced"])).toBe(true);
+    expect(memberSkillMatchesEvent("beginner", ["beginner", "advanced"])).toBe(true);
+  });
+
+  it("is case- and whitespace-insensitive and rejects unknown skill values", () => {
+    expect(memberSkillMatchesEvent("  Advanced ", ["Beginner", "Intermediate"])).toBe(true);
+    expect(memberSkillMatchesEvent("expert", [...DEFAULT_EVENT])).toBe(false);
+    expect(memberSkillMatchesEvent("advanced", [])).toBe(false);
   });
 });
 
