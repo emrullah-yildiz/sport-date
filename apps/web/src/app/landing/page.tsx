@@ -82,13 +82,16 @@ export default function LandingPage() {
     show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.12, delayChildren: 0.1 } },
   };
 
-  // Progressive enhancement: until mounted on the client we render the hero
-  // copy and the 3D wrapper fully visible with no `initial` hidden state, so
-  // the SSR / no-JS HTML is readable and the first client paint matches it
-  // exactly (no hydration mismatch — framer-motion never injects opacity:0 on
-  // the server). After mount we remount the motion subtrees (via `key`) so the
-  // entrance plays once, client-side only. `initial={false}` on the static
-  // pass disables any implicit first animation.
+  // Progressive enhancement: the server and the first client paint render the
+  // hero copy as plain, animation-free HTML (no `motion.*`, no `initial`/
+  // `animate`, no inline opacity/transform). framer-motion `motion.*` elements
+  // serialize their resolved inline styles differently on server vs client
+  // (e.g. `opacity:1` number vs `opacity:"1"` + `transform:"none"`), which is
+  // exactly the hydration mismatch reported on the reduced-motion path. By
+  // emitting identical static markup on both passes, the SSR HTML and the first
+  // client render are byte-identical in every motion setting. Only after mount
+  // do we swap in the `motion.*` versions so the entrance plays once,
+  // client-side only — pure post-hydration enhancement.
 
   return (
     <main className="landing-page">
@@ -103,30 +106,44 @@ export default function LandingPage() {
       </nav>
 
       <section className="hero-section">
-        <motion.div
-          key={mounted ? "hero-anim" : "hero-static"}
-          className="hero-content"
-          style={{ y: titleY, opacity: titleOpacity }}
-          variants={heroStagger}
-          initial={mounted ? "hidden" : false}
-          animate="show"
-        >
-          <motion.p className="eyebrow" variants={enter}>Meet through movement</motion.p>
-          <motion.h1 className="hero-title" variants={enter}>Find people who share your <span className="gradient-text">passion for sports</span></motion.h1>
-          <motion.p className="hero-subtitle" variants={enter}>Discover local activities, request a place, and meet compatible people around something you already enjoy.</motion.p>
-          <motion.div className="hero-cta" variants={enter}><Link href="/signup" className="btn-hero">Start your profile</Link></motion.div>
-          <motion.p className="microcopy" variants={enter}>Private beta · Adults only · Europe first</motion.p>
-        </motion.div>
-        <motion.div
-          key={mounted ? "hero3d-anim" : "hero3d-static"}
-          className="hero-3d"
-          initial={mounted ? { opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 } : false}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: prefersReducedMotion ? 0.4 : 0.9, ease: "easeOut" }}
-          aria-hidden="true"
-        >
-          <MovementFieldHero />
-        </motion.div>
+        {mounted ? (
+          <motion.div
+            className="hero-content"
+            style={{ y: titleY, opacity: titleOpacity }}
+            variants={heroStagger}
+            initial="hidden"
+            animate="show"
+          >
+            <motion.p className="eyebrow" variants={enter}>Meet through movement</motion.p>
+            <motion.h1 className="hero-title" variants={enter}>Find people who share your <span className="gradient-text">passion for sports</span></motion.h1>
+            <motion.p className="hero-subtitle" variants={enter}>Discover local activities, request a place, and meet compatible people around something you already enjoy.</motion.p>
+            <motion.div className="hero-cta" variants={enter}><Link href="/signup" className="btn-hero">Start your profile</Link></motion.div>
+            <motion.p className="microcopy" variants={enter}>Private beta · Adults only · Europe first</motion.p>
+          </motion.div>
+        ) : (
+          <div className="hero-content">
+            <p className="eyebrow">Meet through movement</p>
+            <h1 className="hero-title">Find people who share your <span className="gradient-text">passion for sports</span></h1>
+            <p className="hero-subtitle">Discover local activities, request a place, and meet compatible people around something you already enjoy.</p>
+            <div className="hero-cta"><Link href="/signup" className="btn-hero">Start your profile</Link></div>
+            <p className="microcopy">Private beta · Adults only · Europe first</p>
+          </div>
+        )}
+        {mounted ? (
+          <motion.div
+            className="hero-3d"
+            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: prefersReducedMotion ? 0.4 : 0.9, ease: "easeOut" }}
+            aria-hidden="true"
+          >
+            <MovementFieldHero />
+          </motion.div>
+        ) : (
+          <div className="hero-3d" aria-hidden="true">
+            <MovementFieldHero />
+          </div>
+        )}
       </section>
 
       <section className="how-it-works">

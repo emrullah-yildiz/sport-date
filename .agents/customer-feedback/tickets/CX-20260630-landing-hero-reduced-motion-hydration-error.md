@@ -1,12 +1,12 @@
 # CX-20260630-landing-hero-reduced-motion-hydration-error
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Customer journey: First impression — a reduced-motion visitor opens the public landing page (`/landing`)
 - Surface: `web`
 - Environment and viewport/device: Local dev server (`http://localhost:3000`), dev Neon branch, Chromium headless, viewport 1280x900, `prefers-reduced-motion: reduce` emulated. Observed 2026-06-30.
 - Found by: Customer Experience Agent (targeted 3D-surface verification pass)
-- Implementation owner: `unassigned`
+- Implementation owner: `Claude Opus 4.8 (implementer)`
 - Related tickets: `none found`
 
 ## Customer outcome
@@ -68,15 +68,20 @@ Low. The hero copy stays visible and the primary CTA works, so no customer is bl
 
 ## Acceptance criteria
 
-- [ ] `/landing` hydrates with a clean browser console under `prefers-reduced-motion: reduce` (no hydration-mismatch error).
-- [ ] The hero eyebrow, headline, subtitle, CTA, and microcopy remain visible immediately in both motion modes (no regression to the current visible-by-default behavior).
-- [ ] The "Start your profile" CTA continues to navigate to `/signup` in both motion modes.
-- [ ] Server-rendered and first-client-rendered inline styles for the hero copy match in the reduced-motion case (no `transform:none` vs absent disagreement).
-- [ ] No new console errors are introduced on the non-reduced-motion path (it must stay at 0).
-- [ ] Relevant automated checks pass (`npm test`, `npm run typecheck`).
+- [ ] `/landing` hydrates with a clean browser console under `prefers-reduced-motion: reduce` (no hydration-mismatch error). _(customer retest — left for tester)_
+- [x] The hero eyebrow, headline, subtitle, CTA, and microcopy remain visible immediately in both motion modes (no regression to the current visible-by-default behavior).
+- [x] The "Start your profile" CTA continues to navigate to `/signup` in both motion modes.
+- [x] Server-rendered and first-client-rendered inline styles for the hero copy match in the reduced-motion case (no `transform:none` vs absent disagreement).
+- [x] No new console errors are introduced on the non-reduced-motion path (it must stay at 0).
+- [x] Relevant automated checks pass (`npm test`, `npm run typecheck`).
 
 Removed criteria: precise-location/data-exposure criterion deleted — this page exposes no member data.
 
 ## Handoff and retest log
 
 - `2026-06-30 05:06 GTBDT` - Filed by Customer Experience Agent; status `ready`. Reproduced 3/3 under reduced motion, 0/3 without. Content stays visible; this is a console-error / correctness finding, not a blocked journey.
+- `2026-06-30 05:12 GTBDT` - Implemented by Claude Opus 4.8 (implementer); status `ready` → `implemented`.
+  - Root cause confirmed: the hero copy was wrapped in framer-motion `motion.*` elements on *every* render pass (the previous attempt only swapped a `key`/`initial`, but still mounted `motion.*` on the static pass). `motion.*` injects resolved inline styles that serialize differently on server vs client (`style={{opacity:1}}` number on the server vs `style={{opacity:"1",transform:"none"}}` strings on the client), producing the reduced-motion hydration mismatch.
+  - Fix (`apps/web/src/app/landing/page.tsx`): gated the framer-motion entrance behind `useMounted()` (the existing `useSyncExternalStore` idiom: `false` on server + first client paint, `true` after hydration). Before mount, the hero `.hero-content` block and the `.hero-3d` wrapper render as **plain, animation-free markup** — `<div>/<p>/<h1>` with no `motion.*`, no `initial`/`animate`, and no inline `opacity`/`transform`. After mount we render the `motion.*` versions with `initial="hidden"` / `animate="show"`, so the staggered entrance plays once, client-side only. SSR HTML and the first client render are now byte-identical in *every* motion setting → no motion-injected inline styles pre-mount → no hydration mismatch. Non-reduced-motion entrance and the 3D scene are untouched.
+  - Checks: `npx eslint src/` → 0 problems. `npm run typecheck` → green. `npm test` (full workspaces) → 188 passed (131 web + 57 contracts) | 12 skipped, none shrunk. `npm run build --workspace @sport-date/web` → Turbopack "Compiled successfully", `/landing` prerendered static.
+  - Left the customer-retest acceptance criterion (clean console under reduced motion) unticked for the QA tester's screenshot verification.
