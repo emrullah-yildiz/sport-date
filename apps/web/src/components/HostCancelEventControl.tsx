@@ -16,7 +16,7 @@ export default function HostCancelEventControl({ eventId }: { eventId: string })
       const response = await fetch(`/api/events/${eventId}`, { method: "DELETE" });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Event cancellation failed.");
-      window.location.assign("/profile?event=cancelled");
+      window.location.assign("/hosting?event=cancelled");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Event cancellation failed.");
       setSubmitting(false);

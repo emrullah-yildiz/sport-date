@@ -98,6 +98,7 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
     <main className="host-event-page">
       <nav className="profile-nav">
         <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/hosting">Your events</Link>
         <Link href="/events/new">Host another</Link>
       </nav>
 

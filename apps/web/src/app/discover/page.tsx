@@ -24,7 +24,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
 
   return (
     <main className="discover-page">
-      <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><Link href="/events/new">Host an event</Link></nav>
+      <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><Link href="/hosting">Your events</Link><Link href="/events/new">Host an event</Link></nav>
       <header className="discover-header"><p className="eyebrow">Events that fit your movement</p><h1>Something real to do. Someone new to meet.</h1><p>Only events compatible with your sports, experience, adult age range, and active blocks appear here.</p></header>
       <form className="discover-filters" method="get">
         <label>City<input name="city" defaultValue={filters.city} placeholder={user.location} /></label>

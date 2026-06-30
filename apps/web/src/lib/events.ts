@@ -360,6 +360,21 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   };
 }
 
+export type HostedEventStatus = "upcoming" | "past";
+export type HostedEvent = MemberEventSummary & { hostedStatus: HostedEventStatus };
+
+// Pure derivation so the hosting page and its tests share one rule. The query
+// (`getMemberEventSummaries`) returns the member's hosted *and* joined published
+// or completed events; the hosting hub only owns the ones the member hosts, and
+// splits them into upcoming vs past by the query's `hasEnded` flag. The query
+// already orders not-ended before ended, then by start time descending, so the
+// relative order within each bucket is preserved.
+export function selectHostedEvents(summaries: ReadonlyArray<MemberEventSummary>): HostedEvent[] {
+  return summaries
+    .filter((summary) => summary.isHost)
+    .map((summary) => ({ ...summary, hostedStatus: summary.hasEnded ? "past" : "upcoming" }));
+}
+
 export async function getMemberEventSummaries(userId: string): Promise<MemberEventSummary[]> {
   const sql = getDatabase();
   const rows = await sql`
