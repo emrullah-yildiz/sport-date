@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ageOnDate, validateLogin, validateProfileUpdate, validateRegistration } from "./registration";
+import { ageOnDate, dateOfBirthError, validateLogin, validateProfileUpdate, validateRegistration } from "./registration";
 
 const validInput = {
   email: " Athlete@Example.com ", password: "StrongPassword9",
@@ -41,6 +41,28 @@ describe("registration validation", () => {
       sports: [...validInput.sports, ...validInput.sports],
     });
     expect(result.valid).toBe(false);
+  });
+});
+
+describe("inline date-of-birth validation", () => {
+  const today = new Date("2026-06-29T12:00:00Z");
+
+  it("flags an empty date of birth", () => {
+    expect(dateOfBirthError("", today)).toBe("Enter your date of birth.");
+  });
+
+  it("flags invalid or future dates", () => {
+    expect(dateOfBirthError("2000-02-30", today)).toBe("Enter a valid date of birth.");
+    expect(dateOfBirthError("2030-01-01", today)).toBe("Enter a valid date of birth.");
+  });
+
+  it("blocks under-18 applicants the moment the birthday is entered", () => {
+    expect(dateOfBirthError("2008-06-30", today)).toBe("You must be 18 or older to use Sport Date.");
+  });
+
+  it("clears once the applicant is 18 or older", () => {
+    expect(dateOfBirthError("2008-06-29", today)).toBeNull();
+    expect(dateOfBirthError("2000-06-29", today)).toBeNull();
   });
 });
 

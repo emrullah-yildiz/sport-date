@@ -1,6 +1,6 @@
 "use client";
 
-import { validateRegistration } from "@sport-date/domain";
+import { dateOfBirthError, validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
@@ -20,7 +20,8 @@ function stepError(step: number, state: SignUpState): string | null {
     if (!/[a-z]/.test(state.password) || !/[A-Z]/.test(state.password) || !/\d/.test(state.password)) {
       return "Include upper-case, lower-case, and numeric characters.";
     }
-    if (!state.dateOfBirth) return "Enter your date of birth.";
+    const dobError = dateOfBirthError(state.dateOfBirth);
+    if (dobError) return dobError;
     if (!state.acceptedTerms) return "Confirm the Terms and Safety Guidelines to continue.";
   }
   if (step === 2 && (!state.firstName.trim() || !state.lastName.trim() || !state.location.trim())) {

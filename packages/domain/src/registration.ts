@@ -126,6 +126,25 @@ export function ageOnDate(dateOfBirth: string, today = new Date()): number | nul
   return age;
 }
 
+export const MINIMUM_AGE = 18;
+
+/**
+ * Inline, field-level validation for a date of birth as it is entered during
+ * sign-up. Reuses {@link ageOnDate} so the inline check and the final-submit
+ * guard share one source of truth. Returns a calm, user-facing message when the
+ * date is empty, invalid/future, or under the minimum age, or `null` when valid.
+ */
+export function dateOfBirthError(
+  dateOfBirth: string,
+  today = new Date(),
+): string | null {
+  if (!dateOfBirth) return "Enter your date of birth.";
+  const age = ageOnDate(dateOfBirth, today);
+  if (age === null || age < 0) return "Enter a valid date of birth.";
+  if (age < MINIMUM_AGE) return "You must be 18 or older to use Sport Date.";
+  return null;
+}
+
 export function validateRegistration(
   raw: unknown,
   today = new Date(),
