@@ -19,6 +19,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
     withinDays: requestedDays === 1 || requestedDays === 30 ? requestedDays : 7,
   };
   const events = await getDiscoverableEvents(user, filters);
+  const hasNarrowingFilters = Boolean(filters.city || filters.sport || filters.language);
+  const profileMissingSports = user.sports.length === 0;
 
   return (
     <main className="discover-page">
@@ -35,7 +37,25 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       <section className="discovery-results" aria-live="polite">
         <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : `${events.length} ${events.length === 1 ? "invitation" : "invitations"}`}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
         {events.length === 0 ? (
-          <div className="discovery-empty"><p>No compatible events match these filters yet.</p><Link href="/events/new">Host the first one</Link></div>
+          <div className="discovery-empty">
+            {profileMissingSports ? (
+              <>
+                <p>We match you to events by the sports in your profile, and your profile doesn&apos;t list any yet. Add a sport you play and your matches will start showing up here.</p>
+                <Link href="/profile">Add a sport to your profile</Link>
+              </>
+            ) : hasNarrowingFilters ? (
+              <>
+                <p>Nothing matches these filters right now. Try widening your search — clear the city, sport, or language filters, or look further ahead in time.</p>
+                <Link href="/discover">Clear the filters</Link>
+              </>
+            ) : (
+              <>
+                <p>No compatible events are open near you just yet. It can also help to add more sports and the languages you&apos;re comfortable with to your profile, so more events can match you. Or you can start one yourself.</p>
+                <Link href="/profile">Update your profile</Link>
+                <Link href="/events/new">Host the first one</Link>
+              </>
+            )}
+          </div>
         ) : (
           <div className="discovery-grid">{events.map((event) => {
             const startsAt = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: event.timeZone }).format(new Date(event.startsAt));

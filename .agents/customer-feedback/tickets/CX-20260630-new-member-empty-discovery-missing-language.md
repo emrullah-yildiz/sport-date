@@ -1,12 +1,12 @@
 # CX-20260630-new-member-empty-discovery-missing-language
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Customer journey: Onboarding into discovery (sign up, then find the first compatible event to join)
 - Surface: `web`
 - Environment and viewport/device: Local dev server (`http://localhost:3000`), dev Neon branch, Chromium 1280x900, headless. Observed 2026-06-30.
 - Found by: Customer Experience Agent (browser chaos explorer, `apps/web/qa/explore.mjs`)
-- Implementation owner: `unassigned`
+- Implementation owner: `Implementation Agent (Opus 4.8)`
 - Related tickets: `none found`
 
 ## Customer outcome
@@ -67,13 +67,21 @@ This is a silent dead end at the most important first moment. The product's core
 
 ## Acceptance criteria
 
-- [ ] A newly signed-up member whose sport matches an open, age-compatible event can find that event in discovery, OR the empty state clearly explains what to add (e.g. a language) and links to where to add it.
-- [ ] If a language is required for matching, it is either collected during signup with a sensible default, or its absence is surfaced as an explainable, recoverable state — not a silent empty feed.
-- [ ] The discovery empty state distinguishes "no events exist yet" from "your profile is missing something needed to match."
-- [ ] The wording uses human language (no internal/database terms) and tells the member exactly what to do next.
-- [ ] No precise location or other sensitive data is exposed; approximate-area-only behavior is preserved.
-- [ ] Relevant automated tests cover the new-member discovery path and repository checks pass.
+- [x] A newly signed-up member whose sport matches an open, age-compatible event can find that event in discovery, OR the empty state clearly explains what to add (e.g. a language) and links to where to add it. (Root fix: empty-language members are no longer filtered to nothing.)
+- [x] If a language is required for matching, it is either collected during signup with a sensible default, or its absence is surfaced as an explainable, recoverable state — not a silent empty feed. (A member with no language preference now sees all otherwise-eligible events instead of a silent empty feed.)
+- [x] The discovery empty state distinguishes "no events exist yet" from "your profile is missing something needed to match." (Empty state now branches on missing-sports vs. narrowing filters vs. genuinely nothing open.)
+- [x] The wording uses human language (no internal/database terms) and tells the member exactly what to do next, with profile/host links.
+- [x] No precise location or other sensitive data is exposed; approximate-area-only behavior is preserved. (Only the language preference filter was relaxed; no location/visibility/privacy clause changed.)
+- [x] Relevant automated tests cover the new-member discovery path and repository checks pass. (New `events.test.ts`; web 131 + domain 57 pass, typecheck green.)
 
 ## Handoff and retest log
 
 - `2026-06-30` - Filed by Customer Experience Agent; status `ready`. Cause confirmed in-run (event hidden before adding a language, visible after).
+- `2026-06-30` - Implemented by Implementation Agent (Opus 4.8); status `implemented`. Awaiting customer retest.
+  - Root fix (`apps/web/src/lib/events.ts`, `getDiscoverableEvents`): the language clause now reads `(CARDINALITY(candidate.languages) = 0 OR EXISTS (... UNNEST(candidate.languages) ... LOWER(language) = LOWER(events.language)))`. A member with NO languages set skips the language-overlap filter (no preference => not filtered to nothing); a member with one or more languages keeps the exact previous overlap behaviour. No other clause was touched — host/candidate active checks, sport+experience join, time window, host-self exclusion, age `BETWEEN`, capacity-vs-existing-request, city/sport/language filter params, the block exclusion, and the approximate-area-only projection (no precise location, no private venue) are all unchanged.
+  - Added a pure, unit-testable mirror `eventLanguageMatchesMemberPreference(memberLanguages, eventLanguage)` documenting the same rule the SQL enforces, with a doc comment tying the two together so they cannot drift.
+  - Tests (`apps/web/src/lib/events.test.ts`): (a) a member with empty languages matches an event that was previously hidden (English and Romanian); (b) a member with a stated language still only matches overlapping languages (case-insensitive), no regression.
+  - Guidance (`apps/web/src/app/discover/page.tsx`): the empty state now distinguishes three calm, plain-language cases — profile lists no sports (add a sport), narrowing filters applied (widen/clear them), or genuinely nothing open near you (suggests adding more sports and the languages you're comfortable with, with profile + host links). No internal/DB terms.
+  - Checks: `npm run typecheck` (web) green; web tests 131 passed / 12 skipped (was 129 hermetic, +2 new); domain 57 passed. Total hermetic 186 -> 188.
+  - Recommended enhancement (not done here): collect a language during signup with a sensible default so the empty-language state is rare rather than the norm. This is a deeper product/onboarding change for an owner; the relaxed discovery filter above makes the silent dead-end safe in the meantime.
+  - Note for retest: signup still does not collect a language, so a brand-new member's `languages` is still `'{}'`; the change makes that state non-blocking for discovery rather than collecting the language. Verify the previously-hidden Tennis event now appears for a fresh member with no profile edits.

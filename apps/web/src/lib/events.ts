@@ -52,6 +52,27 @@ type HostJoinRequestRow = {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+/**
+ * Discovery language-preference rule.
+ *
+ * A member who has expressed at least one language preference only sees events
+ * whose language overlaps with theirs. A member who has expressed NO language
+ * preference (empty set — e.g. a brand-new member, since signup does not yet
+ * collect a language) is treated as having no preference, so the language filter
+ * is not applied to them and they are not silently filtered down to an empty
+ * discovery feed. This mirrors the SQL language clause in `getDiscoverableEvents`
+ * exactly so the two cannot drift; it relaxes only the language *preference*
+ * filter and nothing else (blocks, age, capacity, time, sport, location all
+ * remain enforced independently).
+ */
+export function eventLanguageMatchesMemberPreference(
+  memberLanguages: readonly string[],
+  eventLanguage: string,
+): boolean {
+  if (memberLanguages.length === 0) return true;
+  return memberLanguages.some((language) => language.trim().toLowerCase() === eventLanguage.trim().toLowerCase());
+}
+
 export async function getHostEvent(eventId: string, hostId: string): Promise<HostEvent | null> {
   if (!UUID_PATTERN.test(eventId)) return null;
   const sql = getDatabase();
@@ -106,7 +127,10 @@ export async function getDiscoverableEvents(
       AND events.host_user_id <> ${user.id}
       AND (${eventId ?? ""} = '' OR events.id = NULLIF(${eventId ?? ""}, '')::uuid)
       AND ${user.age} BETWEEN events.minimum_age AND events.maximum_age
-      AND EXISTS (SELECT 1 FROM UNNEST(candidate.languages) AS language WHERE LOWER(language) = LOWER(events.language))
+      AND (
+        CARDINALITY(candidate.languages) = 0
+        OR EXISTS (SELECT 1 FROM UNNEST(candidate.languages) AS language WHERE LOWER(language) = LOWER(events.language))
+      )
       AND (
         (SELECT COUNT(*) FROM event_participants WHERE event_id = events.id) < events.capacity
         OR member_request.id IS NOT NULL
