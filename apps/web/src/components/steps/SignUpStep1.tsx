@@ -43,6 +43,7 @@ export default function SignUpStep1() {
           onChange={(event) => { setDobTouched(true); setField("dateOfBirth", event.target.value); }}
           onBlur={() => setDobTouched(true)}
         />
+        <p className="field-format-hint">Date order follows your browser&apos;s region (e.g. dd/mm/yyyy in Europe).</p>
         {dobError ? <p id="signup-date-of-birth-error" className="field-error" role="alert">{dobError}</p> : null}
       </div>
       <label className="terms terms-check">

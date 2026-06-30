@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { sportEmoji } from "@/lib/sports";
+
 export const metadata: Metadata = {
   title: "Sport Date — Meet through movement",
   description:
@@ -28,20 +30,22 @@ const steps = [
   },
 ];
 
+// Curated subset shown on marketing. Emoji come from the shared sport map
+// (`@/lib/sports`) so the landing and the sign-up picker can never drift.
 const sports = [
-  { emoji: "🏃", name: "Running" },
-  { emoji: "🎾", name: "Tennis" },
-  { emoji: "🏓", name: "Padel" },
-  { emoji: "⚽", name: "Football" },
-  { emoji: "🏀", name: "Basketball" },
-  { emoji: "🧗", name: "Bouldering" },
-  { emoji: "🧘", name: "Yoga" },
-  { emoji: "🚴", name: "Cycling" },
-  { emoji: "🏊", name: "Swimming" },
-  { emoji: "🏓", name: "Table tennis" },
-  { emoji: "🏸", name: "Badminton" },
-  { emoji: "♟️", name: "Chess" },
-];
+  "Running",
+  "Tennis",
+  "Padel",
+  "Football",
+  "Basketball",
+  "Bouldering",
+  "Yoga",
+  "Cycling",
+  "Swimming",
+  "Table Tennis",
+  "Badminton",
+  "Chess",
+].map((name) => ({ name, emoji: sportEmoji(name) }));
 
 const safety = [
   {

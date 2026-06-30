@@ -3,19 +3,13 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useSignUpStore } from "@/lib/sign-up-store";
+import { SPORT_PRESETS, sportEmoji } from "@/lib/sports";
 
 // Every kind of sportive meet-up — physical or mind sport — including chess.
-// If a member's game isn't here, they can add their own below.
-const sports = [
-  { name: "Running", symbol: "R" }, { name: "Tennis", symbol: "T" },
-  { name: "Padel", symbol: "P" }, { name: "Football", symbol: "F" },
-  { name: "Basketball", symbol: "BB" }, { name: "Volleyball", symbol: "V" },
-  { name: "Bouldering", symbol: "BL" }, { name: "Climbing", symbol: "CL" },
-  { name: "Hiking", symbol: "H" }, { name: "Cycling", symbol: "CY" },
-  { name: "Swimming", symbol: "SW" }, { name: "Yoga", symbol: "Y" },
-  { name: "Dance", symbol: "D" }, { name: "Table Tennis", symbol: "TT" },
-  { name: "Badminton", symbol: "BM" }, { name: "Chess", symbol: "CH" },
-];
+// Emoji come from the shared sport map (`@/lib/sports`) so the picker matches
+// the marketing landing exactly. If a member's game isn't here, they can add
+// their own below (custom sports get a sensible default glyph via sportEmoji).
+const sports = SPORT_PRESETS;
 
 const MAX_SPORTS = 5;
 const MAX_SPORT_NAME = 60;
@@ -57,7 +51,7 @@ export default function SignUpStep3() {
           const active = selected.some((item) => item.name.toLowerCase() === sport.name.toLowerCase());
           return (
             <button type="button" key={sport.name} aria-pressed={active} disabled={!active && atLimit} className={`sport-card ${active ? "active" : ""}`} onClick={() => toggleSport(sport.name)}>
-              <span className="sport-emoji">{sport.symbol}</span><span>{sport.name}</span>
+              <span className="sport-emoji" aria-hidden="true">{sport.emoji}</span><span>{sport.name}</span>
             </button>
           );
         })}
@@ -67,7 +61,7 @@ export default function SignUpStep3() {
         <div className="custom-sport-tags">
           {customSelected.map((sport) => (
             <button type="button" key={sport.name} className="custom-sport-tag" onClick={() => removeSport(sport.name)}>
-              {sport.name}<span aria-hidden="true">×</span><span className="visually-hidden">remove {sport.name}</span>
+              <span aria-hidden="true">{sportEmoji(sport.name)}</span>{sport.name}<span aria-hidden="true">×</span><span className="visually-hidden">remove {sport.name}</span>
             </button>
           ))}
         </div>
