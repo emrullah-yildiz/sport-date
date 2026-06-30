@@ -17,25 +17,33 @@
  *   - Ambient motion: the cluster always breathes/orbits slowly so it feels
  *     alive at rest.
  *
+ * A luminous emissive core plus a tasteful additive bloom pass make the lime
+ * and coral energy read as actual light. The bloom is tuned with a high
+ * luminance threshold so only the bright core/orbs glow and the cream backdrop
+ * never washes out.
+ *
  * Robustness & a11y:
  *   - `prefers-reduced-motion` => a calm, near-static arrangement (no spin,
- *     no drift, no pointer reactions).
+ *     no drift, no pointer reactions) AND no bloom — just a steady glow.
+ *   - Compact screens => bloom off and dpr pinned to 1 to protect mobile perf;
+ *     the core still reads as bright emissive lime without the post pass.
  *   - WebGL-unavailable => the caller renders a static poster instead; this
  *     component also guards its own context creation.
  *   - dpr capped, lighter geometry on small screens, decorative (aria-hidden
  *     handled by the caller's wrapper).
  *
- * Everything is bundled three.js — no eval, no inline script, no external
- * asset hosts — so it satisfies the production CSP unchanged.
+ * Everything is bundled three.js / postprocessing — no eval, no inline script,
+ * no external asset hosts — so it satisfies the production CSP unchanged.
  */
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 const LIME = "#c9f458";
+const CORE_LIME = "#d8ff6e"; // a brighter lime that blooms cleanly without washing out
 const CORAL = "#ff765f";
-const INK = "#17241d";
 const SAGE = "#9fb39d";
 
 type OrbSpec = {
@@ -52,12 +60,15 @@ type OrbSpec = {
   emissive: string;
 };
 
+// Orbits are spaced on a near-golden-angle progression so the cluster reads as
+// an intentional constellation rather than a random scatter. Radii step out
+// evenly; phases fan around the ring; sizes taper with distance for depth.
 const ORBS: OrbSpec[] = [
-  { radius: 1.55, phase: 0.0, height: 0.35, speed: 0.65, size: 0.42, color: LIME, emissive: LIME },
-  { radius: 1.85, phase: 2.2, height: -0.55, speed: -0.5, size: 0.3, color: CORAL, emissive: CORAL },
-  { radius: 2.25, phase: 4.1, height: 0.7, speed: 0.42, size: 0.34, color: LIME, emissive: LIME },
-  { radius: 1.35, phase: 5.4, height: -0.2, speed: -0.78, size: 0.24, color: "#ffffff", emissive: SAGE },
-  { radius: 2.55, phase: 1.1, height: 0.15, speed: 0.34, size: 0.2, color: CORAL, emissive: CORAL },
+  { radius: 1.6, phase: 0.0, height: 0.42, speed: 0.6, size: 0.4, color: LIME, emissive: LIME },
+  { radius: 1.95, phase: 2.4, height: -0.5, speed: -0.48, size: 0.3, color: CORAL, emissive: CORAL },
+  { radius: 2.35, phase: 4.7, height: 0.62, speed: 0.4, size: 0.32, color: LIME, emissive: LIME },
+  { radius: 1.45, phase: 5.6, height: -0.28, speed: -0.72, size: 0.22, color: "#ffffff", emissive: SAGE },
+  { radius: 2.7, phase: 1.3, height: 0.08, speed: 0.32, size: 0.18, color: CORAL, emissive: CORAL },
 ];
 
 /** Smoothly eases `current` toward `target`. Frame-rate aware. */
@@ -80,7 +91,7 @@ function Orb({ spec, reducedMotion }: { spec: OrbSpec; reducedMotion: boolean })
       const a = spec.phase;
       mesh.position.set(Math.cos(a) * spec.radius, spec.height, Math.sin(a) * spec.radius * 0.6);
       mesh.scale.setScalar(spec.size);
-      mat.emissiveIntensity = 0.45;
+      mat.emissiveIntensity = 0.65;
       return;
     }
 
@@ -98,7 +109,7 @@ function Orb({ spec, reducedMotion }: { spec: OrbSpec; reducedMotion: boolean })
     const next = damp(mesh.scale.x, targetScale, 9, dt);
     mesh.scale.setScalar(next);
 
-    const targetGlow = hovered ? 1.25 : 0.6 + Math.sin(t * 1.3 + spec.phase) * 0.12;
+    const targetGlow = hovered ? 1.5 : 0.85 + Math.sin(t * 1.3 + spec.phase) * 0.15;
     mat.emissiveIntensity = damp(mat.emissiveIntensity, targetGlow, 8, dt);
   });
 
@@ -130,33 +141,67 @@ function Orb({ spec, reducedMotion }: { spec: OrbSpec; reducedMotion: boolean })
   );
 }
 
-/** Soft central core — the shared "field" the orbs gather around. */
+/**
+ * Luminous central core — the shared "field" the orbs gather around. A bright
+ * emissive lime sphere reads as a ball of energy; a faint outer halo shell adds
+ * volumetric softness so the bloom has something to bleed into. High-segment
+ * smooth geometry (no flatShading) removes the old facet/triangle artifact, and
+ * the core is scaled down a touch so the orbiting orbs read as a balanced
+ * constellation around it rather than crowding a heavy blob.
+ */
 function Core({ reducedMotion }: { reducedMotion: boolean }) {
   const ref = useRef<THREE.Mesh>(null);
+  const matRef = useRef<THREE.MeshStandardMaterial>(null);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const mesh = ref.current;
-    if (!mesh || reducedMotion) return;
+    const mat = matRef.current;
+    if (!mesh) return;
+    if (reducedMotion) {
+      if (mat) mat.emissiveIntensity = 0.9;
+      return;
+    }
+    const dt = Math.min(delta, 0.05);
     const t = state.clock.elapsedTime;
-    const pulse = 1 + Math.sin(t * 0.9) * 0.05;
+    const pulse = 1 + Math.sin(t * 0.9) * 0.04;
     mesh.scale.setScalar(pulse);
-    mesh.rotation.y = t * 0.15;
-    mesh.rotation.x = t * 0.08;
+    mesh.rotation.y = t * 0.12;
+    // Gentle energy flicker around a bright baseline so bloom stays alive.
+    if (mat) {
+      const target = 1.5 + Math.sin(t * 1.6) * 0.25;
+      mat.emissiveIntensity = damp(mat.emissiveIntensity, target, 6, dt);
+    }
   });
 
   return (
-    <mesh ref={ref}>
-      <icosahedronGeometry args={[0.95, 3]} />
-      <meshStandardMaterial
-        color={INK}
-        emissive={LIME}
-        emissiveIntensity={reducedMotion ? 0.15 : 0.28}
-        roughness={0.4}
-        metalness={0.2}
-        flatShading
-        toneMapped={false}
-      />
-    </mesh>
+    <group>
+      {/* Energy core: smooth, bright, blooms as the luminous centerpiece. */}
+      <mesh ref={ref}>
+        <sphereGeometry args={[0.72, 64, 64]} />
+        <meshStandardMaterial
+          ref={matRef}
+          color={CORE_LIME}
+          emissive={CORE_LIME}
+          emissiveIntensity={reducedMotion ? 0.9 : 1.5}
+          roughness={0.18}
+          metalness={0.0}
+          toneMapped={false}
+        />
+      </mesh>
+      {/* Soft halo shell: backface-rendered translucent glow that gives the
+          core volume and feeds the bloom a gradient instead of a hard edge. */}
+      <mesh scale={1.55}>
+        <sphereGeometry args={[0.72, 48, 48]} />
+        <meshBasicMaterial
+          color={LIME}
+          transparent
+          opacity={0.12}
+          side={THREE.BackSide}
+          depthWrite={false}
+          toneMapped={false}
+        />
+      </mesh>
+    </group>
   );
 }
 
@@ -318,10 +363,18 @@ export default function MovementField({
 }) {
   const particleCount = isCompact ? 90 : 220;
 
+  // Bloom is the expensive, "wow" upgrade. We keep it off when motion is
+  // reduced (calm, static composition) and off on compact screens (mobile perf
+  // budget). On those paths the core still reads as bright emissive lime, just
+  // without the post-processing glow.
+  const useBloom = !reducedMotion && !isCompact;
+
   return (
     <Canvas
       camera={{ position: [0, 0, 6.5], fov: 42 }}
-      dpr={[1, 2]}
+      // dpr stays capped at 2; with bloom we additionally pin compact screens to
+      // 1 so the extra fullscreen passes never run at retina cost on mobile.
+      dpr={isCompact ? [1, 1] : [1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       style={{ width: "100%", height: "100%" }}
       // If WebGL context creation fails, react-three-fiber throws; the caller's
@@ -335,6 +388,24 @@ export default function MovementField({
       <pointLight position={[-5, -2, 3]} color={CORAL} intensity={0.6} />
       <pointLight position={[3, 4, -4]} color={LIME} intensity={0.5} />
       <Cluster reducedMotion={reducedMotion} particleCount={particleCount} />
+
+      {/* Tasteful bloom: a high luminance threshold means only the bright
+          emissive core + orbs bloom, while the cream hero backdrop (which is
+          CSS behind a transparent canvas, so near-black in the buffer) never
+          blows out. Tuned for glow, not haze. */}
+      {useBloom ? (
+        <EffectComposer>
+          <Bloom
+            intensity={0.85}
+            luminanceThreshold={0.62}
+            luminanceSmoothing={0.28}
+            mipmapBlur
+            radius={0.72}
+          />
+        </EffectComposer>
+      ) : (
+        <></>
+      )}
     </Canvas>
   );
 }

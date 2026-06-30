@@ -3,7 +3,29 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useSyncExternalStore } from "react";
+
+const subscribeNoop = () => () => {};
+
+/**
+ * True only after the component has mounted/hydrated on the client. Used to
+ * gate framer-motion entrance animations behind progressive enhancement: the
+ * server (and any no-JS / pre-hydration paint) renders fully visible content,
+ * and the animated entrance is layered on only once we're safely on the
+ * client. This keeps hero copy visible by default and avoids the SSR/client
+ * style mismatch that an `initial={{ opacity: 0 }}` would otherwise cause.
+ *
+ * Implemented with `useSyncExternalStore` (getServerSnapshot => false,
+ * getSnapshot => true) so React itself draws the SSR/client boundary — the
+ * hydration-safe idiom for "are we on the client yet?".
+ */
+function useMounted() {
+  return useSyncExternalStore(
+    subscribeNoop,
+    () => true,
+    () => false,
+  );
+}
 
 const MovementFieldHero = dynamic(() => import("@/components/3d/MovementFieldHero"), {
   ssr: false,
@@ -11,8 +33,19 @@ const MovementFieldHero = dynamic(() => import("@/components/3d/MovementFieldHer
 
 function Reveal({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
+  const mounted = useMounted();
   const visible = useInView(ref, { once: true, margin: "-100px" });
-  return <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={visible ? { opacity: 1, y: 0 } : undefined}>{children}</motion.div>;
+  // Before hydration we render at full opacity (no `initial` hidden state), so
+  // the content is never invisible without JS and SSR markup matches the first
+  // client paint. The scroll-reveal is enhancement only.
+  if (!mounted) {
+    return <div ref={ref}>{children}</div>;
+  }
+  return (
+    <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={visible ? { opacity: 1, y: 0 } : undefined}>
+      {children}
+    </motion.div>
+  );
 }
 
 const steps = [
@@ -31,6 +64,7 @@ const safetyFeatures = [
 
 export default function LandingPage() {
   const prefersReducedMotion = useReducedMotion();
+  const mounted = useMounted();
   const { scrollY } = useScroll();
   const titleY = useTransform(scrollY, [0, 300], [0, prefersReducedMotion ? 0 : -42]);
   const titleOpacity = useTransform(scrollY, [0, 300], [1, prefersReducedMotion ? 1 : 0.35]);
@@ -48,6 +82,14 @@ export default function LandingPage() {
     show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.12, delayChildren: 0.1 } },
   };
 
+  // Progressive enhancement: until mounted on the client we render the hero
+  // copy and the 3D wrapper fully visible with no `initial` hidden state, so
+  // the SSR / no-JS HTML is readable and the first client paint matches it
+  // exactly (no hydration mismatch — framer-motion never injects opacity:0 on
+  // the server). After mount we remount the motion subtrees (via `key`) so the
+  // entrance plays once, client-side only. `initial={false}` on the static
+  // pass disables any implicit first animation.
+
   return (
     <main className="landing-page">
       <nav className="navbar" aria-label="Primary navigation">
@@ -62,10 +104,11 @@ export default function LandingPage() {
 
       <section className="hero-section">
         <motion.div
+          key={mounted ? "hero-anim" : "hero-static"}
           className="hero-content"
           style={{ y: titleY, opacity: titleOpacity }}
           variants={heroStagger}
-          initial="hidden"
+          initial={mounted ? "hidden" : false}
           animate="show"
         >
           <motion.p className="eyebrow" variants={enter}>Meet through movement</motion.p>
@@ -75,8 +118,9 @@ export default function LandingPage() {
           <motion.p className="microcopy" variants={enter}>Private beta · Adults only · Europe first</motion.p>
         </motion.div>
         <motion.div
+          key={mounted ? "hero3d-anim" : "hero3d-static"}
           className="hero-3d"
-          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 }}
+          initial={mounted ? { opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 } : false}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: prefersReducedMotion ? 0.4 : 0.9, ease: "easeOut" }}
           aria-hidden="true"
