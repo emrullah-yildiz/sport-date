@@ -17,7 +17,7 @@
  */
 
 import dynamic from "next/dynamic";
-import { Component, type ReactNode, useEffect, useState } from "react";
+import { Component, type ReactNode, useSyncExternalStore } from "react";
 
 const MovementField = dynamic(() => import("./MovementField"), {
   ssr: false,
@@ -46,6 +46,13 @@ class CanvasErrorBoundary extends Component<{ children: ReactNode; fallback: Rea
   }
 }
 
+// Hydration-safe "are we on the client yet?" — false on the server and first
+// paint, true after hydration, with no in-effect setState cascade.
+const subscribeNoop = () => () => {};
+function useMounted(): boolean {
+  return useSyncExternalStore(subscribeNoop, () => true, () => false);
+}
+
 function supportsWebGL(): boolean {
   if (typeof window === "undefined") return false;
   try {
@@ -59,34 +66,37 @@ function supportsWebGL(): boolean {
   }
 }
 
+let webglCache: boolean | undefined;
+function useWebGL(): boolean {
+  return useSyncExternalStore(
+    subscribeNoop,
+    () => {
+      if (webglCache === undefined) webglCache = supportsWebGL();
+      return webglCache;
+    },
+    () => false,
+  );
+}
+
+function useMediaQuery(query: string): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const list = window.matchMedia(query);
+      list.addEventListener("change", onChange);
+      return () => list.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
+}
+
 export default function MovementFieldHero() {
   // Start with the poster so SSR markup matches the first client paint and the
   // hero space is reserved (no layout shift). We upgrade to WebGL after mount.
-  const [mounted, setMounted] = useState(false);
-  const [webgl, setWebgl] = useState(false);
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [compact, setCompact] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setWebgl(supportsWebGL());
-
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const compactQuery = window.matchMedia("(max-width: 640px)");
-
-    const sync = () => {
-      setReducedMotion(motionQuery.matches);
-      setCompact(compactQuery.matches);
-    };
-    sync();
-
-    motionQuery.addEventListener("change", sync);
-    compactQuery.addEventListener("change", sync);
-    return () => {
-      motionQuery.removeEventListener("change", sync);
-      compactQuery.removeEventListener("change", sync);
-    };
-  }, []);
+  const mounted = useMounted();
+  const webgl = useWebGL();
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const compact = useMediaQuery("(max-width: 640px)");
 
   if (!mounted || !webgl) {
     return <StaticPoster />;

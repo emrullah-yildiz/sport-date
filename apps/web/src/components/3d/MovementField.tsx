@@ -215,13 +215,19 @@ function ParticleField({ count, reducedMotion }: { count: number; reducedMotion:
     const angles = new Float32Array(count);
     const speeds = new Float32Array(count);
     const heights = new Float32Array(count);
+    // Deterministic, seeded pseudo-random (pure: a hash of the index) so the
+    // particle layout is stable across renders and the factory stays pure.
+    const prng = (seed: number) => {
+      const x = Math.sin(seed) * 43758.5453;
+      return x - Math.floor(x);
+    };
     for (let i = 0; i < count; i++) {
-      const r = 2.6 + Math.random() * 2.6;
-      const a = Math.random() * Math.PI * 2;
-      const h = (Math.random() - 0.5) * 3.2;
+      const r = 2.6 + prng(i * 12.9898 + 0.1) * 2.6;
+      const a = prng(i * 78.233 + 0.2) * Math.PI * 2;
+      const h = (prng(i * 37.719 + 0.3) - 0.5) * 3.2;
       radii[i] = r;
       angles[i] = a;
-      speeds[i] = (0.04 + Math.random() * 0.12) * (Math.random() > 0.5 ? 1 : -1);
+      speeds[i] = (0.04 + prng(i * 95.137 + 0.4) * 0.12) * (prng(i * 4.531 + 0.5) > 0.5 ? 1 : -1);
       heights[i] = h;
       positions[i * 3] = Math.cos(a) * r;
       positions[i * 3 + 1] = h;
