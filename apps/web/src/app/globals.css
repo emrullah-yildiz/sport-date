@@ -335,6 +335,10 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 
 .btn-primary, .btn-secondary { min-height: 52px; padding: 12px 24px; border: none; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: all 200ms ease; }
 
+.btn-primary:focus-visible, .btn-secondary:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) { .btn-primary, .btn-secondary { transition: none; }.btn-primary:hover:not(:disabled) { transform: none; } }
+
 .btn-primary { background: #17241d; color: white; }
 
 .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(23,36,29,.2); }

@@ -1,12 +1,12 @@
 # CX-20260630-moderation-route-renders-unbranded-default-404
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Customer journey: A signed-in member (without moderator role) navigates to `/moderation`.
 - Surface: `web`
 - Environment and viewport/device: Local dev, Chromium, all widths (1920/1440/1024/768/390).
 - Found by: Visual QA
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `none found`
 
 ## Customer outcome
@@ -57,3 +57,4 @@ Cosmetic + trust. No privacy/authorization leak (the gate holds; no moderator co
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
+- `2026-06-30 21:10 EEST` - Experience Build Agent picked up; status `in-progress`.
