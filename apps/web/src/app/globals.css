@@ -227,10 +227,14 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 .sports-section { background: var(--ink); color: #fff; border-radius: var(--radius-lg); }
 .sports-section .section-title { color: #fff; }
 .sports-section .section-lede { color: #c4d0c7; }
-.sports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.sport-chip { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-radius: var(--radius); background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); }
-.sport-chip .emoji { font-size: 22px; line-height: 1; }
-.sport-chip span:last-child { font-size: 15px; font-weight: 600; }
+/* Scoped to .sports-section so the sign-up `.sports-grid` rule below can't
+   clobber it. Flex-wrap, not a fixed-column grid: chips size to their own
+   content so variable-length single-word labels (Basketball, Bouldering) never
+   overflow a too-narrow column. */
+.sports-section .sports-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+.sport-chip { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 12px; padding: 16px 18px; border-radius: var(--radius); background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .1); }
+.sport-chip .emoji { font-size: 22px; line-height: 1; flex: 0 0 auto; }
+.sport-chip span:last-child { font-size: 15px; font-weight: 600; white-space: nowrap; }
 .sport-chip.add { background: var(--lime); border-color: transparent; color: var(--ink); }
 .sports-note { margin: 26px 0 0; color: #c4d0c7; font-size: var(--fs-small); }
 
