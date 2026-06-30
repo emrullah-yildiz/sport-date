@@ -1,187 +1,249 @@
-"use client";
-
-import dynamic from "next/dynamic";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { useRef, useSyncExternalStore } from "react";
 
-const subscribeNoop = () => () => {};
-
-/**
- * True only after the component has mounted/hydrated on the client. Used to
- * gate framer-motion entrance animations behind progressive enhancement: the
- * server (and any no-JS / pre-hydration paint) renders fully visible content,
- * and the animated entrance is layered on only once we're safely on the
- * client. This keeps hero copy visible by default and avoids the SSR/client
- * style mismatch that an `initial={{ opacity: 0 }}` would otherwise cause.
- *
- * Implemented with `useSyncExternalStore` (getServerSnapshot => false,
- * getSnapshot => true) so React itself draws the SSR/client boundary — the
- * hydration-safe idiom for "are we on the client yet?".
- */
-function useMounted() {
-  return useSyncExternalStore(
-    subscribeNoop,
-    () => true,
-    () => false,
-  );
-}
-
-const MovementFieldHero = dynamic(() => import("@/components/3d/MovementFieldHero"), {
-  ssr: false,
-});
-
-function Reveal({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const mounted = useMounted();
-  const visible = useInView(ref, { once: true, margin: "-100px" });
-  // Before hydration we render at full opacity (no `initial` hidden state), so
-  // the content is never invisible without JS and SSR markup matches the first
-  // client paint. The scroll-reveal is enhancement only.
-  if (!mounted) {
-    return <div ref={ref}>{children}</div>;
-  }
-  return (
-    <motion.div ref={ref} initial={{ opacity: 0, y: 32 }} animate={visible ? { opacity: 1, y: 0 } : undefined}>
-      {children}
-    </motion.div>
-  );
-}
+export const metadata: Metadata = {
+  title: "Sport Date — Meet through movement",
+  description:
+    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults only, Europe first.",
+};
 
 const steps = [
-  { number: "01", title: "Build your profile", description: "Choose your sports, level, language, and the connections you want." },
-  { number: "02", title: "Discover events", description: "Find small activities nearby without exposing anyone's exact location." },
-  { number: "03", title: "Request a place", description: "Hosts review requests before private event details become visible." },
-  { number: "04", title: "Meet through movement", description: "Use the shared activity to make the first meeting feel natural." },
+  {
+    number: "STEP 01",
+    title: "Build your profile",
+    description:
+      "Pick the sports you play, your level, and whether you're open to dating, friendship, or just a good group to move with.",
+  },
+  {
+    number: "STEP 02",
+    title: "Discover activities nearby",
+    description:
+      "Browse small local events with the level, time, approximate area, and intentions clear — before you commit, and without exact addresses on display.",
+  },
+  {
+    number: "STEP 03",
+    title: "Request a place & meet",
+    description:
+      "Send a request to the host. Once they accept, the private meeting details unlock, and the shared activity does the work of breaking the ice.",
+  },
 ];
 
-const safetyFeatures = [
-  { icon: "18+", title: "Adults only", description: "The initial product is designed exclusively for adults." },
-  { icon: "LOC", title: "Private by default", description: "Exact meeting details stay hidden until a request is accepted." },
-  { icon: "CTL", title: "Member controls", description: "Blocking, reporting, and moderation are part of the product baseline." },
-  { icon: "EU", title: "Europe first", description: "Privacy and safety requirements shape the product from day one." },
+const sports = [
+  { emoji: "🏃", name: "Running" },
+  { emoji: "🎾", name: "Tennis" },
+  { emoji: "🏓", name: "Padel" },
+  { emoji: "⚽", name: "Football" },
+  { emoji: "🏀", name: "Basketball" },
+  { emoji: "🧗", name: "Bouldering" },
+  { emoji: "🧘", name: "Yoga" },
+  { emoji: "🚴", name: "Cycling" },
+  { emoji: "🏊", name: "Swimming" },
+  { emoji: "🏓", name: "Table tennis" },
+  { emoji: "🏸", name: "Badminton" },
+  { emoji: "♟️", name: "Chess" },
+];
+
+const safety = [
+  {
+    badge: "18+",
+    title: "Adults only",
+    description: "The product is built exclusively for adults. No minors, by design.",
+  },
+  {
+    badge: "AREA",
+    title: "Approximate until accepted",
+    description:
+      "Discovery shows only an approximate area. Precise meeting details stay hidden until a host accepts your request.",
+  },
+  {
+    badge: "CTRL",
+    title: "Block & report built in",
+    description:
+      "Blocking and reporting are part of the baseline, with a moderation queue behind them — not an afterthought bolted on later.",
+  },
+  {
+    badge: "EU",
+    title: "Privacy-first, Europe first",
+    description:
+      "We launch in one dense European city first, with privacy and safety shaping the product from day one rather than after the fact.",
+  },
 ];
 
 export default function LandingPage() {
-  const prefersReducedMotion = useReducedMotion();
-  const mounted = useMounted();
-  const { scrollY } = useScroll();
-  const titleY = useTransform(scrollY, [0, 300], [0, prefersReducedMotion ? 0 : -42]);
-  const titleOpacity = useTransform(scrollY, [0, 300], [1, prefersReducedMotion ? 1 : 0.35]);
-
-  // Tasteful staggered entrance for the hero copy. Reduced-motion collapses it
-  // to a plain fade with no movement.
-  const enter = prefersReducedMotion
-    ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
-    : {
-        hidden: { opacity: 0, y: 24 },
-        show: { opacity: 1, y: 0 },
-      };
-  const heroStagger = {
-    hidden: {},
-    show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.12, delayChildren: 0.1 } },
-  };
-
-  // Progressive enhancement: the server and the first client paint render the
-  // hero copy as plain, animation-free HTML (no `motion.*`, no `initial`/
-  // `animate`, no inline opacity/transform). framer-motion `motion.*` elements
-  // serialize their resolved inline styles differently on server vs client
-  // (e.g. `opacity:1` number vs `opacity:"1"` + `transform:"none"`), which is
-  // exactly the hydration mismatch reported on the reduced-motion path. By
-  // emitting identical static markup on both passes, the SSR HTML and the first
-  // client render are byte-identical in every motion setting. Only after mount
-  // do we swap in the `motion.*` versions so the entrance plays once,
-  // client-side only — pure post-hydration enhancement.
-
   return (
     <main className="landing-page">
-      <nav className="navbar" aria-label="Primary navigation">
+      <header className="navbar">
         <div className="nav-container">
-          <Link className="logo" href="/landing">Sport Date</Link>
+          <Link className="logo" href="/landing">
+            <span className="logo-mark" aria-hidden="true">S</span>
+            Sport Date
+          </Link>
+          <nav className="nav-links" aria-label="Primary">
+            <a href="#how-it-works">How it works</a>
+            <a href="#sports">Sports</a>
+            <a href="#safety">Safety</a>
+          </nav>
           <div className="landing-nav-actions">
             <Link href="/login" className="nav-signin">Sign in</Link>
-            <Link href="/signup" className="nav-cta">Create a profile</Link>
+            <Link href="/signup" className="btn btn--accent">Create a profile</Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      <section className="hero-section">
-        {mounted ? (
-          <motion.div
-            className="hero-content"
-            style={{ y: titleY, opacity: titleOpacity }}
-            variants={heroStagger}
-            initial="hidden"
-            animate="show"
-          >
-            <motion.p className="eyebrow" variants={enter}>Meet through movement</motion.p>
-            <motion.h1 className="hero-title" variants={enter}>Find people who share your <span className="gradient-text">passion for sports</span></motion.h1>
-            <motion.p className="hero-subtitle" variants={enter}>Discover local activities, request a place, and meet compatible people around something you already enjoy.</motion.p>
-            <motion.div className="hero-cta" variants={enter}><Link href="/signup" className="btn-hero">Start your profile</Link></motion.div>
-            <motion.p className="microcopy" variants={enter}>Private beta · Adults only · Europe first</motion.p>
-          </motion.div>
-        ) : (
+      <div className="landing-shell">
+        <section className="hero-section" aria-labelledby="hero-title">
           <div className="hero-content">
             <p className="eyebrow">Meet through movement</p>
-            <h1 className="hero-title">Find people who share your <span className="gradient-text">passion for sports</span></h1>
-            <p className="hero-subtitle">Discover local activities, request a place, and meet compatible people around something you already enjoy.</p>
-            <div className="hero-cta"><Link href="/signup" className="btn-hero">Start your profile</Link></div>
+            <h1 id="hero-title" className="hero-title">
+              Meet people through a real game, <span className="accent">not another profile.</span>
+            </h1>
+            <p className="hero-subtitle">
+              Sport Date organises the first encounter around a small local sport — a run, a padel
+              match, a chess game. Know the level, time, area, and intentions before you request a
+              place.
+            </p>
+            <div className="hero-cta">
+              <Link href="/signup" className="btn btn--primary btn--lg">Create a profile</Link>
+              <a href="#how-it-works" className="btn btn--secondary btn--lg">See how it works</a>
+            </div>
             <p className="microcopy">Private beta · Adults only · Europe first</p>
           </div>
-        )}
-        {mounted ? (
-          <motion.div
-            className="hero-3d"
-            initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: prefersReducedMotion ? 0.4 : 0.9, ease: "easeOut" }}
-            aria-hidden="true"
-          >
-            <MovementFieldHero />
-          </motion.div>
-        ) : (
-          <div className="hero-3d" aria-hidden="true">
-            <MovementFieldHero />
-          </div>
-        )}
-      </section>
 
-      <section className="how-it-works">
-        <Reveal>
-          <div className="section-container">
-            <p className="eyebrow">How it works</p>
-            <h2 className="section-title">Less swiping. More living.</h2>
-            <div className="steps-grid">{steps.map((step) => <article className="step-card" key={step.number}><div className="step-number">{step.number}</div><h3>{step.title}</h3><p>{step.description}</p></article>)}</div>
-          </div>
-        </Reveal>
-      </section>
-
-      <section className="why-section">
-        <Reveal>
-          <div className="section-container">
-            <p className="eyebrow">Safety is product work</p>
-            <h2 className="section-title">Built for real-world meetings.</h2>
-            <div className="why-grid">{safetyFeatures.map((feature) => <article className="why-card" key={feature.title}><span className="why-icon">{feature.icon}</span><h3>{feature.title}</h3><p>{feature.description}</p></article>)}</div>
-            <div className="trust-preview-callout">
-              <p>Want the honest version of our trust posture?</p>
-              <Link href="/trust">Read the Trust preview</Link>
+          <div className="hero-visual" aria-hidden="true">
+            <div className="preview-card">
+              <div className="preview-head">
+                <strong>Near you this week</strong>
+                <span>4 events</span>
+              </div>
+              <div className="preview-event">
+                <span className="preview-event-icon">🏃</span>
+                <div>
+                  <h3>Easy 5K + coffee</h3>
+                  <p>Sat 09:00 · Beginner · ~Floreasca</p>
+                </div>
+                <span className="preview-spots">2 spots</span>
+              </div>
+              <div className="preview-event">
+                <span className="preview-event-icon">🏓</span>
+                <div>
+                  <h3>4-player padel</h3>
+                  <p>Tue 19:30 · Intermediate · ~Aviatorilor</p>
+                </div>
+                <span className="preview-spots">1 spot</span>
+              </div>
+              <div className="preview-event">
+                <span className="preview-event-icon">♟️</span>
+                <div>
+                  <h3>Casual chess night</h3>
+                  <p>Thu 18:00 · All levels · ~Herastrau</p>
+                </div>
+                <span className="preview-spots">3 spots</span>
+              </div>
+              <p className="preview-foot">Exact location shared after the host accepts</p>
             </div>
           </div>
-        </Reveal>
+        </section>
+      </div>
+
+      <section id="how-it-works" className="landing-section how-section" aria-labelledby="how-title">
+        <div className="landing-shell">
+          <div className="section-head">
+            <p className="eyebrow">How it works</p>
+            <h2 id="how-title" className="section-title">Three steps from sign-up to a real meeting.</h2>
+            <p className="section-lede">
+              No infinite feed, no auditioning through chat. You join something you already want to do.
+            </p>
+          </div>
+          <div className="steps-grid">
+            {steps.map((step) => (
+              <article className="step-card" key={step.number}>
+                <p className="step-number">{step.number}</p>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="cta-section">
-        <div className="cta-card"><h2>Ready to find your next game?</h2><p>Build a private beta profile and help shape the experience.</p><Link href="/signup" className="btn-cta">Create a profile</Link></div>
+      <div className="landing-shell">
+        <section id="sports" className="landing-section sports-section" aria-labelledby="sports-title">
+          <div className="landing-shell">
+            <div className="section-head">
+              <p className="eyebrow" style={{ color: "var(--lime)" }}>A sport for everyone</p>
+              <h2 id="sports-title" className="section-title">From a 5K to a chess board.</h2>
+              <p className="section-lede">
+                Every kind of sportive meet-up — physical or mind sport. If your game isn&apos;t here, host it.
+              </p>
+            </div>
+            <ul className="sports-grid" aria-label="Supported activities">
+              {sports.map((sport) => (
+                <li className="sport-chip" key={sport.name}>
+                  <span className="emoji" aria-hidden="true">{sport.emoji}</span>
+                  <span>{sport.name}</span>
+                </li>
+              ))}
+              <li className="sport-chip add">
+                <span className="emoji" aria-hidden="true">＋</span>
+                <span>Add your own</span>
+              </li>
+            </ul>
+            <p className="sports-note">
+              Chess counts — meeting over a board is as real as meeting over a run.
+            </p>
+          </div>
+        </section>
+      </div>
+
+      <section id="safety" className="landing-section" aria-labelledby="safety-title">
+        <div className="landing-shell">
+          <div className="section-head">
+            <p className="eyebrow">Safety is product work</p>
+            <h2 id="safety-title" className="section-title">Built for meeting strangers, carefully.</h2>
+            <p className="section-lede">
+              Trust comes from how the product behaves, not from badges. Here is the honest posture today.
+            </p>
+          </div>
+          <div className="safety-grid">
+            {safety.map((item) => (
+              <article className="safety-card" key={item.title}>
+                <span className="badge">{item.badge}</span>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </article>
+            ))}
+          </div>
+          <p className="safety-honest">
+            Being honest: this is an early product. There is no open one-to-one messaging yet, and we
+            don&apos;t claim identity verification or any safety guarantee. Read the full, unvarnished
+            version in our <Link href="/trust">Trust statement</Link>.
+          </p>
+        </div>
+      </section>
+
+      <section className="final-cta" aria-labelledby="cta-title">
+        <h2 id="cta-title">Stop performing. Start playing.</h2>
+        <p>
+          Create a private beta profile, pick your sports, and help shape how adults meet through
+          movement.
+        </p>
+        <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
       </section>
 
       <footer className="landing-footer">
         <div className="landing-footer-shell">
-          <p>Preview-era product boundaries, not final legal approval.</p>
-          <nav aria-label="Legal links">
-            <Link href="/trust">Trust preview</Link>
-            <Link href="/terms">Terms preview</Link>
-            <Link href="/privacy">Privacy Notice preview</Link>
-            <Link href="/safety-guidelines">Safety Guidelines</Link>
+          <div className="landing-footer-brand">
+            <span className="logo">
+              <span className="logo-mark" aria-hidden="true">S</span>
+              Sport Date
+            </span>
+            <p>Meet through movement. Adults only · Europe first.</p>
+          </div>
+          <nav aria-label="Legal and policy links">
+            <Link href="/terms">Terms</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/safety-guidelines">Safety guidelines</Link>
+            <Link href="/trust">Trust</Link>
           </nav>
         </div>
       </footer>
