@@ -20,7 +20,12 @@ describe("registration validation", () => {
   it("rejects invalid calendar dates and underage users", () => {
     expect(ageOnDate("2008-06-30", new Date("2026-06-29T12:00:00Z"))).toBe(17);
     expect(ageOnDate("2000-02-30", new Date("2026-06-29T12:00:00Z"))).toBeNull();
-    expect(validateRegistration({ ...validInput, dateOfBirth: "2008-06-30" }).valid).toBe(false);
+    expect(
+      validateRegistration(
+        { ...validInput, dateOfBirth: "2008-06-30" },
+        new Date("2026-06-29T12:00:00Z"),
+      ).valid,
+    ).toBe(false);
   });
 
   it("requires explicit terms acceptance and at least one sport", () => {
