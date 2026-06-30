@@ -107,8 +107,10 @@ export default function SignUpForm() {
 
         {error ? <div className="error-message" role="alert">{error}</div> : null}
 
-        <div className="signup-actions">
-          <button className="btn-secondary" type="button" onClick={handlePrev} disabled={step === 1}>Back</button>
+        <div className={`signup-actions${step === 1 ? " single" : ""}`}>
+          {step > 1 ? (
+            <button className="btn-secondary" type="button" onClick={handlePrev}>Back</button>
+          ) : null}
           {step < steps.length ? (
             <button className="btn-primary" type="button" onClick={handleNext}>Next</button>
           ) : (
