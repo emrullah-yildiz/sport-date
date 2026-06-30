@@ -1,6 +1,6 @@
 # CX-20260630-session-management-web-session-not-listed
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Customer journey: Account security — reviewing and signing out my signed-in devices/sessions from the profile
 - Surface: `web`
@@ -61,7 +61,7 @@ Practical: a web member who used a shared/public computer, or who suspects their
 - [x] A signed-in web member can see at least their current web session in the "Account security" panel (or is clearly told, without internal terminology, that web sessions are ended by signing out / resetting the password and why).
 - [x] If web sessions are listed, the member can revoke a session and sees a confirmation; a revoked session can no longer access the account.
 - [x] The empty state no longer implies "you have no active sessions" while the member is signed in.
-- [ ] The mobile and web layouts of the panel remain usable (verified at 390px and desktop). _(implemented to design system + 390px CSS; customer retest for visual confirmation.)_
+- [x] The mobile and web layouts of the panel remain usable (verified at 390px and desktop). _(Customer-retested 2026-06-30: panel renders cleanly at 1280px and 390px with no horizontal overflow; "This device" badge, sign-out, and per-session "End session" controls all visible and usable.)_
 - [x] Keyboard, screen-reader naming, and focus are correct for any new list/revoke controls.
 - [x] No access or refresh credentials are exposed for any session.
 - [x] Relevant automated tests and repository checks pass.
@@ -77,3 +77,10 @@ Practical: a web member who used a shared/public computer, or who suspects their
   - Tests (DB mocked): `web-sessions.test.ts` (list returns only safe metadata + no token, isCurrent matched by hashed cookie, user/active scoping, revoke deletes scoped to owner, wasCurrent signal, not-revoked for another user's id) and route tests for `GET` (401, isCurrent, no token, no-store) and `[id] DELETE` (CSRF 403, 401, malformed-id 404, own-session revoke, non-owner 404, current-session sign-out clears cookie). 13 new tests.
   - Checks: `npx eslint src/` → 0; `npm run typecheck` → green; `npm test` → 144 passed / 12 skipped (3 new files, 13 new tests); `npm run build --workspace @sport-date/web` → compiled on Turbopack with both routes registered.
   - Left for QA retest: real-browser flow (log in → see this session → revoke another → it's gone → revoke current → signed out) and the 390px/desktop visual check.
+- `2026-06-30 18:11 GTBDT` - Independently retested by Customer Experience Agent (QA owner) on the real dev server (`http://localhost:3000`, dev Neon branch, Chromium/Playwright). Status → `verified`. All five web-session checks PASS on a synthetic `qa+websess-...@sport-date.invalid` adult:
+  1. **This-session listing** — After registering/landing on `/profile`, the new "Signed-in browsers" panel lists exactly this session with a "This device" badge and a "Signed in … · expires …" line. DOM scan of the panel HTML found NO uuid-like or 32+ hex-char token/id (`uuidInDom=false longHexInDom=false`). PASS.
+  2. **Second session appears** — Logging in as the same member in a second browser context, then reloading context 1's panel, shows 2 rows with exactly one "This device" badge. PASS.
+  3. **Revoke the OTHER (non-current) session — core security promise** — From context 1, ending the non-current row drops the panel to 1 row (still "This device"), and context 2's very next request to `/profile` redirects to `/login` (`ctx2 url after revoke = …/login`). The revoked session is genuinely locked out, not merely hidden. PASS.
+  4. **Revoke the current session ("Sign out this browser")** — From context 1, signing out this browser shows a calm "This browser has been signed out. Redirecting to sign in…" message and redirects to `/login`; the auth cookie is cleared (a subsequent `/profile` request still lands on `/login`). PASS.
+  5. **Mobile 390px + mislabel fix** — At 390px the web panel is usable with no horizontal overflow, and the mobile-session panel's empty state now reads "No Sport Date mobile app is signed in to your account. Your browser sessions are managed above." — the old misleading "No mobile device sessions yet." is gone. PASS.
+  - Console/page/server signal: 0 console errors, 0 uncaught page errors, 0 HTTP ≥500 across all profile loads in the retest. Regression pass of the 10 core workflows (`apps/web/qa/full-flows.mjs`) returned 0 defects / 24 strengths / 0 console errors. Evidence: screenshots `01..06-*` in the QA retest scratchpad dir (redacted; synthetic adult only). All acceptance criteria now pass on the web surface (mobile-native revocation remains untestable without a native client, as originally noted).
