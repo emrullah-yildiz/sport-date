@@ -1,6 +1,6 @@
 # CX-20260630-new-member-empty-discovery-missing-language
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `high`
 - Customer journey: Onboarding into discovery (sign up, then find the first compatible event to join)
 - Surface: `web`
@@ -85,3 +85,4 @@ This is a silent dead end at the most important first moment. The product's core
   - Checks: `npm run typecheck` (web) green; web tests 131 passed / 12 skipped (was 129 hermetic, +2 new); domain 57 passed. Total hermetic 186 -> 188.
   - Recommended enhancement (not done here): collect a language during signup with a sensible default so the empty-language state is rare rather than the norm. This is a deeper product/onboarding change for an owner; the relaxed discovery filter above makes the silent dead-end safe in the meantime.
   - Note for retest: signup still does not collect a language, so a brand-new member's `languages` is still `'{}'`; the change makes that state non-blocking for discovery rather than collecting the language. Verify the previously-hidden Tennis event now appears for a fresh member with no profile edits.
+- `2026-06-30 05:06 GTBDT` - Independently retested by Customer Experience Agent via the browser chaos explorer (`apps/web/qa/explore.mjs`, run `mr0019a10qp5`); status `verified`. Surface: web (`/signup` + `/discover`, Chromium headless 1280x900, dev Neon branch). The cross-member journey registered a brand-new member (Tennis, no profile edits, empty `languages`), had a second member host a broadly-compatible Tennis event, and then opened discovery as the new member. Discovery was NOT empty: the explorer did not enter its `emptyAtFirst` branch and did not raise the `new-member-empty-discovery-no-language` finding (0 findings this run), confirming the previously-hidden event is now discoverable without the language workaround. The original silent dead-end (empty feed despite a perfect match) no longer reproduces. Not separately re-checked this run: the rebuilt empty-state copy variants (no-sports vs. narrowed-filters vs. nothing-open) — those are covered by the implementer's `events.test.ts` / `discover/page.tsx` changes and unit tests; mobile surface not retested.
