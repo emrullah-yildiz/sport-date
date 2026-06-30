@@ -72,9 +72,13 @@ select {
   -moz-appearance: none;
   /* Custom chevron (inline SVG, --ink stroke). Reserve room on the right so
      option text never sits under the arrow. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2317241d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
+  /* !important so per-surface `background: white` shorthands (discover, feedback,
+     edit-profile, safety, moderation, reflection, …) can't reset the chevron to
+     none, repeat, or top-left — leaving selects with no dropdown affordance. The
+     shorthand still sets the (white) background-color underneath. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2317241d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
   padding-right: 38px !important;
   cursor: pointer;
 }
