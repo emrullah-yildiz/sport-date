@@ -1,0 +1,2 @@
+# QA explorer outputs are evidence, not source. Keep them out of Git.
+artifacts/

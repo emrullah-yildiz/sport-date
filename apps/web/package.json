@@ -10,6 +10,7 @@
     "db:cleanup-sessions": "node --env-file-if-exists=../../.env ./scripts/cleanup-sessions.mjs",
     "test": "vitest run",
     "test:integration": "node --env-file-if-exists=../../.env ./scripts/test-integration.mjs",
+    "qa:explore": "node --env-file-if-exists=../../.env ./qa/explore.mjs",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit"
   },
@@ -29,6 +30,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
