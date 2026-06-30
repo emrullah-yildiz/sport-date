@@ -1,12 +1,28 @@
-# Legal draft set — compliance preparation for counsel
+# Legal draft set — SUPERSEDED by the finalized documents in `docs/legal/`
 
-> **STATUS: DRAFTS — every document here requires qualified EU counsel review
-> before any use.** These are *compliance preparation* artifacts written by the
-> product team so that engaging counsel starts from grounded, reviewable text
-> instead of a blank page. They are **not** legal advice, **not** approved, and
-> must **not** be published, shown to users, accepted, or relied upon until
-> counsel has reviewed, corrected, and approved them for the selected launch
-> jurisdiction.
+> **STATUS: SUPERSEDED (2026-06-30).** These drafts have been promoted to
+> **owner-approved, finalized** documents that now live one level up in
+> `docs/legal/` and are the **canonical** legal set. Start at
+> [`../README.md`](../README.md), and read the finalized documents:
+> [`../privacy-notice.md`](../privacy-notice.md),
+> [`../terms-of-service.md`](../terms-of-service.md),
+> [`../safety-community-guidelines.md`](../safety-community-guidelines.md), and
+> [`../consent-copy.md`](../consent-copy.md). The finalized versions are
+> owner-approved as of 2026-06-30; they are **not** legal advice and have **not**
+> been lawyer-reviewed, and independent qualified-EU-counsel review remains
+> recommended before relying on them in a dispute. The files in this folder are kept
+> only for history.
+>
+> The original draft framing is retained below for reference.
+>
+> ---
+>
+> **STATUS (historical): DRAFTS — every document here requires qualified EU counsel
+> review before any use.** These were *compliance preparation* artifacts written by
+> the product team so that engaging counsel starts from grounded, reviewable text
+> instead of a blank page. They were **not** legal advice, **not** approved, and
+> were not to be published, shown to users, accepted, or relied upon until counsel
+> reviewed, corrected, and approved them for the selected launch jurisdiction.
 
 This set exists to unblock **Gate 2 (EU counsel sign-off)** in
 `docs/operations/owner-escalation.md`: it converts the prepared groundwork in

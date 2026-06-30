@@ -2,12 +2,15 @@
 
 This document is product and compliance preparation, not legal advice. A qualified lawyer must review the final policy, lawful bases, retention periods, notices, and operational procedure for the selected launch countries.
 
-> **Reviewable draft artifacts for counsel.** The GDPR-baseline draft set in
-> `docs/legal/drafts/` (Privacy Notice, Terms of Service, and consent/disclosure
-> copy) turns this preparation into reviewable documents. Those drafts are clearly
-> labelled "DRAFT — requires qualified EU counsel review", are grounded in the data
-> flows and retention matrix below, and must not contradict this document. Start at
-> `docs/legal/drafts/README.md`.
+> **Finalized legal documents (2026-06-30).** The GDPR-baseline legal set in
+> `docs/legal/` (Privacy Notice, Terms of Service, Safety & Community Guidelines, and
+> consent/disclosure copy) turns this preparation into the product's **owner-approved
+> operational** documents. They are headed "PUBLISHED — owner-approved as of
+> 2026-06-30", are grounded in the data flows and retention matrix below, and must
+> not contradict this document. They are **not** legal advice and have **not** been
+> lawyer-reviewed; independent qualified-EU-counsel review remains recommended before
+> relying on them in a dispute. Start at `docs/legal/README.md`. (The earlier
+> `docs/legal/drafts/` versions are superseded and kept only for history.)
 
 ## Official baseline
 
