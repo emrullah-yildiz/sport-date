@@ -2,12 +2,11 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { Suspense, useRef } from "react";
+import { motion, useInView, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
-const RotatingSportsBall = dynamic(() => import("@/components/3d/RotatingSportsBall"), {
+const MovementFieldHero = dynamic(() => import("@/components/3d/MovementFieldHero"), {
   ssr: false,
-  loading: () => <div className="placeholder-3d">Loading interactive preview…</div>,
 });
 
 function Reveal({ children }: { children: React.ReactNode }) {
@@ -31,9 +30,23 @@ const safetyFeatures = [
 ];
 
 export default function LandingPage() {
+  const prefersReducedMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const titleY = useTransform(scrollY, [0, 300], [0, -42]);
-  const titleOpacity = useTransform(scrollY, [0, 300], [1, 0.35]);
+  const titleY = useTransform(scrollY, [0, 300], [0, prefersReducedMotion ? 0 : -42]);
+  const titleOpacity = useTransform(scrollY, [0, 300], [1, prefersReducedMotion ? 1 : 0.35]);
+
+  // Tasteful staggered entrance for the hero copy. Reduced-motion collapses it
+  // to a plain fade with no movement.
+  const enter = prefersReducedMotion
+    ? { hidden: { opacity: 0 }, show: { opacity: 1 } }
+    : {
+        hidden: { opacity: 0, y: 24 },
+        show: { opacity: 1, y: 0 },
+      };
+  const heroStagger = {
+    hidden: {},
+    show: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.12, delayChildren: 0.1 } },
+  };
 
   return (
     <main className="landing-page">
@@ -48,15 +61,27 @@ export default function LandingPage() {
       </nav>
 
       <section className="hero-section">
-        <motion.div className="hero-content" style={{ y: titleY, opacity: titleOpacity }}>
-          <p className="eyebrow">Meet through movement</p>
-          <h1 className="hero-title">Find people who share your <span className="gradient-text">passion for sports</span></h1>
-          <p className="hero-subtitle">Discover local activities, request a place, and meet compatible people around something you already enjoy.</p>
-          <div className="hero-cta"><Link href="/signup" className="btn-hero">Start your profile</Link></div>
-          <p className="microcopy">Private beta · Adults only · Europe first</p>
+        <motion.div
+          className="hero-content"
+          style={{ y: titleY, opacity: titleOpacity }}
+          variants={heroStagger}
+          initial="hidden"
+          animate="show"
+        >
+          <motion.p className="eyebrow" variants={enter}>Meet through movement</motion.p>
+          <motion.h1 className="hero-title" variants={enter}>Find people who share your <span className="gradient-text">passion for sports</span></motion.h1>
+          <motion.p className="hero-subtitle" variants={enter}>Discover local activities, request a place, and meet compatible people around something you already enjoy.</motion.p>
+          <motion.div className="hero-cta" variants={enter}><Link href="/signup" className="btn-hero">Start your profile</Link></motion.div>
+          <motion.p className="microcopy" variants={enter}>Private beta · Adults only · Europe first</motion.p>
         </motion.div>
-        <motion.div className="hero-3d" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }}>
-          <Suspense fallback={<div className="placeholder-3d">Loading interactive preview…</div>}><RotatingSportsBall /></Suspense>
+        <motion.div
+          className="hero-3d"
+          initial={{ opacity: 0, scale: prefersReducedMotion ? 1 : 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: prefersReducedMotion ? 0.4 : 0.9, ease: "easeOut" }}
+          aria-hidden="true"
+        >
+          <MovementFieldHero />
         </motion.div>
       </section>
 

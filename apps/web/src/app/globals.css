@@ -70,9 +70,25 @@ a { color: inherit; text-decoration: none; }
 
 .btn-hero:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(23,36,29,.25); }
 
-.hero-3d { position: relative; height: 600px; border-radius: 32px; overflow: hidden; background: linear-gradient(135deg, rgba(201,244,88,.1) 0%, rgba(255,118,95,.05) 100%); }
+.hero-3d { position: relative; height: 600px; border-radius: 32px; overflow: hidden; background: radial-gradient(120% 120% at 30% 25%, rgba(201,244,88,.18) 0%, rgba(255,118,95,.08) 45%, rgba(23,36,29,.06) 100%); box-shadow: inset 0 0 80px rgba(23,36,29,.06); touch-action: pan-y; }
 
 .placeholder-3d { display: flex; align-items: center; justify-content: center; height: 100%; color: #667169; font-size: 14px; }
+
+/* Static CSS poster: shown while the 3D scene loads, when WebGL is
+   unavailable, or if the canvas errors. Mirrors the scene's composition
+   (a glowing core ringed by orbiting energy orbs) so the fallback still
+   feels on-brand and reserves the hero space (no layout shift). */
+.movement-poster { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; }
+.movement-poster-core { position: absolute; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #2a4f3d 0%, #17241d 70%); box-shadow: 0 0 60px rgba(201,244,88,.35), inset -10px -10px 30px rgba(0,0,0,.4); }
+.movement-poster-orb { position: absolute; border-radius: 50%; filter: blur(.2px); }
+.movement-poster-orb--1 { width: 70px; height: 70px; background: radial-gradient(circle at 35% 30%, #e7ffa6, #c9f458); box-shadow: 0 0 40px rgba(201,244,88,.6); transform: translate(-150px, -90px); animation: poster-float-a 7s ease-in-out infinite; }
+.movement-poster-orb--2 { width: 52px; height: 52px; background: radial-gradient(circle at 35% 30%, #ffb4a3, #ff765f); box-shadow: 0 0 36px rgba(255,118,95,.55); transform: translate(150px, 70px); animation: poster-float-b 9s ease-in-out infinite; }
+.movement-poster-orb--3 { width: 40px; height: 40px; background: radial-gradient(circle at 35% 30%, #ffffff, #cfe8c0); box-shadow: 0 0 28px rgba(201,244,88,.45); transform: translate(120px, -120px); animation: poster-float-a 8s ease-in-out infinite reverse; }
+@keyframes poster-float-a { 0%,100% { translate: 0 0; } 50% { translate: 14px -18px; } }
+@keyframes poster-float-b { 0%,100% { translate: 0 0; } 50% { translate: -16px 14px; } }
+@media (prefers-reduced-motion: reduce) {
+  .movement-poster-orb { animation: none !important; }
+}
 
 /* Section Styling */
 .how-it-works, .why-section, .cta-section { padding: 120px 32px; }
