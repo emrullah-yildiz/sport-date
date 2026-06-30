@@ -1,12 +1,12 @@
 # CX-20260630-session-management-web-session-not-listed
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Customer journey: Account security — reviewing and signing out my signed-in devices/sessions from the profile
 - Surface: `web`
 - Environment and viewport/device: Local dev server (`http://localhost:3000`), dev Neon branch, Chromium (Playwright) 1280x900 and 390x844. Observed 2026-06-30.
 - Found by: Customer Experience Agent (full end-to-end workflow pass, `apps/web/qa/full-flows.mjs`)
-- Implementation owner: `unassigned`
+- Implementation owner: `Claude Opus 4.8 (1M context)`
 - Related tickets: `none found`
 
 ## Customer outcome
@@ -58,14 +58,22 @@ Practical: a web member who used a shared/public computer, or who suspects their
 
 ## Acceptance criteria
 
-- [ ] A signed-in web member can see at least their current web session in the "Account security" panel (or is clearly told, without internal terminology, that web sessions are ended by signing out / resetting the password and why).
-- [ ] If web sessions are listed, the member can revoke a session and sees a confirmation; a revoked session can no longer access the account.
-- [ ] The empty state no longer implies "you have no active sessions" while the member is signed in.
-- [ ] The mobile and web layouts of the panel remain usable (verified at 390px and desktop).
-- [ ] Keyboard, screen-reader naming, and focus are correct for any new list/revoke controls.
-- [ ] No access or refresh credentials are exposed for any session.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] A signed-in web member can see at least their current web session in the "Account security" panel (or is clearly told, without internal terminology, that web sessions are ended by signing out / resetting the password and why).
+- [x] If web sessions are listed, the member can revoke a session and sees a confirmation; a revoked session can no longer access the account.
+- [x] The empty state no longer implies "you have no active sessions" while the member is signed in.
+- [ ] The mobile and web layouts of the panel remain usable (verified at 390px and desktop). _(implemented to design system + 390px CSS; customer retest for visual confirmation.)_
+- [x] Keyboard, screen-reader naming, and focus are correct for any new list/revoke controls.
+- [x] No access or refresh credentials are exposed for any session.
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-06-30` - Filed by Customer Experience Agent; status `ready`.
+- `2026-06-30` - Implemented by Claude Opus 4.8 (1M context). Status → `implemented`.
+  - Built a web-session lib (`apps/web/src/lib/web-sessions.ts`): `getWebSessions(userId, currentToken?)` lists the member's ACTIVE (not-expired) rows from `sessions` returning only safe metadata — `id`, `createdAt`, `expiresAt`, `isCurrent`. It never selects or returns `token_hash`. `isCurrent` is computed server-side by hashing the request's auth cookie (`hashSessionToken`) and matching `token_hash` in SQL; the raw token never leaves the function and is never returned. `revokeWebSession(userId, sessionId, currentToken?)` hard-`DELETE`s the row scoped to `id = ... AND user_id = ${userId}` (own-sessions-only authorization), and returns `wasCurrent` so the caller can sign the member out.
+  - Added API under `apps/web/src/app/api/account/web-sessions/`: `GET` (auth-gated list, `Cache-Control: no-store`) and `[id]` `DELETE` (revoke by UUID). DELETE mirrors the other account mutations: `isTrustedBrowserMutation` CSRF guard, `getCurrentUser` auth, UUID validation, 404 for a non-owned/missing id. Revoking the CURRENT session clears the `auth_token` cookie (`clearSessionCookie`) and returns `{ signedOut: true }` so the client redirects to `/login`.
+  - UI: new `WebSessionControls` ("Signed-in browsers" panel) added to `/profile` above the mobile panel — lists this browser + others with sign-in/expiry dates, a "This device" badge, accessible per-row revoke buttons (`aria-label`, disabled-while-pending), a calm only-browser empty state, and a `role="status"` message. Revoking the current browser shows a calm confirmation then redirects to sign in. No tokens/ids are rendered.
+  - Fixed the mislabel: the mobile panel's empty state now reads "No Sport Date mobile app is signed in to your account. Your browser sessions are managed above." instead of "No mobile device sessions yet." Mobile UI/behaviour otherwise unchanged.
+  - Tests (DB mocked): `web-sessions.test.ts` (list returns only safe metadata + no token, isCurrent matched by hashed cookie, user/active scoping, revoke deletes scoped to owner, wasCurrent signal, not-revoked for another user's id) and route tests for `GET` (401, isCurrent, no token, no-store) and `[id] DELETE` (CSRF 403, 401, malformed-id 404, own-session revoke, non-owner 404, current-session sign-out clears cookie). 13 new tests.
+  - Checks: `npx eslint src/` → 0; `npm run typecheck` → green; `npm test` → 144 passed / 12 skipped (3 new files, 13 new tests); `npm run build --workspace @sport-date/web` → compiled on Turbopack with both routes registered.
+  - Left for QA retest: real-browser flow (log in → see this session → revoke another → it's gone → revoke current → signed out) and the 390px/desktop visual check.

@@ -8,6 +8,7 @@ import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
+import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser } from "@/lib/session";
@@ -57,6 +58,7 @@ export default async function ProfilePage() {
       </section>
       <MovementArc progress={movementProgress} />
       <CommunicationPreferences preferences={communicationPreferences} />
+      <WebSessionControls />
       <MobileSessionControls />
       <EditProfileForm profile={user} />
       <PrivacyControls />
