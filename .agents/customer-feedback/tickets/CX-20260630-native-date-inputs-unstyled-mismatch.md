@@ -1,6 +1,6 @@
 # CX-20260630-native-date-inputs-unstyled-mismatch
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Customer journey: Signing up (date of birth) and hosting an event (event start time)
 - Surface: `both`
@@ -64,7 +64,7 @@ Medium-low. Nothing is blocked and no data is at risk, but the owner explicitly 
 - [x] The host-event "Starts at" field visually matches the other inputs in its section.
 - [x] 18+ validation and the inline underage error still work after any restyle.
 - [x] Keyboard entry and screen-reader labeling of the date/date-time fields remain intact.
-- [ ] Desktop (1440) and mobile (390) both render the restyled fields without overflow or clipping. (needs a real-browser screenshot pass)
+- [x] Desktop (1440) and mobile (390) both render the restyled fields without overflow or clipping. (verified in real Chromium 1440 + 390)
 - [x] No new console errors are introduced (both pages are at 0 today).
 
 Removed criteria: precise-location/data-exposure deleted — no member data is exposed by these fields.
@@ -72,4 +72,5 @@ Removed criteria: precise-location/data-exposure deleted — no member data is e
 ## Handoff and retest log
 
 - `2026-06-30 13:39 GTBDT` - Filed by Customer Experience Agent; status `ready`. Reproduced on `/signup` and `/events/new`, desktop + mobile.
+- `2026-06-30 14:02 GTBDT` - Independently retested by Customer Experience Agent (real Chromium, dev DB) at 1440 and 390; status → `verified`. Sign-up DOB and the host-event "Starts at" now read as part of the form: both compute `appearance: none`, sit at the same height/radius/border as their sibling inputs, and the native calendar glyph is dimmed/tidied (still clickable). The `.field-format-hint` line is present under both ("Date order follows your browser's region."). The inline underage error still fires: entering `2015-01-01` on Step 1 surfaced `#signup-date-of-birth-error` = "You must be 18 or older to use Sport Date." Keyboard entry intact. No overflow/clipping at 1440 or 390 (event form stacks to one column on mobile). 0 console errors on `/signup` and `/events/new`. Note (not a defect): Chromium still renders the `datetime-local` placeholder as `mm/dd/yyyy --:-- --` regardless of `en-GB` locale — this is browser-controlled and is exactly what the format hint exists to cover. Evidence in `qa-art2/`: `signup_step1_underage_error__desktop.png`, `events_new__desktop.png`, `events_new__mobile.png`. Customer outcome genuinely fixed.
 - `2026-06-30 13:48 GTBDT` - Implemented by UI engineer (Claude Opus 4.8); status → `implemented`. Restyled (did NOT replace) the native controls. In `apps/web/src/app/globals.css`, added global `input[type="date"]` / `input[type="datetime-local"]` rules: `appearance: none`, a lime `:focus-visible` ring matching the other inputs, and a tidied `::-webkit-calendar-picker-indicator` (reduced opacity, pointer cursor, rounded hover background, reduced-motion-safe transition). The fields keep each surface's own border/radius/height/padding — signup DOB via `.form-group input` (rounded 16px, lime focus), event "Starts at" via `.event-form input`. Per the ticket, did NOT force mm/dd vs dd/mm order (browser-locale controlled); instead added a small `.field-format-hint` line under the DOB field (`SignUpStep1.tsx`) and the "Starts at" field (`CreateEventForm.tsx`) noting the date order follows the browser's region — so EU users aren't surprised. 18+ validation (`dateOfBirthError`) and the inline underage error path are untouched and still fire. Verified: `npx eslint src/` 0 problems; `npm run typecheck` green; web tests 131 passed + 12 skipped (domain 61 → 192 + 12 total); Turbopack build compiled. Only Chromium reasoned about; Safari/Firefox native rendering + 1440/390 overflow still want a real-browser screenshot.

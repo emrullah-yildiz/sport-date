@@ -1,6 +1,6 @@
 # CX-20260630-signup-sport-cards-letter-monograms
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Customer journey: Signing up — choosing the sports I play (Step 3 of 5)
 - Surface: `both`
@@ -60,7 +60,7 @@ Medium. It does not block signup, but it lands at exactly the wrong moment — t
 ## Acceptance criteria
 
 - [x] Sign-up Step 3 sport cards use the same emoji/icon language as the landing page (or a deliberately designed icon set), not raw letter monograms.
-- [ ] The icons stay legible and aligned at desktop (1440) and mobile (390), selected and unselected states. (needs a real-browser screenshot pass)
+- [x] The icons stay legible and aligned at desktop (1440) and mobile (390), selected and unselected states. (verified in real Chromium 1440 + 390)
 - [x] Selecting/deselecting a sport still works and the `aria-pressed`/disabled-at-limit behavior is unchanged.
 - [x] Custom user-added sports get a sensible default glyph (no broken/empty icon).
 - [x] No new console errors are introduced (the page is at 0 today).
@@ -70,4 +70,5 @@ Removed criteria: precise-location/data-exposure deleted — not applicable.
 ## Handoff and retest log
 
 - `2026-06-30 13:39 GTBDT` - Filed by Customer Experience Agent; status `ready`. Reproduced on `/signup` Step 3 and corroborated against `/landing` and source.
+- `2026-06-30 14:02 GTBDT` - Independently retested by Customer Experience Agent (real Chromium, dev DB) at 1440 and 390 from a fresh signup; status → `verified`. Sign-up Step 3 now shows full-colour emoji on every card — 🏃 Running, 🎾 Tennis, 🏓 Padel, ⚽ Football, 🏀 Basketball, 🏐 Volleyball, 🧗 Bouldering, 🧗 Climbing, 🥾 Hiking, 🚴 Cycling, 🏊 Swimming, 🧘 Yoga, 💃 Dance, 🏓 Table Tennis, 🏸 Badminton, ♟️ Chess (DOM `.sport-emoji` capture confirms these exact glyphs, no grey monograms). They match the landing "From a 5K to a chess board" section (shared `@/lib/sports` map). Emoji are legible and the cards stay aligned: desktop 3-up grid, mobile 2-up grid, no clipping/overflow; the lime selected state (Running, Tennis) keeps the emoji readable. Selection + 1–5 limit + disabled-at-limit behaviour all work. 0 console errors on the page. Evidence in `qa-art2/`: `signup_step3_sports__desktop.png`, `signup_step3_sports_selected__desktop.png`, `signup_step3_sports__mobile.png`, `landing_sports__desktop.png`. Customer outcome genuinely fixed.
 - `2026-06-30 13:48 GTBDT` - Implemented by UI engineer (Claude Opus 4.8); status → `implemented`. Replaced the grey letter monograms with the landing's emoji. Created a shared single-source-of-truth map `apps/web/src/lib/sports.ts` (`SPORT_PRESETS` name→emoji + `sportEmoji()` resolver with a `DEFAULT_SPORT_EMOJI` 🤸 fallback). `SignUpStep3.tsx` now renders `SPORT_PRESETS` and the `.sport-emoji` span shows `sport.emoji` (`aria-hidden`); the landing page (`app/landing/page.tsx`) now sources its emoji from the same map via `sportEmoji(name)`, so marketing and sign-up cannot drift. Mapping used: Running 🏃, Tennis 🎾, Padel 🏓, Football ⚽, Basketball 🏀, Volleyball 🏐, Bouldering 🧗, Climbing 🧗, Hiking 🥾, Cycling 🚴, Swimming 🏊, Yoga 🧘, Dance 💃, Table Tennis 🏓, Badminton 🏸, Chess ♟️ — matches the landing's set. Custom user-added sports now also get a glyph: the custom-sport chips render `sportEmoji(name)` (default 🤸 when not a preset), so no broken/empty icon. Selection state, the 1–5 limit, `aria-pressed`, and disabled-at-limit behaviour are unchanged. Verified: `npx eslint src/` 0 problems; `npm run typecheck` green; web tests 131 passed + 12 skipped (domain 61 → 192 + 12 total); Turbopack build compiled. Legibility/alignment of the emoji cards at 1440/390 selected+unselected still wants a real-browser screenshot.
