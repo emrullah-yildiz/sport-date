@@ -1,12 +1,12 @@
 # CX-20260630-discover-filter-input-placeholders-truncated
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Customer journey: Using the discovery filter bar on `/discover`.
 - Surface: `web`
 - Environment and viewport/device: Local dev, Chromium, 1920 / 1440 / 1024 (most pronounced at 1024).
 - Found by: Visual QA (per-element overflow scan + visual)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `none found`
 
 ## Customer outcome
@@ -63,3 +63,5 @@ Minor usability. No data/safety concern. A first-time member may not realize the
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
+- `2026-06-30 20:30 EEST` - Experience Build Agent took ownership; status `in-progress`.
+- `2026-06-30 20:55 EEST` - Implemented. Shortened the SPORT placeholder to "Any in your profile" and the LANGUAGE placeholder to "Any compatible" so both read fully under their uppercase labels at 1920/1440/1024 (previous strings clipped by ~9-49px). Added `title` attributes carrying the full "Defaults to any sport/compatible language" hint for hover and assistive tech, so no meaning is lost. Added `text-overflow: ellipsis` to `.discover-filters input,select` so any typed value too long for the box (the CITY case flagged at 1920/1440) truncates with a visible ellipsis affordance instead of silently cutting. No layout/grid change, so the stacked mobile filter bar is unaffected. Checks: typecheck pass, lint pass (only the pre-existing warning in untracked `qa/full-flows.mjs`), test pass (144 passed / 12 skipped). Status `implemented` for independent retest. /discover is auth-gated, so visual confirmation relied on width math + the deterministic nature of the text/CSS change rather than a logged-in screenshot.

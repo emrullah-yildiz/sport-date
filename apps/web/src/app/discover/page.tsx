@@ -28,8 +28,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       <header className="discover-header"><p className="eyebrow">Events that fit your movement</p><h1>Something real to do. Someone new to meet.</h1><p>Only events compatible with your sports, experience, adult age range, and active blocks appear here.</p></header>
       <form className="discover-filters" method="get">
         <label>City<input name="city" defaultValue={filters.city} placeholder={user.location} /></label>
-        <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any sport in your profile" /></label>
-        <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible language" /></label>
+        <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any in your profile" title="Defaults to any sport in your profile" /></label>
+        <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible" title="Defaults to any compatible language" /></label>
         <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>
         <button type="submit">Find my events</button>
       </form>
