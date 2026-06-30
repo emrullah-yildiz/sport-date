@@ -1,7 +1,8 @@
 # CX-20260630-native-select-dropdowns-default-chrome
 
-- Status: `ready`
+- Status: `verified`
 - Severity: `medium`
+- Verified: 2026-06-30 — root cause was per-surface `background: white` shorthands resetting the global chevron's `background-image` to `none`. Fixed in `47763ee` by marking the chevron `background-image`/`repeat`/`position` `!important`. Confirmed: computed `background-image` on `.feedback-form select` is the SVG (not `none`), the chevron renders visibly, 0 console errors; deployed to production.
 - Customer journey: Filtering discovery, sending feedback, and editing profile — anywhere a dropdown appears
 - Surface: `both`
 - Environment and viewport/device: Local dev server (`http://localhost:3000`), dev Neon branch, Chromium (Playwright) 1440x900 and 390x844. Observed 2026-06-30.
