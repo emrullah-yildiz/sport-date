@@ -1,6 +1,6 @@
 # CX-20260701-repeated-cancellation-no-fair-reliability-rule
 
-- Status: `in-progress`
+- Status: `implemented`
 - Implementation owner: Experience Build Agent
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. Held at P1: reliability directly protects hosts and the safe-completed-event north-star, and a *fair, recoverable* rule is a member-dignity/safety concern that must not be built carelessly. Severity of the consequence itself is an **owner-tunable** (see below).
@@ -75,3 +75,4 @@ Hosts plan real logistics around accepted counts; unchecked serial cancellation 
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 5); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`.
+- 2026-07-01 - Experience Build Agent implemented (commit 5f97b2e); status `implemented` for independent retest. Added `packages/domain/reliability.ts` (owner-tunable `RELIABILITY_POLICY`: 24h late window, warn at 2, pause at 3 consecutive, 48h cool-down, 30-day auto-reset) + 15 unit tests (threshold, safety/early/pending exclusions, warning boundary, auto-reset + clean-attendance recovery, privacy). Migration `021_member_reliability.sql` adds 3 private columns on `users` (clean default, no backfill). Wired through cancel (counts only accepted late member cancels; safety exits go via safety-actions.ts and never reach this path), browser + mobile join POST (423 when paused), and the reflection path (attended → restore). Private warning/paused card in `JoinRequestControls`; counts never exposed to hosts/peers/profile. Checks: typecheck pass, lint 0 errors, web tests 207 pass/12 skip, domain 79 pass, migration clean, live discover page 200 on clean standing. Full multi-cancel→paused sequence covered by unit tests (awkward to drive live without burning limits).
