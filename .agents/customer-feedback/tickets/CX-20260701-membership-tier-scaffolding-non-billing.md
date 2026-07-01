@@ -1,8 +1,8 @@
 # CX-20260701-membership-tier-scaffolding-non-billing
 
-- Status: `ready`
+- Status: `superseded` — **folded into `CX-20260701-plus-tier-entitlement-model-and-gating` (P1, ready).** Do NOT pick this up independently; the successor carries the same non-billing tier + fail-closed gating helper plus the finalized €6.99-launch guardrails, the `isPlus(user)` contract, the `SessionUser` wiring, and the sequence into the Stripe/perk tickets.
 - Severity: `medium`
-- Priority: `P2` — (Reach 3 × Impact 3 × Confidence 4) / Effort 3 = 12. Non-urgent foundation that makes the owner-approved freemium model *possible and honest* later; free-loop work stays ahead of it. No member-visible charging.
+- Priority: `P2` — (Reach 3 × Impact 3 × Confidence 4) / Effort 3 = 12. Non-urgent foundation that makes the owner-approved freemium model *possible and honest* later; free-loop work stays ahead of it. No member-visible charging. **(Superseded — see status.)**
 - Customer journey: (foundation — spans profile, discovery, and future Plus surfaces; no charging surface)
 - Surface: `web` (mobile parity where surfaced)
 - Environment and viewport/device: all widths
@@ -59,3 +59,4 @@ Without an honest foundation, later Plus work risks either sprawling ad-hoc gate
 ## Handoff and retest log
 
 - 2026-07-01 - Filed as the non-billing foundation for the owner-approved ethical-freemium model (`CX-20260701-owner-decision-monetization-model-and-pricing`, verified). Cross-linked to the payments gate (`blocked-owner`) which this ticket must not touch. Status `ready`.
+- 2026-07-01 - **SUPERSEDED / folded into `CX-20260701-plus-tier-entitlement-model-and-gating`.** After the owner finalized the launch (Plus €6.99/mo, build Stripe now in TEST mode behind `BILLING_ENABLED`), the entitlement + gating foundation was re-filed as a **P1** ticket carrying the finalized allowed/forbidden guardrails, the fail-closed `isPlus(user)` / `canUse` contract, the `SessionUser` wiring, and the explicit sequence into the Stripe integration and first perk. This ticket's scope is fully absorbed there; nothing here is lost. Status `ready` → `superseded`. Implementers should work the successor, not this ticket.

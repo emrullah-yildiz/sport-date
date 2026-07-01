@@ -19,6 +19,93 @@ Two guardrails constrain every option below, without exception:
 
 ---
 
+## 0. Launch decision (2026-07-01) — OWNER DECIDED
+
+> This section supersedes the "proposal / analysis" framing of the sections below for the decided
+> points. The analysis (sections 1–6) is retained as the reasoning of record. Where a number here
+> differs from a range below, this section is the decision.
+
+**The owner has decided the first revenue line.** First revenue = **Sport Date Plus subscription**
+(ethical freemium, exactly as recommended in section 2). The rest of the monetization model
+(host tools, venue-cost pass-through) stays a later phase and is unchanged.
+
+**Decided parameters:**
+
+- **Model:** ethical freemium. Safety and core participation are **free forever**; Plus is
+  convenience/richness/expression only.
+- **Launch price:** **€6.99 / month** (VAT-inclusive, EUR). Annual **~€59–69/yr** ("2 months
+  free"), **configurable** — the exact annual number and any short pass are set as a Stripe Price at
+  go-live, not hardcoded.
+- **Processor:** **Stripe** (direct, web-first — per section 3 / alternative B of the payments
+  ticket). App-store billing for native is a later, separate phase.
+- **Build posture:** **build the Stripe billing NOW, in TEST mode, behind a feature flag**
+  (`BILLING_ENABLED`) and env-gated Stripe keys. **Nothing charges until go-live.** The integration
+  **fails closed** — Plus is simply unavailable with a calm "coming soon" state — whenever the keys
+  or the flag are absent (the default in dev/CI and in production until the owner flips it). This
+  mirrors the fail-closed, env-gated pattern already used for photo storage
+  (`apps/web/src/lib/photo-storage.ts`): a missing owner-provided secret degrades to a safe
+  unavailable state, never a throw and never a charge.
+- **Go-live is separately owner-gated.** All real-money actions — creating and verifying a Stripe
+  account (KYC), adding LIVE keys, creating the real €6.99 Product/Price, registering a legal entity
+  + EU VAT/OSS, accepting Stripe's terms, and finally flipping `BILLING_ENABLED` — are owner
+  actions performed at go-live. No agent creates accounts, adds live keys, accepts terms, or spends
+  money. The exact ordered steps are in `docs/operations/monetization-go-live-runbook.md`.
+
+**Finalized free-vs-paid matrix (the binding contract).** The section 1e/2 matrix stands; this is
+the launch-finalized allowed/forbidden split for Plus, stated as two explicit lists so no future
+feature drifts across the line:
+
+**FREE FOREVER — never gated by Plus, never degraded:**
+
+- **Safety:** report, block, leave an event, emergency guidance, approximate-location privacy
+  (precise location hidden pre-acceptance), Safety Center, moderation, decision notices, appeals.
+- **Core participation:** discover/browse events, request a place, cancel a request, attend, host an
+  event (baseline coordination + safety tools), send/receive the messages the product supports,
+  sign out. Basic profile (intro, sports, languages, seeking, prompts, up to 6 photos — photos are
+  capped at 6 for **everyone**), event reflection + Movement Arc progression.
+
+**PLUS (allowed perks — convenience / richness / expression only):**
+
+- **Advanced discovery filters** — distance/radius, schedule / time-of-day, more languages
+  (relevance/convenience; never a compatibility or attractiveness score). *First Plus perk to
+  build.*
+- **Richer profile customization** + a few **extra personality prompts** (self-expression).
+- **Your own meet / reflection history** (your data, richer view).
+- A **supporter badge** (honest "thanks for supporting Sport Date" signal, never a status ranking).
+- **Early access** to new **non-safety** features.
+
+**FORBIDDEN — dark patterns, permanently excluded, DO NOT BUILD:**
+
+- Paid boosts, paid likes, paid priority/visibility, paid waitlist priority.
+- Paid access to people; paid "see who rated / skipped / viewed you."
+- Unlimited photos or any per-tier photo advantage (photos stay capped at **6 for everyone**).
+- Any attractiveness / popularity / ranking mechanic.
+- Manipulative urgency, artificial scarcity, guilt loops, or hard-to-cancel flows.
+
+**Cancel-easy invariant (EU Digital Fairness Act / UCPD):** cancelling Plus must be **as easy as
+subscribing** — one obvious path, no guilt loop, no dark pattern. Implemented via Stripe's Billing
+Portal so members self-serve cancel/renewal. VAT-inclusive EUR pricing; no dynamic/personalised
+pricing.
+
+**Filed as buildable work (all `ready`, test-mode, no charges):**
+
+- `CX-20260701-plus-tier-entitlement-model-and-gating` (P1) — entitlement concept + fail-closed
+  server-side `isPlus(user)` capability helper; everyone free by default; safety/core never gated.
+  Supersedes/absorbs `CX-20260701-membership-tier-scaffolding-non-billing`.
+- `CX-20260701-stripe-subscription-integration-test-mode` (P1) — `stripe` dependency; env-gated,
+  fail-closed Stripe module; Checkout Session (subscription) + signature-verified webhook that
+  sets/clears Plus; all behind `BILLING_ENABLED`; unit-tested with Stripe mocked; no real charges.
+- `CX-20260701-plus-billing-management-ui` (P2) — honest upgrade surface + manage/cancel via Stripe
+  Billing Portal; hidden when the flag/keys are absent.
+- `CX-20260701-plus-perks-advanced-discovery-filters` (P2) — first real Plus perk, gated by the
+  entitlement helper, gracefully degrading (fully usable free).
+
+Owner-decision tickets updated: monetization model/pricing → `verified`;
+payments-processor-and-billing-gate → Stripe chosen, **build unblocked** (test mode, flag/env-gated,
+no charges), status kept `blocked-owner` for **go-live only**.
+
+---
+
 ## 1. Market & competitor scan
 
 Prices are current as of the cited dates and vary by country, age, platform (Apple/Google take a
