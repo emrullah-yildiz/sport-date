@@ -1,0 +1,13 @@
+{
+  "updatedAt": "2026-07-02T03:08:00.000Z",
+  "loop": "running",
+  "phase": "orchestrate",
+  "note": "Orchestrator heartbeat for the /agents.html dashboard. The orchestrator overwrites this when it launches/finishes a phase agent. agents[name] = { state: 'working'|'idle', ticket, since }.",
+  "agents": {
+    "Orchestrator": { "state": "working", "ticket": "agent dashboard + bookkeeping", "since": "2026-07-02T03:08:00.000Z" },
+    "Planner": { "state": "idle", "ticket": null, "since": null },
+    "Builder": { "state": "idle", "ticket": "just finished: ia-consolidate-guideline-and-legal-pages (89af256)", "since": null },
+    "Tester": { "state": "idle", "ticket": null, "since": null },
+    "UserSimulator": { "state": "idle", "ticket": null, "since": null }
+  }
+}
