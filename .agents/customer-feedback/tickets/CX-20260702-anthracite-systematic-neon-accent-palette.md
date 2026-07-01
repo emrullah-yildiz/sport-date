@@ -1,6 +1,6 @@
 # CX-20260702-anthracite-systematic-neon-accent-palette
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1 high` — owner-directed palette refinement (2026-07-02): anthracite background + a SYSTEMATIC multi-neon accent system, with readability as the top rule. Retunes the already-tokenized theme (token change, no schema).
 - Customer journey: cross-cutting (visual system)
@@ -39,3 +39,4 @@ Semantic accent tokens, each used consistently for one meaning:
 
 - 2026-07-02 - Filed from owner direction (anthracite bg + systematic green/red/blue neons + readability); status `ready`.
 - 2026-07-02 - Builder picked up; status `in-progress`, owner = experience-build-agent. Retuning `:root` tokens to anthracite + systematic neon green/blue/red, adding subtle static texture, mapping semantic aliases (`--accent-info`, `--danger`), and re-pointing links/info to blue.
+- 2026-07-02 - Implemented (commit f9e3cf9, pushed). Final hexes: `--bg` #20262B (anthracite gunmetal), `--surface` #272E34, `--surface-raised` #313A41, `--text` #F1F5F3, `--text-muted` #A7B4B0; GREEN `--accent` #3BEA7E, BLUE `--accent-2`/`--accent-info` #43C6F5, RED `--warn`/`--danger` #FF6E68; `--focus` #3BEA7E; `--line` rgba(241,245,243,.14). Subtle static feTurbulence texture on `body::before` (fixed, pointer-events-none, reduced-motion safe). Measured AA/AAA ratios: text/bg 13.90 AAA, text/surface 12.51 AAA, muted/bg 7.13 AAA, muted/surface 6.42 AA, green/bg 9.65 AAA, blue/bg 7.74 AAA, red/bg 5.59 AA; bg-on-green 9.65, bg-on-blue 7.74, bg-on-red 5.59. Green=primary/positive/focus, blue=links/info, red=destructive/urgency/error applied systematically (prose links re-pointed to blue; danger-action → red fill w/ --bg text). Docs (design-refresh-2026 §1, design-system) updated. Checks: typecheck pass, lint pass (only warning is in untouched qa/full-flows.mjs), test 391 pass/12 skip, production build pass. Served CSS verified to carry new tokens + texture. Member surfaces auth-gated + pooled accounts were register-rate-limited/`.invalid`-email in this env, so visual confirmation done via served-CSS + public surfaces (landing/login/signup/safety/terms/privacy all 200) + source. No migration. Ready for independent retest.
