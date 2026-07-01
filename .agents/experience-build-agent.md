@@ -57,6 +57,20 @@ add a handoff-log line with the timestamp.
 - Product copy describes only implemented capability — no unproven safety/verification/
   member-count claims.
 
+## Reusable test accounts (verify without burning the signup limit)
+
+When you confirm acceptance criteria against the running app, prefer a
+pre-seeded pooled account over registering a new member. Read
+`apps/web/qa/artifacts/test-accounts.json` (gitignored — never commit
+credentials) and **LOG IN** (`POST /api/auth/login`, browser-auth 10 / 15 min
+per IP) with the role that fits the scenario: `host-A` + `seeker-B` (Bucharest /
+Tennis intermediate, compatible for join-request), `seeker-advanced-C` (Tennis
+ADVANCED), `seeker-D` (Cluj / Running, for filter / empty states). Register a
+fresh account only when the change under test is the signup flow itself
+(browser-registration is just 5 / hr per IP). If the pool file is missing, run
+`npm run qa:seed --workspace @sport-date/web` once. On a **429**, reuse a pooled
+account or fall back to source-level verification instead of retry-looping.
+
 ## Verify before you commit (definition of done)
 
 - `npm run typecheck --workspace @sport-date/web`

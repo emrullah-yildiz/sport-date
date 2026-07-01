@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:integration": "node --env-file-if-exists=../../.env ./scripts/test-integration.mjs",
     "qa:explore": "node --env-file-if-exists=../../.env ./qa/explore.mjs",
+    "qa:seed": "node --env-file-if-exists=../../.env ./qa/seed-accounts.mjs",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit"
   },

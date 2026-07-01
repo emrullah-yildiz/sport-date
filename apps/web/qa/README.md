@@ -58,6 +58,13 @@ screenshot is saved to `qa/artifacts/` for each issue.
    Useful env vars: `BASE_URL` (default `http://localhost:3000`), `QA_HEADED=1`
    (show the browser), `QA_SLOWMO=250` (slow actions down, ms).
 
+3. **Reusable account pool (for retests):** `npm run qa:seed --workspace @sport-date/web`
+   seeds ~4 persistent synthetic adults (host-A, seeker-B, seeker-advanced-C,
+   seeker-D) into `qa/artifacts/test-accounts.json` (gitignored). Retest agents
+   should **log in** with a pooled account (browser-auth 10 / 15 min) instead of
+   registering fresh, which is capped at 5 / hr per IP. The seed is idempotent —
+   re-running falls back to verifying login for accounts that already exist.
+
 ## Output
 
 - `qa/artifacts/findings-latest.json` and `findings-<runId>.json` — structured

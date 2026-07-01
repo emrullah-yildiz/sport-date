@@ -122,6 +122,23 @@ arithmetic. A missing convenience is not an emergency — keep severity honest.
    implementer to pick up. Use `blocked-owner` only for an owner decision named in
    `references/escalation-policy.md` (brand, pricing, launch country, legal, paid).
 
+## Reusable test accounts (retest without burning the signup limit)
+
+A small pool of persistent synthetic adults is pre-seeded by
+`apps/web/qa/seed-accounts.mjs` into `apps/web/qa/artifacts/test-accounts.json`
+(gitignored — never commit credentials). Before a retest, **read that file and
+LOG IN with a pooled account** (`POST /api/auth/login`, browser-auth is 10 /
+15 min per IP — plenty of headroom) instead of registering a fresh member.
+Roles cover the common scenarios: `host-A` + `seeker-B` (Bucharest / Tennis
+intermediate / English, compatible for join-request), `seeker-advanced-C`
+(Tennis ADVANCED, discover advanced-skill), `seeker-D` (Cluj / Running, for
+filter and empty-state cases). Register a **fresh** account only when the pass
+is specifically exercising the signup flow itself. If the pool file is missing,
+run `npm run qa:seed --workspace @sport-date/web` once against the dev server.
+On a **429**, do not retry-loop: reuse a pooled account (login has far more
+budget than registration) or fall back to source-level verification; note the
+rate limit and move on rather than burning retries.
+
 ## Retest handshake (close the loop)
 
 When a ticket is marked `implemented` by the builder, retest it **from the original
