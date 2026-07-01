@@ -1,6 +1,6 @@
 # CX-20260701-empty-states-lack-warmth-and-next-step
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P0` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Empty states are the first thing early members see; warmth here shapes trust and retention cheaply.
 - Customer journey: discovery (and hosting, profile)
@@ -63,3 +63,11 @@ auth/privacy dimension; must not fabricate traction ("people near you", counts) 
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
 - 2026-07-01 - Picked up by Experience Build Agent (Opus 4.8); status `in-progress`.
+- 2026-07-01 - Implemented by Experience Build Agent (Opus 4.8); status `implemented` (commit b631ca0). Awaiting independent retest.
+  - Scope: discover and hosting already branch into warm, next-step empties (prior CX tickets); this pass covered the remaining flat surfaces the ticket names — profile sections and feedback.
+  - Profile (`apps/web/src/app/profile/page.tsx`): intro, languages, sports, and prompts empty states now each render one clear next action — a lime, 44px, focus-visible `profile-empty-action` link that jumps to the profile editor via a new `id="edit-profile"` anchor on `EditProfileForm` (`apps/web/src/components/EditProfileForm.tsx`) — instead of only saying "Edit your profile below". Copy explains why each helps (matching / being found); no fabricated traction.
+  - Feedback history empty (`apps/web/src/components/FeedbackWorkspace.tsx`): warmer, reassuring copy pointing to the form; still distinct from the error state (`role="alert"`). Loading/empty/error remain correctly separated.
+  - Received-rating empty (`apps/web/src/components/ReceivedRatingSummary.tsx`): keeps the honest "not enough ratings yet" (no partial number, no fabricated count) and adds a calm "Find a game to play" link to discover.
+  - Styling (`apps/web/src/app/globals.css`): `.profile-empty-block`, `.profile-empty-action`, `.received-rating-action` — on-brand Ink/Cream/Lime, 44px targets, `:focus-visible` outlines, no motion (reduced-motion safe), responsive/no new overflow at 1280/375. Empty stays visually distinct from error everywhere.
+  - Checks: `npm run typecheck` (web) green; `npm run lint` (web) clean apart from a pre-existing warning in the untouched, uncommitted `qa/full-flows.mjs`; `npm run test` (web) 229 passed / 12 skipped. Changes are copy/markup/CSS only (no new logic), so no new unit tests were needed; no test asserted the old strings. Verified authed against the running dev app as pooled `seeker-D`: profile rendered the `edit-profile` anchor + all four empty-section action links; discover with a no-match filter showed the warm "Clear the filters" empty (distinct from error).
+  - Note for retest: the feedback-history empty is client-rendered (fetched), so it is not in the SSR HTML; verify it in-browser on a fresh account with no feedback yet. Mobile (375) visual pass recommended.
