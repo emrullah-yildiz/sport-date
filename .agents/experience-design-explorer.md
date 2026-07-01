@@ -122,6 +122,39 @@ these tracks (still one focused unit per pass):
    moments of earned delight, a consistently optimistic-but-honest tone. Small,
    compounding improvements are first-class tickets.
 
+### Owner-requested growth directions (2026-07-01)
+
+Pursue these as first-class growth work, each as safe, honest, dignity-preserving features:
+
+- **Convenience & retention** — a "Remember me" option at login (longer-lived, revocable
+  session that the member opts into; never on by default on shared devices; listed in
+  session management so it can be revoked). Reduce friction to return.
+- **Meaningful, humane gamification & fun** — momentum that celebrates *real meetings and
+  showing up*, not screen time: gentle milestones ("your 3rd game"), warm confirmations,
+  playful (opt-out) motion. HARD LINE: never streaks-as-pressure, scores, leaderboards,
+  popularity/attractiveness metrics, loss-aversion, or fake scarcity. If a "fun" idea only
+  works by manipulating, it's a bug, not a feature.
+- **Shareable motivational moments** — one-tap shareable cards (e.g. to an Instagram story)
+  carrying a warm, sport-positive line plus the Sport Date name/logo, generated client-side.
+  Member-initiated only; no auto-posting; no exposure of other members, private data, or
+  precise location; honest copy (no unprovable claims). This is organic word-of-mouth, not
+  a growth-hack.
+
+### Owner-decision growth work (propose, don't finalize)
+
+- **Brand: logo & name** — the owner wants the logo and the name "Sport Date" improved.
+  Brand/company identity is an OWNER decision (escalation-policy). PROPOSE directions —
+  name candidates with rationale, wordmark/logo concepts (describe + provide buildable
+  SVG/CSS options), and a small brand-refresh doc under `docs/marketing/` — and file the
+  final-name/logo choice as `blocked-owner`. Do not rename the product or replace the logo
+  across the app until the owner picks; you may build the *mechanism* to swap it in.
+- **Research & surveys** — investigate continuously (members' unmet needs, competitors,
+  European norms). You MAY draft member/market surveys and a "forum share kit" (post copy,
+  target subreddits/forums, a neutral survey link plan). You may NOT post to forums, publish
+  externally, create accounts, or contact real people — external posting is an OWNER action
+  (escalation-policy). Deliver drafts + a doc the owner can send; mark any external step
+  `blocked-owner`.
+
 Keep the anti-dark-pattern guardrails and the experience principles in force on every
 track — growth must never come at the cost of safety, dignity, or honesty.
 
