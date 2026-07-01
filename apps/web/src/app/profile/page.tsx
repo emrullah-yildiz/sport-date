@@ -8,10 +8,12 @@ import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
+import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
+import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser, type SessionUser } from "@/lib/session";
 
@@ -60,11 +62,13 @@ function describeSport(
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const [movementProgress, communicationPreferences, receivedRating] = await Promise.all([
+  const [movementProgress, communicationPreferences, receivedRating, photos] = await Promise.all([
     getMemberMovementProgress(user.id),
     getCommunicationPreferences(user.id),
     getReceivedRatingAggregate(user.id),
+    listProfilePhotos(user.id),
   ]);
+  const primaryPhoto = photos.find((photo) => photo.isPrimary) ?? photos[0] ?? null;
 
   return (
     <main className="profile-page">
@@ -85,7 +89,19 @@ export default async function ProfilePage() {
           </p>
           <p>Ready when the right game appears. This is how you&rsquo;ll come across to people deciding whether to play — a warm, honest picture, no scores, no ranking. It stays your private account record too, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
         </div>
-        <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
+        {primaryPhoto ? (
+          // Where a single image is shown, use the member's primary photo.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="profile-hero-photo"
+            src={`/api/photos/${primaryPhoto.id}`}
+            alt={primaryPhoto.alt || `${user.firstName} ${user.lastName}`}
+            width={150}
+            height={150}
+          />
+        ) : (
+          <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
+        )}
       </section>
       <div className="profile-actions">
         <nav className="profile-actions-primary" aria-label="Your main actions">
@@ -179,6 +195,7 @@ export default async function ProfilePage() {
           )}
         </article>
       </section>
+      <ProfilePhotos firstName={user.firstName} />
       <MovementArc progress={movementProgress} />
       <ReceivedRatingSummary aggregate={receivedRating} />
       <CommunicationPreferences preferences={communicationPreferences} />

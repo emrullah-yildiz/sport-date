@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { revokeOutstandingAuthTokensForUser } from "@/lib/auth-email";
 import { verifyPassword } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
+import { purgeProfilePhotosForUser } from "@/lib/photos";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { clearSessionCookie, getCurrentUser } from "@/lib/session";
 
@@ -79,6 +80,11 @@ export async function POST(request: Request) {
   }
 
   await revokeOutstandingAuthTokensForUser(user.id);
+
+  // Remove the member's sensitive profile photos — rows and the private blobs —
+  // as part of locking the account for deletion, so images stop being served
+  // immediately and no bytes are left orphaned in the private store.
+  await purgeProfilePhotosForUser(user.id);
 
   const response = NextResponse.json({
     success: true,

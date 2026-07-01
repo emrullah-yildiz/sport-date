@@ -128,6 +128,17 @@ export async function GET() {
     WHERE user_id = ${user.id}
     LIMIT 1
   `;
+  // Profile photos. We include the member-facing metadata (order, primary, alt,
+  // format, size, when added) plus a stable in-app fetch path for each image. The
+  // raw private blob pathname is deliberately NOT exported — it is an internal
+  // storage locator, not member data, and must stay non-guessable.
+  const profilePhotos = await sql`
+    SELECT id, content_type, byte_size, alt, position, is_primary, created_at
+    FROM profile_photos WHERE user_id = ${user.id} ORDER BY position ASC, created_at ASC
+  ` as unknown as Array<{
+    id: string; content_type: string; byte_size: number; alt: string;
+    position: number; is_primary: boolean; created_at: string;
+  }>;
   const communicationPreferenceHistory = await sql`
     SELECT id, preference_key, previous_value, new_value, source, lawful_basis_note, created_at
     FROM communication_preference_events
@@ -160,6 +171,16 @@ export async function GET() {
       updatedAt: account.updated_at,
       personalityPrompts: account.personality_prompts ?? [],
       sports: account.sports,
+      photos: profilePhotos.map((photo) => ({
+        id: String(photo.id),
+        contentType: photo.content_type,
+        byteSize: Number(photo.byte_size),
+        alt: photo.alt,
+        position: photo.position,
+        isPrimary: photo.is_primary,
+        addedAt: photo.created_at,
+        image: `/api/photos/${photo.id}`,
+      })),
     },
     hostedEvents,
     joinRequestsAndAcceptedParticipation: joinRequests,
