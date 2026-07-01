@@ -1,13 +1,13 @@
 # CX-20260701-empty-states-lack-warmth-and-next-step
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P0` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Empty states are the first thing early members see; warmth here shapes trust and retention cheaply.
 - Customer journey: discovery (and hosting, profile)
 - Surface: `web` (mobile follow-up)
 - Environment and viewport/device: all widths
 - Found by: Product/growth strategist review (2026-07-01), member-journey analysis for `docs/marketing/feature-roadmap-proposal.md` (b6)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Opus 4.8)`
 - Related tickets: `CX-20260630-new-member-empty-discovery-missing-language` (narrow: a specific missing-language string on empty discovery; this ticket is the broader warmth-and-next-step pass across surfaces)
 
 ## Customer outcome
@@ -62,3 +62,4 @@ auth/privacy dimension; must not fabricate traction ("people near you", counts) 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
+- 2026-07-01 - Picked up by Experience Build Agent (Opus 4.8); status `in-progress`.

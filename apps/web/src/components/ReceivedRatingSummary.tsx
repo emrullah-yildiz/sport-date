@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { PEER_FEEDBACK_AGGREGATE_MIN_COUNT, PEER_FEEDBACK_STARS_MAX, type PeerRatingAggregate } from "@sport-date/domain";
 
 // The recipient's OWN meetup-experience rating, shown as an aggregate average only.
@@ -38,6 +40,7 @@ export default function ReceivedRatingSummary({ aggregate }: { aggregate: PeerRa
             Once at least {PEER_FEEDBACK_AGGREGATE_MIN_COUNT} people you&rsquo;ve met have left a star, you&rsquo;ll see your
             average here. Until then nothing is shown &mdash; a single rating can never be traced back or stand alone.
           </p>
+          <Link href="/discover" className="received-rating-action">Find a game to play <span aria-hidden="true">→</span></Link>
         </div>
       )}
       <small>Only you can see this. It is never shown on your profile to others, in discovery, or anywhere public.</small>

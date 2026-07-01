@@ -78,7 +78,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
   }
 
   return (
-    <details className="edit-profile">
+    <details className="edit-profile" id="edit-profile">
       <summary>Edit your profile</summary>
       <form onSubmit={submit}>
         <div className="edit-profile-row"><label>First name<input value={fields.firstName} onChange={(event) => setFields({ ...fields, firstName: event.target.value })} /></label><label>Last name<input value={fields.lastName} onChange={(event) => setFields({ ...fields, lastName: event.target.value })} /></label></div>

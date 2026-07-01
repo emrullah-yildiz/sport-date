@@ -237,7 +237,7 @@ export default function FeedbackWorkspace() {
           <div className="feedback-history-state" role="alert"><p>{loadError}</p><button type="button" onClick={() => void loadTickets()}>Try again</button></div>
         ) : null}
         {!loading && !loadError && tickets.length === 0 ? (
-          <div className="feedback-history-state"><strong>Nothing shared yet.</strong><p>When you send feedback, you can return here to see its status.</p></div>
+          <div className="feedback-history-state"><strong>Nothing shared yet — and that&apos;s fine.</strong><p>When something feels off, tell us on the left. Anything you send shows up here so you can follow where it lands.</p></div>
         ) : null}
         {!loading && !loadError && tickets.length > 0 ? (
           <div className="feedback-ticket-list">

@@ -109,7 +109,12 @@ export default async function ProfilePage() {
           <h2>A little about {user.firstName}</h2>
           {user.bio
             ? <blockquote>{user.bio}</blockquote>
-            : <p className="profile-empty">No intro yet. A sentence or two about why you play helps people say yes — add one under &ldquo;Edit your profile&rdquo; below.</p>}
+            : (
+              <div className="profile-empty-block">
+                <p className="profile-empty">No intro yet. A sentence or two about why you play helps people say yes.</p>
+                <Link href="#edit-profile" className="profile-empty-action">Write a short intro <span aria-hidden="true">→</span></Link>
+              </div>
+            )}
         </article>
         <article className="profile-panel">
           <p className="panel-label">Looking for</p>
@@ -126,10 +131,11 @@ export default async function ProfilePage() {
               </ul>
             </>
           ) : (
-            <>
+            <div className="profile-empty-block">
               <h2>Languages</h2>
-              <p className="profile-empty">No languages listed yet. Adding them helps people who share one find you.</p>
-            </>
+              <p className="profile-empty">No languages listed yet. Adding the languages you&rsquo;re comfortable in helps people who share one find you — and lets more events match you.</p>
+              <Link href="#edit-profile" className="profile-empty-action">Add a language <span aria-hidden="true">→</span></Link>
+            </div>
           )}
         </article>
         <article className="profile-panel">
@@ -149,7 +155,10 @@ export default async function ProfilePage() {
               </div>
             ))}</div>
           ) : (
-            <p className="profile-empty">No sports listed yet. Add at least one so compatible events can find you.</p>
+            <div className="profile-empty-block">
+              <p className="profile-empty">No sports listed yet. Add at least one so compatible events can find you and show up in discovery.</p>
+              <Link href="#edit-profile" className="profile-empty-action">Add a sport <span aria-hidden="true">→</span></Link>
+            </div>
           )}
         </article>
         <article className="profile-panel profile-prompts">
@@ -163,7 +172,10 @@ export default async function ProfilePage() {
               </div>
             ))}</dl>
           ) : (
-            <p className="profile-empty">No prompts answered yet. Optional one-liners like &ldquo;A perfect Saturday game is…&rdquo; give people a real sense of you. Add up to three under &ldquo;Edit your profile&rdquo; below.</p>
+            <div className="profile-empty-block">
+              <p className="profile-empty">No prompts answered yet. Optional one-liners like &ldquo;A perfect Saturday game is…&rdquo; give people a real sense of you — you can add up to three.</p>
+              <Link href="#edit-profile" className="profile-empty-action">Answer a prompt <span aria-hidden="true">→</span></Link>
+            </div>
           )}
         </article>
       </section>
