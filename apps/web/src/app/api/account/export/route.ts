@@ -105,6 +105,14 @@ export async function GET() {
     SELECT event_id, attendance, would_join_again, qualified_for_progress, created_at, updated_at
     FROM event_reflections WHERE user_id = ${user.id} ORDER BY created_at
   `;
+  // The member's OWN private peer signals (the ones they gave). We deliberately do
+  // NOT include feedback OTHERS left about them: that raw per-person data is
+  // attributable to its author and surfacing "who said what" would enable
+  // retaliation. It stays internal to trust & safety only.
+  const peerFeedbackGiven = await sql`
+    SELECT event_id, to_user_id, showed_up, felt_respected, felt_safe, note, created_at, updated_at
+    FROM peer_feedback WHERE from_user_id = ${user.id} ORDER BY created_at
+  `;
   const mobileDevices = await sql`
     SELECT device_name, access_expires_at, refresh_expires_at, last_used_at, created_at, revoked_at
     FROM mobile_sessions WHERE user_id = ${user.id} ORDER BY created_at
@@ -159,6 +167,7 @@ export async function GET() {
     safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
     privateEventReflections: eventReflections,
+    privatePeerFeedbackGiven: peerFeedbackGiven,
     mobileDeviceSessions: mobileDevices,
     productFeedbackSubmitted: productFeedback,
     communicationPreferences: communicationPreferences[0] ?? {

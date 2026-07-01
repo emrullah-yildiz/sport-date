@@ -4,12 +4,14 @@ import { notFound, redirect } from "next/navigation";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
+import PeerFeedbackPanel from "@/components/PeerFeedbackPanel";
 import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
+import { getPeerFeedbackTargets } from "@/lib/peer-feedback";
 import { getCurrentUser } from "@/lib/session";
 
 export default async function EventRoomPage({ params }: { params: Promise<{ eventId: string }> }) {
@@ -18,6 +20,10 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   const { eventId } = await params;
   const room = await getEventRoom(eventId, user.id);
   if (!room) notFound();
+  // Post-attendance peer signal: only meaningful once the event has ended and only
+  // for the people the viewer actually co-attended with. The gate itself lives in
+  // getPeerFeedbackTargets; here we just avoid the query before the event ends.
+  const peerFeedbackTargets = room.hasEnded ? await getPeerFeedbackTargets(room.id, user.id) : [];
 
   const startsAt = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "full",
@@ -137,6 +143,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
+      {room.hasEnded ? <PeerFeedbackPanel eventId={room.id} targets={peerFeedbackTargets} /> : null}
       <aside className="room-safety-note"><strong>Why there is no chat yet</strong><p>Open messaging will not launch before blocking, reporting, moderation evidence, and response operations are ready.</p></aside>
     </main>
   );

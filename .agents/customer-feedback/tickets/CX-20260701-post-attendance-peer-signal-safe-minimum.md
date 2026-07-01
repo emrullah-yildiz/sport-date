@@ -1,6 +1,7 @@
 # CX-20260701-post-attendance-peer-signal-safe-minimum
 
-- Status: `ready`
+- Status: `in-progress`
+- Implementation owner: Experience Build Agent (Claude Opus 4.8)
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 5 × Confidence 3) / Effort 4 = 15. Held at P1: this is the safety-forward trust signal at the heart of the product's differentiation, but it is safety-sensitive and must ship as the *safe minimum* only. The visible-rating question is escalated separately (`blocked-owner`).
 - Customer journey: activity → reflection → trust (after a shared event)
@@ -61,3 +62,4 @@ Post-attendance trust signals are the product's honest alternative to profile-pe
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 7); status `ready`.
+- 2026-07-01 - Experience Build Agent took ownership; status `in-progress`. Building the safe-minimum private peer reliability/respect signal (migration + domain validation + shared-attendance-gated API + calm ended-room UI); visibility/aggregation stays deferred to the blocked-owner decision ticket.

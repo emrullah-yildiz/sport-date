@@ -1,6 +1,7 @@
 export * from "./event";
 export * from "./feedback";
 export * from "./join-request";
+export * from "./peer-feedback";
 export * from "./progress";
 export * from "./registration";
 export * from "./reliability";

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getEventRoom: vi.fn(),
+  getPeerFeedbackTargets: vi.fn(),
   notFound: vi.fn(() => {
     throw new Error("notFound");
   }),
@@ -20,6 +21,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/lib/session", () => ({ getCurrentUser: mocks.getCurrentUser }));
 vi.mock("@/lib/events", () => ({ getEventRoom: mocks.getEventRoom }));
+vi.mock("@/lib/peer-feedback", () => ({ getPeerFeedbackTargets: mocks.getPeerFeedbackTargets }));
 
 import EventRoomPage from "./page";
 
@@ -54,6 +56,7 @@ function room(overrides: Record<string, unknown> = {}) {
 async function render(overrides?: Record<string, unknown>) {
   mocks.getCurrentUser.mockResolvedValue(user);
   mocks.getEventRoom.mockResolvedValue(room(overrides));
+  mocks.getPeerFeedbackTargets.mockResolvedValue([]);
   const element = await EventRoomPage({ params: Promise.resolve({ eventId: room().id }) });
   return renderToStaticMarkup(element);
 }
