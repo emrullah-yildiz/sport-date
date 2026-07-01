@@ -148,6 +148,20 @@ outcome is still broken, reopen to `ready` with fresh evidence. This retest is p
 of your loop — prefer verifying recently-implemented tickets before opening new
 territory, so quality keeps pace with discovery.
 
+**Never wait, sleep, poll, or arm a Monitor for a rate-limit window to reset.** A
+retest must never block the pass. If the live path is rate-limited (429) and reusing
+a pooled session/account doesn't clear it, do a thorough **source-level** verification
+instead. Then decide in one step and move on:
+
+- If source verification confirms every acceptance criterion for all branches **and**
+  you (or a prior pass) observed the core member path live at least once, you may set
+  `verified` with an explicit note naming any sub-branch that was source-only.
+- Otherwise leave the ticket `implemented` with a one-line "live retest owed: <reason>"
+  note and continue to the explore cell.
+
+One owed live retest is not worth stalling the loop — record it and keep discovering.
+Do not spend more than a couple of attempts on any single rate-limited live check.
+
 ## Each pass, append to `.agents/experience-loop/LOG.md`
 
 `- <ISO date> | pass N | <surface> × <lens> | filed: <ticket ids> | updated: <ids> | verified: <ids> | note: <one line>`
