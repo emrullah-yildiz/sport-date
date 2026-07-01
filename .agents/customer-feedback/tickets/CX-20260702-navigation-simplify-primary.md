@@ -1,6 +1,6 @@
 # CX-20260702-navigation-simplify-primary
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 3 = 16. Fewer, clearer primary destinations directly addresses "hard to navigate," but depends on the IA consolidation landing first (so the nav has the right set to point at), so it sits at P2 just behind that ticket. Broad reach, real clarity impact, moderate effort.
 - Customer journey: cross-cutting — every authenticated surface's navigation
@@ -62,3 +62,4 @@ Practical/emotional: a stable, minimal nav lowers cognitive load and makes the a
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Depends on `CX-20260702-ia-consolidate-guideline-and-legal-pages` landing first. Status `ready`.
 - 2026-07-02 - Picked up by experience-build-agent; set `in-progress`. Standardizing authenticated primary nav to a shared component (Discover, Host, Safety + AccountMenu).
+- 2026-07-02 - Implemented (commit `89038dd`, pushed). New shared `apps/web/src/components/PrimaryNav.tsx` (nav landmark, logo→/discover, Discover/Host/Safety with aria-current, one page-action slot, AccountMenu) replaces the per-page `.profile-nav` on discover, discover event detail, hosting (+ loading/error), host event detail, create flow, room, profile, safety, feedback. Feedback moved into the AccountMenu (progressive disclosure); legal/trust stays in SiteFooter; `/moderation` staff-only untouched. Blue (`--accent-info`) nav links/active-state, green CTAs. Checks: typecheck/lint/test pass (400 pass/12 skip; AccountMenu.test updated for the new Feedback item), production `npm run build` pass. Verified logged in as pooled host-A: primary nav byte-identical across surfaces, aria-current correct, no legal/feedback in the top bar, no overflow at 375. Migration: none. Ready for independent retest.
