@@ -1,5 +1,28 @@
 # Agent state
 
+## Planning snapshot — 2026-07-01 (Planner)
+
+**Current focus:** Product is fully functional and prod is healthy; all P0/P1 are done and verified. The loop is now grooming and closing the remaining trust/safety, recovery, and vibe polish so the free core loop is credible before any monetization work begins.
+
+**Single next ticket to build:** `CX-20260630-event-detail-safety-emergency-microcopy-smallest-text` (reprioritized P2 → **P1** this pass). The emergency-services safety line is the smallest text on the page (11px vs 17px body); the safety-and-accessibility-never-below-P1 guardrail floors it to P1. Lowest-effort P1 (CSS on a few `.safety-*` rules) and the shared `ReportSafetyControls` fix lands on event detail, event room, and host-request cards at once.
+
+**Next 3 outcomes (after the P1 above):**
+1. `CX-20260701-safety-center-report-tracker-only-no-proactive-guidance-link` (P2, RICE 32) — connect the Safety center to the existing `/safety-guidelines` and reframe its dead-end empty state; highest-scoring ready trust ticket, no owner decision.
+2. `CX-20260701-reset-verify-dead-link-no-direct-recovery-path` (P2, RICE 24) — one-click fresh-link recovery on dead reset/verify pages, anti-enumeration preserved; closes the last big re-entry dead-end (feature-roadmap a3).
+3. `CX-20260701-event-room-stays-future-tense-after-event-ends` (P2) — event-room lifecycle correctness (future-tense after end → graceful transition to reflection); completes the activity→reflection journey (feature-roadmap a6).
+
+**Owner blockers (stay `blocked-owner`, do NOT let Builder pull):**
+- `CX-20260701-owner-decision-payments-processor-and-billing-gate` (P1) — no billing until a processor is chosen.
+- `CX-20260701-owner-decision-brand-name-and-logo` (P1) — brand/name/logo; blocks `brand-asset-swap-mechanism` and the research serif choice.
+- `CX-20260701-owner-action-run-surveys-and-forum-outreach` (P2) — external outreach needs the owner.
+- `CX-20260701-no-automatic-production-migration-on-deploy` (P0) — standing production-ops rule; owner-governed, no auto-migrate on deploy.
+- (Recommendation on all four: hold; each has a clear recommendation in-ticket. Monetization c-track waits behind payments + pricing.)
+
+**Open risks:**
+- A cluster of `implemented`-but-not-yet-`verified` tickets awaits the Tester: `empty-states-lack-warmth` (P0), `first-event-preparation-card` (P1), `global-error-boundary-white-screen` (P1), `home-landing-not-auth-aware` (P1), `peer-feedback-submit-no-focus-confirmation` (P1), `remember-me-optional-persistent-login` (P2). None are known-broken, but they are unproven live — verification is the gating activity, not new build.
+- Signup/login rate limits (5/hr/IP signup, 10/15min browser-auth) repeatedly block live retest of two-account flows; verification of multi-account tickets can lag. Do not poll for limit resets.
+- Monetization/photos value is real but correctly gated behind owner decisions (payments, storage/moderation); backlog reflects this — no un-ticketed high-value work outranks the current queue (feature-roadmap-proposal confirms its top items are all already filed).
+
 ## Current outcome
 
 **Owner finalized the legal set — drafts promoted to owner-approved operational documents in `docs/legal/` (honest non-counsel header).** On the owner's "legal looks OK, finalize it" instruction, one `docs:` commit promoted the four `docs/legal/drafts/` documents to finalized, canonical documents: `docs/legal/privacy-notice.md`, `docs/legal/terms-of-service.md`, `docs/legal/safety-community-guidelines.md`, `docs/legal/consent-copy.md`, plus a new `docs/legal/README.md` index. Each "DRAFT — requires qualified EU counsel review" header was replaced with a **"PUBLISHED — owner-approved as of 2026-06-30"** header that is honest: operational, owner-approved, **not legal advice, not lawyer-reviewed**, with independent qualified-EU-counsel review still recommended before relying on them in a dispute — preserving the AGENTS.md rule against representing legal advice as counsel. The `[OWNER:]`/`[COUNSEL:]` markers were resolved onto the working assumptions (name "Sport Date", EU/GDPR baseline, Bucharest *hypothesis*, implemented data-minimisation defaults); retention uses the **actually-implemented** periods where the code fixes one (browser session 7d, mobile refresh 30d, verification 24h, reset 60m, appeal window 6 months) and states an owner/counsel-confirmable operating default otherwise. Owner-only facts (legal entity name & registered address, a monitored privacy/safety contact email, DPO/representative if any, processor list + DPAs, named safety owner, real links + enabled email provider, backup schedule, final jurisdiction) were **not invented** — they are `[OWNER TO CONFIRM: …]` placeholders, consolidated into an "Owner inputs still required to be litigation-ready" list per document and in `docs/legal/README.md`. Nothing was overclaimed beyond the implemented schema/flows; all honesty boundaries intact. The drafts README now marks the drafts SUPERSEDED and points up; `privacy-rights-preparation.md`, `decision-log.md`, and `owner-escalation.md` (Gate 2) updated to record the owner finalization while noting qualified-counsel review + the owner-fact placeholders remain open. **Verify:** docs-only; typecheck green; hermetic web suite unchanged at 129 passed + 12 skipped. (Pre-existing, unrelated: the date-sensitive `packages/domain/src/registration.test.ts` line 23 now fails because 2008-06-30 turns 18 today, 2026-06-30 — it omits an explicit "now" date and uses the system clock; not touched by this docs work.)

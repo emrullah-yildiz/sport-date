@@ -1,6 +1,6 @@
 # CX-20260701-first-event-preparation-card
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 3) / Effort 3 = 20. Reduces first-timer anxiety; supports attendance and safe completion.
 - Customer journey: commitment → arrival
@@ -50,15 +50,16 @@ regression, but the card must respect approximate-location rules.
 
 ## Acceptance criteria
 
-- [ ] Accepted members see a preparation card with sport/level (human phrasing), time, approximate area, a short "what to bring", and how the meet begins.
-- [ ] Precise meeting location is only shown where existing authorization rules already allow it; the card never leaks it to unauthorized viewers.
-- [ ] Copy is warm and specific and describes only implemented capabilities (no invented claims).
-- [ ] Clear empty/partial states when a host has not filled every optional detail.
-- [ ] Mobile and web layouts usable; keyboard, screen-reader naming, focus, contrast, 44px covered.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Accepted members see a preparation card with sport/level (human phrasing), time, approximate area, a short "what to bring", and how the meet begins.
+- [x] Precise meeting location is only shown where existing authorization rules already allow it; the card never leaks it to unauthorized viewers.
+- [x] Copy is warm and specific and describes only implemented capabilities (no invented claims).
+- [x] Clear empty/partial states when a host has not filled every optional detail.
+- [x] Mobile and web layouts usable; keyboard, screen-reader naming, focus, contrast, 44px covered.
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
 - 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Adding a warm, practical first-event preparation card in the event room for an accepted first-timer (no prior accepted participation), coordinated with (not duplicating) the shipped pre-arrival safety micro-brief. Deriving "first event" from existing `event_participants` data — no migration.
 - 2026-07-01 - experience-build-agent implemented; status `implemented` (commit 2ad515d). Added `FirstEventPreparationCard` (new component + test) rendered in the event room, below the pre-arrival safety brief, for an accepted non-host participant attending their FIRST event. Card shows sport + welcomed levels in human terms, start time, approximate area (never the precise venue — that prop is not passed to the card), an honest sport-specific "what to bring", and a calm "meet in the public spot / play at your own pace / leave any time" flow that links to the on-page safety/leaving controls (`#prearrival-brief`) instead of repeating them. "First event" derived from a count of the viewer's OTHER `event_participants` rows via `getEventRoom` (also now selects `experience_levels`, `public_area_label`, `duration_minutes`) — additive reads, NO migration, no deploy-ordering hazard. Empty/partial host details degrade to calm generic lines; no location leak; no unprovable claims (tests assert no "verified"/"guaranteed safe"/"background check"). Labelled region, visible focus, 44px-friendly targets, reduced-motion parity, responsive (facts stack ≤750px). Checks (--workspace @sport-date/web): typecheck pass, lint pass (only pre-existing untracked qa/full-flows.mjs warning), test pass (293 passed, +new gating/copy/render tests), production build pass. Verified live at localhost:3000 as a pooled accepted first-timer: card + safety brief both render with the fact lines and the `#prearrival-brief` link and no "verified" leak; card correctly disappears once a second seeded participation makes them a repeat attendee (gate holds) while the safety brief keeps showing. Seeded dev-DB rows cleaned up; pooled fixtures restored (seeker-B back to 0 participations). Ready for independent retest.
+- 2026-07-01 - **Verified** by Tester (source + unit; the accepted-first-timer live path requires seeding a fresh accepted participation, which the builder drove live and cleaned up, so it is source-only this pass). `FirstEventPreparationCard` shows: sport + welcomed levels in human, inclusive-upward phrasing (`describeWelcomedLevels` — floor-honest, degrades to "Players of all levels are welcome" when empty); start time; **approximate area only** (`areaLabel` = `public_area_label`; no precise-venue prop is passed — confirmed in `room/page.tsx` line 85, and `events.ts:402` maps `areaLabel: room.public_area_label`), with a calm "Shown in the room below" degrade when blank; a sport-specific "what to bring" (`whatToBringFor`, generic fallback, never claims host-provided gear); and a 3-step meet flow linking to the safety brief anchor (`#prearrival-brief` / `#room-leave`) rather than repeating it. Gating `shouldShowFirstEventPreparation` = `!isHost && !hasEnded && viewerIsFirstTimer && status==='accepted'`; `viewerIsFirstTimer = !is_host && viewer_other_event_count === 0` derives from a COUNT subquery over existing `event_participants` (events.ts:315-322) — **additive read, NO migration, no deploy-ordering hazard**. Labelled `role="region"`, single h2, visible focus, reduced-motion via CSS. 19 unit tests cover show/hide (host/repeat/accepted-first-timer), level/area degrade, sport note, no invented equipment, and `not.toContain("verified"/"guaranteed safe"/"background check")`. Repo checks: typecheck/lint pass, test 319 pass/12 skip, production build pass. All criteria met (accepted-first-timer render is source+unit only this pass).

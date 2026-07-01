@@ -1,6 +1,6 @@
 # CX-20260701-remember-me-optional-persistent-login
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 2 = 24. Convenience that reduces return friction; a missing convenience, not an emergency. Because it touches auth, the security guardrails below are non-negotiable and any security regression would be P1.
 - Customer journey: return visit → login → coordination (staying signed in between sessions)
@@ -71,17 +71,18 @@ shorter session (protecting shared/public devices), and must keep the longer ses
 
 ## Acceptance criteria
 
-- [ ] A member sees a clearly-labeled "Remember me" (or "Keep me signed in on this device") control at `/login` that is **unchecked/OFF by default**.
-- [ ] Leaving it unchecked produces exactly today's behavior (default ~7-day session); checking it produces a **longer** session expiry (e.g. ~30 days) — the *only* difference is the expiry window.
-- [ ] The remembered session is **listed** in the existing "Signed-in browsers" panel and can be **revoked** there; revoking it signs that browser out on its next request, same as any other session.
-- [ ] The auth cookie remains `httpOnly`, `secure` (in production), `sameSite`, with a server-side hashed token; no token/id is exposed to client JS; opt-in never downgrades any of these attributes.
-- [ ] Copy is honest and host-like: it tells the member this keeps them signed in longer *on this device* and reminds them not to use it on shared/public computers; it does not overclaim security.
-- [ ] Keyboard operable and screen-reader labeled (real checkbox with a `<label>`), visible focus, 44px target; layout usable at 375px and desktop; reduced-motion unaffected.
-- [ ] Automated tests cover: default-off yields the short expiry; opt-in yields the long expiry; cookie attributes unchanged in both branches; remembered session appears in `getWebSessions` and is revocable; and a regression test asserting the default is never the long duration.
-- [ ] Relevant repository checks pass (lint, typecheck, build, test).
+- [x] A member sees a clearly-labeled "Remember me" (or "Keep me signed in on this device") control at `/login` that is **unchecked/OFF by default**.
+- [x] Leaving it unchecked produces exactly today's behavior (default ~7-day session); checking it produces a **longer** session expiry (e.g. ~30 days) — the *only* difference is the expiry window.
+- [x] The remembered session is **listed** in the existing "Signed-in browsers" panel and can be **revoked** there; revoking it signs that browser out on its next request, same as any other session.
+- [x] The auth cookie remains `httpOnly`, `secure` (in production), `sameSite`, with a server-side hashed token; no token/id is exposed to client JS; opt-in never downgrades any of these attributes.
+- [x] Copy is honest and host-like: it tells the member this keeps them signed in longer *on this device* and reminds them not to use it on shared/public computers; it does not overclaim security.
+- [x] Keyboard operable and screen-reader labeled (real checkbox with a `<label>`), visible focus, 44px target; layout usable at 375px and desktop; reduced-motion unaffected.
+- [x] Automated tests cover: default-off yields the short expiry; opt-in yields the long expiry; cookie attributes unchanged in both branches; remembered session appears in `getWebSessions` and is revocable; and a regression test asserting the default is never the long duration.
+- [x] Relevant repository checks pass (lint, typecheck, build, test).
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner growth-intake pass); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`.
 - 2026-07-01 - Experience Build Agent implemented (commit cb1ff3c); status `implemented`. Opt-in "Keep me signed in on this device" checkbox at `/login` (OFF by default, 44px target, real `<label>`, visible focus, calm honest copy). `createSession({ remember })` selects a 30-day window ONLY on explicit `rememberMe === true`; default stays 7 days. Cookie keeps httpOnly/secure(prod)/sameSite=lax + hashed token in both branches — only expiry differs. Longer session is a normal revocable row; NO migration (derives from `expires_at`, which the sessions table + `getWebSessions`/`WebSessionControls` panel already order by). Checks: typecheck/lint/test (298 passed; new tests assert default-off short expiry, opt-in long expiry, cookie flags unchanged both branches, and default-is-never-long regression) + production build all pass. Dev-server verified: unchecked = 7-day cookie, fresh remember=true = 30-day cookie (httpOnly+sameSite intact), remembered session lists as current+revocable in the Signed-in browsers panel. Awaiting independent retest by Explorer.
+- 2026-07-01 - **Verified** by Tester (source + unit; security-sensitive auth path checked closely). `LoginForm.tsx`: real `<input id="login-remember" type="checkbox">` with `<label htmlFor="login-remember">`, `useState(false)` → **OFF by default**, honest copy "Keep me signed in on this device / Stays signed in for about a month. Use only on your own device — you can end this session anytime from Signed-in browsers." `createSession({ remember })` (auth.ts) selects 30 days only when `remember` is truthy; default stays 7 days. The login route derives `remember = body.rememberMe === true` (**strict** — verified the guard), so only an explicit boolean true widens; a unit test proves `false`, `"true"`, `1`, `"on"`, `null`, `undefined` all keep the 7-day window (no truthy-string bypass). `setSessionCookie` sets `httpOnly:true`, `secure:(prod)`, `sameSite:"lax"`, hashed server-side token in BOTH branches — only `expires` differs; the raw token is never returned to client JS. No migration (session lifetime derives from `expires_at`, already ordered by the existing `getWebSessions`/`WebSessionControls` panel, so a remembered session surfaces and is revocable automatically). Tests: `auth.test.ts` (default-7d, opt-in-30d, longer-is-strictly-longer, token hashed) + `login/route.test.ts` (default-off short expiry + flags, opt-in long expiry + identical flags, non-boolean stays short). Guardrail check: no auth weakening, default protects shared devices, session fully revocable. Repo checks: typecheck/lint pass, test 319 pass/12 skip, production build pass. All criteria met.

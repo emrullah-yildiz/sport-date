@@ -1,6 +1,6 @@
 # CX-20260701-empty-states-lack-warmth-and-next-step
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P0` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Empty states are the first thing early members see; warmth here shapes trust and retention cheaply.
 - Customer journey: discovery (and hosting, profile)
@@ -52,12 +52,12 @@ auth/privacy dimension; must not fabricate traction ("people near you", counts) 
 
 ## Acceptance criteria
 
-- [ ] Discover, hosting, and profile empty states are warm, on-brand, and each offer one clear next action.
-- [ ] Empty is visually distinct from error; a normal empty state is never styled as a failure.
-- [ ] Copy fabricates no traction, counts, or "others near you" claims that are not real.
-- [ ] Loading vs empty vs error are correctly distinguished on each surface.
-- [ ] Mobile and web layouts usable; keyboard, screen-reader naming, focus, contrast, 44px covered.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Discover, hosting, and profile empty states are warm, on-brand, and each offer one clear next action.
+- [x] Empty is visually distinct from error; a normal empty state is never styled as a failure.
+- [x] Copy fabricates no traction, counts, or "others near you" claims that are not real.
+- [x] Loading vs empty vs error are correctly distinguished on each surface.
+- [x] Mobile and web layouts usable; keyboard, screen-reader naming, focus, contrast, 44px covered.
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
@@ -71,3 +71,4 @@ auth/privacy dimension; must not fabricate traction ("people near you", counts) 
   - Styling (`apps/web/src/app/globals.css`): `.profile-empty-block`, `.profile-empty-action`, `.received-rating-action` — on-brand Ink/Cream/Lime, 44px targets, `:focus-visible` outlines, no motion (reduced-motion safe), responsive/no new overflow at 1280/375. Empty stays visually distinct from error everywhere.
   - Checks: `npm run typecheck` (web) green; `npm run lint` (web) clean apart from a pre-existing warning in the untouched, uncommitted `qa/full-flows.mjs`; `npm run test` (web) 229 passed / 12 skipped. Changes are copy/markup/CSS only (no new logic), so no new unit tests were needed; no test asserted the old strings. Verified authed against the running dev app as pooled `seeker-D`: profile rendered the `edit-profile` anchor + all four empty-section action links; discover with a no-match filter showed the warm "Clear the filters" empty (distinct from error).
   - Note for retest: the feedback-history empty is client-rendered (fetched), so it is not in the SSR HTML; verify it in-browser on a fresh account with no feedback yet. Mobile (375) visual pass recommended.
+- 2026-07-01 - **Verified** by Tester. LIVE (logged in ONCE as pooled `host-A`): `/profile` renders the `#edit-profile` anchor and `profile-empty-action` links on empty sections. Source-confirmed the full cross-surface pass: (a) DISCOVER empty (`discover/page.tsx`) branches warmly by cause — missing-sports → "Add a sport to your profile", near-me empty → "Search everywhere" + "Host the first one", narrowing-filters → "Clear the filters", general → "Update your profile" + "Host the first one"; headline "A quiet court—for now.", `aria-live="polite"`, on-brand white/lime container (not error). (b) HOSTING empty (`hosting/page.tsx`) — "You're not hosting anything yet." + "Host your first event →" / "Or discover one to join"; per-section "Nothing coming up" empty distinct. (c) PROFILE (`profile/page.tsx`) — intro/languages/sports/prompts each render a warm reason + a lime 44px focus-visible `.profile-empty-action` → `#edit-profile`. (d) `ReceivedRatingSummary` keeps the honest "Not enough ratings yet." (`role="status"`, no fabricated count) + "Find a game to play" → /discover. (e) `FeedbackWorkspace` empty stays distinct from its `role="alert"` error. CSS: `.profile-empty-action`/`.received-rating-action` = lime, min-height 44px, `:focus-visible` 3px ink outline. No fabricated traction/counts/"others near you" anywhere; empty ≠ error on every surface. Repo checks: typecheck/lint pass, test 319 pass/12 skip, production build pass. All criteria met.

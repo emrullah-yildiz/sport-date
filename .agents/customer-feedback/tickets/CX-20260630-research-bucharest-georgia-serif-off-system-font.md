@@ -2,6 +2,7 @@
 
 - Status: `ready`
 - Severity: `low`
+- Priority: `P3 polish` — (Reach 2 × Impact 2 × Confidence 5) / Effort 2 = 10 → P3. Cosmetic brand-consistency only, on the `noindex`, non-collecting Bucharest research microsite (not a launch-critical member surface). No data/safety/a11y/authorization dimension (contrast is fine). Held at P3; note this may fold into the owner brand/type decision (`CX-20260701-owner-decision-brand-name-and-logo`) if the accent serif becomes a brand choice — Builder may action the "bring into the Space Grotesk / Inter system" option now without waiting on the owner.
 - Customer journey: Reading the Bucharest research invitation page (`/research/bucharest`).
 - Surface: `web`
 - Environment and viewport/device: Local dev, Chromium, all widths.

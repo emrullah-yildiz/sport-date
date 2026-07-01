@@ -1,6 +1,6 @@
 # CX-20260701-home-landing-not-auth-aware-appears-signed-out
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 5 × Impact 5 × Confidence 5) / Effort 2 = 62. A member who believes they've been signed out and can't get back into the app is a severe trust/retention failure. Effort low (page already renders; add session awareness).
 - Customer journey: re-entry / navigation / trust
@@ -54,3 +54,4 @@ A member reasonably concludes their account logged them out or broke, and has no
 - 2026-07-01 - Filed from owner feedback + source diagnosis (perceived logout: session intact, landing not auth-aware); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`. Making `/landing` auth-aware and repointing in-app logos.
 - 2026-07-01 - Implemented (commit 42a4642). `/landing` now reads the session (guarded getCurrentUser, still a server component): signed-in members get "Enter Sport Date"→/discover, "Signed in as <name>"→/profile, logo→/discover; logged-out visitors keep the marketing page + "Sign in". In-app logos on /profile and /safety now point at /discover. Checks: typecheck/lint/test all pass (180 passed/12 skipped; added landing/page.test.tsx). Live-verified with pooled host-A: signed-in /landing shows Enter Sport Date and no Sign in, logged-out /landing shows Sign in, /profile still 200 after home visit (session intact). Status `implemented` — awaiting independent retest.
+- 2026-07-01 - **Verified** by Tester (independent LIVE retest). Logged in ONCE as pooled `host-A` (`POST /api/auth/login` 200): `/landing` returns 200 and renders "Enter Sport Date" + "Signed in as {name}" with NO `nav-signin > Sign in` link; the nav logo `href="/discover"`. `/profile` still returns 200 after the home visit — session intact, no logout regression (the reported "signed out" perception is resolved). Logged-OUT `/landing` (no cookie) still shows the "Sign in" link and no "Enter Sport Date" — marketing page preserved for visitors. Signed-in member reaches the app in ≤1 click (Enter Sport Date → /discover; Your profile → /profile). Build confirms `/landing` is now `ƒ (Dynamic)` (correctly session-dependent). Accessibility/brand preserved (real `<Link>`s, primary btn styling, no overflow). `landing/page.test.tsx` present. Repo checks: typecheck/lint pass, test 319 pass/12 skip, production build pass. All criteria met.

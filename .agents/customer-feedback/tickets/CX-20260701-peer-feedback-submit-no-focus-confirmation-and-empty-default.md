@@ -1,6 +1,6 @@
 # CX-20260701-peer-feedback-submit-no-focus-confirmation-and-empty-default
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P1` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12. Arithmetic lands P2, but this is an **accessibility floor** gap (async success is not focus-managed), which the rubric never puts below P1. The empty-default-submit is a separate, smaller data-quality concern folded in because it shares the same submit handler.
 - Customer journey: activity → reflection → trust (leaving a private word after a shared event)
@@ -49,13 +49,13 @@ Accessibility: a keyboard/screen-reader member cannot tell the note saved and is
 
 ## Acceptance criteria
 
-- [ ] After a successful submit, keyboard/screen-reader focus moves to a confirmation element and the announcement persists (`role="status"`), mirroring the join-request confirmation pattern; the mutable form no longer sits open beneath an ambiguous status line.
-- [ ] A member cannot silently file a note that says nothing: submitting with no substantive answer (all `prefer_not_to_say` and no note) is prevented or clearly requires a choice first; skipping a person simply leaves no row (no pressure, no penalty).
-- [ ] The private-by-default, one-per-pair, block-aware, ended-only, edit-window-then-lock, and no-rating guarantees of the parent feature are unchanged.
-- [ ] Loading/submitting, success, failure, and locked states are all clearly distinguishable to sighted and non-sighted members; the safety "no" nudge to Report/Block still appears and never replaces reporting.
-- [ ] Mobile and web layouts remain usable; touch targets ≥44px, visible focus, AA contrast, reduced-motion parity (any resolve animation has an instant-swap fallback).
-- [ ] No precise location or private safety content is exposed to an unauthorized person.
-- [ ] Relevant automated tests (focus-move on success, empty-submit guard, unchanged gating) and repository checks pass.
+- [x] After a successful submit, keyboard/screen-reader focus moves to a confirmation element and the announcement persists (`role="status"`), mirroring the join-request confirmation pattern; the mutable form no longer sits open beneath an ambiguous status line.
+- [x] A member cannot silently file a note that says nothing: submitting with no substantive answer (all `prefer_not_to_say` and no note) is prevented or clearly requires a choice first; skipping a person simply leaves no row (no pressure, no penalty).
+- [x] The private-by-default, one-per-pair, block-aware, ended-only, edit-window-then-lock, and no-rating guarantees of the parent feature are unchanged.
+- [x] Loading/submitting, success, failure, and locked states are all clearly distinguishable to sighted and non-sighted members; the safety "no" nudge to Report/Block still appears and never replaces reporting.
+- [x] Mobile and web layouts remain usable; touch targets ≥44px, visible focus, AA contrast, reduced-motion parity (any resolve animation has an instant-swap fallback).
+- [x] No precise location or private safety content is exposed to an unauthorized person.
+- [x] Relevant automated tests (focus-move on success, empty-submit guard, unchanged gating) and repository checks pass.
 
 ## Duplicate check
 
@@ -68,3 +68,4 @@ Accessibility: a keyboard/screen-reader member cannot tell the note saved and is
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 16, peer-feedback × accessibility + completeness-of-states); status `ready`.
 - 2026-07-01 - Experience Build Agent picked up (P1, highest actionable `ready`); status `in-progress`, owner recorded.
 - 2026-07-01 - Experience Build Agent implemented (commit `5953329`); status `implemented` for independent retest. Changes: no pre-selected radio + submit disabled with calm guidance until substantive (one yes/no answer or a note); `validatePeerFeedback` now rejects an all-`prefer_not_to_say`+no-note content-free payload server-side (added `peerFeedbackHasSubstance`); success resolves the `<details>` form in place to a focus-managed "recorded privately" confirmation (`role=status` + focus move via `attachConfirmation`, mirroring `JoinRequestControls`, reduced-motion-safe); failure now `role=alert`; locked state unchanged. Gating (co-attendance/one-per-pair/ended-only/edit-window/no-rating) untouched; Report/Block stays primary. Checks: typecheck pass, lint pass (only warning is in untracked qa/full-flows.mjs), domain test 96 pass, web test 223 pass (added PeerFeedbackPanel + content-floor tests). Live: all-prefer_not_to_say+no-note → 400 content-free reject; one substantive answer → 409 eligibility gate (gating holds). Focus-move-on-success + resolved-state branch source-verified against the shipped join-request pattern (two-co-attendee ended-event path not driven, per ticket, to avoid filing a real locked row).
+- 2026-07-01 - **Verified** by Tester (source + unit + static render; the two-co-attendee ended-event live submit is deliberately not driven to avoid filing a real locked row, as the ticket notes). `PeerFeedbackPanel.tsx`: on save, `setResolved(...)` swaps the mutable form for a `.peer-feedback-recorded` `role="status" tabIndex={-1}` confirmation and `attachConfirmation` (callback ref → `node.focus()`) moves focus to it — the exact shipped join-request pattern; no timer/motion so reduced-motion is identical (instant swap). Empty-default guard: radios initialise to `""` (no pre-check), `canSubmit = peerFeedbackHasSubstance(...)` disables the button until a substantive answer/note/star, and `submit()` early-returns on `!canSubmit`; a calm hint says skipping is fine (no row filed). Defense in depth: the domain `validatePeerFeedback` also rejects a content-free payload server-side via `peerFeedbackHasSubstance` (packages/domain/src/peer-feedback.ts:147) — a star now counts as substance too. Failure → `role="alert"`; locked → `role="note"` unchanged; the Report/Block safety nudge stays primary and never replaces reporting. Gating (co-attendance / one-per-pair / ended-only / edit-window / no-rating-in-summary) untouched. 8 panel render tests (no pre-selected radio, disabled-until-substance, re-seed on edit, locked state, safety reminder, labelled keyboard star input) + domain content-floor tests. Repo checks: typecheck/lint pass, test 319 pass/12 skip, production build pass. All criteria met (focus-move-on-async-success is source-verified against the already-live-verified join-request confirmation).
