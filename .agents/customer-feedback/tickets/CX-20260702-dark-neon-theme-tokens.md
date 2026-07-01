@@ -1,6 +1,6 @@
 # CX-20260702-dark-neon-theme-tokens
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 4) / Effort 3 = 26.7. This is the foundation of the owner-requested black+neon refresh: it flips the `:root` semantic tokens every token-driven surface already reads, so the whole app can move to the new theme from one place with verified AA contrast. High reach (every surface), high impact (the headline of the redesign), but not a functional/safety floor on its own — so P1, not P0. Sequenced FIRST; typography and IA tickets build on the token layer.
 - Customer journey: cross-cutting (every surface — discovery, hosting, trust, coordination, reflection)
@@ -66,3 +66,4 @@ Practical/emotional: the theme is the most visible part of the redesign. Done ri
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Direction + measured ratios in `docs/design-refresh-2026.md`. Sequenced first in the refresh cluster. Status `ready`.
 - 2026-07-02 - experience-build-agent took ownership; Status `ready` → `in-progress`. Flipping `:root` semantic tokens to the black+neon palette at the token layer.
+- 2026-07-02 - Implemented at the token layer in `apps/web/src/app/globals.css` (commit `b4ff31a`, pushed to origin/main). Added the 10 design-refresh-2026 semantic tokens with exact documented values; re-pointed legacy names (`--cream`→`--bg`, `--ink`→`--text`, `--ink-soft`/`--muted`→`--text-muted`, `--lime`→`--accent`, `--coral`→`--warn`, dark `--line`); `body` resolves to `--bg`/`--text`; shared button primitives use neon fills with near-black `--bg` text and a `--focus` lime ring. Contrast re-measured (WCAG sRGB): text/bg 17.86, text/surface 16.65, text/raised 14.72, muted/bg 8.45, muted/surface 7.88, accent/bg 15.95, accent/surface 14.87, accent-2/bg 11.60, accent-2/surface 10.82, warn/bg 6.85 (AA), warn/surface 6.39 (AA), --bg-on-accent 15.95, --bg-on-accent-2 11.60, --bg-on-warn 6.85 (AA) — all match the doc, every pairing AA (most AAA). Checks: typecheck pass, lint 0 errors, test 391 passed/12 skipped, production build pass. Verified via pooled login (host-A): compiled CSS serves the new tokens; discover/profile/hosting/safety/landing/login all 200. No migration. Follow-up filed for hardcoded-literal surfaces that do NOT flip: `CX-20260702-migrate-hardcoded-colors-to-tokens`. Status `in-progress` → `implemented` (Explorer retests independently).
