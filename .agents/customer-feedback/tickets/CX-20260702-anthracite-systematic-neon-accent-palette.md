@@ -1,13 +1,13 @@
 # CX-20260702-anthracite-systematic-neon-accent-palette
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — owner-directed palette refinement (2026-07-02): anthracite background + a SYSTEMATIC multi-neon accent system, with readability as the top rule. Retunes the already-tokenized theme (token change, no schema).
 - Customer journey: cross-cutting (visual system)
 - Surface: `web`
 - Environment and viewport/device: all widths
 - Found by: Owner (direct feedback 2026-07-02, referencing rayon.design)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent (Builder)`
 - Related tickets: `CX-20260702-dark-neon-theme-tokens` (verified/implemented), `CX-20260702-migrate-hardcoded-colors-to-tokens` (implemented), `docs/design-refresh-2026.md`
 
 ## Owner direction (verbatim intent)
@@ -38,3 +38,4 @@ Semantic accent tokens, each used consistently for one meaning:
 ## Handoff and retest log
 
 - 2026-07-02 - Filed from owner direction (anthracite bg + systematic green/red/blue neons + readability); status `ready`.
+- 2026-07-02 - Builder picked up; status `in-progress`, owner = experience-build-agent. Retuning `:root` tokens to anthracite + systematic neon green/blue/red, adding subtle static texture, mapping semantic aliases (`--accent-info`, `--danger`), and re-pointing links/info to blue.

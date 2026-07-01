@@ -14,25 +14,34 @@ Typography uses bold, compact headlines and highly readable body text. Interacti
 
 Product copy must describe only implemented capabilities. Do not claim identity verification, ratings, moderation coverage, member counts, or safety guarantees before they exist.
 
-## 2026-07-02 — Adopted direction: black + neon refresh
+## 2026-07-02 — Adopted direction: anthracite + systematic neon refresh
 
-The default theme is moving from the warm Cream/Ink palette to an energetic **black + neon**
-system. See `docs/design-refresh-2026.md` for the full direction, measured AA contrast ratios,
+The default theme moved from the warm Cream/Ink palette to an energetic dark system, refined
+(owner direction 2026-07-02) to an **anthracite background with a systematic multi-neon accent
+set**. See `docs/design-refresh-2026.md` for the full direction, measured AA contrast ratios,
 type scale, and information-architecture plan. That document is the source of truth for the
 refresh; this file keeps the safety/honesty rules below, which still govern everything.
 
 **Semantic tokens (applied at `:root` in `apps/web/src/app/globals.css`):**
 
-- `--bg` `#0B0F0D` — near-black app background.
-- `--surface` `#121815` / `--surface-raised` `#1B2420` — elevated panels.
-- `--text` `#F4F7F2` (AAA on all surfaces) / `--text-muted` `#9DB0A6` (AAA on bg/surface).
-- `--accent` `#B6FF3C` — neon lime, primary/positive/active.
-- `--accent-2` `#31E0C8` — neon teal, secondary/info/momentum.
-- `--warn` `#FF6B4A` — coral, warning and urgency ONLY (kept from the current system).
-- `--focus` `#B6FF3C` — always-visible focus ring.
+- `--bg` `#20262B` — ANTHRACITE gunmetal grey app background (not pure black), with a subtle
+  static texture (`body::before`, pointer-events-none, reduced-motion safe, behind all content).
+- `--surface` `#272E34` / `--surface-raised` `#313A41` — lifted anthracite panels.
+- `--text` `#F1F5F3` (AAA on all surfaces) / `--text-muted` `#A7B4B0` (7.13 AAA on bg).
+- `--accent` `#3BEA7E` — **NEON GREEN**, primary/positive/success/go (join, publish, confirm).
+- `--accent-2` / `--accent-info` `#43C6F5` — **NEON BLUE**, informational/links/active-nav.
+- `--warn` / `--danger` / `--coral` `#FF6E68` — **NEON RED**, destructive/urgency/danger/error
+  (report, leave, cancel, validation) — genuine urgency ONLY, never decoration.
+- `--focus` `#3BEA7E` — always-visible green focus ring.
 
-All pairings are measured to meet **WCAG AA** (most AAA); neon fills carry near-black `--bg`
-text, never off-white. Re-measure any token whose value changes.
+Use the neons **systematically by meaning**, not randomly: green = positive/primary, blue =
+informational/links/nav, red = destructive/urgency. All pairings are measured to meet **WCAG AA**
+(body/text/muted AAA); neon fills carry near-black `--bg` text, never off-white. Re-measure any
+token whose value changes.
+
+Measured ratios: text/bg 13.90 (AAA), text/surface 12.51 (AAA), muted/bg 7.13 (AAA),
+green/bg 9.65 (AAA), blue/bg 7.74 (AAA), red/bg 5.59 (AA); bg-on-green 9.65, bg-on-blue 7.74,
+bg-on-red 5.59.
 
 **Typography:** one restrained scale — every in-app page h1 uses `--fs-h1`; only the logged-out
 marketing hero may use `--fs-display`. The 12 bespoke off-scale headline clamps are being

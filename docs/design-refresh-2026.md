@@ -1,8 +1,11 @@
-# Design refresh 2026 — black + neon, simpler, energetic
+# Design refresh 2026 — anthracite + systematic neon, simpler, energetic
 
 Status: adopted direction (2026-07-02). Supersedes the warm Cream/Ink/Lime palette as the
-default theme. This document is the source of truth for the refresh; `docs/design-system.md`
-points here and keeps the safety/honesty rules that still govern all copy and claims.
+default theme. Owner refinement 2026-07-02 moved the background from near-black to **anthracite
+(gunmetal grey) with a subtle texture**, and formalized a **systematic green/blue/red neon**
+accent system (see §1). This document is the source of truth for the refresh;
+`docs/design-system.md` points here and keeps the safety/honesty rules that still govern all
+copy and claims.
 
 ## Why we are changing
 
@@ -19,49 +22,68 @@ legible and prominent, and accessibility is non-negotiable.
 
 ---
 
-## 1. Palette — black + neon (with measured AA contrast)
+## 1. Palette — anthracite + systematic neon (with measured AA contrast)
 
-A near-black background family, two elevated surface shades, a high-legibility off-white text
-pair, and three neon accents. All ratios below were **measured** with the WCAG 2.x relative-
-luminance formula (sRGB). Every text/UI pairing meets **AA (≥4.5 normal / ≥3 large)**; most
-reach AAA. Coral is reserved for warning/urgency only.
+Owner-directed refinement (2026-07-02, `CX-20260702-anthracite-systematic-neon-accent-palette`):
+the background is now **anthracite** — a dark gunmetal charcoal grey, **not pure black** — carrying
+a *subtle static texture*, and the accents are a **systematic multi-neon set (green / blue / red)
+used semantically, never randomly**. Readability is the top rule. All ratios below were **measured**
+with the WCAG 2.x relative-luminance formula (sRGB). Every text/UI pairing meets **AA (≥4.5 normal /
+≥3 large)**; body/text/muted reach AAA. Red is reserved for destructive/urgency/error only.
 
 ### Semantic tokens (apply at the `:root` layer in `apps/web/src/app/globals.css`)
 
-| Token             | HEX       | Role                                              |
-|-------------------|-----------|---------------------------------------------------|
-| `--bg`            | `#0B0F0D` | App background — near-black, faint green cast      |
-| `--surface`       | `#121815` | Cards / panels (elevation 1)                       |
-| `--surface-raised`| `#1B2420` | Raised panels, popovers, inputs (elevation 2)      |
-| `--text`          | `#F4F7F2` | Primary text (off-white, not pure #fff)            |
-| `--text-muted`    | `#9DB0A6` | Secondary text, meta, labels                       |
-| `--accent`        | `#B6FF3C` | Neon lime — primary / positive / active selection  |
-| `--accent-2`      | `#31E0C8` | Neon teal — secondary accent, info, momentum cues  |
-| `--warn`          | `#FF6B4A` | Coral — warning + urgency ONLY (kept from current) |
-| `--focus`         | `#B6FF3C` | Focus ring (= accent; always visible on dark)      |
-| `--line`          | `rgba(244,247,242,.12)` | Hairline borders on dark            |
+| Token             | HEX       | Role                                                    |
+|-------------------|-----------|---------------------------------------------------------|
+| `--bg`            | `#20262B` | App background — ANTHRACITE gunmetal grey (not black)   |
+| `--surface`       | `#272E34` | Cards / panels (elevation 1) — lifted anthracite        |
+| `--surface-raised`| `#313A41` | Raised panels, popovers, inputs (elevation 2)           |
+| `--text`          | `#F1F5F3` | Primary text (legible off-white, not pure #fff)         |
+| `--text-muted`    | `#A7B4B0` | Secondary text, meta, labels                            |
+| `--accent`        | `#3BEA7E` | **NEON GREEN** — primary / positive / success / go      |
+| `--accent-2` / `--accent-info` | `#43C6F5` | **NEON BLUE** — info / links / active-nav  |
+| `--warn` / `--danger` | `#FF6E68` | **NEON RED** — destructive / urgency / danger / error |
+| `--focus`         | `#3BEA7E` | Focus ring (= green accent; always visible on anthracite) |
+| `--line`          | `rgba(241,245,243,.14)` | Hairline borders on anthracite            |
 
-Ink-on-accent text color for filled neon buttons is `--bg` (`#0B0F0D`) — do NOT put off-white
-text on a neon fill (low contrast). Neon fills always carry the near-black text.
+Legacy aliases re-point to the new theme so token-consuming surfaces recolor from one place:
+`--lime` → `--accent` (green), `--coral` → `--warn` (red), `--ink` → `--text`, `--cream` →
+`--surface`, `--muted` → `--text-muted`.
+
+**Systematic semantic use (the rule Builders apply):**
+- **GREEN** (`--accent`/`--lime`) = primary/positive CTAs, publish/join/confirm, active selection.
+- **BLUE** (`--accent-2`/`--accent-info`) = informational text links, secondary highlights, active nav.
+- **RED** (`--warn`/`--danger`/`--coral`) = destructive/report/leave/cancel affordances, validation
+  errors, genuine urgency — never decoration.
+
+Text color for any filled neon button is `--bg` (`#20262B`) — do NOT put off-white text on a neon
+fill. Neon fills always carry the near-black text; neon-as-text sits on the anthracite surfaces and
+still meets AA.
+
+**Subtle texture:** `body::before` (fixed, `z-index:-1`, `pointer-events:none`) paints a low-opacity
+inline-SVG `feTurbulence` grain (~3.5% effective) over a barely-there radial lift, `mix-blend-mode:
+soft-light`. Pure CSS (no raster asset / network request), static — so `prefers-reduced-motion` needs
+no special case (an explicit `animation:none` guard is kept). It sits behind all content and never
+overlaps text, so the measured text-on-solid ratios below are unaffected.
 
 ### Measured contrast ratios
 
 | Pairing                                   | Ratio  | Verdict |
 |-------------------------------------------|--------|---------|
-| `--text` on `--bg`                        | 17.86  | AAA     |
-| `--text` on `--surface`                   | 16.65  | AAA     |
-| `--text` on `--surface-raised`            | 14.72  | AAA     |
-| `--text-muted` on `--bg`                  | 8.45   | AAA     |
-| `--text-muted` on `--surface`             | 7.88   | AAA     |
-| `--accent` (lime) on `--bg`               | 15.95  | AAA     |
-| `--accent` (lime) on `--surface`          | 14.87  | AAA     |
-| `--accent-2` (teal) on `--bg`             | 11.60  | AAA     |
-| `--accent-2` (teal) on `--surface`        | 10.82  | AAA     |
-| `--warn` (coral) on `--bg`                | 6.85   | AA      |
-| `--warn` (coral) on `--surface`           | 6.39   | AA      |
-| `--bg` text on `--accent` fill (button)   | 15.95  | AAA     |
-| `--bg` text on `--accent-2` fill          | 11.60  | AAA     |
-| `--bg` text on `--warn` fill              | 6.85   | AA      |
+| `--text` on `--bg`                        | 13.90  | AAA     |
+| `--text` on `--surface`                   | 12.51  | AAA     |
+| `--text` on `--surface-raised`            | 10.54  | AAA     |
+| `--text-muted` on `--bg`                  | 7.13   | AAA     |
+| `--text-muted` on `--surface`             | 6.42   | AA      |
+| `--accent` (green) on `--bg`              | 9.65   | AAA     |
+| `--accent` (green) on `--surface`         | 8.68   | AAA     |
+| `--accent-2` (blue) on `--bg`             | 7.74   | AAA     |
+| `--accent-2` (blue) on `--surface`        | 6.97   | AA      |
+| `--warn` (red) on `--bg`                  | 5.59   | AA      |
+| `--warn` (red) on `--surface`             | 5.03   | AA      |
+| `--bg` text on `--accent` (green) fill    | 9.65   | AAA     |
+| `--bg` text on `--accent-2` (blue) fill   | 7.74   | AAA     |
+| `--bg` text on `--warn` (red) fill        | 5.59   | AA      |
 
 Reproduce: run the ratio check in a Builder's environment before shipping; any token whose
 value changes MUST be re-measured. Do not lower `--text-muted` toward the background — its AAA
