@@ -61,9 +61,11 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
  * collect a language) is treated as having no preference, so the language filter
  * is not applied to them and they are not silently filtered down to an empty
  * discovery feed. This mirrors the SQL language clause in `getDiscoverableEvents`
- * exactly so the two cannot drift; it relaxes only the language *preference*
- * filter and nothing else (blocks, age, capacity, time, sport, location all
- * remain enforced independently).
+ * AND the join gate in `createEventJoinRequest` exactly so the two cannot drift
+ * (a member is never shown an event in discovery they would then be barred from
+ * requesting — CX-20260701); it relaxes only the language *preference* filter and
+ * nothing else (blocks, age, capacity, time, sport, skill, location all remain
+ * enforced independently).
  */
 export function eventLanguageMatchesMemberPreference(
   memberLanguages: readonly string[],

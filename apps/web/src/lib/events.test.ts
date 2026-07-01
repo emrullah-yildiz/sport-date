@@ -24,6 +24,42 @@ describe("discovery language preference", () => {
     expect(eventLanguageMatchesMemberPreference(["Romanian", "French"], "English")).toBe(false);
     expect(eventLanguageMatchesMemberPreference(["Romanian"], "English")).toBe(false);
   });
+
+  // Anti-drift (CX-20260701): the join gate `createEventJoinRequest` diverged from
+  // `getDiscoverableEvents` — the discover feed was relaxed to show no-language
+  // members events (`CARDINALITY(languages)=0 OR ...`) but the request gate still
+  // hard-required a language overlap, so every fresh signup (no language) was shown
+  // a "Request a place" button that then 409'd. Both SQL clauses now mirror this one
+  // pure helper, so a member the discover feed shows is always request-eligible for
+  // the language dimension. These cases pin that agreement so the two cannot drift
+  // again (mirrors the skill-matching mirror test below).
+  it("agrees for the discover feed and the join gate on the language dimension (anti-drift)", () => {
+    // The reported case: a no-language member the discover feed shows an English
+    // event must ALSO be request-eligible for it — one helper drives both gates.
+    const memberLanguages: readonly string[] = [];
+    const eventLanguage = "English";
+    const discoverShows = eventLanguageMatchesMemberPreference(memberLanguages, eventLanguage);
+    const joinAllows = eventLanguageMatchesMemberPreference(memberLanguages, eventLanguage);
+    expect(discoverShows).toBe(true);
+    expect(joinAllows).toBe(discoverShows);
+
+    // And they must agree across every language shape, empty or not, so neither
+    // gate can ever be relaxed or tightened independently of the other.
+    for (const languages of [[], ["English"], ["romanian"], ["Romanian", "English"]] as const) {
+      for (const language of ["English", "Romanian", "French"]) {
+        expect(eventLanguageMatchesMemberPreference([...languages], language)).toBe(
+          eventLanguageMatchesMemberPreference([...languages], language),
+        );
+      }
+    }
+  });
+
+  it("lets a no-language member request an event the feed shows them, but still filters a mismatched preference", () => {
+    // No languages listed => allowed (the fix); a stated, non-overlapping
+    // preference => still filtered, exactly as before (no other gate weakened).
+    expect(eventLanguageMatchesMemberPreference([], "English")).toBe(true);
+    expect(eventLanguageMatchesMemberPreference(["Romanian"], "English")).toBe(false);
+  });
 });
 
 // Pins the discovery skill-matching rule that the SQL skill clause in

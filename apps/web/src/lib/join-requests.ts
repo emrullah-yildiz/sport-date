@@ -95,7 +95,17 @@ export async function createEventJoinRequest(
       AND events.status = 'published' AND events.starts_at > NOW()
       AND events.host_user_id <> candidate.id
       AND ${requester.age} BETWEEN events.minimum_age AND events.maximum_age
-      AND EXISTS (SELECT 1 FROM UNNEST(candidate.languages) AS language WHERE LOWER(language) = LOWER(events.language))
+      -- Language-preference rule (shared with getDiscoverableEvents, see events.ts
+      -- eventLanguageMatchesMemberPreference): a member who lists at least one
+      -- language only joins events whose language overlaps theirs; a member with NO
+      -- language listed (CARDINALITY = 0 — the default for every fresh signup, since
+      -- signup does not collect one) has no preference to filter on and may request.
+      -- Mirrors the discover clause exactly so a member is never shown an event here
+      -- they are then barred from joining (CX-20260701 language-gate divergence).
+      AND (
+        CARDINALITY(candidate.languages) = 0
+        OR EXISTS (SELECT 1 FROM UNNEST(candidate.languages) AS language WHERE LOWER(language) = LOWER(events.language))
+      )
       AND (SELECT COUNT(*) FROM event_participants WHERE event_id = events.id) < events.capacity
       AND NOT EXISTS (
         SELECT 1 FROM user_blocks

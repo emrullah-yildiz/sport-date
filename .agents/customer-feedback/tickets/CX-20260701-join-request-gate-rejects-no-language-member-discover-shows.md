@@ -1,0 +1,75 @@
+# CX-20260701-join-request-gate-rejects-no-language-member-discover-shows
+
+- Status: `in-progress`
+- Severity: `high`
+- Priority: `P1 high` — (Reach 4 × Impact 5 × Confidence 5) / Effort 2 = 50. The commitment step (asking a stranger for a place) hard-fails for a member the app itself invited to request. Discovery and the invitation both show the event and a live "Request a place" button, but the request is rejected with a blunt, unexplained 409 and NO recovery path. This is the exact discover-vs-join gate DIVERGENCE the loop has repeatedly guarded against ("never show an event the member is then barred from"). Not below P1: it silently blocks a whole class of members (anyone who signed up and never added a language — which is EVERY new member, since signup never collects one) from joining anything.
+- Customer journey: commitment (discover → open invitation → request a place)
+- Surface: `web` (mobile parity — `/api/mobile/events/[eventId]/requests` calls the same `createEventJoinRequest`)
+- Environment and viewport/device: dev server localhost:3000, Chromium 1280×900, observed 2026-07-01
+- Found by: User-simulator — HOST → COORDINATE end-to-end journey drive, 2026-07-01
+- Implementation owner: `experience-build-agent (Claude Opus 4.8)`
+- Related tickets: `CX-20260630-new-member-empty-discovery-missing-language` (verified — that fix relaxed the DISCOVER gate to let empty-language members SEE events via `CARDINALITY(candidate.languages) = 0 OR EXISTS(...)`, but did NOT apply the same relaxation to the REQUEST gate, which is the divergence this ticket reports); `CX-20260701-discover-advanced-skill-silently-excludes-events` (verified — the precedent: skill matching was fixed in BOTH `getDiscoverableEvents` AND `createEventJoinRequest` precisely so discover/join can't drift; the language rule was left one-sided); `CX-20260701-join-request-commitment-hard-reload-no-confirmation` (the success-path a11y of this same control, verified)
+
+## Customer outcome
+
+As a member who has just signed up and found a compatible event, I want my "Request a place" to actually go through — or, if something in my profile is genuinely required, to be told plainly what to add and where — so that I am not stopped at the single most important moment (asking to join) by an error I can neither understand nor recover from.
+
+## What I observed
+
+Driving the HOST → COORDINATE journey live as two pooled members:
+
+1. Pooled host published a fresh, broadly-compatible Tennis event in Bucharest (ages 24–38, English, beginner+intermediate welcome, 4 places open).
+2. Pooled seeker (Bucharest, Tennis intermediate — the documented compatible pair) opened the invitation at `/discover/events/{id}`. The page rendered normally (not a 404): the facts block, the "deliberately approximate" area, and a live **"Request a place"** button with a note field.
+3. Clicking **Request a place** returned **HTTP 409** with the body `{"error":"This event is not available for a new request."}`. The control showed that raw string in a `role="alert"` and stayed on the request form. No place was created.
+4. Back on the host side, `/hosting` still read **"No requests yet"** and the event page showed **no pending request / no Accept button** — confirming nothing persisted.
+5. Because no request could be accepted, the seeker could never reach the event room (`/events/{id}/room` correctly 404s for a non-accepted viewer), so the entire downstream coordination journey — pre-arrival safety brief, approximate location, first-event prep — was unreachable for this member.
+
+Root cause (source-confirmed): the seeker's profile lists **"No languages listed yet"** (signup never collects a language, so this is the default for every new member). `getDiscoverableEvents` was previously relaxed (ticket CX-20260630) to `CARDINALITY(candidate.languages) = 0 OR EXISTS (... language overlap ...)` so a no-language member still SEES events. But `createEventJoinRequest` (`apps/web/src/lib/join-requests.ts`) still requires `EXISTS (SELECT 1 FROM UNNEST(candidate.languages) AS language WHERE LOWER(language) = LOWER(events.language))` with **no zero-languages allowance**. So the two gates diverge: the event is discoverable and the button is shown, but the request is silently refused.
+
+## What I expected
+
+- Whatever the app is willing to SHOW me and offer a "Request a place" button for, I should be able to request — the discover gate and the request gate must not disagree. Mirror the empty-language allowance into `createEventJoinRequest` exactly as the skill-matching fix (CX-20260701) was mirrored into both places, so a no-language member who can see the event can also request it.
+- If a profile detail is ever genuinely required to join, the invitation should say so BEFORE I click (and ideally not show a bare "Request a place" button), and the error must name what to add and link to where (e.g. "Add a language to your profile to join events in English → Edit profile"), never a blunt "This event is not available for a new request."
+- The 409 copy should distinguish real "unavailable" cases (event full, event passed, host blocked me) from "your profile needs one more detail" — the current single opaque string collapses several very different situations into one dead end.
+
+## Reproduction
+
+1. Log in as a member whose profile has **no languages** listed (every fresh signup; the pooled `seeker-B` is in this state).
+2. Have a host publish a compatible event (same city, matching sport, age-compatible, some language e.g. English).
+3. As the no-language member, open the event at `/discover/events/{id}` — the page renders with a "Request a place" button.
+4. Click **Request a place**. Observe a 409 and the raw alert "This event is not available for a new request."; no request is created, and the host sees "No requests yet".
+
+Reproduction rate: `2/2 on brand-new events (POST /api/events/{id}/requests → 409 both times); root cause source-confirmed (discover allows empty languages, request gate does not)`
+
+## Customer impact
+
+Practical: a whole class of members — anyone who signed up and never manually added a language, which is the DEFAULT because signup never asks — is shown events and a request button but cannot actually join anything. They hit an unexplained error at the exact commitment moment and have no way to know that adding a language to their profile would fix it. Many will conclude the product is broken or the event is fake and leave. Emotional: being stopped with a blunt "not available" while looking at a live "Request a place" button feels like the app changed its mind about you with no reason given. Accessibility: the failure is announced (`role="alert"`), but it is uninformative and offers no recoverable next step. No authorization/privacy/precise-location regression — the meeting point stays gated; this is a gating-divergence + error-copy defect, not a data exposure.
+
+## Evidence and limits
+
+- Evidence: live POST `/api/events/{id}/requests` → `409 {"error":"This event is not available for a new request."}` on two brand-new events; seeker `/profile` shows "No languages listed yet"; host `/hosting` shows "No requests yet" afterward. Source: `apps/web/src/lib/join-requests.ts` `createEventJoinRequest` language clause `EXISTS(... UNNEST(candidate.languages) ...)` (no `CARDINALITY = 0` allowance) vs. `apps/web/src/lib/events.ts` `getDiscoverableEvents` `(CARDINALITY(candidate.languages) = 0 OR EXISTS(...))`; the 409 mapping at `apps/web/src/app/api/events/[eventId]/requests/route.ts:33`.
+- Redactions made: synthetic pooled accounts only; approximate area only; no precise venue, no credentials/tokens.
+- Facts: discover allows empty-language members; the request gate does not; the resulting 409 renders as a single opaque string with no field association or recovery link. Reproduced 2/2 on fresh events.
+- Hypotheses to verify during implementation: the owner-intended fix is almost certainly to MIRROR the empty-language allowance into `createEventJoinRequest` (keep discover/join in lockstep, as the skill fix did) so a no-language member CAN join; independently, the 409 copy should be split so genuinely-unavailable cases (full / passed / blocked) read differently from a profile-completeness case, with a plain "what to add / where" for the latter. Confirm the mobile route inherits the fix (it shares `createEventJoinRequest`). Consider whether signup should collect a language so the empty-language state is rare (deeper onboarding change; not required to close this ticket).
+- Paths or surfaces not tested this pass: a member WITH a matching language requesting (that path works — it is only the empty-language + shown-event divergence that fails); the mobile client UI.
+
+## Duplicate check
+
+- Search terms used: "not available for a new request", "language", "409", "request gate", "no languages", "CARDINALITY", "createEventJoinRequest", "discover join diverge".
+- Tickets reviewed: full queue (72). Closest is `CX-20260630-new-member-empty-discovery-missing-language` (verified) — but its acceptance criteria are entirely about the DISCOVER FEED and its EMPTY STATE ("member can find the event OR the empty state explains what to add"), all satisfied; it explicitly relaxed only `getDiscoverableEvents` and never touched `createEventJoinRequest`. `CX-20260701-discover-advanced-skill-silently-excludes-events` fixed a DIFFERENT gate (skill) in both places and is the precedent for why this language divergence is a bug.
+- Why this is new: no ticket covers the join-request gate rejecting a member the discover gate shows, nor the opaque 409 copy on the request step. Independently fixable (one SQL clause + error copy) and independently checkable by a member.
+
+## Acceptance criteria
+
+- [ ] A member with no languages listed who can SEE an event in discovery / on its invitation can successfully **request a place** (the empty-language allowance in `getDiscoverableEvents` is mirrored in `createEventJoinRequest`), and the request appears to the host as pending — discover and join never disagree.
+- [ ] If any profile detail is ever genuinely required to request, the invitation communicates it BEFORE the click, and the error names the exact detail and links to where to add it — never a bare "This event is not available for a new request."
+- [ ] The request-step error copy distinguishes genuinely-unavailable cases (event full, event already started, host blocked) from a recoverable profile-completeness case; each reads in calm human language with a clear next step.
+- [ ] The success path (request → pending, host sees it on `/hosting` and the event page, can accept, member reaches the room) works end-to-end for a member who previously hit the 409.
+- [ ] No precise location or other sensitive data is exposed; the meeting-point stays gated until acceptance; no authorization change (self/host-exclusion, block, age, capacity, skill gates all preserved).
+- [ ] Mobile parity: the mobile request route (`/api/mobile/events/[eventId]/requests`, same `createEventJoinRequest`) inherits the fix.
+- [ ] Relevant automated tests pass, including a test that a no-language member who is discoverable-eligible for an event is ALSO request-eligible for it (pinning the two gates together so they cannot drift again), mirroring the skill-matching mirror test.
+
+## Handoff and retest log
+
+- 2026-07-01 - Filed by User-simulator (HOST → COORDINATE journey drive); status `ready`. Live-reproduced 2/2; root cause = language clause present in `createEventJoinRequest` but relaxed only in `getDiscoverableEvents` (discover/join gate divergence).
+- 2026-07-01 - experience-build-agent (Claude Opus 4.8) took ownership; status `in-progress`. Mirroring the empty-language allowance (`CARDINALITY(candidate.languages) = 0 OR EXISTS(...)`) from `getDiscoverableEvents` into `createEventJoinRequest`'s language clause, pinning both gates to the existing shared pure helper `eventLanguageMatchesMemberPreference` so they cannot drift, and adding an anti-drift test — same pattern as the skill-matching fix.
