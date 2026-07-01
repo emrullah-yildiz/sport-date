@@ -16,6 +16,8 @@
  * and exported so they are unit-testable without a database or a browser.
  */
 
+import { BRAND_NAME } from "@/lib/brand";
+
 const SKILL_RANK: Readonly<Record<string, number>> = { beginner: 1, intermediate: 2, advanced: 3 };
 
 /**
@@ -106,7 +108,7 @@ export default function FirstEventPreparationCard({
 
   return (
     <section className="first-event-prep" aria-labelledby="first-event-prep-title" role="region">
-      <p className="panel-label">Your first Sport Date</p>
+      <p className="panel-label">Your first {BRAND_NAME}</p>
       <h2 id="first-event-prep-title">You&apos;re set — here&apos;s how it&apos;ll go</h2>
       <p className="first-event-prep-lede">
         First time? Nothing fancy to prepare. Here&apos;s the plan in plain terms so you can just show

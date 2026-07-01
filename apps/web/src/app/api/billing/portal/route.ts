@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { getMemberBilling } from "@/lib/billing";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
   // Fail closed BEFORE any Stripe interaction: Plus management simply isn't available yet.
   if (!isBillingConfigured()) {
     return NextResponse.json(
-      { error: "Sport Date Plus isn’t available yet. The rest of Sport Date is unaffected.", code: "billing-unavailable" },
+      { error: `${BRAND_NAME} Plus isn’t available yet. The rest of ${BRAND_NAME} is unaffected.`, code: "billing-unavailable" },
       { status: 503, headers: privateHeaders },
     );
   }
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
   if (!result.ok) {
     if (result.reason === "not-configured") {
       return NextResponse.json(
-        { error: "Sport Date Plus isn’t available yet.", code: "billing-unavailable" },
+        { error: `${BRAND_NAME} Plus isn’t available yet.`, code: "billing-unavailable" },
         { status: 503, headers: privateHeaders },
       );
     }

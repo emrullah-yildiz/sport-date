@@ -5,7 +5,7 @@ import type Stripe from "stripe";
 
 import { getDatabase } from "@/lib/db";
 
-// Server-side billing persistence for Sport Date Plus test-mode subscriptions
+// Server-side billing persistence for Rally Plus test-mode subscriptions
 // (CX-20260701-stripe-subscription-integration-test-mode).
 //
 // This lib owns the Stripe customer↔member linkage and applies verified webhook

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 type Device = {
   id: string; deviceName: string; lastUsedAt: string; refreshExpiresAt: string;
   revokedAt: string | null; active: boolean;
@@ -49,7 +51,7 @@ export default function MobileSessionControls() {
     <p>Review native sessions without exposing their access or refresh credentials.</p>
     {state === "loading" ? <p>Loading device sessions...</p> : null}
     {state === "error" ? <button type="button" onClick={() => void load()}>Try again</button> : null}
-    {state === "ready" && devices.length === 0 ? <p>No Sport Date mobile app is signed in to your account. Your browser sessions are managed above.</p> : null}
+    {state === "ready" && devices.length === 0 ? <p>No {BRAND_NAME} mobile app is signed in to your account. Your browser sessions are managed above.</p> : null}
     {state === "ready" ? <div className="mobile-device-list">{devices.map((device) => <article key={device.id}>
       <div><strong>{device.deviceName}</strong><span>{device.active ? "Active" : device.revokedAt ? "Revoked" : "Expired"}</span></div>
       <small>Last used {new Date(device.lastUsedAt).toLocaleString()} · refresh expires {new Date(device.refreshExpiresAt).toLocaleDateString()}</small>

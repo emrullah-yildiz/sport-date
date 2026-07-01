@@ -1,7 +1,7 @@
 import SignUpForm from "@/components/SignUpForm";
 
 export const metadata = {
-  title: "Sign Up — Sport Date",
+  title: "Sign Up",
   description: "Create a private beta profile and meet people through sports.",
 };
 

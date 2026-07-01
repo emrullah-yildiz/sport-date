@@ -2,7 +2,7 @@ import "server-only";
 
 import Stripe from "stripe";
 
-// Test-mode Stripe billing seam for Sport Date Plus (€6.99/mo)
+// Test-mode Stripe billing seam for Rally Plus (€6.99/mo)
 // (CX-20260701-stripe-subscription-integration-test-mode).
 //
 // This module is the ONE place the app talks to Stripe. It mirrors the fail-closed

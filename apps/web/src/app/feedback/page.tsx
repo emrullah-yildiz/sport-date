@@ -2,10 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
+import { Wordmark } from "@/lib/brand";
 import FeedbackWorkspace from "@/components/FeedbackWorkspace";
 import { getCurrentUser } from "@/lib/session";
 
-export const metadata = { title: "Share feedback - Sport Date" };
+export const metadata = { title: "Share feedback" };
 
 export default async function FeedbackPage() {
   const user = await getCurrentUser();
@@ -14,7 +15,7 @@ export default async function FeedbackPage() {
   return (
     <main className="feedback-page">
       <nav className="profile-nav" aria-label="Feedback navigation">
-        <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <Link href="/profile">Back to profile</Link>
           <AccountMenu firstName={user.firstName} />

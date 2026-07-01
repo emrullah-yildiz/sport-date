@@ -14,6 +14,8 @@
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
+import { BRAND_ACCENT, BRAND_NAME, RallyGlyph } from "@/lib/brand";
+
 // Brand palette, inlined (globals.css :root vars are unavailable in global-error).
 const INK = "#17241d";
 const CREAM = "#f4f0e7";
@@ -31,7 +33,7 @@ export function GlobalErrorFallback({ onRetry }: { onRetry?: () => void }) {
   return (
     <html lang="en">
       <head>
-        <title>Sport Date — we&apos;re having a problem</title>
+        <title>{BRAND_NAME} — we&apos;re having a problem</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex" />
         {/* Focus + hover styling that survives even if app CSS never loaded, and
@@ -85,8 +87,13 @@ export function GlobalErrorFallback({ onRetry }: { onRetry?: () => void }) {
         >
           <div style={{ width: "100%", maxWidth: 480 }}>
             <p
+              role="img"
+              aria-label={`${BRAND_NAME} logo`}
               style={{
                 margin: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
                 fontFamily:
                   '"Space Grotesk", "Inter", system-ui, sans-serif',
                 fontWeight: 700,
@@ -95,7 +102,8 @@ export function GlobalErrorFallback({ onRetry }: { onRetry?: () => void }) {
                 color: INK,
               }}
             >
-              Sport Date
+              <RallyGlyph size={26} color={BRAND_ACCENT} aria-hidden />
+              <span>{BRAND_NAME}</span>
             </p>
             <div
               role="alert"

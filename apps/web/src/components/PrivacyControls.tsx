@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export default function PrivacyControls() {
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -60,7 +62,7 @@ export default function PrivacyControls() {
         <p className="panel-label">Privacy controls</p>
         <h2 id="privacy-title">Your data should leave as easily as you arrived.</h2>
         <p>
-          Download the information currently held by Sport Date in a machine-readable JSON file, or start a deletion request that immediately locks your profile while final handling follows the applicable legal and retention review.
+          Download the information currently held by {BRAND_NAME} in a machine-readable JSON file, or start a deletion request that immediately locks your profile while final handling follows the applicable legal and retention review.
         </p>
         <p className="privacy-inline-note">
           Read the <Link href="/privacy">Privacy Notice preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link> for the current member-facing boundary. Optional product-update preferences live separately so terms acceptance is not treated as marketing consent.

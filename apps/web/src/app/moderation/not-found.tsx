@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Staff area only - Sport Date",
-  description: "The moderation area is limited to Sport Date safety staff.",
+  title: "Staff area only",
+  description: `The moderation area is limited to ${BRAND_NAME} safety staff.`,
 };
 
 export default function ModerationNotFound() {
@@ -14,7 +16,7 @@ export default function ModerationNotFound() {
           <p className="eyebrow">Restricted staff area</p>
           <h1>This area is for safety staff</h1>
           <p className="auth-intro">
-            The moderation tools are limited to Sport Date&apos;s safety staff. Nothing is wrong with
+            The moderation tools are limited to {BRAND_NAME}&apos;s safety staff. Nothing is wrong with
             your account &mdash; you have simply reached a page that is not part of your space.
           </p>
         </div>

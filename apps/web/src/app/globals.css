@@ -271,8 +271,13 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 /* ---- Sticky nav ---- */
 .navbar { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); background: rgba(11, 15, 13, .78); border-bottom: 1px solid var(--line); }
 .nav-container { width: min(var(--container), calc(100% - 48px)); margin: 0 auto; padding: 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
-.logo { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.logo { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; border-radius: 12px; color: var(--text); font-family: var(--font-display); font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+a.logo:hover { color: var(--text); }
+.logo:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .logo-mark { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--surface-raised); color: var(--lime); font-size: 16px; font-weight: 700; }
+/* Rally motion-mark: the neon rally-arc glyph sits in a lifted anthracite badge. */
+.logo-mark--glyph { background: var(--surface-raised); }
+.logo-word { color: var(--text); }
 .nav-links { display: flex; align-items: center; gap: 28px; }
 .nav-links a { font-size: 14px; font-weight: 600; color: var(--ink); }
 .nav-links a:hover { color: var(--ink-soft); }

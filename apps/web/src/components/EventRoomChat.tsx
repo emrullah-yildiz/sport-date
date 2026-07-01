@@ -3,6 +3,8 @@
 import { EVENT_MESSAGE_MAX_LENGTH, SAFETY_REPORT_CATEGORIES, type SafetyReportCategory } from "@sport-date/domain";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 type ChatMessage = {
   id: string;
   senderUserId: string;
@@ -119,7 +121,7 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
       <p className="panel-label">Coordinate together</p>
       <h2 id="room-chat-title">Room chat</h2>
       <p className="room-chat-lede">
-        Sort the practical details here — timing, what to bring, running late. Keep it in Sport Date and share no private
+        Sort the practical details here — timing, what to bring, running late. Keep it in {BRAND_NAME} and share no private
         contact details or exact home addresses.
       </p>
 

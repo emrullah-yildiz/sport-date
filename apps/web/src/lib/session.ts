@@ -26,7 +26,7 @@ export type SessionUser = Readonly<{
   }>;
   prompts: ReadonlyArray<{ prompt: string; answer: string }>;
   // Membership entitlement state (CX-20260701-plus-tier-entitlement-model-and-gating).
-  // The instant the member's Sport Date Plus access lapses, or null for a FREE
+  // The instant the member's Rally Plus access lapses, or null for a FREE
   // member (the default for everyone). Never trust this raw — always resolve tier
   // through the fail-closed helper in `@/lib/entitlements` (isPlus / canUse), which
   // treats null / missing / expired as FREE. No safety or core capability is ever

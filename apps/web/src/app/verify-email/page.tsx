@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
 import EmailVerificationConfirmCard from "@/components/EmailVerificationConfirmCard";
 import { firstSearchParam } from "@/lib/auth-flow";
 
 export const metadata: Metadata = {
-  title: "Verify Email - Sport Date",
-  description: "Confirm your Sport Date email address and keep your profile secure.",
+  title: "Verify Email",
+  description: `Confirm your ${BRAND_NAME} email address and keep your profile secure.`,
 };
 
 export default async function VerifyEmailPage({

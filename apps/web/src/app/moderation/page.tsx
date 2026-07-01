@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Wordmark } from "@/lib/brand";
 import { getModerationQueue, getModeratorSession } from "@/lib/moderation";
 
-export const metadata = { title: "Moderation queue - Sport Date" };
+export const metadata = { title: "Moderation queue" };
 
 export default async function ModerationQueuePage() {
   const moderator = await getModeratorSession();
@@ -13,7 +14,7 @@ export default async function ModerationQueuePage() {
   return (
     <main className="moderation-page">
       <nav className="profile-nav">
-        <Link href="/landing" className="logo">Sport Date</Link>
+        <Link href="/landing" className="logo" aria-label="Rally home"><Wordmark decorative /></Link>
         <Link href="/profile">Leave staff area</Link>
       </nav>
       <header className="moderation-header">

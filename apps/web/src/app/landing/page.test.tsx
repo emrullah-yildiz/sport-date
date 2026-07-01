@@ -38,7 +38,7 @@ describe("LandingPage auth-awareness", () => {
     expect(html).toContain('href="/signup"');
     expect(html).toContain("Sign in");
     // No signed-in affordances leak to logged-out visitors.
-    expect(html).not.toContain("Enter Sport Date");
+    expect(html).not.toContain("Enter Rally");
     expect(html).not.toContain("Signed in as");
   });
 
@@ -48,7 +48,7 @@ describe("LandingPage auth-awareness", () => {
     const html = await render();
 
     // A signed-in member must reach the app in one click and see they're signed in.
-    expect(html).toContain("Enter Sport Date");
+    expect(html).toContain("Enter Rally");
     expect(html).toContain('href="/discover"');
     expect(html).toContain("Signed in as Ana");
     // They are never shown the "Sign in" CTA that implies they were logged out.

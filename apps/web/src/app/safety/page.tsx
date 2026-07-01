@@ -2,11 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
+import { Wordmark } from "@/lib/brand";
 import SafetyAppealForm from "@/components/SafetyAppealForm";
 import { getMemberSafetyCases } from "@/lib/safety";
 import { getCurrentUser } from "@/lib/session";
 
-export const metadata = { title: "Safety center - Sport Date" };
+export const metadata = { title: "Safety center" };
 
 function displayLabel(value: string) {
   return value.replaceAll("_", " ");
@@ -20,7 +21,7 @@ export default async function SafetyCenterPage() {
   return (
     <main className="safety-center-page">
       <nav className="profile-nav">
-        <Link href="/discover" className="logo">Sport Date</Link>
+        <Link href="/discover" className="logo" aria-label="Rally — go to discover"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <Link href="/profile">Back to profile</Link>
           <AccountMenu firstName={user.firstName} />

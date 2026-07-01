@@ -1,13 +1,13 @@
 # CX-20260702-rebrand-to-rally-name-and-neon-logo
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — owner delegated the name+logo decision ("You decide", 2026-07-02). Rename the product and ship a modern neon logo, centralized so it's a one-edit change later.
 - Customer journey: brand / trust (cross-cutting)
 - Surface: `web`
 - Environment and viewport/device: all widths + metadata/favicon/emails
 - Found by: Owner (delegated 2026-07-02)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-owner-decision-brand-name-and-logo` (decision — now made), `CX-20260701-brand-asset-swap-mechanism`, `CX-20260701-shareable-branded-motivational-card`, `docs/marketing/brand-refresh-proposal.md`, `docs/design-refresh-2026.md`
 
 ## Decision (made by the assistant under owner delegation)
@@ -34,3 +34,4 @@
 ## Handoff and retest log
 
 - 2026-07-02 - Filed after owner delegated the name/logo decision; decision recorded (name "Rally", neon motion-mark). Status `ready`.
+- 2026-07-02 - experience-build-agent picked up, set `in-progress`, recorded as implementation owner. Implementing single brand module + component and sweeping all member-facing "Sport Date" literals.

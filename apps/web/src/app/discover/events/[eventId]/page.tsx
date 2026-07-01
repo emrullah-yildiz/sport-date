@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
+import { Wordmark } from "@/lib/brand";
 import JoinRequestControls from "@/components/JoinRequestControls";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import { getAcceptedEventLocation, getDiscoverableEvent } from "@/lib/events";
@@ -25,7 +26,7 @@ export default async function DiscoveryEventPage({ params }: { params: Promise<{
 
   return (
     <main className="event-detail-page">
-      <nav className="profile-nav"><Link href="/discover" className="logo">Sport Date</Link><div className="nav-actions"><Link href="/discover">Back to discovery</Link><AccountMenu firstName={user.firstName} /></div></nav>
+      <nav className="profile-nav"><Link href="/discover" className="logo" aria-label="Rally — back to discovery"><Wordmark decorative /></Link><div className="nav-actions"><Link href="/discover">Back to discovery</Link><AccountMenu firstName={user.firstName} /></div></nav>
       <header className="event-detail-hero"><div><p className="eyebrow">{event.sport} · {event.areaLabel}</p><h1>{event.title}</h1><p>{event.description}</p></div><div className="event-detail-facts"><strong>{start}</strong><span>{event.durationMinutes} minutes</span><span>{event.placesRemaining} of {event.capacity} places remain</span><span>{event.language} · {event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span><span>Hosted by {event.hostFirstName}</span></div></header>
       <section className="event-detail-grid"><article><p className="panel-label">Before acceptance</p><h2>{event.areaLabel}, {event.city}</h2><p>This is deliberately approximate. The exact venue is not included in this page or its data.</p></article>{event.viewerIsHost ? (
         <div className="event-detail-manage">

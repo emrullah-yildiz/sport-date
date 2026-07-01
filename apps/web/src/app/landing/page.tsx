@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BRAND_NAME, BRAND_TITLE, Wordmark } from "@/lib/brand";
 import { sportEmoji } from "@/lib/sports";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Sport Date — Meet through movement",
+  // Absolute so the root layout's "%s — Rally" template does not append the
+  // brand name twice on the marketing home (its title already ends in "Rally").
+  title: { absolute: BRAND_TITLE },
   description:
     "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults only, Europe first.",
 };
@@ -85,9 +88,8 @@ export default async function LandingPage() {
     <main className="landing-page">
       <header className="navbar">
         <div className="nav-container">
-          <Link className="logo" href={user ? "/discover" : "/landing"}>
-            <span className="logo-mark" aria-hidden="true">S</span>
-            Sport Date
+          <Link className="logo" href={user ? "/discover" : "/landing"} aria-label={`${BRAND_NAME} home`}>
+            <Wordmark decorative />
           </Link>
           <nav className="nav-links" aria-label="Primary">
             <a href="#how-it-works">How it works</a>
@@ -100,7 +102,7 @@ export default async function LandingPage() {
                 <Link href="/profile" className="nav-signin">
                   Signed in as {user.firstName}
                 </Link>
-                <Link href="/discover" className="btn btn--accent">Enter Sport Date</Link>
+                <Link href="/discover" className="btn btn--accent">Enter {BRAND_NAME}</Link>
               </>
             ) : (
               <>
@@ -120,14 +122,14 @@ export default async function LandingPage() {
               Meet people through a real game, <span className="accent">not another profile.</span>
             </h1>
             <p className="hero-subtitle">
-              Sport Date organises the first encounter around a small local sport — a run, a padel
+              {BRAND_NAME} organises the first encounter around a small local sport — a run, a padel
               match, a chess game. Know the level, time, area, and intentions before you request a
               place.
             </p>
             <div className="hero-cta">
               {user ? (
                 <>
-                  <Link href="/discover" className="btn btn--primary btn--lg">Enter Sport Date</Link>
+                  <Link href="/discover" className="btn btn--primary btn--lg">Enter {BRAND_NAME}</Link>
                   <Link href="/profile" className="btn btn--secondary btn--lg">Your profile</Link>
                 </>
               ) : (
@@ -264,7 +266,7 @@ export default async function LandingPage() {
             : "Create a private beta profile, pick your sports, and help shape how adults meet through movement."}
         </p>
         {user ? (
-          <Link href="/discover" className="btn btn--accent btn--lg">Enter Sport Date</Link>
+          <Link href="/discover" className="btn btn--accent btn--lg">Enter {BRAND_NAME}</Link>
         ) : (
           <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
         )}
@@ -273,10 +275,7 @@ export default async function LandingPage() {
       <footer className="landing-footer">
         <div className="landing-footer-shell">
           <div className="landing-footer-brand">
-            <span className="logo">
-              <span className="logo-mark" aria-hidden="true">S</span>
-              Sport Date
-            </span>
+            <Wordmark variant="footer" />
             <p>Meet through movement. Adults only · Europe first.</p>
           </div>
           <nav aria-label="Legal and policy links">

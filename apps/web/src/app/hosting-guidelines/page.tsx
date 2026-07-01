@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Hosting Guidelines - Sport Date",
-  description: "Preview-era host expectations and boundaries for Sport Date.",
+  title: "Hosting Guidelines",
+  description: `Preview-era host expectations and boundaries for ${BRAND_NAME}.`,
 };
 
 export default function HostingGuidelinesPage() {
@@ -13,7 +15,7 @@ export default function HostingGuidelinesPage() {
         <p className="eyebrow">Hosting Guidelines</p>
         <h1>Hosting is real responsibility, not a trust badge</h1>
         <p>
-          These guidelines explain what Sport Date currently expects from a host in the preview. They are designed to make events clearer, calmer, and safer without implying that host status is certification, employment, or emergency support.
+          These guidelines explain what {BRAND_NAME} currently expects from a host in the preview. They are designed to make events clearer, calmer, and safer without implying that host status is certification, employment, or emergency support.
         </p>
       </section>
 

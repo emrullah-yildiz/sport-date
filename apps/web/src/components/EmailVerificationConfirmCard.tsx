@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { isBrowserEmailVerificationToken } from "@/lib/auth-flow";
 
 async function readJson(response: Response) {
@@ -35,7 +36,7 @@ function initialState(token: string): VerificationState {
     return {
       kind: "invalid",
       title: "Verification link invalid",
-      body: "This verification link does not match Sport Date's expected secure format.",
+      body: `This verification link does not match ${BRAND_NAME}'s expected secure format.`,
     };
   }
   return {

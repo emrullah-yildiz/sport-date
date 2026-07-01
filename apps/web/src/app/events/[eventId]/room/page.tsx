@@ -12,6 +12,7 @@ import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
+import { BRAND_NAME, Wordmark } from "@/lib/brand";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
 import { getPeerFeedbackTargets } from "@/lib/peer-feedback";
@@ -62,7 +63,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   return (
     <main className="room-page">
       <nav className="profile-nav">
-        <Link href={room.isHost ? `/events/${room.id}` : `/discover/events/${room.id}`} className="logo">Sport Date</Link>
+        <Link href={room.isHost ? `/events/${room.id}` : `/discover/events/${room.id}`} className="logo" aria-label="Rally — back to the event"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <span>{room.isHost ? "Host room" : "Accepted participant"}</span>
           <AccountMenu firstName={user.firstName} />
@@ -174,7 +175,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       <section className="room-rhythm">
         <p className="panel-label">A calm arrival</p>
         <div>
-          <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Use the room chat below to sort the practical details — keep coordination inside Sport Date.</p></article>
+          <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Use the room chat below to sort the practical details — keep coordination inside {BRAND_NAME}.</p></article>
           <article><span>02</span><h3>When you arrive</h3><p>Meet in the stated public venue. You can leave at any time if the situation feels different from the invitation.</p></article>
           <article><span>03</span><h3>If plans change</h3><p>Post in the room chat or cancel your place so the host has an accurate group. Every message can be reported, and blocking still hides you both ways.</p></article>
         </div>

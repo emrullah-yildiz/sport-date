@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BRAND_ACCENT, BRAND_NAME, RallyGlyph } from "@/lib/brand";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "Bucharest research preview — Sport Date",
-  description: "A local-only preview of the Sport Date Bucharest research proposition.",
+  title: "Bucharest research preview",
+  description: `A local-only preview of the ${BRAND_NAME} Bucharest research proposition.`,
   robots: { index: false, follow: false },
 };
 
@@ -39,9 +40,9 @@ export default function BucharestResearchPreview() {
   return (
     <main className={styles.page}>
       <nav className={styles.nav} aria-label="Research preview navigation">
-        <Link href="/landing" className={styles.brand}>
-          <span aria-hidden="true">SD</span>
-          Sport Date
+        <Link href="/landing" className={styles.brand} aria-label={`${BRAND_NAME} home`}>
+          <span aria-hidden="true"><RallyGlyph size={22} color={BRAND_ACCENT} /></span>
+          {BRAND_NAME}
         </Link>
         <span className={styles.previewFlag}>Local research preview</span>
       </nav>
@@ -149,7 +150,7 @@ export default function BucharestResearchPreview() {
       </section>
 
       <footer className={styles.footer}>
-        <div><strong>Sport Date</strong><span>Working name · Meet through movement</span></div>
+        <div><strong>{BRAND_NAME}</strong><span>Meet through movement</span></div>
         <p>Research hypothesis prepared for owner review. Bucharest and these sports are not final launch commitments.</p>
       </footer>
     </main>

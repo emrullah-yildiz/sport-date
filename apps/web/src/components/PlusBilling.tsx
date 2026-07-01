@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
-// Member-facing Sport Date Plus surface (CX-20260701-plus-billing-management-ui).
+import { BRAND_NAME } from "@/lib/brand";
+
+// Member-facing Rally Plus surface (CX-20260701-plus-billing-management-ui).
 //
 // HONEST + FAIL-CLOSED. This component renders NOTHING unless the server has told
 // it billing is actually configured (`billingConfigured`). When billing is dormant
@@ -60,12 +62,12 @@ export default function PlusBilling({ billingConfigured, isPlus }: PlusBillingPr
 
   return (
     <section className="plus-panel" aria-labelledby="plus-title">
-      <p className="panel-label">Sport Date Plus</p>
+      <p className="panel-label">{BRAND_NAME} Plus</p>
       {isPlus ? (
         <>
           <h2 id="plus-title">You’re a supporter</h2>
           <p>
-            Thank you for supporting Sport Date. You have Plus. Safety and joining games are always
+            Thank you for supporting {BRAND_NAME}. You have Plus. Safety and joining games are always
             free — Plus only adds convenience and a little extra expression.
           </p>
           <button
@@ -83,7 +85,7 @@ export default function PlusBilling({ billingConfigured, isPlus }: PlusBillingPr
         </>
       ) : (
         <>
-          <h2 id="plus-title">Support Sport Date with Plus</h2>
+          <h2 id="plus-title">Support {BRAND_NAME} with Plus</h2>
           <p className="plus-price">
             <strong>€6.99/month</strong> <span>VAT included</span>
           </p>

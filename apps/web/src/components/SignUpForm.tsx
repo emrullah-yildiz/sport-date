@@ -4,6 +4,7 @@ import { dateOfBirthError, validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { useSignUpStore, type SignUpState } from "@/lib/sign-up-store";
 import SignUpStep1 from "./steps/SignUpStep1";
 import SignUpStep2 from "./steps/SignUpStep2";
@@ -82,7 +83,7 @@ export default function SignUpForm() {
       <div className="signup-container">
         <div className="signup-card signup-success">
           <p className="step-indicator">Account created</p>
-          <h1>Welcome to Sport Date.</h1>
+          <h1>Welcome to {BRAND_NAME}.</h1>
           <p>Email verification delivery is not active yet. Your profile remains private, and you will be able to prepare verification from account security once delivery is approved.</p>
           <a className="btn-primary success-link" href="/profile">View your private profile</a>
         </div>

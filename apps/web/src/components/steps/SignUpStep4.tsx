@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { Seeking } from "@sport-date/domain";
+import { BRAND_NAME } from "@/lib/brand";
 import { useSignUpStore } from "@/lib/sign-up-store";
 
 const seekingOptions: Array<{ value: Seeking; label: string; description: string }> = [
@@ -19,7 +20,7 @@ export default function SignUpStep4() {
       <h2>Tell us about yourself</h2>
       <div className="form-group">
         <label htmlFor="signup-bio">Bio (optional)</label>
-        <textarea id="signup-bio" value={bio} onChange={(event) => setField("bio", event.target.value.slice(0, 200))} placeholder="What brings you to Sport Date?" rows={3} />
+        <textarea id="signup-bio" value={bio} onChange={(event) => setField("bio", event.target.value.slice(0, 200))} placeholder={`What brings you to ${BRAND_NAME}?`} rows={3} />
         <p className="char-count">{bio.length}/200</p>
       </div>
       <div className="form-group">

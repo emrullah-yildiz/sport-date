@@ -6,7 +6,7 @@ import ModerationAppealForm from "@/components/ModerationAppealForm";
 import ModerationCaseForm from "@/components/ModerationCaseForm";
 import { getModerationCase, getModeratorSession } from "@/lib/moderation";
 
-export const metadata = { title: "Moderation case - Sport Date" };
+export const metadata = { title: "Moderation case" };
 
 export default async function ModerationCasePage({ params }: { params: Promise<{ reportId: string }> }) {
   const moderator = await getModeratorSession();

@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect } from "react";
 
+import { Wordmark } from "@/lib/brand";
+
 export default function HostingError({
   error,
   unstable_retry,
@@ -17,7 +19,7 @@ export default function HostingError({
   return (
     <main className="hosting-page">
       <nav className="profile-nav">
-        <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
         <Link href="/events/new">Host an event</Link>
       </nav>
       <section className="hosting-empty" role="alert">

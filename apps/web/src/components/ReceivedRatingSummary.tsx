@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { PEER_FEEDBACK_AGGREGATE_MIN_COUNT, PEER_FEEDBACK_STARS_MAX, type PeerRatingAggregate } from "@sport-date/domain";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 // The recipient's OWN meetup-experience rating, shown as an aggregate average only.
 //
 // This is the ONLY place a member ever sees their received stars, and it is
@@ -18,7 +20,7 @@ export default function ReceivedRatingSummary({ aggregate }: { aggregate: PeerRa
       <p className="panel-label">Earned trust</p>
       <h2 id="received-rating-title">How your meetups land</h2>
       <p>
-        After you meet someone through Sport Date, they can leave a private 1&ndash;5 star note on the
+        After you meet someone through {BRAND_NAME}, they can leave a private 1&ndash;5 star note on the
         <strong> experience of meeting up</strong> &mdash; reliability, respect, and how the shared activity went.
         This is never about looks or desirability, and it is only ever shown here, to you, as an average.
       </p>

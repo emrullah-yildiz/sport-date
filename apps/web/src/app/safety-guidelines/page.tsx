@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Safety Guidelines - Sport Date",
-  description: "Preview-era member safety guidelines for Sport Date.",
+  title: "Safety Guidelines",
+  description: `Preview-era member safety guidelines for ${BRAND_NAME}.`,
 };
 
 export default function SafetyGuidelinesPage() {

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Terms Preview - Sport Date",
-  description: "Preview-era product terms and member expectations for Sport Date.",
+  title: "Terms Preview",
+  description: `Preview-era product terms and member expectations for ${BRAND_NAME}.`,
 };
 
 export default function TermsPage() {

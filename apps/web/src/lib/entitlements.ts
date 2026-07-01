@@ -23,7 +23,7 @@ import type { SessionUser } from "@/lib/session";
 // `canUse` even by mistake (it would not typecheck).
 
 /**
- * Is the given signed-in member currently Sport Date Plus? Fails closed to false
+ * Is the given signed-in member currently Rally Plus? Fails closed to false
  * (FREE) for a null user or an absent/expired entitlement.
  */
 export function isPlus(user: SessionUser | null | undefined, now: Date = new Date()): boolean {

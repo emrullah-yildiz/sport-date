@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
+import { Wordmark } from "@/lib/brand";
 import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
@@ -107,7 +108,7 @@ export default async function HostEventPage({
   return (
     <main className="host-event-page">
       <nav className="profile-nav">
-        <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <Link href="/hosting">Your events</Link>
           <Link href="/events/new">Host another</Link>

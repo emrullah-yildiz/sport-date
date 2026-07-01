@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
+import { BRAND_NAME, BRAND_TITLE } from "@/lib/brand";
 import "./globals.css";
 
 // Self-hosted at build time by next/font (downloaded into /_next/static), so
@@ -18,7 +19,13 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Sport Date — Meet through movement",
+  // One brand source of truth: a page sets just its own label (e.g. "Discover
+  // events") and `%s` composes it with the brand name; pages that set no title
+  // fall back to the full brand title.
+  title: {
+    default: BRAND_TITLE,
+    template: `%s — ${BRAND_NAME}`,
+  },
   description:
     "Meet compatible people through small, local sports — from running and padel to chess. Adults only, Europe first, privacy-first.",
 };

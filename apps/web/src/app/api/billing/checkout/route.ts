@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { BRAND_NAME } from "@/lib/brand";
 import { getMemberBilling, linkStripeCustomer } from "@/lib/billing";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -9,7 +10,7 @@ export const runtime = "nodejs";
 
 const privateHeaders = { "Cache-Control": "no-store" };
 
-// Start a Sport Date Plus subscription checkout (€6.99/mo, test mode)
+// Start a Rally Plus subscription checkout (€6.99/mo, test mode)
 // (CX-20260701-stripe-subscription-integration-test-mode).
 //
 // Requires an authenticated member and a same-origin (CSRF-safe) request. When
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
   // Fail closed BEFORE any Stripe interaction: Plus simply isn't available yet.
   if (!isBillingConfigured()) {
     return NextResponse.json(
-      { error: "Sport Date Plus isn’t available yet. The rest of Sport Date is unaffected.", code: "billing-unavailable" },
+      { error: `${BRAND_NAME} Plus isn’t available yet. The rest of ${BRAND_NAME} is unaffected.`, code: "billing-unavailable" },
       { status: 503, headers: privateHeaders },
     );
   }
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
   if (!result.ok) {
     if (result.reason === "not-configured") {
       return NextResponse.json(
-        { error: "Sport Date Plus isn’t available yet.", code: "billing-unavailable" },
+        { error: `${BRAND_NAME} Plus isn’t available yet.`, code: "billing-unavailable" },
         { status: 503, headers: privateHeaders },
       );
     }

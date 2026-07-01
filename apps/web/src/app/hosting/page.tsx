@@ -2,10 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
+import { Wordmark } from "@/lib/brand";
 import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, type HostedEvent } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
-export const metadata = { title: "Your events — Sport Date" };
+export const metadata = { title: "Your events" };
 
 function formatWhen(event: HostedEvent) {
   return new Intl.DateTimeFormat("en-GB", {
@@ -81,7 +82,7 @@ export default async function HostingPage({ searchParams }: { searchParams: Prom
   return (
     <main className="hosting-page">
       <nav className="profile-nav">
-        <Link href="/profile" className="logo">Sport Date</Link>
+        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <Link href="/events/new">Host an event</Link>
           <AccountMenu firstName={user.firstName} />

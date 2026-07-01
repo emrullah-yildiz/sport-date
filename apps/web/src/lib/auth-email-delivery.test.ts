@@ -7,7 +7,7 @@ import { dispatchAuthEmail, canSendAuthEmails, resolveAuthEmailProvider } from "
 const draft = {
   kind: "email_verification" as const,
   to: "ana@example.com",
-  subject: "Verify your Sport Date email",
+  subject: "Verify your Rally email",
   html: "<p>hi</p>",
   text: "hi",
   actionUrl: "https://sportdate.example/verify-email?token=sdv_example",

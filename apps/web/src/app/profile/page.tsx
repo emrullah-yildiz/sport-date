@@ -12,6 +12,7 @@ import PlusBilling from "@/components/PlusBilling";
 import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import WebSessionControls from "@/components/WebSessionControls";
+import { Wordmark } from "@/lib/brand";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { isPlus } from "@/lib/entitlements";
 import { isBillingConfigured } from "@/lib/stripe";
@@ -20,7 +21,7 @@ import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser, type SessionUser } from "@/lib/session";
 
-export const metadata = { title: "Your profile — Sport Date" };
+export const metadata = { title: "Your profile" };
 
 const SEEKING_HEADLINES: Record<SessionUser["seeking"], string> = {
   dating: "Dating",
@@ -80,7 +81,7 @@ export default async function ProfilePage() {
   return (
     <main className="profile-page">
       <nav className="profile-nav">
-        <Link href="/discover" className="logo">Sport Date</Link>
+        <Link href="/discover" className="logo" aria-label="Rally — go to discover"><Wordmark decorative /></Link>
         <div className="nav-actions">
           <AccountMenu firstName={user.firstName} />
         </div>

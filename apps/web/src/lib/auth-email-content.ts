@@ -1,3 +1,5 @@
+import { BRAND_NAME } from "@/lib/brand";
+
 export type AuthEmailKind = "email_verification" | "password_reset";
 
 export type AuthEmailDraft = Readonly<{
@@ -67,7 +69,7 @@ export function buildEmailVerificationDraft({ origin, email, token, expiresAt }:
   return {
     kind: "email_verification",
     to: email,
-    subject: "Verify your Sport Date email",
+    subject: `Verify your ${BRAND_NAME} email`,
     actionUrl,
     expiresAt: expiresIso,
     metadata: {
@@ -75,20 +77,20 @@ export function buildEmailVerificationDraft({ origin, email, token, expiresAt }:
       expiresAt: expiresIso,
     },
     text: [
-      "Verify your Sport Date email.",
+      `Verify your ${BRAND_NAME} email.`,
       "",
-      "You received this message because a Sport Date account asked to confirm this inbox.",
+      `You received this message because a ${BRAND_NAME} account asked to confirm this inbox.`,
       `Verification link: ${actionUrl}`,
       `This link expires at ${expiresIso}.`,
       "",
-      "If you did not create or update a Sport Date account, you can ignore this email.",
+      `If you did not create or update a ${BRAND_NAME} account, you can ignore this email.`,
     ].join("\n"),
     html: [
-      "<p>Verify your Sport Date email.</p>",
-      "<p>You received this message because a Sport Date account asked to confirm this inbox.</p>",
+      `<p>Verify your ${BRAND_NAME} email.</p>`,
+      `<p>You received this message because a ${BRAND_NAME} account asked to confirm this inbox.</p>`,
       `<p><a href="${actionUrl}">Verify email</a></p>`,
       `<p>This link expires at <strong>${expiresIso}</strong>.</p>`,
-      "<p>If you did not create or update a Sport Date account, you can ignore this email.</p>",
+      `<p>If you did not create or update a ${BRAND_NAME} account, you can ignore this email.</p>`,
     ].join(""),
   };
 }
@@ -99,7 +101,7 @@ export function buildPasswordResetDraft({ origin, email, token, expiresAt }: Bui
   return {
     kind: "password_reset",
     to: email,
-    subject: "Reset your Sport Date password",
+    subject: `Reset your ${BRAND_NAME} password`,
     actionUrl,
     expiresAt: expiresIso,
     metadata: {
@@ -107,9 +109,9 @@ export function buildPasswordResetDraft({ origin, email, token, expiresAt }: Bui
       expiresAt: expiresIso,
     },
     text: [
-      "Reset your Sport Date password.",
+      `Reset your ${BRAND_NAME} password.`,
       "",
-      "A password reset was requested for this Sport Date account.",
+      `A password reset was requested for this ${BRAND_NAME} account.`,
       `Reset link: ${actionUrl}`,
       `This link expires at ${expiresIso}.`,
       "Nothing changes unless you complete the reset form from that link.",
@@ -117,8 +119,8 @@ export function buildPasswordResetDraft({ origin, email, token, expiresAt }: Bui
       "If you did not request a reset, you can ignore this email.",
     ].join("\n"),
     html: [
-      "<p>Reset your Sport Date password.</p>",
-      "<p>A password reset was requested for this Sport Date account.</p>",
+      `<p>Reset your ${BRAND_NAME} password.</p>`,
+      `<p>A password reset was requested for this ${BRAND_NAME} account.</p>`,
       `<p><a href="${actionUrl}">Choose a new password</a></p>`,
       `<p>This link expires at <strong>${expiresIso}</strong>.</p>`,
       "<p>Nothing changes unless you complete the reset form from that link.</p>",

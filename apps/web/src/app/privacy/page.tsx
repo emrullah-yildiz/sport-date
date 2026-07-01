@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Privacy Notice Preview - Sport Date",
-  description: "Preview-era privacy notice and data-rights summary for Sport Date.",
+  title: "Privacy Notice Preview",
+  description: `Preview-era privacy notice and data-rights summary for ${BRAND_NAME}.`,
 };
 
 export default function PrivacyPage() {

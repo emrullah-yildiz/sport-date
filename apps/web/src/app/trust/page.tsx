@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export const metadata: Metadata = {
-  title: "Trust Preview - Sport Date",
-  description: "Public-facing trust and safety boundaries for the Sport Date preview.",
+  title: "Trust Preview",
+  description: `Public-facing trust and safety boundaries for the ${BRAND_NAME} preview.`,
 };
 
 export default function TrustPage() {
@@ -13,7 +15,7 @@ export default function TrustPage() {
         <p className="eyebrow">Trust preview</p>
         <h1>Trust has to be visible in product behavior, not just in brand language</h1>
         <p>
-          Sport Date is designed for real-world meetings, so this page explains the current trust boundary in plain language. It describes what the preview does now, what remains intentionally unavailable, and what still requires launch-country legal and operational review.
+          {BRAND_NAME} is designed for real-world meetings, so this page explains the current trust boundary in plain language. It describes what the preview does now, what remains intentionally unavailable, and what still requires launch-country legal and operational review.
         </p>
       </section>
 
