@@ -1,14 +1,14 @@
 # CX-20260702-migrate-hardcoded-colors-to-tokens
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — bumped from P2: until the ~141 hardcoded light card/panel/input colors + ~32 dark-fill surfaces are moved onto tokens, the app is a half-migrated mix (dark shell, light cards) that looks worse than either state. Completing this is what actually delivers the black+neon look. Split by surface-group if too large for one clean unit.
 - Customer journey: cross-cutting (every surface with a card/panel — discovery, hosting, trust, profile, coordination, reflection, auth)
 - Surface: `web` (desktop + mobile; shared CSS)
 - Environment and viewport/device: dev server localhost:3000, all widths; `apps/web/src/app/globals.css`
 - Found by: experience-build-agent — inventory taken while implementing `CX-20260702-dark-neon-theme-tokens` (2026-07-02)
-- Implementation owner: `unassigned`
-- Related tickets: `CX-20260702-dark-neon-theme-tokens` (parent — established the token layer this migrates onto), `CX-20260702-typography-right-size-and-scale`
+- Implementation owner: `experience-build-agent`
+- Related tickets: `CX-20260702-dark-neon-theme-tokens` (parent — established the token layer this migrates onto), `CX-20260702-typography-right-size-and-scale`, `CX-20260702-migrate-hardcoded-colors-moderation-remainder` (child — deferred staff `/moderation` + dead legacy landing CSS)
 
 ## Customer outcome
 
@@ -79,3 +79,4 @@ Practical/emotional: leftover light cards on a dark page read as broken/half-fin
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by experience-build-agent as the scoped follow-up to `CX-20260702-dark-neon-theme-tokens` (token layer shipped in commit `b4ff31a`). Inventory of Class A (hardcoded light fills), Class B (`--ink`-as-dark-fill), and Class C (dark-ink rgba helpers) captured above from a source grep of `globals.css`. Status `ready`.
+- 2026-07-02 - experience-build-agent took ownership, status `in-progress`. Migrating the high-visibility member journeys fully (global controls + button system, landing, signup, auth, profile, discover, hosting, event detail/room, safety report control, feedback) onto `--surface`/`--surface-raised`/`--text`/`--text-muted`/`--line`. Re-pointing legacy `--cream` from `--bg` to `--surface` so token-consuming pills/chips render as raised dark chips (not invisible on the page bg). Deferring staff-only `/moderation` + `/research/bucharest` low-level literal text colors to a focused follow-up if they don't recolor for free.
