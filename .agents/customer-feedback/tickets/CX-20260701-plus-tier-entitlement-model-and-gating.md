@@ -1,13 +1,13 @@
 # CX-20260701-plus-tier-entitlement-model-and-gating
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 4) / Effort 3 = 26.7. Foundation every other Plus ticket depends on; nothing else can be gated honestly until this exists. Build first in the monetization sequence.
 - Customer journey: (foundation — spans profile, discovery, and future Plus surfaces; no charging surface here)
 - Surface: `web` (mobile parity where surfaced)
 - Environment and viewport/device: all widths
 - Found by: Owner launch decision (2026-07-01) — freemium + Plus €6.99/mo; `docs/marketing/monetization-and-pricing-analysis.md` §0
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-owner-decision-monetization-model-and-pricing` (verified — the approved model this implements), `CX-20260701-owner-decision-payments-processor-and-billing-gate` (blocked-owner — go-live only; this ticket must NOT integrate a live processor or charge), `CX-20260701-stripe-subscription-integration-test-mode` (P1 — the Stripe webhook is what actually sets/clears the entitlement this ticket defines; sequence: build this first, then Stripe), `CX-20260701-plus-billing-management-ui` (P2), `CX-20260701-plus-perks-advanced-discovery-filters` (P2 — first consumer of the gating helper), `CX-20260701-membership-tier-scaffolding-non-billing` (**superseded / folded into this ticket** — see Duplicate check)
 
 ## Customer outcome

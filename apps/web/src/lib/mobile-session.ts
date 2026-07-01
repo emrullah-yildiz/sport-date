@@ -18,6 +18,7 @@ type MobileSessionUserRow = {
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
   prompts: Array<{ prompt: string; answer: string }> | null;
+  plus_until: string | Date | null;
 };
 
 export type MobileSessionContext = Readonly<{ sessionId: string; user: SessionUser }>;
@@ -50,6 +51,7 @@ export async function getMobileSession(request: Request): Promise<MobileSessionC
       DATE_PART('year', AGE(CURRENT_DATE, users.date_of_birth))::integer AS age,
       users.first_name, users.last_name, users.location, users.bio, users.languages,
       users.seeking, users.email_verified, users.personality_prompts AS prompts,
+      users.plus_until,
       COALESCE(jsonb_agg(jsonb_build_object(
         'name', user_sports.sport, 'skillLevel', user_sports.skill_level, 'frequency', user_sports.frequency
       ) ORDER BY user_sports.created_at) FILTER (WHERE user_sports.id IS NOT NULL), '[]'::jsonb) AS sports
@@ -68,6 +70,14 @@ export async function getMobileSession(request: Request): Promise<MobileSessionC
       lastName: row.last_name, location: row.location, bio: row.bio,
       languages: row.languages, seeking: row.seeking, emailVerified: row.email_verified,
       sports: row.sports, prompts: Array.isArray(row.prompts) ? row.prompts : [],
+      plusUntil: normalizePlusUntil(row.plus_until),
     },
   };
+}
+
+// Fail closed: any unparseable value resolves to null (= FREE).
+function normalizePlusUntil(value: string | Date | null | undefined): string | null {
+  if (value == null) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
 }

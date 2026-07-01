@@ -25,6 +25,13 @@ export type SessionUser = Readonly<{
     frequency: "weekly" | "biweekly" | "monthly" | "casual";
   }>;
   prompts: ReadonlyArray<{ prompt: string; answer: string }>;
+  // Membership entitlement state (CX-20260701-plus-tier-entitlement-model-and-gating).
+  // The instant the member's Sport Date Plus access lapses, or null for a FREE
+  // member (the default for everyone). Never trust this raw — always resolve tier
+  // through the fail-closed helper in `@/lib/entitlements` (isPlus / canUse), which
+  // treats null / missing / expired as FREE. No safety or core capability is ever
+  // gated on it.
+  plusUntil: string | null;
 }>;
 
 type SessionUserRow = {
@@ -40,6 +47,7 @@ type SessionUserRow = {
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
   prompts: Array<{ prompt: string; answer: string }> | null;
+  plus_until: string | Date | null;
 };
 
 export function setSessionCookie(
@@ -77,6 +85,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       users.first_name, users.last_name, users.location,
       users.bio, users.languages, users.seeking, users.email_verified,
       users.personality_prompts AS prompts,
+      users.plus_until,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -112,7 +121,16 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     emailVerified: row.email_verified,
     sports: row.sports,
     prompts: Array.isArray(row.prompts) ? row.prompts : [],
+    // Normalise to an ISO string (or null). Fail closed: anything unparseable
+    // becomes null (= FREE) rather than a bogus non-null value.
+    plusUntil: normalizePlusUntil(row.plus_until),
   };
+}
+
+function normalizePlusUntil(value: string | Date | null | undefined): string | null {
+  if (value == null) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isFinite(date.getTime()) ? date.toISOString() : null;
 }
 
 export async function revokeSessionToken(token: string): Promise<void> {

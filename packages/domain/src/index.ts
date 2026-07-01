@@ -1,3 +1,4 @@
+export * from "./entitlements";
 export * from "./event";
 export * from "./feedback";
 export * from "./image-metadata";
