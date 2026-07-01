@@ -1,6 +1,6 @@
 # CX-20260701-peer-star-rating-recipient-visible-safe
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 5 × Confidence 3) / Effort 4 = 15. Held at P1: this delivers the visible half of owner criterion 7 ("feedback to profiles, like Uber") that the owner explicitly decided, but it is safety-sensitive and must ship exactly to the safety-bounded design below.
 - Customer journey: activity → reflection → trust (after a shared event)
@@ -64,4 +64,5 @@ Earned, experience-based trust is the product's honest alternative to profile-pe
 ## Handoff and retest log
 
 - 2026-07-01 - `experience-build-agent` took ownership; status `ready` → `in-progress` to implement the recipient-visible star extension.
+- 2026-07-01 - `experience-build-agent` implemented (commit `55ffbac`, status `in-progress` → `implemented`). Added an optional 1-5 star meetup-EXPERIENCE dimension (reliability/respect/how it went — explicitly not looks/desirability; domain now accepts the single `experienceStars` key and still rejects attractiveness/desirability/popularity/bare rating keys). Migration 023 adds a nullable CHECK-bounded `experience_stars` column, preserving all 022 invariants. Double-blind reveal enforced server-side (`getReceivedRatingAggregate`: a received star counts only after the recipient rated back for that event or a 14-day window passes). Recipient sees only an aggregate AVERAGE on their own /profile, gated at ≥3 (calm "not enough ratings yet" below), never who-gave-what, never to other members/discovery/public. Report-unfair-rating routes to existing Report/Block moderation; ratings never gate safety/leave/block/report. Accessible star input (native radiogroup, labelled, 44px, non-colour-only, focus-visible, reduced-motion safe, on brand). Given ratings exportable; received/aggregate not exported. Checks: typecheck pass, lint clean (only pre-existing warning in untracked qa/full-flows.mjs), web tests 229 pass/12 skipped, domain tests 105 pass, migration applied + idempotent. Sanity-checked recipient aggregate + export with one pooled login (two-attendee double-blind sequence is rate-limited — covered by unit tests + source). Ready for independent retest.
 - 2026-07-01 - Filed to implement the owner decision (`CX-20260701-owner-decision-peer-rating-visibility-and-dimensions`, verified): recipient-visible 1-5 star meetup-experience rating with double-blind reveal, ≥3-threshold aggregate average, report-abuse path, and no other-member/public exposure. Extends the verified safe-minimum peer-feedback feature. Status `ready`.
