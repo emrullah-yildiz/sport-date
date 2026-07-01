@@ -32,8 +32,8 @@ export default async function ProfilePage() {
       <section className="profile-hero">
         <div>
           <p className="eyebrow">Your private beta profile</p>
-          <h1>{user.firstName}, ready when the right game appears.</h1>
-          <p>This is your current private account record, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
+          <h1>{user.firstName} {user.lastName}</h1>
+          <p>Ready when the right game appears. This is your private account record, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
         </div>
         <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
       </section>
@@ -41,8 +41,8 @@ export default async function ProfilePage() {
       <section className="profile-grid">
         <article className="profile-panel">
           <p className="panel-label">About</p>
-          <h2>{user.firstName} {user.lastName}</h2>
-          <p>{user.location}</p>
+          <h2>{user.location}</h2>
+          <p>Where you move · {user.firstName}&rsquo;s home base for meeting people through sport.</p>
           {user.bio ? <blockquote>{user.bio}</blockquote> : <p className="profile-empty">Add a short introduction when profile editing arrives.</p>}
         </article>
         <article className="profile-panel">
