@@ -8,8 +8,10 @@ import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
+import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
+import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
 import { getMemberMovementProgress } from "@/lib/progress";
 import { getCurrentUser, type SessionUser } from "@/lib/session";
 
@@ -58,9 +60,10 @@ function describeSport(
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const [movementProgress, communicationPreferences] = await Promise.all([
+  const [movementProgress, communicationPreferences, receivedRating] = await Promise.all([
     getMemberMovementProgress(user.id),
     getCommunicationPreferences(user.id),
+    getReceivedRatingAggregate(user.id),
   ]);
 
   return (
@@ -165,6 +168,7 @@ export default async function ProfilePage() {
         </article>
       </section>
       <MovementArc progress={movementProgress} />
+      <ReceivedRatingSummary aggregate={receivedRating} />
       <CommunicationPreferences preferences={communicationPreferences} />
       <WebSessionControls />
       <MobileSessionControls />

@@ -2,7 +2,12 @@ import "server-only";
 
 import crypto from "node:crypto";
 
-import { peerFeedbackFlagsSafetyConcern, type PeerFeedbackInput } from "@sport-date/domain";
+import {
+  peerFeedbackFlagsSafetyConcern,
+  summarizeReceivedRatings,
+  type PeerFeedbackInput,
+  type PeerRatingAggregate,
+} from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
 
@@ -10,6 +15,14 @@ import { getDatabase } from "@/lib/db";
 // day after first leaving it, then it locks. Kept as a pure export so the rule is
 // unit-tested and shared with any UI that needs to show "locked".
 export const PEER_FEEDBACK_EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+// Double-blind reveal window: a member sees a star they RECEIVED for an event only
+// after they have submitted their own for that co-attendance, OR after this window
+// passes since the giver left it — whichever comes first. The window blunts
+// retaliation / quid-pro-quo (you can't peek before reciprocating) while still
+// guaranteeing the rating eventually surfaces even if the recipient never rates
+// back. Enforced server-side in the reveal query below.
+export const PEER_FEEDBACK_REVEAL_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
 export function peerFeedbackEditWindowOpen(firstSubmittedAt: string | Date, now: Date = new Date()): boolean {
   const submitted = firstSubmittedAt instanceof Date ? firstSubmittedAt : new Date(firstSubmittedAt);
@@ -28,6 +41,7 @@ export type PeerFeedbackTarget = Readonly<{
     feltRespected: PeerFeedbackInput["feltRespected"];
     feltSafe: PeerFeedbackInput["feltSafe"];
     note: string | null;
+    experienceStars: number | null;
   } | null;
 }>;
 
@@ -39,6 +53,7 @@ type TargetRow = {
   felt_respected: PeerFeedbackInput["feltRespected"] | null;
   felt_safe: PeerFeedbackInput["feltSafe"] | null;
   note: string | null;
+  experience_stars: number | null;
   created_at: string | null;
 };
 
@@ -76,7 +91,7 @@ export async function getPeerFeedbackTargets(eventId: string, viewerId: string):
       member.id AS user_id,
       member.first_name,
       co_attendees.is_host,
-      given.showed_up, given.felt_respected, given.felt_safe, given.note, given.created_at
+      given.showed_up, given.felt_respected, given.felt_safe, given.note, given.experience_stars, given.created_at
     FROM co_attendees
     JOIN users AS member ON member.id = co_attendees.user_id AND member.account_status = 'active'
     LEFT JOIN peer_feedback AS given
@@ -105,6 +120,7 @@ export async function getPeerFeedbackTargets(eventId: string, viewerId: string):
             feltRespected: row.felt_respected as PeerFeedbackInput["feltRespected"],
             feltSafe: row.felt_safe as PeerFeedbackInput["feltSafe"],
             note: row.note,
+            experienceStars: row.experience_stars === null ? null : Number(row.experience_stars),
           }
         : null,
     };
@@ -165,9 +181,9 @@ export async function savePeerFeedback(
       SELECT 1 FROM existing
       WHERE created_at + INTERVAL '24 hours' < NOW()
     ), upserted AS (
-      INSERT INTO peer_feedback (id, event_id, from_user_id, to_user_id, showed_up, felt_respected, felt_safe, note, flagged_safety_concern)
+      INSERT INTO peer_feedback (id, event_id, from_user_id, to_user_id, showed_up, felt_respected, felt_safe, note, experience_stars, flagged_safety_concern)
       SELECT ${id}::uuid, eligible.id, ${fromUserId}, ${toUserId},
-        ${input.showedUp}, ${input.feltRespected}, ${input.feltSafe}, ${input.note}, ${flagged}
+        ${input.showedUp}, ${input.feltRespected}, ${input.feltSafe}, ${input.note}, ${input.experienceStars}, ${flagged}
       FROM eligible
       WHERE NOT EXISTS (SELECT 1 FROM locked)
       ON CONFLICT (event_id, from_user_id, to_user_id) DO UPDATE SET
@@ -175,6 +191,7 @@ export async function savePeerFeedback(
         felt_respected = EXCLUDED.felt_respected,
         felt_safe = EXCLUDED.felt_safe,
         note = EXCLUDED.note,
+        experience_stars = EXCLUDED.experience_stars,
         flagged_safety_concern = EXCLUDED.flagged_safety_concern,
         updated_at = NOW()
       RETURNING (xmax <> 0) AS updated
@@ -189,4 +206,43 @@ export async function savePeerFeedback(
   if (!result || result.eligible === null) return { ok: false, reason: "not_eligible" };
   if (result.locked !== null && result.updated === null) return { ok: false, reason: "locked" };
   return { ok: true, flaggedSafetyConcern: flagged, updated: Boolean(result.updated) };
+}
+
+// The recipient's OWN received experience rating, as a privacy-preserving aggregate.
+//
+// DOUBLE-BLIND, enforced here in SQL: a star another member gave `userId` for an
+// event only counts toward the aggregate once EITHER the recipient has submitted
+// their own peer feedback for that same event (reciprocated), OR the giver's row is
+// older than the reveal window. Until one of those holds, the received star is
+// invisible — the recipient cannot peek before reciprocating, blunting retaliation.
+//
+// The result is an aggregate AVERAGE only, gated at ≥3 revealed ratings; below that
+// the recipient sees a calm "not enough ratings yet" state with no partial number.
+// Individual stars, who gave them, and (below the threshold) any count are NEVER
+// returned. This function is recipient-scoped by construction: it only ever reads
+// rows where `to_user_id = ${userId}`, and nothing here is reachable for another
+// member or a public profile.
+export async function getReceivedRatingAggregate(userId: string): Promise<PeerRatingAggregate> {
+  const sql = getDatabase();
+  const rows = (await sql`
+    SELECT received.experience_stars
+    FROM peer_feedback AS received
+    WHERE received.to_user_id = ${userId}
+      AND received.experience_stars IS NOT NULL
+      AND (
+        -- Reciprocated: the recipient left their own feedback for the same event.
+        EXISTS (
+          SELECT 1 FROM peer_feedback AS mine
+          WHERE mine.event_id = received.event_id
+            AND mine.from_user_id = ${userId}
+        )
+        -- Or the reveal window (14 days) has passed since the star was given.
+        OR received.created_at + INTERVAL '14 days' <= NOW()
+      )
+  `) as unknown as Array<{ experience_stars: number | string | null }>;
+
+  const revealedStars = rows
+    .map((row) => (row.experience_stars === null ? Number.NaN : Number(row.experience_stars)))
+    .filter((value) => !Number.isNaN(value));
+  return summarizeReceivedRatings(revealedStars);
 }

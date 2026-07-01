@@ -1,13 +1,13 @@
 # CX-20260701-peer-star-rating-recipient-visible-safe
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 5 × Confidence 3) / Effort 4 = 15. Held at P1: this delivers the visible half of owner criterion 7 ("feedback to profiles, like Uber") that the owner explicitly decided, but it is safety-sensitive and must ship exactly to the safety-bounded design below.
 - Customer journey: activity → reflection → trust (after a shared event)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths
 - Found by: Owner decision (2026-07-01) on `CX-20260701-owner-decision-peer-rating-visibility-and-dimensions`
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-owner-decision-peer-rating-visibility-and-dimensions` (verified — the decision + safety-bounded design this implements), `CX-20260701-post-attendance-peer-signal-safe-minimum` (verified — the existing peer-feedback feature this extends: migration `022_peer_feedback.sql`, `packages/domain/src/peer-feedback.ts`, `apps/web/src/lib/peer-feedback.ts`, `apps/web/src/components/PeerFeedbackPanel.tsx`), `CX-20260701-member-profile-not-viewable-by-others`, `CX-20260701-repeated-cancellation-no-fair-reliability-rule`
 
 ## Customer outcome
@@ -63,4 +63,5 @@ Earned, experience-based trust is the product's honest alternative to profile-pe
 
 ## Handoff and retest log
 
+- 2026-07-01 - `experience-build-agent` took ownership; status `ready` → `in-progress` to implement the recipient-visible star extension.
 - 2026-07-01 - Filed to implement the owner decision (`CX-20260701-owner-decision-peer-rating-visibility-and-dimensions`, verified): recipient-visible 1-5 star meetup-experience rating with double-blind reveal, ≥3-threshold aggregate average, report-abuse path, and no other-member/public exposure. Extends the verified safe-minimum peer-feedback feature. Status `ready`.

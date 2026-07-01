@@ -110,7 +110,7 @@ export async function GET() {
   // attributable to its author and surfacing "who said what" would enable
   // retaliation. It stays internal to trust & safety only.
   const peerFeedbackGiven = await sql`
-    SELECT event_id, to_user_id, showed_up, felt_respected, felt_safe, note, created_at, updated_at
+    SELECT event_id, to_user_id, showed_up, felt_respected, felt_safe, note, experience_stars, created_at, updated_at
     FROM peer_feedback WHERE from_user_id = ${user.id} ORDER BY created_at
   `;
   const mobileDevices = await sql`

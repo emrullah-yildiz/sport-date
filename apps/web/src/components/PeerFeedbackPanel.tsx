@@ -1,6 +1,12 @@
 "use client";
 
-import { PEER_FEEDBACK_ANSWERS, type PeerFeedbackAnswer, peerFeedbackHasSubstance } from "@sport-date/domain";
+import {
+  PEER_FEEDBACK_ANSWERS,
+  PEER_FEEDBACK_STARS_MAX,
+  PEER_FEEDBACK_STARS_MIN,
+  type PeerFeedbackAnswer,
+  peerFeedbackHasSubstance,
+} from "@sport-date/domain";
 import { useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 
@@ -10,8 +16,68 @@ export type PeerFeedbackTargetView = {
   isHost: boolean;
   submitted: boolean;
   editable: boolean;
-  given: { showedUp: PeerFeedbackAnswer; feltRespected: PeerFeedbackAnswer; feltSafe: PeerFeedbackAnswer; note: string | null } | null;
+  given: {
+    showedUp: PeerFeedbackAnswer;
+    feltRespected: PeerFeedbackAnswer;
+    feltSafe: PeerFeedbackAnswer;
+    note: string | null;
+    experienceStars?: number | null;
+  } | null;
 };
+
+const STAR_VALUES = [1, 2, 3, 4, 5] as const;
+// Plain-language meaning for each star value so the control is never colour- or
+// shape-only: every option carries an accessible name a screen reader announces.
+const STAR_LABELS: Record<(typeof STAR_VALUES)[number], string> = {
+  1: "1 star — the meetup did not go well",
+  2: "2 stars — some issues with how it went",
+  3: "3 stars — a fine, respectful meetup",
+  4: "4 stars — a good, reliable meetup",
+  5: "5 stars — an excellent, respectful meetup",
+};
+
+// A keyboard-operable, labelled star input built on a native radio group: Tab moves
+// focus in, arrow keys move between values, each value has a real accessible name
+// and a visible numeric label (not colour-only). Optional — leaving it unset means
+// "no star". It rates the EXPERIENCE of meeting up, never looks/desirability.
+function ExperienceStarInput({
+  name,
+  value,
+  onChange,
+  disabled,
+  personName,
+}: {
+  name: string;
+  value: number | "";
+  onChange: (next: number) => void;
+  disabled: boolean;
+  personName: string;
+}) {
+  return (
+    <fieldset className="peer-feedback-stars">
+      <legend>How was the experience of meeting up? (optional)</legend>
+      <p className="peer-feedback-stars-help">
+        Rate reliability, respect, and how the shared activity went with {personName} — <strong>not</strong> their looks or desirability.
+      </p>
+      <div className="peer-feedback-stars-options" role="radiogroup" aria-label={`Experience rating from ${PEER_FEEDBACK_STARS_MIN} to ${PEER_FEEDBACK_STARS_MAX} stars`}>
+        {STAR_VALUES.map((star) => (
+          <label key={star} className="peer-feedback-star-option" data-selected={value === star ? "true" : undefined}>
+            <input
+              type="radio"
+              name={name}
+              value={star}
+              checked={value === star}
+              disabled={disabled}
+              onChange={() => onChange(star)}
+            />
+            <span aria-hidden="true" className="peer-feedback-star-glyph">{"★".repeat(star)}</span>
+            <span className="peer-feedback-star-name">{STAR_LABELS[star]}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 const ANSWER_LABELS: Record<PeerFeedbackAnswer, string> = {
   yes: "Yes",
@@ -75,6 +141,7 @@ function TargetForm({ eventId, target }: { eventId: string; target: PeerFeedback
     feltRespected: target.given?.feltRespected ?? "",
     feltSafe: target.given?.feltSafe ?? "",
   });
+  const [stars, setStars] = useState<number | "">(target.given?.experienceStars ?? "");
   const [note, setNote] = useState(target.given?.note ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -97,6 +164,7 @@ function TargetForm({ eventId, target }: { eventId: string; target: PeerFeedback
     feltRespected: answers.feltRespected || "prefer_not_to_say",
     feltSafe: answers.feltSafe || "prefer_not_to_say",
     note: note.trim() || null,
+    experienceStars: stars === "" ? null : stars,
   });
 
   // Callback ref: fires when the confirmation actually attaches to the DOM after the
@@ -124,6 +192,7 @@ function TargetForm({ eventId, target }: { eventId: string; target: PeerFeedback
           feltRespected: answers.feltRespected || "prefer_not_to_say",
           feltSafe: answers.feltSafe || "prefer_not_to_say",
           note: note.trim() || null,
+          experienceStars: stars === "" ? null : stars,
         }),
       });
       const result = await response.json();
@@ -176,6 +245,13 @@ function TargetForm({ eventId, target }: { eventId: string; target: PeerFeedback
               disabled={submitting}
             />
           ))}
+          <ExperienceStarInput
+            name={`${baseId}-experience-stars`}
+            value={stars}
+            onChange={(next) => setStars(next)}
+            disabled={submitting}
+            personName={target.firstName}
+          />
           <label className="peer-feedback-note">
             Optional private note to the safety team
             <textarea
@@ -189,7 +265,7 @@ function TargetForm({ eventId, target }: { eventId: string; target: PeerFeedback
           </label>
           {!canSubmit ? (
             <p className="peer-feedback-hint">
-              Answer at least one question, or leave a private note. Skipping this person is fine — nothing is recorded.
+              Answer at least one question, or leave a private note or a star. Skipping this person is fine — nothing is recorded.
             </p>
           ) : null}
           <button type="submit" disabled={submitting || !canSubmit}>
@@ -210,9 +286,12 @@ export default function PeerFeedbackPanel({ eventId, targets }: { eventId: strin
         <p className="panel-label">Quiet trust</p>
         <h2 id="peer-feedback-title">A private word on who you met</h2>
         <p>
-          Only for the people you actually met here. These reliability and respect notes are private,
-          are never shown on anyone&apos;s profile, and are never a public score or rating. You can leave one for
-          each person, or none at all — nothing changes if you skip it.
+          Only for the people you actually met here. Your reliability and respect notes stay private, and the
+          optional 1&ndash;5 star rating is about <strong>how the meetup went</strong> &mdash; reliability, respect, and the
+          shared activity &mdash; never about looks or desirability. What you leave is never shown on anyone&apos;s profile
+          and never as a public score. The person only ever sees an <em>average</em> of the stars they&apos;ve received, and
+          only once at least three people have rated them &mdash; never who gave which star. You can leave feedback for
+          each person, or none at all.
         </p>
       </div>
       <div className="peer-feedback-list">
@@ -220,7 +299,11 @@ export default function PeerFeedbackPanel({ eventId, targets }: { eventId: strin
           <TargetForm key={target.userId} eventId={eventId} target={target} />
         ))}
       </div>
-      <small>This is not a substitute for reporting. If something was wrong, use the Report or Block controls above.</small>
+      <small>
+        This is not a substitute for reporting. If something was wrong &mdash; including a rating you believe was unfair or
+        abusive &mdash; use the Report or Block controls above; a report reaches the safety team, and a rating never limits
+        your ability to leave, block, or report.
+      </small>
     </section>
   );
 }

@@ -64,8 +64,31 @@ describe("PeerFeedbackPanel empty-default guard", () => {
     expect(html).not.toMatch(/<form/);
   });
 
-  it("keeps the Report/Block safety reminder present and never replaces it", () => {
+  it("keeps the Report/Block safety reminder present and offers a path to report an unfair rating", () => {
     const html = render([target()]);
     expect(html).toMatch(/not a substitute for reporting/i);
+    // The report-an-unfair-rating path routes to the same Report/Block controls.
+    expect(html).toMatch(/unfair or abusive/i);
+  });
+
+  it("renders a labelled, non-color-only, keyboard-operable star input framed on the experience — not looks", () => {
+    const html = render([target()]);
+    // A real radiogroup => Tab/arrow-key operable and labelled.
+    expect(html).toMatch(/role="radiogroup"/);
+    expect(html).toMatch(/type="radio"[^>]*value="5"/);
+    // Every value has an accessible NAME (not colour/shape only).
+    expect(html).toMatch(/excellent, respectful meetup/i);
+    // The copy anchors it to the meetup experience and explicitly not to appeal.
+    expect(html).toMatch(/experience of meeting up/i);
+    expect(html).toMatch(/not<\/strong>\s*their looks or desirability/i);
+    // Fresh target => no star pre-selected, so an idle expand can't file one.
+    expect(html).not.toMatch(/name="[^"]*experience-stars"[^>]*checked/);
+  });
+
+  it("re-seeds a previously given star when editing within the window", () => {
+    const html = render([
+      target({ submitted: true, editable: true, given: { showedUp: "yes", feltRespected: "yes", feltSafe: "yes", note: null, experienceStars: 4 } }),
+    ]);
+    expect(html).toMatch(/value="4"[^>]*checked|checked[^>]*value="4"/);
   });
 });
