@@ -1,6 +1,6 @@
 # CX-20260701-post-attendance-peer-signal-safe-minimum
 
-- Status: `in-progress`
+- Status: `implemented`
 - Implementation owner: Experience Build Agent (Claude Opus 4.8)
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 5 × Confidence 3) / Effort 4 = 15. Held at P1: this is the safety-forward trust signal at the heart of the product's differentiation, but it is safety-sensitive and must ship as the *safe minimum* only. The visible-rating question is escalated separately (`blocked-owner`).
@@ -63,3 +63,4 @@ Post-attendance trust signals are the product's honest alternative to profile-pe
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 7); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`. Building the safe-minimum private peer reliability/respect signal (migration + domain validation + shared-attendance-gated API + calm ended-room UI); visibility/aggregation stays deferred to the blocked-owner decision ticket.
+- 2026-07-01 - Experience Build Agent implemented (commit `aef3b94`), status `implemented`. Shipped whole: migration `022_peer_feedback.sql` (private, event-scoped, from/to, three fixed yes/no/prefer-not confirmations + optional private note + internal safety flag, unique per (event,from,to), no-self CHECK, ON DELETE CASCADE both sides); domain `peer-feedback.ts` validation (three fixed dimensions, rejects any rating/score/attractiveness key, note private-data guard); `lib/peer-feedback.ts` shared-attendance-gated save + co-attendee target query with 24h edit window then lock, block-aware, self-guard; nested API route `POST /api/events/[eventId]/peer-feedback/[participantId]`; calm `PeerFeedbackPanel` in the ended room below reflection; export includes only feedback GIVEN (not received, anti-retaliation). No rating/score/aggregate is exposed publicly or on profiles — visibility stays owner-owned in `CX-20260701-owner-decision-peer-rating-visibility-and-dimensions`. Checks: typecheck pass, lint pass (only pre-existing warning in untracked qa file), web tests 217 pass, domain tests 91 pass, migration applied clean. Live sanity check via pooled host-A login: non-co-attendee POST → 409 (non-probing message), smuggled `rating` → 400. Two-member co-attendance happy path is rate-limited; covered by unit tests + source. Ready for independent retest.
