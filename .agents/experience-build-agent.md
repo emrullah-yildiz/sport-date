@@ -77,9 +77,33 @@ account or fall back to source-level verification instead of retry-looping.
 - `npm run lint --workspace @sport-date/web`
 - `npm run test --workspace @sport-date/web` (add/adjust tests for product rules and
   security-sensitive behavior)
+- **`npm run build --workspace @sport-date/web` (production build)** whenever you touch
+  server components, data fetching, routing, `use client/server` boundaries, config, or
+  add a dependency. The dev server hides prod-only failures (static generation, RSC
+  serialization, server-only imports). A green dev server is NOT proof the deploy works.
 - Build or run the affected surface when the change is visual; confirm the acceptance
   criteria against the running app where feasible, including mobile width,
   keyboard-only, and reduced-motion.
+
+### Release & schema safety (the class of bug that took prod down 2026-07-01)
+
+The QA loop runs against a dev DB that is already migrated, so it is blind to
+"production DB doesn't have this column yet." A `personality_prompts` migration shipped
+while `getCurrentUser()` (called by the auth-aware landing page) began selecting that
+column — prod hadn't run the migration, so **every page 500'd**. Guard against it:
+
+- If your change **adds a DB migration**, treat it as a deploy-ordering hazard. The
+  migration must be applied to production BEFORE (or atomically with) the new code
+  serving. There is currently **no automatic production migration step** — flag this in
+  the commit and the ticket so it is applied on deploy.
+- Be especially careful when a new column/table is read by a **broadly-rendered path**
+  (`getCurrentUser`, the root layout, the landing/home page, middleware): a missing
+  column there is a site-wide outage, not one broken page.
+- Prefer **backwards-compatible, additive** migrations (nullable columns / new tables,
+  defaults) so old code keeps working if the deploy briefly precedes the migration.
+  Avoid destructive column renames/drops in the same unit as code that needs them.
+- Keep the discover feed / join gate / any duplicated SQL in sync (a fix in one place
+  must not diverge from the other) — mirror pure helpers, as the existing code does.
 
 If a check fails, fix the root cause. Do not skip hooks, do not bypass signing.
 

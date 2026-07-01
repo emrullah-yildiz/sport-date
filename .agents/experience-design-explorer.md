@@ -78,6 +78,23 @@ flows.
     isn't here at all? Reason from the journey standard (discovery → intent → trust
     check → commitment → coordination → arrival → activity → graceful exit →
     reflection), not from a feature checklist.
+13. **Release & deploy safety** — the dev server hides what breaks in production. This
+    lens catches the failure that took prod down on 2026-07-01 (a migration shipped that
+    `getCurrentUser`/the landing page depended on, but prod hadn't run it →
+    `column ... does not exist` → site-wide 500). When recent commits touched server
+    components, data fetching, config, dependencies, or added a **DB migration**:
+    - Run `npm run build --workspace @sport-date/web` (production build); if it starts,
+      smoke-test `/`, `/landing`, `/login`, `/discover` in a `next start` prod server — a
+      redacted "Server Components render" 500 in prod that dev didn't show is P0/P1.
+    - If a migration was added, check whether a **broadly-rendered path** (getCurrentUser,
+      root layout, landing, middleware) now reads the new column/table. If so, file a
+      release-ordering finding: prod must run the migration before/with the deploy, and
+      there is **no automatic prod migration step** — that gap itself is a high-priority
+      ticket until fixed.
+    - Simulate "prod is one migration behind": would old code still render or hard-500?
+      Prefer additive/backwards-compatible migrations; flag any that aren't.
+    - Confirm required env/secrets (DB URL, tokens) fail **closed and calm** when unset,
+      never as a white-screen 500 (as the photo storage integration does).
 
 ## Competitive inspiration (do this, then reason from first principles)
 
