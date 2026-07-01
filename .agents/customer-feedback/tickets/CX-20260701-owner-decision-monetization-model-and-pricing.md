@@ -1,14 +1,14 @@
 # CX-20260701-owner-decision-monetization-model-and-pricing
 
-- Status: `blocked-owner`
+- Status: `verified`
 - Severity: `high`
-- Priority: `P1` — foundational business decision that gates all monetizable work; not member-buildable until decided.
+- Priority: `P1` — foundational business decision that gates all monetizable work; not member-buildable until decided. DECIDED 2026-07-01 (owner approved the recommended ethical-freemium model + Plus price band).
 - Customer journey: (business/strategy — no member surface until decided)
 - Surface: `both` (eventual)
 - Environment and viewport/device: n/a
 - Found by: Product/growth strategist review (2026-07-01), analysis in `docs/marketing/monetization-and-pricing-analysis.md`
 - Implementation owner: `owner`
-- Related tickets: `CX-20260701-owner-decision-payments-processor-and-billing-gate`, `CX-20260701-profile-photo-series-up-to-six`
+- Related tickets: `CX-20260701-owner-decision-payments-processor-and-billing-gate`, `CX-20260701-profile-photo-series-up-to-six`, `CX-20260701-membership-tier-scaffolding-non-billing` (non-billing foundation that implements this decision)
 
 ## Decision needed
 
@@ -63,10 +63,11 @@ block the free core loop, which should proceed regardless.
 
 ## Acceptance criteria
 
-- [ ] Owner records the chosen model and EUR price points (or amendments).
-- [ ] Guardrails confirmed as binding product constraints.
-- [ ] Decision logged in `docs/operations/decision-log.md`; this ticket updated to reflect it.
+- [x] Owner records the chosen model and EUR price points (or amendments). (Ethical freemium approved; Plus €6.99-8.99/mo, ~€49-69/yr — see 2026-07-01 log.)
+- [x] Guardrails confirmed as binding product constraints. (Safety + core participation free forever; no paid access to people; no dark patterns.)
+- [x] Decision recorded on this ticket and referenced from the non-billing scaffolding ticket; this ticket updated to reflect it.
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist with recommendation; status `blocked-owner` (awaiting owner decision).
+- 2026-07-01 - **Owner decision — APPROVED.** Model = **ethical freemium** exactly as recommended in `docs/marketing/monetization-and-pricing-analysis.md`: **safety and core participation are free forever** (report, block, leave, emergency guidance, approximate-location privacy, Safety Center, moderation, appeals; browse/request/attend/host baseline; basic profile + reflection). The paid tier is **"Sport Date Plus"** — **convenience/richness/expression only, never safety and never paid access to people** — at **€6.99-8.99/mo** (annual ~**€49-69/yr**, "~2 months free"), anchored to the enthusiast-utility band and deliberately below dating-app premium. Host tooling stays a later phase with a free host baseline. All guardrails from the analysis confirmed binding (no paid likes/visibility/waitlist priority, no dark patterns, cancel-as-easy-as-subscribe, VAT-inclusive EUR, no dynamic/personalised pricing). Payment go-live remains separately owner-gated (`CX-20260701-owner-decision-payments-processor-and-billing-gate`). The **non-billing foundation** is filed as a `ready` ticket `CX-20260701-membership-tier-scaffolding-non-billing`. Status `blocked-owner` → `verified` (decision made and recorded).

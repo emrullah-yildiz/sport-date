@@ -8,7 +8,7 @@
 - Environment and viewport/device: n/a
 - Found by: Product/growth strategist review (2026-07-01), analysis in `docs/marketing/monetization-and-pricing-analysis.md`
 - Implementation owner: `owner`
-- Related tickets: `CX-20260701-owner-decision-monetization-model-and-pricing`
+- Related tickets: `CX-20260701-owner-decision-monetization-model-and-pricing` (verified), `CX-20260701-membership-tier-scaffolding-non-billing` (non-billing foundation; must not integrate a live processor)
 
 ## Decision needed
 
@@ -58,3 +58,4 @@ block any free feature work.
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist with recommendation; status `blocked-owner` (awaiting owner decision and credentials).
+- 2026-07-01 - **Owner direction recorded (status intentionally kept `blocked-owner`).** Processor direction = **Stripe** (per alternative B: direct processor for web; app-store billing for native later). This records the chosen *direction* for **design only**. Go-live is NOT unblocked: it still requires owner-provided actions the escalation policy reserves — creating the Stripe account, providing live/test keys, accepting Stripe's platform terms, and signing off real pricing. **No agent may** create the account, add keys, accept terms, or switch on charging. Only **non-secret integration DESIGN** may proceed (EU-compliant cancel/renewal UX spec, VAT handling design, data-boundary design, a keyless integration sketch that reads any future credential from the environment). No live billing until credentials + explicit owner go-live approval + counsel review of subscription terms. Status remains `blocked-owner`.

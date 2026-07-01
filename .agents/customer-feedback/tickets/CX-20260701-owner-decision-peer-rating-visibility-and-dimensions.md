@@ -1,13 +1,13 @@
 # CX-20260701-owner-decision-peer-rating-visibility-and-dimensions
 
-- Status: `blocked-owner`
+- Status: `verified`
 - Severity: `high`
-- Priority: `P1` — safety-sensitive product decision that gates how far the peer-feedback feature can go. Blocks only the *visibility* expansion; the safe-minimum private slice can proceed independently.
+- Priority: `P1` — safety-sensitive product decision that gates how far the peer-feedback feature can go. DECIDED 2026-07-01: owner chose a 1-5 star overall rating, recipient-visible, implemented per the safety-bounded design below. Only the recipient-visible slice is in scope; showing ratings to OTHER members / on public profiles remains out of scope and needs a separate explicit owner sign-off.
 - Customer journey: trust check / reflection (peer feedback exposure)
 - Surface: `web` (and mobile)
 - Environment and viewport/device: n/a — product/safety decision
 - Found by: Experience & Design Explorer — owner design-acceptance intake (2026-07-01), criterion 7
-- Related tickets: `CX-20260701-post-attendance-peer-signal-safe-minimum` (the safe-minimum private slice this decision would later expand), `CX-20260701-member-profile-not-viewable-by-others`, `CX-20260701-repeated-cancellation-no-fair-reliability-rule`
+- Related tickets: `CX-20260701-post-attendance-peer-signal-safe-minimum` (verified — the safe-minimum private slice this decision expands), `CX-20260701-peer-star-rating-recipient-visible-safe` (ready — implements this decision), `CX-20260701-member-profile-not-viewable-by-others`, `CX-20260701-repeated-cancellation-no-fair-reliability-rule`
 
 ## Decision needed
 
@@ -50,11 +50,27 @@ Owner: choose the visibility model (recommended private/aggregate-only, or alter
 
 ## Acceptance criteria (for closing the decision)
 
-- [ ] Owner records a visibility model and the permitted dimensions, with attractiveness/desirability/popularity explicitly excluded.
-- [ ] The decision preserves private-by-default individual feedback and the "no public skip/no-show/reliability score shown to the person" principle.
-- [ ] Any surfaced signal (if chosen) is defined as aggregate/non-identifying and copy makes clear it is not a safety certification.
-- [ ] The safe-minimum private slice ticket is unblocked or explicitly expanded per the chosen model.
+- [x] Owner records a visibility model and the permitted dimensions, with attractiveness/desirability/popularity explicitly excluded. (1-5 star, meetup-experience only, recipient-visible.)
+- [x] The decision preserves the "no per-giver rating shown to the person, no revenge-rating can define someone" principle. (Double-blind reveal; aggregate average only at ≥3; never "who gave what".)
+- [x] Any surfaced signal is defined as aggregate/non-identifying and copy makes clear it is not a safety certification. (Recipient sees own aggregate average only; ratings never gate safety.)
+- [x] The safe-minimum private slice ticket is explicitly expanded per the chosen model via `CX-20260701-peer-star-rating-recipient-visible-safe`.
+- [x] The higher-risk other-member/public-profile exposure is explicitly held out of scope pending a separate owner sign-off.
+
+## Owner decision (2026-07-01) — DECIDED, with safety-bounded design
+
+The owner chose to **show a 1-5 star rating, with the rating visible to the RECIPIENT** (the person receiving it). The owner accepted a **safe version** of this outcome, which is the exact design that is in scope and must be implemented:
+
+1. **Dimension.** A **1-5 star OVERALL** rating anchored to the **MEETUP EXPERIENCE** — reliability, respect, and how the shared activity went — **explicitly NOT attractiveness / desirability / looks / "would date again"**. Copy must frame it as being about the experience, not the person's appeal.
+2. **Gating.** Co-attendance-gated, **one per (event, from, to)**, mutual — reuse the existing gates from the safe-minimum slice (ended event + both attended + block-freedom + self-guard).
+3. **Double-blind reveal.** A member does **not** see the rating they received for an event until they have **submitted their own** for that event **OR a reveal window passes** — to blunt retaliation and quid-pro-quo.
+4. **Recipient sees only an AGGREGATE AVERAGE of their OWN received ratings, and only once there are ≥3 ratings.** Below the threshold, a calm "not enough ratings yet" state. Never show who gave which rating. This prevents a single revenge rating from defining someone.
+5. **Safety and reporting.** A "report an unfair/abusive rating" path exists. Ratings **never** gate safety / leave / report. Counts and aggregate are **NEVER** shown to other members or on public profiles in this slice.
+
+**Out of scope / still owner-gated:** showing ratings (aggregate, average, count, or badge) to **OTHER members** or on **public/browsable profiles** is a **higher-risk step that is NOT in scope** here and requires a **separate, explicit owner sign-off** before any such exposure is designed or built. This decision authorises recipient-visible only.
+
+The build ticket is `CX-20260701-peer-star-rating-recipient-visible-safe` (P1, `ready`).
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 7) as an owner decision under the escalation policy; status `blocked-owner`.
+- 2026-07-01 - **Owner decision — DECIDED.** Owner chose a **1-5 star overall rating visible to the recipient**, implemented per the safety-bounded design recorded above (meetup-experience dimension only — not attractiveness; double-blind reveal; recipient sees an aggregate average only at ≥3 ratings; report-abuse path; ratings never gate safety; nothing shown to other members or public profiles in this slice). The remaining higher-risk step — showing ratings to OTHER members / on profiles — is explicitly **out of scope and needs a separate owner sign-off**. Build ticket `CX-20260701-peer-star-rating-recipient-visible-safe` (P1) filed `ready`. Status `blocked-owner` → `verified`.
