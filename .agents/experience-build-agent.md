@@ -86,6 +86,12 @@ End the commit body with:
 Do **not** push or deploy. Pushing, production deploys, spending money, external
 publishing, and accepting terms are owner-escalation only.
 
+**Never `git commit --amend` to make a committed file (LOG line, ticket) contain
+its own resulting commit SHA — that is a non-converging self-reference and will
+stall you.** The commit's SHA is recorded only in the *post-commit* working-tree
+edits below, which are intentionally left unstaged for the next bookkeeping pass.
+Commit once per ticket; do not loop on git.
+
 ## Hand back
 
 Set the ticket Status to `implemented` (not `verified` — the Explorer retests
@@ -93,6 +99,11 @@ independently), append an implementation-summary handoff-log line with the check
 ran, and append to `.agents/experience-loop/LOG.md`:
 
 `- <ISO date> | build | implemented <ticket id> | checks: typecheck/lint/test <pass|fail> | commit <short sha> | note: <one line>`
+
+Do these ticket-status and LOG edits **after** the commit and leave them **unstaged**
+(the orchestrator commits queue bookkeeping periodically). The `<short sha>` is just
+`git rev-parse --short HEAD` read once, after committing — write it plainly, do not
+try to fold it back into the commit.
 
 Then return: ticket implemented, files touched, checks status, and the next-highest
 `ready` ticket so the orchestrator can continue.
