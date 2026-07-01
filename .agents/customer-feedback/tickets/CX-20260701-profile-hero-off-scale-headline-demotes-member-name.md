@@ -8,7 +8,7 @@
 - Environment and viewport/device: `/profile`, `apps/web/src/app/globals.css` (~lines 46, 138, 185, 464–479); design tokens in `:root` (lines 13–24). Source-measured 2026-07-01; live rendering not re-measured this pass (signup registration rate-limited, so no synthetic account could be signed in — clamp/token values below are exact from source).
 - Found by: experience-design-explorer (profile × typography pass)
 - Implementation owner: `experience-build-agent`
-- Related tickets: `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (same hero, *spacing* not *type scale* — complementary, not a duplicate), `CX-20260701-profile-action-strip-flat-no-hierarchy` (same page, the pill strip not the headings), `CX-20260701-profile-lacks-rich-browsable-detail` (owner request for richer profile content), `CX-20260630-signup-redundant-double-headline-weak-focal-point` (headline focal-point pattern on a different surface)
+- Related tickets: `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (same hero, *spacing* not *type scale* — complementary, not a duplicate), `CX-20260701-profile-action-strip-flat-no-hierarchy` (same page, the pill strip not the headings), `CX-20260701-profile-lacks-rich-browsable-detail` (owner request for richer profile content), `CX-20260630-signup-redundant-double-headline-weak-focal-point` (headline focal-point pattern on a different surface), `CX-20260701-in-app-page-headers-off-scale-headline-systemic` (the SAME off-scale headline on the remaining in-app surfaces — this ticket fixed only `/profile`; that one finishes the reconciliation)
 
 ## Customer outcome
 
