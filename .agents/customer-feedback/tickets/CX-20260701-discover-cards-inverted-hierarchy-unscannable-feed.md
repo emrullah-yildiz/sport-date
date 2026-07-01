@@ -1,13 +1,13 @@
 # CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1 high` — (Reach 5 × Impact 4 × Confidence 4) / Effort 2 = 40. `/discover` is the member's core browse surface; every member hits this every session, and the current card hierarchy makes the primary decision (which event, when) slow to scan. Effort is CSS + light markup reorder, no data/query change.
 - Customer journey: discovery (browse compatible events → pick one to open)
 - Surface: `web` (mobile + desktop)
 - Environment and viewport/device: dev server localhost:3000, Chromium headless, 1280×900 and 375×812. Observed 2026-07-01 with a signed-in synthetic adult; 19 discoverable invitations in the feed.
 - Found by: experience-design-explorer (discover × visual-hierarchy pass)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (cross-cutting spacing, different fix), `CX-20260701-profile-action-strip-flat-no-hierarchy` (same "flat/undifferentiated" pattern on a different surface), `CX-20260630-new-member-empty-discovery-missing-language` (empty state, not the populated feed)
 
 ## Customer outcome
@@ -70,3 +70,4 @@ The primary browse surface is slow and tiring to scan, which is exactly the fric
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by experience-design-explorer (discover × visual-hierarchy pass); status `ready`.
+- 2026-07-01 - Picked up by experience-build-agent; status `in-progress` (implementation owner).

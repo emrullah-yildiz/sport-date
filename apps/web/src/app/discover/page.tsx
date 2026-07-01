@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate } from "@/lib/discovery-card";
 import { getDiscoverableEvents, type DiscoveryFilters } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
@@ -58,8 +59,23 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
           </div>
         ) : (
           <div className="discovery-grid">{events.map((event) => {
-            const startsAt = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: event.timeZone }).format(new Date(event.startsAt));
-            return <article className="discovery-card" key={event.id}><div className="discovery-card-top"><span>{event.sport}</span><span>{event.areaLabel}, {event.city}</span></div><h3>{event.title}</h3><p>{event.description}</p><div className="discovery-meta"><span>{startsAt}</span><span>{event.placesRemaining} places</span><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div><footer><span>{event.request ? `Request: ${event.request.status}` : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer></article>;
+            const when = formatDiscoveryDate(event.startsAt, event.timeZone);
+            const area = formatDiscoveryArea(event.areaLabel, event.city);
+            const availability = describeDiscoveryAvailability(event.placesRemaining);
+            return (
+              <article className="discovery-card" key={event.id}>
+                <div className="discovery-card-scan">
+                  <p className="discovery-identity"><span className="discovery-sport">{event.sport}</span><span className="discovery-area">{area}</span></p>
+                  <p className="discovery-when"><time dateTime={event.startsAt}><span className="discovery-when-day">{when.day}</span><span className="discovery-when-time">{when.time}</span></time><span className={`discovery-availability${availability.isFull ? " is-full" : ""}`}>{availability.label}</span></p>
+                </div>
+                <div className="discovery-card-body">
+                  <h3>{event.title}</h3>
+                  <p className="discovery-description">{event.description}</p>
+                </div>
+                <div className="discovery-meta"><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div>
+                <footer><span>{event.request ? `Request: ${event.request.status}` : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer>
+              </article>
+            );
           })}</div>
         )}
       </section>
