@@ -1,13 +1,13 @@
 # CX-20260701-pre-arrival-safety-micro-brief
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P0` — (Reach 5 × Impact 4 × Confidence 3) / Effort 2 = 30. First-in-person-meeting safety is core to the promise and must be free.
 - Customer journey: commitment → arrival
 - Surface: `web` (mobile follow-up)
 - Environment and viewport/device: all widths
 - Found by: Product/growth strategist review (2026-07-01), member-journey analysis for `docs/marketing/feature-roadmap-proposal.md` (a7)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260630-event-detail-safety-emergency-microcopy-smallest-text` (that ticket is about text size of existing emergency microcopy on event detail; this ticket adds a distinct pre-arrival brief at the commitment/arrival moment)
 
 ## Customer outcome
@@ -69,3 +69,4 @@ present and free — directly relevant to a safe encounter. Safety-relevant.
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
+- 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Building a calm, always-free pre-arrival safety micro-brief for accepted participants in the event room.

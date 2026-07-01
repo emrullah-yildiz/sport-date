@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
+import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
@@ -23,6 +24,9 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
     timeZone: room.timeZone,
   }).format(new Date(room.startsAt));
   const latestSeenCount = room.participants.filter((participant) => participant.seenLatestUpdate).length;
+  // The pre-arrival safety brief is for an accepted participant heading to an
+  // in-person meeting — not the host, and not once the event is over.
+  const showPreArrivalBrief = !room.isHost && room.viewerRequest?.status === "accepted" && !room.hasEnded;
 
   return (
     <main className="room-page">
@@ -35,6 +39,14 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         <h1>{room.title}</h1>
         <p>{startsAt}</p>
       </header>
+      {showPreArrivalBrief ? (
+        <PreArrivalSafetyBrief
+          eventId={room.id}
+          startsAt={room.startsAt}
+          safetyControlsId="room-people"
+          leaveControlId="room-leave"
+        />
+      ) : null}
       {room.updates.length > 0 ? (
         <section className="room-updates">
           <p className="panel-label">Host updates</p>
@@ -80,7 +92,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
           <p>{room.address}</p>
           {room.instructions ? <blockquote>{room.instructions}</blockquote> : null}
         </article>
-        <article className="room-people">
+        <article className="room-people" id="room-people">
           <p className="panel-label">Who has a place</p>
           <h2>{room.participants.length} {room.participants.length === 1 ? "person" : "people"} joining</h2>
           <div>
@@ -121,7 +133,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
           <article><span>03</span><h3>If plans change</h3><p>Cancel your place so the host has an accurate group. Safety and reporting controls arrive before open chat.</p></article>
         </div>
       </section>
-      {!room.isHost && room.viewerRequest?.status === "accepted" ? <RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /> : null}
+      {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /></div> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
       <aside className="room-safety-note"><strong>Why there is no chat yet</strong><p>Open messaging will not launch before blocking, reporting, moderation evidence, and response operations are ready.</p></aside>
     </main>
