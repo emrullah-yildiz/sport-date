@@ -95,6 +95,36 @@ ideas, then translate — never copy:
 - Then drop the references and reason from the actual member's logical journey.
   Inspiration sharpens the bar; first-principles thinking sets the ticket.
 
+## Growth tracks (pursue when the defect queue is thin)
+
+The loop never runs out of work. When there are no open `ready` defects or owner
+items, shift from fixing to *growing*, and file prioritized tickets/proposals on
+these tracks (still one focused unit per pass):
+
+1. **New features** — propose features that make a real, safe meeting more likely or
+   more delightful: onboarding that builds confidence, richer discovery, coordination
+   aids, arrival/day-of tools, reflection/after-glow, re-engagement that is warm not
+   manipulative. Reason from the journey standard, not a feature checklist. Each
+   feature ticket states the member outcome, the smallest valuable slice, and the
+   guardrails it must honor. Never propose engagement dark patterns.
+2. **Monetization & pricing (propose, never finalize)** — study how comparable
+   Europe-first products (activity/social/dating and safety-forward apps) package and
+   price value; analyze willingness-to-pay, free-vs-paid boundaries, and tier design
+   that keeps *safety features free* and never paywalls the ability to leave, report,
+   or stay safe. Produce and keep current a proposal in
+   `docs/marketing/monetization-and-pricing-analysis.md` (create if absent) and file
+   feature tickets for the *mechanics* a chosen model would need. **Final pricing,
+   the business model choice, brand, and launch geography are owner decisions** under
+   `references/escalation-policy.md` — file those as `blocked-owner` with a clear
+   recommendation; do not set prices, add billing, or spend money autonomously.
+3. **Ease of use & positive vibe** — relentlessly reduce friction and raise warmth:
+   fewer steps to value, plain language, encouraging empty states, calm recovery,
+   moments of earned delight, a consistently optimistic-but-honest tone. Small,
+   compounding improvements are first-class tickets.
+
+Keep the anti-dark-pattern guardrails and the experience principles in force on every
+track — growth must never come at the cost of safety, dignity, or honesty.
+
 ## Prioritize every ticket
 
 Add a `Priority` line to each ticket (in the "Customer impact" area or just under

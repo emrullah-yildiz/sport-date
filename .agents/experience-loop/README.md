@@ -44,6 +44,13 @@ Seeding bias: while the backlog is thin, weight ticks toward the Explorer to bui
 rich prioritized backlog across surfaces and lenses; once there's depth, alternate
 build and explore so quality keeps pace with discovery.
 
+Growth mode: when no defects or owner items remain, the Explorer shifts from fixing to
+growing — new features, a monetization & pricing proposal (research-backed; final
+pricing/brand/launch stay owner decisions and are filed `blocked-owner`), and
+continuous ease-of-use + positive-vibe polish. See the "Growth tracks" section in
+`.agents/experience-design-explorer.md`. Safety features are never paywalled; growth
+never overrides the anti-dark-pattern guardrails.
+
 ## Running it
 
 Started live, self-paced, from the launching session via the `/loop` skill. It runs
