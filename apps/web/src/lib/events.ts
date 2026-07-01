@@ -22,6 +22,17 @@ export type DiscoveryEvent = Readonly<{
   placesRemaining: number; request: DiscoveryRequest | null;
 }>;
 
+// A single event's PUBLIC invitation as seen on the direct `/discover/events/{id}`
+// view. It carries the same approximate-only fields as a feed card, plus whether
+// the viewer is the host — so the page can offer the host a "manage it" affordance
+// instead of a "Request a place" box on their own event. Unlike the feed
+// (`getDiscoverableEvents`), this direct view is NOT gated by host-exclusion or the
+// age/skill/language/capacity compatibility filters (those gate the feed, not a
+// directly-opened invitation link — CX-20260701-view-public-invitation-404s). The
+// hard guards are preserved: only `published` events render, mutual-block still
+// hides blocked parties from each other, and the precise venue is never included.
+export type DiscoveryEventView = DiscoveryEvent & { viewerIsHost: boolean };
+
 type HostEventRow = {
   id: string; sport: string; title: string; description: string; starts_at: string;
   time_zone: string; duration_minutes: number; capacity: number; language: string;
@@ -202,8 +213,68 @@ export async function getDiscoverableEvents(
   }));
 }
 
-export async function getDiscoverableEvent(user: { id: string; age: number }, eventId: string): Promise<DiscoveryEvent | null> {
-  return (await getDiscoverableEvents(user, { city: "", sport: "", language: "", withinDays: 30 }, eventId))[0] ?? null;
+/**
+ * A single event's PUBLIC invitation for a directly-opened `/discover/events/{id}`
+ * view (the "View the public invitation" CTA, and any shared invitation link).
+ *
+ * Split from the FEED query (`getDiscoverableEvents`) on purpose (CX-20260701):
+ * the feed EXCLUDES the viewer's own events (`host_user_id <> user.id`) and applies
+ * the age/skill/language/capacity compatibility filters so the feed only surfaces
+ * events a member could join. Those are FEED-ranking rules, not access control — a
+ * host opening their own just-published event, or a recipient opening a shared
+ * link, was being turned into a 404 by them. This direct view instead returns the
+ * event to any PERMITTED authenticated viewer (including the host), so the page can
+ * render a read-only preview and decide the right action from `viewerIsHost` /
+ * `request`.
+ *
+ * The HARD guards are preserved and mirror the other single-event reads
+ * (`getEventRoom`, `getAcceptedEventLocation`): only a `published` event renders
+ * (never draft/cancelled/completed), mutual-block still hides blocked parties from
+ * each other, and ONLY the approximate public location columns are selected — the
+ * precise venue lives in `event_private_locations` and is never joined here, so it
+ * cannot leak before an accepted join.
+ */
+export async function getDiscoverableEvent(user: { id: string; age: number }, eventId: string): Promise<DiscoveryEventView | null> {
+  if (!UUID_PATTERN.test(eventId)) return null;
+  const sql = getDatabase();
+  const rows = await sql`
+    SELECT
+      events.id, events.sport, events.title, events.description, events.starts_at,
+      events.time_zone, events.duration_minutes, events.capacity, events.language,
+      events.minimum_age, events.maximum_age, events.experience_levels,
+      events.host_user_id, host.first_name AS host_first_name,
+      events.public_area_label, events.public_city, events.public_country_code,
+      (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
+      member_request.id AS request_id, member_request.status AS request_status,
+      member_request.skip_count AS request_skip_count
+    FROM events
+    JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
+    JOIN users AS candidate ON candidate.id = ${user.id} AND candidate.account_status = 'active'
+    LEFT JOIN join_requests AS member_request
+      ON member_request.event_id = events.id AND member_request.requester_user_id = ${user.id}
+    WHERE events.id = ${eventId}::uuid
+      AND events.status = 'published'
+      AND NOT EXISTS (
+        SELECT 1 FROM user_blocks
+        WHERE (blocker_user_id = ${user.id} AND blocked_user_id = events.host_user_id)
+           OR (blocker_user_id = events.host_user_id AND blocked_user_id = ${user.id})
+      )
+    LIMIT 1
+  ` as unknown as DiscoveryEventRow[];
+
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    id: row.id, sport: row.sport, title: row.title, description: row.description,
+    startsAt: row.starts_at, timeZone: row.time_zone, durationMinutes: row.duration_minutes,
+    capacity: row.capacity, language: row.language, minimumAge: row.minimum_age,
+    maximumAge: row.maximum_age, experienceLevels: row.experience_levels,
+    hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
+    city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
+    placesRemaining: Math.max(0, row.capacity - row.accepted_count),
+    request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
+    viewerIsHost: String(row.host_user_id) === String(user.id),
+  };
 }
 
 export async function getHostJoinRequests(eventId: string, hostId: string): Promise<HostJoinRequest[]> {

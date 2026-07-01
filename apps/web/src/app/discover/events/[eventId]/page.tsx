@@ -14,17 +14,31 @@ export default async function DiscoveryEventPage({ params }: { params: Promise<{
   const { eventId } = await params;
   const event = await getDiscoverableEvent(user, eventId);
   if (!event) notFound();
-  const privateLocation = event.request?.status === "accepted" ? await getAcceptedEventLocation(eventId, user.id) : null;
+  // The host viewing their own event never requests a place, and the exact meeting
+  // point already lives on their own /events/{id} page — so we skip the
+  // accepted-location lookup and the private reliability standing for them.
+  const privateLocation = !event.viewerIsHost && event.request?.status === "accepted" ? await getAcceptedEventLocation(eventId, user.id) : null;
   // The member's OWN private reliability standing (warning or active cool-down).
   // Only ever shown to the member themselves — never to hosts or other members.
-  const standing = await getMemberReliabilityStanding(user.id);
+  const standing = event.viewerIsHost ? null : await getMemberReliabilityStanding(user.id);
   const start = new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeStyle: "short", timeZone: event.timeZone }).format(new Date(event.startsAt));
 
   return (
     <main className="event-detail-page">
       <nav className="profile-nav"><Link href="/discover" className="logo">Sport Date</Link><div className="nav-actions"><Link href="/discover">Back to discovery</Link><AccountMenu firstName={user.firstName} /></div></nav>
       <header className="event-detail-hero"><div><p className="eyebrow">{event.sport} · {event.areaLabel}</p><h1>{event.title}</h1><p>{event.description}</p></div><div className="event-detail-facts"><strong>{start}</strong><span>{event.durationMinutes} minutes</span><span>{event.placesRemaining} of {event.capacity} places remain</span><span>{event.language} · {event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span><span>Hosted by {event.hostFirstName}</span></div></header>
-      <section className="event-detail-grid"><article><p className="panel-label">Before acceptance</p><h2>{event.areaLabel}, {event.city}</h2><p>This is deliberately approximate. The exact venue is not included in this page or its data.</p></article><JoinRequestControls eventId={event.id} request={event.request} reliability={{ tone: standing.notice.tone, headline: standing.notice.headline, body: standing.notice.body, liftsAt: standing.notice.liftsAt ? standing.notice.liftsAt.toISOString() : null, timeZone: event.timeZone }} /></section>
+      <section className="event-detail-grid"><article><p className="panel-label">Before acceptance</p><h2>{event.areaLabel}, {event.city}</h2><p>This is deliberately approximate. The exact venue is not included in this page or its data.</p></article>{event.viewerIsHost ? (
+        <div className="event-detail-manage">
+          <strong>This is your event.</strong>
+          <p>You are seeing the public invitation exactly as members do — the exact venue stays private until you accept a request. To edit details, review requests, or cancel, open your host page.</p>
+          <div className="event-detail-manage-actions">
+            <Link href={`/events/${event.id}`} className="event-detail-manage-primary">Manage this event <span aria-hidden="true">→</span></Link>
+            <Link href="/hosting">All your events</Link>
+          </div>
+        </div>
+      ) : (
+        <JoinRequestControls eventId={event.id} request={event.request} reliability={{ tone: standing!.notice.tone, headline: standing!.notice.headline, body: standing!.notice.body, liftsAt: standing!.notice.liftsAt ? standing!.notice.liftsAt.toISOString() : null, timeZone: event.timeZone }} />
+      )}</section>
       {privateLocation ? <section className="accepted-location"><p className="panel-label">Your accepted meeting point</p><h2>{privateLocation.venueName}</h2><p>{privateLocation.address}</p>{privateLocation.instructions ? <small>{privateLocation.instructions}</small> : null}<Link href={`/events/${event.id}/room`}>Enter the event room →</Link></section> : null}
       <div className="event-safety"><ReportSafetyControls eventId={event.id} subjectUserId={event.hostUserId} subjectName={event.hostFirstName} /></div>
     </main>

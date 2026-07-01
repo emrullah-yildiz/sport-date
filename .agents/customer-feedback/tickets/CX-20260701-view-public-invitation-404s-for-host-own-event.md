@@ -1,13 +1,13 @@
 # CX-20260701-view-public-invitation-404s-for-host-own-event
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 5 × Impact 4 × Confidence 5) / Effort 2 = 50. A prominent CTA on the publish-success page fails for the host who just created the event; it reads as "the app is broken right after I did the main thing."
 - Customer journey: hosting / coordination / share
 - Surface: `web`
 - Environment and viewport/device: production + dev, all widths
 - Found by: Owner (direct feedback 2026-07-01, "clicking on view publish event is failing")
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-discover-advanced-skill-silently-excludes-events`, `CX-20260701-join-request-gate-rejects-no-language-member-discover-shows` (same discover-gate divergence family)
 
 ## Customer outcome
@@ -69,3 +69,4 @@ No privacy/auth regression, but the fix must keep the invitation approximate-onl
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner report + code confirmation (host-exclusion in shared query 404s own-event preview); status `ready`.
+- 2026-07-01 - build: picked up, status `in-progress`, owner `experience-build-agent`.
