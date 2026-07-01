@@ -180,7 +180,7 @@ export default async function HostEventPage({
         <p className="panel-label">Host boundary</p>
         <h2>Keep the invitation honest after it goes live.</h2>
         <p>Hosting here means protecting the exact location, responding without humiliation, and cancelling early if the format is no longer real. Host status is not safety certification.</p>
-        <Link href="/hosting-guidelines">Review the Hosting Guidelines</Link>
+        <Link href="/hosting#standards">Review the hosting standards</Link>
       </section>
 
       <HostEditEventForm event={event} />

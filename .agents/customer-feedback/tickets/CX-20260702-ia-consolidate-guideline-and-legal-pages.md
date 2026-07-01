@@ -1,13 +1,13 @@
 # CX-20260702-ia-consolidate-guideline-and-legal-pages
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — (Reach 4 × Impact 4 × Confidence 4) / Effort 4 = 16. Directly answers the owner's "too many guideline/staff pages, hard to navigate" complaint by cutting standalone info pages and grouping legal behind a compact footer. Broad reach, real clarity impact; effort is higher (route changes + redirects + content moves) so P1 at the top of the P1/P2 band. Can ship before or after nav-simplify; pairs with it.
 - Customer journey: cross-cutting — trust, safety, hosting, legal discovery
 - Surface: `web` (desktop + mobile)
 - Environment and viewport/device: dev server localhost:3000, all widths; routes under `apps/web/src/app/`
 - Found by: Design Lead — black+neon refresh (2026-07-02); direction in `docs/design-refresh-2026.md` §3
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260702-navigation-simplify-primary` (P2, pairs), `CX-20260702-dark-neon-theme-tokens`, `CX-20260702-typography-right-size-and-scale`
 
 ## Customer outcome
@@ -71,3 +71,4 @@ Practical: reduces navigation load and decision fatigue; makes safety and legal 
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh); IA plan in `docs/design-refresh-2026.md` §3. Status `ready`.
+- 2026-07-02 - `experience-build-agent` took ownership; status `in-progress`. Implementing full consolidation: safety-guidelines→/safety progressive disclosure, hosting-guidelines→/hosting standards accordion, shared SiteFooter with "Legal & trust" grouping, redirects on all moved routes.

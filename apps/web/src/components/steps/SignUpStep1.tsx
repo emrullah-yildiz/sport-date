@@ -49,7 +49,7 @@ export default function SignUpStep1() {
       <label className="terms terms-check">
         <input type="checkbox" checked={acceptedTerms} onChange={(event) => setField("acceptedTerms", event.target.checked)} />
         <span>
-          I confirm I am 18+ and accept the <Link href="/terms">Terms preview</Link> and <Link href="/safety-guidelines">Safety Guidelines</Link>. I understand the <Link href="/privacy">Privacy Notice preview</Link> explains exports, deletion, and current data-use boundaries separately.
+          I confirm I am 18+ and accept the <Link href="/terms">Terms preview</Link> and <Link href="/safety#guidelines">safety guidance</Link>. I understand the <Link href="/privacy">Privacy Notice preview</Link> explains exports, deletion, and current data-use boundaries separately.
         </span>
       </label>
     </motion.div>

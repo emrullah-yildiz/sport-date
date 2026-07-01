@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
 import AccountMenu from "@/components/AccountMenu";
 import { Wordmark } from "@/lib/brand";
+import SiteFooter from "@/components/SiteFooter";
 import { getDiscoverableEvents, type DiscoveryFilters } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
@@ -104,6 +105,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
           })}</div>
         )}
       </section>
+      <SiteFooter />
     </main>
   );
 }

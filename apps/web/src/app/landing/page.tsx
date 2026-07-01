@@ -278,11 +278,11 @@ export default async function LandingPage() {
             <Wordmark variant="footer" />
             <p>Meet through movement. Adults only · Europe first.</p>
           </div>
-          <nav aria-label="Legal and policy links">
+          <nav aria-label="Legal and trust links">
+            <Link href="/trust">Trust</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/privacy">Privacy</Link>
-            <Link href="/safety-guidelines">Safety guidelines</Link>
-            <Link href="/trust">Trust</Link>
+            <Link href="/safety#guidelines">Safety guidance</Link>
           </nav>
         </div>
       </footer>

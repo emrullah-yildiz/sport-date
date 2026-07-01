@@ -27,7 +27,7 @@ export default async function NewEventPage() {
           <article><strong>Do not pressure people</strong><span>No alcohol-led pressure, off-platform demands, retaliation, or romantic coercion.</span></article>
           <article><strong>Know the boundary</strong><span>You are hosting a sport encounter, not acting as a moderator, employee, or emergency service.</span></article>
         </div>
-        <Link href="/hosting-guidelines">Read the Hosting Guidelines</Link>
+        <Link href="/hosting#standards">Read the hosting standards</Link>
       </section>
       <CreateEventForm />
     </main>

@@ -63,7 +63,7 @@ export default function TrustPage() {
 
       <section className="legal-disclaimer trust-disclaimer">
         <p>
-          For the current member-facing boundary, also read the <Link href="/terms">Terms preview</Link>, <Link href="/privacy">Privacy Notice preview</Link>, and <Link href="/safety-guidelines">Safety Guidelines</Link>.
+          For the current member-facing boundary, also read the <Link href="/terms">Terms preview</Link>, <Link href="/privacy">Privacy Notice preview</Link>, and the <Link href="/safety#guidelines">safety guidance</Link>.
         </p>
         <p>
           If you are evaluating the product for launch, partnerships, hosts, or member communications, this page is the shortest honest summary of the current trust posture.

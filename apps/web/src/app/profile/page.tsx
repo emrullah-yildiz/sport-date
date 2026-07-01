@@ -11,6 +11,7 @@ import MobileSessionControls from "@/components/MobileSessionControls";
 import PlusBilling from "@/components/PlusBilling";
 import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
+import SiteFooter from "@/components/SiteFooter";
 import WebSessionControls from "@/components/WebSessionControls";
 import { Wordmark } from "@/lib/brand";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
@@ -119,12 +120,10 @@ export default async function ProfilePage() {
           <Link href="/discover" className="profile-action-primary" aria-label="Discover events to join">Discover events <span aria-hidden="true">→</span></Link>
           <Link href="/hosting" className="profile-action-primary" aria-label="Your events and hosting">Your events <span aria-hidden="true">→</span></Link>
         </nav>
-        <nav className="profile-actions-secondary" aria-label="Safety, legal, and support">
-          <p className="profile-actions-secondary-label" id="profile-actions-secondary-label">Safety, legal &amp; support</p>
+        <nav className="profile-actions-secondary" aria-label="Safety and support">
+          <p className="profile-actions-secondary-label" id="profile-actions-secondary-label">Safety &amp; support</p>
           <ul aria-labelledby="profile-actions-secondary-label">
             <li><Link href="/safety" className="profile-action-secondary" aria-label="Safety center">Safety center</Link></li>
-            <li><Link href="/trust" className="profile-action-secondary" aria-label="Trust preview — pre-launch">Trust <span className="profile-action-tag">preview</span></Link></li>
-            <li><Link href="/privacy" className="profile-action-secondary" aria-label="Privacy Notice preview — pre-launch">Privacy Notice <span className="profile-action-tag">preview</span></Link></li>
             <li><Link href="/feedback" className="profile-action-secondary" aria-label="Share feedback">Share feedback</Link></li>
           </ul>
         </nav>
@@ -214,6 +213,7 @@ export default async function ProfilePage() {
       <MobileSessionControls />
       <EditProfileForm profile={user} />
       <PrivacyControls />
+      <SiteFooter />
     </main>
   );
 }

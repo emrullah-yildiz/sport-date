@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import AccountMenu from "@/components/AccountMenu";
 import { Wordmark } from "@/lib/brand";
 import SafetyAppealForm from "@/components/SafetyAppealForm";
+import SiteFooter from "@/components/SiteFooter";
 import { getMemberSafetyCases } from "@/lib/safety";
 import { getCurrentUser } from "@/lib/session";
 
@@ -75,6 +76,56 @@ export default async function SafetyCenterPage() {
         <strong>This service is not an emergency responder.</strong>
         <span>If anyone is in immediate danger, contact local emergency services.</span>
       </aside>
+
+      <section className="safety-guidelines" id="guidelines" aria-labelledby="safety-guidelines-title">
+        <div className="safety-guidelines-head">
+          <p className="eyebrow">How safety works here</p>
+          <h2 id="safety-guidelines-title">Meet through sport, not pressure.</h2>
+          <p>The member-facing expectations for the preview. They explain the product rules we stand behind now, without overstating protection. Open a section to read more.</p>
+        </div>
+
+        <details className="safety-guideline">
+          <summary>Before the event</summary>
+          <ul>
+            <li>Use your real comfort boundaries, not the app&apos;s momentum, to decide whether to join.</li>
+            <li>Exact meeting points stay private until acceptance. Do not ask another member to bypass that boundary.</li>
+            <li>Hosts may accept or skip requests. A third skip quietly closes the request for that event.</li>
+          </ul>
+        </details>
+
+        <details className="safety-guideline">
+          <summary>During the event</summary>
+          <ul>
+            <li>You can leave early, decline future contact, or stop participating without losing progress points or public status.</li>
+            <li>No one should pressure another member into transport sharing, alcohol, location disclosure, or off-platform contact.</li>
+            <li>The event room exists for accepted participants and hosts only. It is not a substitute for emergency services.</li>
+          </ul>
+        </details>
+
+        <details className="safety-guideline">
+          <summary>If something feels wrong</summary>
+          <ul>
+            <li>Block immediately if you need distance. Blocking removes shared requests, places, room access, and exact-location access.</li>
+            <li>Use the report controls to create a safety case. Reflection is not the same thing as reporting.</li>
+            <li>If there is urgent danger, contact local emergency services first.</li>
+          </ul>
+        </details>
+
+        <details className="safety-guideline">
+          <summary>What the product does not promise</summary>
+          <ul>
+            <li>No public trust badge, identity guarantee, or background-check claim exists in this preview.</li>
+            <li>The Movement Arc is private reflection only, not proof of reliability or safety.</li>
+            <li>Moderation and reporting help reduce harm, but they do not eliminate all risk.</li>
+          </ul>
+        </details>
+
+        <p className="safety-guidelines-note">
+          Read these alongside the <Link href="/trust">Trust preview</Link>, <Link href="/terms">Terms preview</Link>, and <Link href="/privacy">Privacy Notice preview</Link>.
+        </p>
+      </section>
+
+      <SiteFooter />
     </main>
   );
 }
