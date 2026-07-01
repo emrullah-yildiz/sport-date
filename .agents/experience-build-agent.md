@@ -121,8 +121,13 @@ only the files for this ticket plus the ticket file itself. Commit message:
 End the commit body with:
 `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
 
-Do **not** push or deploy. Pushing, production deploys, spending money, external
-publishing, and accepting terms are owner-escalation only.
+Push policy (owner directive 2026-07-01: "commit and push always"): after a verified
+commit, **push to origin/main** — unless this unit added a **new `db/NNN_*.sql`
+migration**. If it did, commit locally, do NOT push, and return `MIGRATION ADDED` so
+the orchestrator pushes and applies the migration to production in the same step
+(prod has no auto-migration yet — pushing migration-dependent code before prod is
+migrated causes a site-wide outage). Spending money, external publishing, accepting
+terms, and production DB/ops beyond this remain owner-escalation only.
 
 **Never `git commit --amend` to make a committed file (LOG line, ticket) contain
 its own resulting commit SHA — that is a non-converging self-reference and will
