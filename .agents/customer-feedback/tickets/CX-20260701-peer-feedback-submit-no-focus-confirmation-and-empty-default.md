@@ -1,6 +1,6 @@
 # CX-20260701-peer-feedback-submit-no-focus-confirmation-and-empty-default
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12. Arithmetic lands P2, but this is an **accessibility floor** gap (async success is not focus-managed), which the rubric never puts below P1. The empty-default-submit is a separate, smaller data-quality concern folded in because it shares the same submit handler.
 - Customer journey: activity → reflection → trust (leaving a private word after a shared event)
@@ -67,3 +67,4 @@ Accessibility: a keyboard/screen-reader member cannot tell the note saved and is
 
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 16, peer-feedback × accessibility + completeness-of-states); status `ready`.
 - 2026-07-01 - Experience Build Agent picked up (P1, highest actionable `ready`); status `in-progress`, owner recorded.
+- 2026-07-01 - Experience Build Agent implemented (commit `5953329`); status `implemented` for independent retest. Changes: no pre-selected radio + submit disabled with calm guidance until substantive (one yes/no answer or a note); `validatePeerFeedback` now rejects an all-`prefer_not_to_say`+no-note content-free payload server-side (added `peerFeedbackHasSubstance`); success resolves the `<details>` form in place to a focus-managed "recorded privately" confirmation (`role=status` + focus move via `attachConfirmation`, mirroring `JoinRequestControls`, reduced-motion-safe); failure now `role=alert`; locked state unchanged. Gating (co-attendance/one-per-pair/ended-only/edit-window/no-rating) untouched; Report/Block stays primary. Checks: typecheck pass, lint pass (only warning is in untracked qa/full-flows.mjs), domain test 96 pass, web test 223 pass (added PeerFeedbackPanel + content-floor tests). Live: all-prefer_not_to_say+no-note → 400 content-free reject; one substantive answer → 409 eligibility gate (gating holds). Focus-move-on-success + resolved-state branch source-verified against the shipped join-request pattern (two-co-attendee ended-event path not driven, per ticket, to avoid filing a real locked row).
