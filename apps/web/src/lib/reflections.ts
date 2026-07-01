@@ -3,6 +3,7 @@ import "server-only";
 import type { EventReflectionInput } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
+import { restoreMemberReliabilityStanding } from "@/lib/join-requests";
 
 export function qualifiesReflectionForProgress(attendance: EventReflectionInput["attendance"]): boolean {
   return attendance === "attended";
@@ -41,10 +42,14 @@ export async function saveEventReflection(eventId: string, userId: string, refle
     SELECT event_id, attendance, would_join_again, qualified_for_progress FROM saved_reflection
   `;
   const row = rows[0];
-  return row ? {
+  if (!row) return null;
+  // Recoverable standing: one clean completed attendance restores the member's
+  // reliability streak immediately, so a bad patch is never a lasting mark.
+  if (row.attendance === "attended") await restoreMemberReliabilityStanding(userId);
+  return {
     eventId: String(row.event_id),
     attendance: row.attendance,
     wouldJoinAgain: row.would_join_again,
     qualifiedForProgress: Boolean(row.qualified_for_progress),
-  } : null;
+  };
 }

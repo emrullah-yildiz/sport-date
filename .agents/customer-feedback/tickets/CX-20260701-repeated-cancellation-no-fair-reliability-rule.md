@@ -1,6 +1,7 @@
 # CX-20260701-repeated-cancellation-no-fair-reliability-rule
 
-- Status: `ready`
+- Status: `in-progress`
+- Implementation owner: Experience Build Agent
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. Held at P1: reliability directly protects hosts and the safe-completed-event north-star, and a *fair, recoverable* rule is a member-dignity/safety concern that must not be built carelessly. Severity of the consequence itself is an **owner-tunable** (see below).
 - Customer journey: commitment → graceful exit → recovery (join/unjoin reliability)
@@ -73,3 +74,4 @@ Hosts plan real logistics around accepted counts; unchecked serial cancellation 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 5); status `ready`.
+- 2026-07-01 - Experience Build Agent took ownership; status `in-progress`.

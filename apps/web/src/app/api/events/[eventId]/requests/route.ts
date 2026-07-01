@@ -31,5 +31,14 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
 
   const created = await createEventJoinRequest(eventId, requester, introduction);
   if (!created) return NextResponse.json({ error: "This event is not available for a new request." }, { status: 409 });
+  // The member is in a short reliability cool-down on requesting NEW places. This
+  // never blocks leaving, reporting, blocking, safety, or already-accepted events.
+  // 423 Locked: temporary, self-lifting; the private notice explains when it lifts.
+  if ("paused" in created) {
+    return NextResponse.json(
+      { error: created.notice.body, paused: true, liftsAt: created.notice.liftsAt?.toISOString() ?? null },
+      { status: 423 },
+    );
+  }
   return NextResponse.json({ success: true, ...created }, { status: 201 });
 }

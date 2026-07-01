@@ -25,5 +25,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ eve
   if (introduction.length > 500) return NextResponse.json({ error: "Introduction must be 500 characters or fewer." }, { status: 400 });
   const created = await createEventJoinRequest(eventId, session.user, introduction);
   if (!created) return NextResponse.json({ error: "This event is no longer available for a new request." }, { status: 409, headers: { "Cache-Control": "no-store" } });
+  // Temporary reliability cool-down on NEW joins only; never gates leave/safety.
+  if ("paused" in created) {
+    return NextResponse.json(
+      { error: created.notice.body, paused: true, liftsAt: created.notice.liftsAt?.toISOString() ?? null },
+      { status: 423, headers: { "Cache-Control": "no-store" } },
+    );
+  }
   return NextResponse.json({ success: true, ...created }, { status: 201, headers: { "Cache-Control": "no-store" } });
 }

@@ -2,9 +2,75 @@ import "server-only";
 
 import crypto from "node:crypto";
 
+import {
+  applyLateCancellation,
+  describeReliabilityStanding,
+  isNewJoinPaused,
+  restoreReliabilityAfterCleanAttendance,
+  type CancellationContext,
+  type ReliabilityNotice,
+  type ReliabilityState,
+} from "@sport-date/domain";
+
 import { getDatabase } from "@/lib/db";
 
-export async function createEventJoinRequest(eventId: string, requester: { id: string; age: number }, introduction: string) {
+type ReliabilityRow = {
+  late_cancellation_streak: number;
+  late_cancellation_streak_started_at: string | null;
+  reliability_paused_until: string | null;
+};
+
+function toReliabilityState(row: ReliabilityRow): ReliabilityState {
+  return {
+    lateCancellationStreak: Number(row.late_cancellation_streak),
+    streakStartedAt: row.late_cancellation_streak_started_at ? new Date(row.late_cancellation_streak_started_at) : null,
+    pausedUntil: row.reliability_paused_until ? new Date(row.reliability_paused_until) : null,
+  };
+}
+
+// Private reliability standing for the signed-in member only. Never selected into
+// any host- or peer-facing query; the returned notice is the member's own copy.
+export async function getMemberReliabilityStanding(
+  userId: string,
+  now: Date = new Date(),
+): Promise<{ paused: boolean; notice: ReliabilityNotice }> {
+  const sql = getDatabase();
+  const rows = (await sql`
+    SELECT late_cancellation_streak, late_cancellation_streak_started_at, reliability_paused_until
+    FROM users WHERE id = ${userId}
+  `) as unknown as ReliabilityRow[];
+  if (rows.length === 0) return { paused: false, notice: { tone: "none", headline: "", body: "", liftsAt: null } };
+  const state = toReliabilityState(rows[0]);
+  return { paused: isNewJoinPaused(state, now), notice: describeReliabilityStanding(state, now) };
+}
+
+async function persistReliabilityState(userId: string, state: ReliabilityState): Promise<void> {
+  const sql = getDatabase();
+  await sql`
+    UPDATE users
+    SET late_cancellation_streak = ${state.lateCancellationStreak},
+        late_cancellation_streak_started_at = ${state.streakStartedAt ? state.streakStartedAt.toISOString() : null},
+        reliability_paused_until = ${state.pausedUntil ? state.pausedUntil.toISOString() : null}
+    WHERE id = ${userId}
+  `;
+}
+
+export type CreateJoinRequestResult =
+  | { requestId: string; status: "pending" }
+  | { paused: true; notice: ReliabilityNotice }
+  | null;
+
+export async function createEventJoinRequest(
+  eventId: string,
+  requester: { id: string; age: number },
+  introduction: string,
+): Promise<CreateJoinRequestResult> {
+  const now = new Date();
+  const standing = await getMemberReliabilityStanding(requester.id, now);
+  // The ONLY consequence of the reliability rule: a temporary pause on requesting
+  // NEW places. Leaving, reporting, blocking, safety, profile editing, and already-
+  // accepted events are untouched (they never reach this gate).
+  if (standing.paused) return { paused: true as const, notice: standing.notice };
   const requestId = crypto.randomUUID();
   const sql = getDatabase();
   const rows = await sql`
@@ -44,18 +110,54 @@ export async function createEventJoinRequest(eventId: string, requester: { id: s
 
 export async function cancelEventJoinRequest(eventId: string, requestId: string, requesterId: string) {
   const sql = getDatabase();
-  const rows = await sql`
+  // Capture the pre-cancel status and hours-until-start in the same statement that
+  // cancels, so the reliability signal reflects the real state. NOTE: safety-path
+  // exits (report/block) cancel seats inside safety-actions.ts and never reach this
+  // function, so a safety-motivated exit can never count here. Host-cancelled
+  // events also do not route through here.
+  const rows = (await sql`
     WITH removed_seat AS (
       DELETE FROM event_participants
       WHERE event_id = ${eventId}::uuid AND user_id = ${requesterId}
     )
     UPDATE join_requests
     SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
-    WHERE id = ${requestId}::uuid AND event_id = ${eventId}::uuid
-      AND requester_user_id = ${requesterId} AND status IN ('pending', 'accepted')
-    RETURNING id
-  `;
-  return rows.length > 0;
+    FROM events
+    WHERE join_requests.id = ${requestId}::uuid AND join_requests.event_id = ${eventId}::uuid
+      AND join_requests.event_id = events.id
+      AND join_requests.requester_user_id = ${requesterId}
+      AND join_requests.status IN ('pending', 'accepted')
+    RETURNING (join_requests.status = 'cancelled') AS cancelled,
+      (join_requests.responded_at IS NOT NULL) AS was_accepted,
+      EXTRACT(EPOCH FROM (events.starts_at - NOW())) / 3600 AS hours_until_start
+  `) as unknown as Array<{ cancelled: boolean; was_accepted: boolean; hours_until_start: string | number }>;
+
+  if (rows.length === 0) return false;
+
+  // A cancellation only counts as a reliability signal when it was an ACCEPTED
+  // place cancelled close to the start. The domain layer owns the exact rule.
+  const context: CancellationContext = {
+    wasAccepted: Boolean(rows[0].was_accepted),
+    hoursUntilStart: Number(rows[0].hours_until_start),
+    viaSafetyPath: false,
+  };
+  const now = new Date();
+  const currentRows = (await sql`
+    SELECT late_cancellation_streak, late_cancellation_streak_started_at, reliability_paused_until
+    FROM users WHERE id = ${requesterId}
+  `) as unknown as ReliabilityRow[];
+  if (currentRows.length > 0) {
+    const nextState = applyLateCancellation(toReliabilityState(currentRows[0]), context, now);
+    await persistReliabilityState(requesterId, nextState);
+  }
+
+  return true;
+}
+
+// A clean completed attendance restores standing immediately (recoverable). Called
+// from the reflection path when the member reports they attended.
+export async function restoreMemberReliabilityStanding(userId: string): Promise<void> {
+  await persistReliabilityState(userId, restoreReliabilityAfterCleanAttendance());
 }
 
 export async function decideEventJoinRequest(eventId: string, requestId: string, hostId: string, action: "accept" | "skip") {

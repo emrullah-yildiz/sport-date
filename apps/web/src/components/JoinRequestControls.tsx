@@ -9,7 +9,25 @@ import { declinedJoinRequestMessage, joinRequestConfirmationMessage } from "@/li
 
 type Status = DiscoveryRequest["status"];
 
-export default function JoinRequestControls({ eventId, request }: { eventId: string; request: DiscoveryRequest | null }) {
+// Private, member-only reliability standing. Never rendered for hosts or other
+// members — this component is on the member's own discovery view.
+type ReliabilityNotice = {
+  tone: "none" | "warning" | "paused";
+  headline: string;
+  body: string;
+  liftsAt: string | null;
+  timeZone: string;
+};
+
+export default function JoinRequestControls({
+  eventId,
+  request,
+  reliability,
+}: {
+  eventId: string;
+  request: DiscoveryRequest | null;
+  reliability?: ReliabilityNotice;
+}) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const [introduction, setIntroduction] = useState("");
@@ -21,6 +39,10 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
   const [status, setStatus] = useState<Status | null>(request?.status ?? null);
   const [requestId, setRequestId] = useState<string | null>(request?.id ?? null);
   const [announcement, setAnnouncement] = useState("");
+  // Live paused state: seeded from the server-rendered standing, and re-set if a
+  // new-join attempt returns 423 (a cool-down that began since page load).
+  const [pausedBody, setPausedBody] = useState<string | null>(reliability?.tone === "paused" ? reliability.body : null);
+  const [pausedLiftsAt, setPausedLiftsAt] = useState<string | null>(reliability?.tone === "paused" ? reliability.liftsAt : null);
   const confirmationRef = useRef<HTMLElement | null>(null);
   // A ref (not state) so consuming it never triggers a render: set true when a
   // commitment resolves in this session so we move focus to the new confirmation
@@ -61,7 +83,14 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ introduction }),
       });
-      const result = (await response.json()) as { error?: string; requestId?: string; status?: Status };
+      const result = (await response.json()) as { error?: string; requestId?: string; status?: Status; paused?: boolean; liftsAt?: string | null };
+      // A reliability cool-down began since page load: show the calm private
+      // explanation in place instead of a generic error, and keep the typed note.
+      if (response.status === 423 && result.paused) {
+        setPausedBody(result.error ?? "New requests are paused for a short while.");
+        setPausedLiftsAt(result.liftsAt ?? null);
+        return;
+      }
       if (!response.ok) throw new Error(result.error || "Request failed.");
       const nextStatus = result.status ?? "pending";
       setStatus(nextStatus);
@@ -108,7 +137,35 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
     }
   }
 
+  function formatLiftTime(iso: string | null): string | null {
+    if (!iso) return null;
+    try {
+      return new Intl.DateTimeFormat("en-GB", {
+        dateStyle: "full",
+        timeStyle: "short",
+        timeZone: reliability?.timeZone,
+      }).format(new Date(iso));
+    } catch {
+      return null;
+    }
+  }
+
   function panel() {
+    // Reliability cool-down: the ONLY consequence of the fair reliability rule is
+    // a temporary pause on requesting NEW places. It is shown only to this member,
+    // explains itself calmly, and states exactly when it lifts. It never appears
+    // once a request already exists — leaving/attending an existing place is
+    // always available and handled by the other branches above.
+    if (pausedBody && status === null) {
+      const liftLabel = formatLiftTime(pausedLiftsAt);
+      return (
+        <motion.div key="paused" className="join-state reliability-paused" role="status" {...panelMotion}>
+          <strong tabIndex={-1} ref={attachConfirmation}>New requests are paused for a short while.</strong>
+          <p>{pausedBody}</p>
+          {liftLabel ? <p className="reliability-lift">New requests reopen automatically on {liftLabel}.</p> : null}
+        </motion.div>
+      );
+    }
     if (status === "accepted") {
       return (
         <motion.div key="accepted" className="join-state accepted" {...panelMotion}>
@@ -151,6 +208,9 @@ export default function JoinRequestControls({ eventId, request }: { eventId: str
     }
     return (
       <motion.div key="request" className="join-request-box" {...panelMotion}>
+        {reliability?.tone === "warning" && !pausedBody ? (
+          <p className="reliability-warning" role="status">{reliability.body}</p>
+        ) : null}
         <label htmlFor="join-introduction">A short note to the host <span>optional</span></label>
         <textarea
           id="join-introduction"
