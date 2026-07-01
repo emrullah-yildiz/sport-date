@@ -1,13 +1,13 @@
 # CX-20260701-discover-no-location-around-me-search
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 5 × Impact 4 × Confidence 4) / Effort 3 = 27. Finding events near you is the core discovery promise; today a member can only text-match a city.
 - Customer journey: discovery
 - Surface: `web` (matching logic shared with mobile)
 - Environment and viewport/device: dev localhost:3000
 - Found by: Owner (direct feedback 2026-07-01, "I cannot search events happening around me")
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-discover-advanced-skill-silently-excludes-events`, `CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed`
 
 ## Customer outcome
@@ -52,3 +52,4 @@ The central discovery promise ("find something to do near you") is unmet; member
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner feedback; status `ready`.
+- 2026-07-01 - Experience Build Agent took ownership; status `in-progress`. Slice: default discovery to the member's profile area ("Events near <area>") with a one-tap "Search everywhere" broaden; splitting true geo-radius / "use my location" to a follow-up because the member location model is a single free-text string with no coordinates (a radius needs geocoding + schema).

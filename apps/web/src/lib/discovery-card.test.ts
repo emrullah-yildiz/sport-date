@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate } from "./discovery-card";
+import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "./discovery-card";
 
 // These pin the scan-critical presentation rules for the /discover card hierarchy
 // (CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed): the "when" is
@@ -37,6 +37,52 @@ describe("formatDiscoveryArea", () => {
   it("falls back gracefully when one part is missing", () => {
     expect(formatDiscoveryArea("", "Berlin")).toBe("Berlin");
     expect(formatDiscoveryArea("Kreuzberg", "")).toBe("Kreuzberg");
+  });
+});
+
+// Pins the "around me" default (CX-20260701-discover-no-location-around-me-search):
+// a member who types nothing should have discovery centred on their own profile
+// area (not an empty, everywhere feed), while still being able to type a specific
+// city or broaden to everywhere. Uses only the member's own approximate area.
+describe("resolveDiscoveryArea", () => {
+  it("defaults an empty search to the member's profile area (the near-me default)", () => {
+    expect(resolveDiscoveryArea("Bucharest", "", false)).toEqual({
+      effectiveCity: "Bucharest",
+      isNearMeDefault: true,
+      memberArea: "Bucharest",
+    });
+    // The reported scenario: a member who never types a city still sees local events.
+    expect(resolveDiscoveryArea("Cluj-Napoca", "", false).effectiveCity).toBe("Cluj-Napoca");
+  });
+
+  it("lets an explicitly typed city override the near-me default", () => {
+    const resolved = resolveDiscoveryArea("Bucharest", "Berlin", false);
+    expect(resolved.effectiveCity).toBe("Berlin");
+    expect(resolved.isNearMeDefault).toBe(false);
+    // The member's own area is still reported so the UI can offer to return to it.
+    expect(resolved.memberArea).toBe("Bucharest");
+  });
+
+  it("broadens to everywhere (empty city, no default) when the member opts in", () => {
+    expect(resolveDiscoveryArea("Bucharest", "", true)).toEqual({
+      effectiveCity: "",
+      isNearMeDefault: false,
+      memberArea: "Bucharest",
+    });
+  });
+
+  it("does not invent an area when the member has no profile location", () => {
+    expect(resolveDiscoveryArea("", "", false)).toEqual({
+      effectiveCity: "",
+      isNearMeDefault: false,
+      memberArea: "",
+    });
+    expect(resolveDiscoveryArea("   ", "", false).isNearMeDefault).toBe(false);
+  });
+
+  it("trims whitespace on both the profile area and a typed city", () => {
+    expect(resolveDiscoveryArea("  Bucharest  ", "", false).effectiveCity).toBe("Bucharest");
+    expect(resolveDiscoveryArea("Bucharest", "  Berlin  ", false).effectiveCity).toBe("Berlin");
   });
 });
 

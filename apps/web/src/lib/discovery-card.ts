@@ -44,6 +44,48 @@ export function formatDiscoveryArea(areaLabel: string, city: string): string {
   return area || town;
 }
 
+/**
+ * Resolve which city discovery should search, centring the feed on the member's
+ * own area by DEFAULT (CX-20260701-discover-no-location-around-me-search).
+ *
+ * Today the member's location is a single free-text string (often just a city, e.g.
+ * "Bucharest" / "Cluj-Napoca") and there are no member coordinates, so "near me" is
+ * implemented as "in my area": when the member has NOT typed a city and has NOT
+ * asked to broaden ("everywhere"), we default the effective city filter to their
+ * profile area rather than leaving it empty — so a member who does not know or type
+ * the exact city still sees what is happening around them.
+ *
+ * Privacy: this only ever uses the member's own already-stored approximate area and
+ * the event's approximate public city. It exposes no precise member or venue
+ * location and adds no device geolocation. A one-tap "everywhere" broaden keeps the
+ * member in control and never traps them in an empty local feed.
+ *
+ * Precedence: an explicit typed `requestedCity` always wins (the member is
+ * deliberately searching a specific place); `everywhere` clears the area default
+ * (broaden). Only when neither is set do we fall back to the profile area.
+ */
+export type ResolvedDiscoveryArea = Readonly<{
+  /** The city string to hand to the discovery query ("" means search everywhere). */
+  effectiveCity: string;
+  /** True when we applied the profile-area default (member typed nothing, not broadened). */
+  isNearMeDefault: boolean;
+  /** The member's own approximate area, trimmed — for "near <area>" framing; may be "". */
+  memberArea: string;
+}>;
+
+export function resolveDiscoveryArea(
+  profileLocation: string,
+  requestedCity: string,
+  everywhere: boolean,
+): ResolvedDiscoveryArea {
+  const memberArea = (profileLocation ?? "").trim();
+  const typedCity = (requestedCity ?? "").trim();
+  if (typedCity) return { effectiveCity: typedCity, isNearMeDefault: false, memberArea };
+  if (everywhere) return { effectiveCity: "", isNearMeDefault: false, memberArea };
+  if (memberArea) return { effectiveCity: memberArea, isNearMeDefault: true, memberArea };
+  return { effectiveCity: "", isNearMeDefault: false, memberArea };
+}
+
 export type DiscoveryAvailability = Readonly<{
   /** Short, glanceable label, e.g. "3 places left" / "Last place" / "Fully booked". */
   label: string;
