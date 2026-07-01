@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getMemberEventSummaries, selectHostedEvents, type HostedEvent } from "@/lib/events";
+import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, type HostedEvent } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata = { title: "Your events — Sport Date" };
@@ -19,6 +19,8 @@ function formatWhen(event: HostedEvent) {
 
 function HostedEventCard({ event }: { event: HostedEvent }) {
   const statusLabel = event.hostedStatus === "upcoming" ? "Upcoming" : "Past";
+  const coordination = event.hostCoordination ? summarizeHostCoordination(event.hostCoordination) : null;
+  const isUpcoming = event.hostedStatus === "upcoming";
   return (
     <article className={`hosting-card ${event.hostedStatus}`}>
       <div className="hosting-card-top">
@@ -30,6 +32,30 @@ function HostedEventCard({ event }: { event: HostedEvent }) {
         <span>{formatWhen(event)}</span>
         <span>{event.areaLabel}, {event.city}</span>
       </div>
+      {coordination ? (
+        <dl className="hosting-coordination">
+          <div className={`hosting-coordination-item${isUpcoming && coordination.hasPending ? " waiting" : ""}`}>
+            <dt>Join requests</dt>
+            {isUpcoming ? (
+              coordination.hasPending ? (
+                <dd>
+                  <Link href={`/events/${event.id}`} aria-label={`${coordination.pendingLabel} for ${event.title} — open to accept or decline`}>
+                    {coordination.pendingLabel} <span aria-hidden="true">→</span>
+                  </Link>
+                </dd>
+              ) : (
+                <dd>{coordination.pendingLabel}</dd>
+              )
+            ) : (
+              <dd>Requests are closed</dd>
+            )}
+          </div>
+          <div className="hosting-coordination-item">
+            <dt>Places</dt>
+            <dd>{coordination.placesLabel}</dd>
+          </div>
+        </dl>
+      ) : null}
       <footer>
         <Link href={`/events/${event.id}`} aria-label={`Manage ${event.title}`}>
           {event.hostedStatus === "upcoming" ? "Manage, edit or cancel" : "Review this event"} <span aria-hidden="true">→</span>

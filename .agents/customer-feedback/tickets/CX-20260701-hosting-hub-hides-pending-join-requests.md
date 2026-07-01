@@ -1,13 +1,13 @@
 # CX-20260701-hosting-hub-hides-pending-join-requests
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P2 high` — (Reach 4 × Impact 4 × Confidence 4) / Effort 3 = 21.3. Coordination/trust gap on the core host surface; just below P1 because it is not an auth/safety/privacy regression, but it is the highest-impact state gap on the new hub.
 - Customer journey: coordination / host management (commitment → coordination)
 - Surface: `web`
 - Environment and viewport/device: dev server localhost:3000, observed at 1280 and 375
 - Found by: Experience & Design Explorer — `/hosting × completeness-of-states` pass, 2026-07-01
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-no-web-surface-to-manage-hosted-events` (the hub this builds on, now `verified`); `CX-20260701-event-creation-entry-point-not-discoverable` (sibling hosting-nav work)
 
 ## Customer outcome
@@ -68,3 +68,4 @@ Practical: requests can sit unseen until they expire or the event passes, so peo
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (`/hosting × completeness-of-states`); status `ready`.
+- 2026-07-01 - Picked up by Experience Build Agent (Claude Opus 4.8); status `in-progress`.

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, type MemberEventSummary } from "./events";
+import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, summarizeHostCoordination, type MemberEventSummary } from "./events";
 
 // These cases pin the discovery language-preference rule that the SQL clause in
 // `getDiscoverableEvents` mirrors. The bug (CX-20260630): a brand-new member has
@@ -81,7 +81,8 @@ describe("hosting page hosted-event selection", () => {
   const summary = (over: Partial<MemberEventSummary>): MemberEventSummary => ({
     id: "e1", title: "Morning run", sport: "Running", startsAt: "2026-07-10T07:00:00Z",
     timeZone: "Europe/Bucharest", city: "Bucharest", areaLabel: "Herastrau",
-    isHost: true, hasEnded: false, reflection: null, ...over,
+    isHost: true, hasEnded: false, reflection: null,
+    hostCoordination: { pendingRequestCount: 0, acceptedCount: 0, capacity: 4 }, ...over,
   });
 
   it("keeps only events the member hosts (excludes events they merely joined)", () => {
@@ -90,6 +91,13 @@ describe("hosting page hosted-event selection", () => {
       summary({ id: "joined-1", isHost: false }),
     ]);
     expect(hosted.map((event) => event.id)).toEqual(["host-1"]);
+  });
+
+  it("carries the host's own coordination counts through to the hosted card", () => {
+    const [hosted] = selectHostedEvents([
+      summary({ id: "host-1", isHost: true, hostCoordination: { pendingRequestCount: 2, acceptedCount: 1, capacity: 4 } }),
+    ]);
+    expect(hosted.hostCoordination).toEqual({ pendingRequestCount: 2, acceptedCount: 1, capacity: 4 });
   });
 
   it("classifies a not-yet-ended hosted event as upcoming and an ended one as past", () => {
@@ -104,5 +112,42 @@ describe("hosting page hosted-event selection", () => {
   it("returns an empty list when the member hosts nothing", () => {
     expect(selectHostedEvents([summary({ isHost: false })])).toEqual([]);
     expect(selectHostedEvents([])).toEqual([]);
+  });
+
+  // Authz: the coordination counts are host-private. `getMemberEventSummaries`
+  // sets `hostCoordination` to null for any row the viewer merely joined, so the
+  // hub cannot leak another host's pending/capacity numbers. `selectHostedEvents`
+  // drops non-host rows entirely, but pin the null-for-joined contract too.
+  it("does not attach coordination counts to an event the member only joined", () => {
+    const joined = summary({ id: "joined-1", isHost: false, hostCoordination: null });
+    expect(joined.hostCoordination).toBeNull();
+    expect(selectHostedEvents([joined])).toEqual([]);
+  });
+});
+
+// Pins the calm, truthful copy for the hosting hub's aggregate counts
+// (CX-20260701). Only aggregate numbers appear — never a requester's name or skip
+// count — and the phrasing carries no scarcity/urgency pressure.
+describe("hosting coordination summary copy", () => {
+  it("uses a calm zero state when no one is waiting", () => {
+    const s = summarizeHostCoordination({ pendingRequestCount: 0, acceptedCount: 0, capacity: 4 });
+    expect(s.pendingLabel).toBe("No requests yet");
+    expect(s.hasPending).toBe(false);
+  });
+
+  it("counts pending requests without exposing who they are, singular vs plural", () => {
+    expect(summarizeHostCoordination({ pendingRequestCount: 1, acceptedCount: 0, capacity: 4 }).pendingLabel)
+      .toBe("1 person waiting for your reply");
+    const many = summarizeHostCoordination({ pendingRequestCount: 3, acceptedCount: 0, capacity: 4 });
+    expect(many.pendingLabel).toBe("3 people waiting for your reply");
+    expect(many.hasPending).toBe(true);
+  });
+
+  it("reports places filled vs capacity, and a plain 'full' state at capacity", () => {
+    expect(summarizeHostCoordination({ pendingRequestCount: 0, acceptedCount: 2, capacity: 4 }).placesLabel)
+      .toBe("2 of 4 places filled");
+    const full = summarizeHostCoordination({ pendingRequestCount: 0, acceptedCount: 4, capacity: 4 });
+    expect(full.placesLabel).toBe("All places filled");
+    expect(full.isFull).toBe(true);
   });
 });

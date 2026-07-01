@@ -259,10 +259,21 @@ export type EventRoom = Readonly<{
   participants: ReadonlyArray<{ userId: string; firstName: string; skillLevel: string; seenLatestUpdate: boolean | null; criticalUpdateIntent: EventUpdateAttendanceIntent | null }>;
 }>;
 
+// Host-only aggregate coordination counts for a hosted event, surfaced on the
+// `/hosting` hub so a host can see at a glance that people are waiting and how full
+// the event is. These are *aggregate counts only* — never a requester's identity,
+// skip count, or any other member's private data (privacy / anti-dark-pattern). The
+// field is present only for events the viewer hosts (`isHost`), so a joined-event
+// summary never carries another host's coordination numbers.
+export type HostCoordination = Readonly<{
+  pendingRequestCount: number; acceptedCount: number; capacity: number;
+}>;
+
 export type MemberEventSummary = Readonly<{
   id: string; title: string; sport: string; startsAt: string; timeZone: string;
   city: string; areaLabel: string; isHost: boolean; hasEnded: boolean;
   reflection: EventRoom["reflection"];
+  hostCoordination: HostCoordination | null;
 }>;
 
 type EventRoomRow = {
@@ -416,12 +427,43 @@ export function selectHostedEvents(summaries: ReadonlyArray<MemberEventSummary>)
     .map((summary) => ({ ...summary, hostedStatus: summary.hasEnded ? "past" : "upcoming" }));
 }
 
+// Pure copy derivation shared by the hosting card and its tests. Turns the host's
+// own aggregate counts into calm, truthful labels — no scarcity/urgency pressure,
+// no other member's identity. `pending` is the count of requests awaiting the
+// host's decision; `filled`/`capacity` describe seats taken. Kept pure (no I/O) so
+// the strings can be asserted directly.
+export function summarizeHostCoordination(counts: HostCoordination): {
+  pendingLabel: string; placesLabel: string; hasPending: boolean; isFull: boolean;
+} {
+  const { pendingRequestCount, acceptedCount, capacity } = counts;
+  const isFull = capacity > 0 && acceptedCount >= capacity;
+  return {
+    hasPending: pendingRequestCount > 0,
+    isFull,
+    pendingLabel:
+      pendingRequestCount === 0
+        ? "No requests yet"
+        : pendingRequestCount === 1
+          ? "1 person waiting for your reply"
+          : `${pendingRequestCount} people waiting for your reply`,
+    placesLabel: isFull ? "All places filled" : `${acceptedCount} of ${capacity} places filled`,
+  };
+}
+
 export async function getMemberEventSummaries(userId: string): Promise<MemberEventSummary[]> {
   const sql = getDatabase();
+  // The two coordination subqueries (accepted seats, pending requests) count rows
+  // in tables the host already owns; both are additive and read-only (no schema
+  // change / no migration). They are computed for every row but only surfaced when
+  // the viewer hosts the event — a joined-event row's counts are discarded below so
+  // a member never learns another host's pending/capacity numbers.
   const rows = await sql`
     SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
-      events.public_city, events.public_area_label, (events.host_user_id = ${userId}) AS is_host,
+      events.public_city, events.public_area_label, events.capacity,
+      (events.host_user_id = ${userId}) AS is_host,
       (events.starts_at + (events.duration_minutes * INTERVAL '1 minute') <= NOW()) AS has_ended,
+      (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
+      (SELECT COUNT(*)::integer FROM join_requests WHERE event_id = events.id AND status = 'pending') AS pending_request_count,
       reflection.attendance, reflection.would_join_again
     FROM events
     LEFT JOIN event_reflections AS reflection ON reflection.event_id = events.id AND reflection.user_id = ${userId}
@@ -436,7 +478,8 @@ export async function getMemberEventSummaries(userId: string): Promise<MemberEve
     LIMIT 30
   ` as unknown as Array<{
     id: string; title: string; sport: string; starts_at: string; time_zone: string;
-    public_city: string; public_area_label: string; is_host: boolean; has_ended: boolean;
+    public_city: string; public_area_label: string; capacity: number; is_host: boolean; has_ended: boolean;
+    accepted_count: number; pending_request_count: number;
     attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
     would_join_again: NonNullable<EventRoom["reflection"]>["wouldJoinAgain"] | null;
   }>;
@@ -446,6 +489,10 @@ export async function getMemberEventSummaries(userId: string): Promise<MemberEve
     isHost: row.is_host, hasEnded: row.has_ended,
     reflection: row.attendance && row.would_join_again
       ? { attendance: row.attendance, wouldJoinAgain: row.would_join_again }
+      : null,
+    // Only the host of an event may see its coordination counts.
+    hostCoordination: row.is_host
+      ? { pendingRequestCount: row.pending_request_count, acceptedCount: row.accepted_count, capacity: row.capacity }
       : null,
   }));
 }
