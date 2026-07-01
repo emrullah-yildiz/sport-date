@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
-import { Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
 import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
@@ -107,14 +106,11 @@ export default async function HostEventPage({
 
   return (
     <main className="host-event-page">
-      <nav className="profile-nav">
-        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <Link href="/hosting">Your events</Link>
-          <Link href="/events/new">Host another</Link>
-          <AccountMenu firstName={host.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav
+        firstName={host.firstName}
+        current="host"
+        action={<Link href="/events/new" className="nav-host-cta" aria-label="Host another event — create a new game">Host another</Link>}
+      />
 
       {view.justPublished ? (
         <section className="host-published" role="status" aria-labelledby="host-published-heading">

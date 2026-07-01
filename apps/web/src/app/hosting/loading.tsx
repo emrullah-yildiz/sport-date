@@ -1,14 +1,14 @@
 import Link from "next/link";
 
-import { Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
 
 export default function HostingLoading() {
   return (
     <main className="hosting-page">
-      <nav className="profile-nav">
-        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
-        <Link href="/events/new">Host an event</Link>
-      </nav>
+      <PrimaryNav
+        current="host"
+        action={<Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event</Link>}
+      />
       <header className="hosting-header">
         <p className="eyebrow">The events you run</p>
         <h1>Your events.</h1>

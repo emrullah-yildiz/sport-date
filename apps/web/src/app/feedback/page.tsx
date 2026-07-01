@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
-import { Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
 import FeedbackWorkspace from "@/components/FeedbackWorkspace";
 import { getCurrentUser } from "@/lib/session";
 
@@ -14,13 +12,7 @@ export default async function FeedbackPage() {
 
   return (
     <main className="feedback-page">
-      <nav className="profile-nav" aria-label="Feedback navigation">
-        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <Link href="/profile">Back to profile</Link>
-          <AccountMenu firstName={user.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav firstName={user.firstName} />
       <header className="feedback-header">
         <p className="eyebrow">Help shape the experience</p>
         <h1>Tell us where the rhythm broke.</h1>

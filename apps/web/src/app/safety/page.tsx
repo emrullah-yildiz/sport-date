@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
-import { Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
 import SafetyAppealForm from "@/components/SafetyAppealForm";
 import SiteFooter from "@/components/SiteFooter";
 import { getMemberSafetyCases } from "@/lib/safety";
@@ -21,13 +20,7 @@ export default async function SafetyCenterPage() {
 
   return (
     <main className="safety-center-page">
-      <nav className="profile-nav">
-        <Link href="/discover" className="logo" aria-label="Rally — go to discover"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <Link href="/profile">Back to profile</Link>
-          <AccountMenu firstName={user.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav firstName={user.firstName} current="safety" />
       <header className="safety-center-header">
         <p className="eyebrow">Safety center</p>
         <h1>Your reports, without the black box.</h1>

@@ -2,8 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
-import AccountMenu from "@/components/AccountMenu";
-import { Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
 import SiteFooter from "@/components/SiteFooter";
 import { getDiscoverableEvents, type DiscoveryFilters } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
@@ -34,7 +33,11 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
 
   return (
     <main className="discover-page">
-      <nav className="profile-nav"><Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link><div className="nav-actions"><Link href="/hosting">Your events</Link><Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event</Link><AccountMenu firstName={user.firstName} /></div></nav>
+      <PrimaryNav
+        firstName={user.firstName}
+        current="discover"
+        action={<Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event</Link>}
+      />
       <header className="discover-header"><p className="eyebrow">Events that fit your movement</p><h1>Something real to do. Someone new to meet.</h1><p>Only events compatible with your sports, experience, adult age range, and active blocks appear here.</p></header>
       {area.isNearMeDefault ? (
         <p className="discover-area-note">

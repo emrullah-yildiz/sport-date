@@ -1,13 +1,13 @@
 # CX-20260702-navigation-simplify-primary
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 3 = 16. Fewer, clearer primary destinations directly addresses "hard to navigate," but depends on the IA consolidation landing first (so the nav has the right set to point at), so it sits at P2 just behind that ticket. Broad reach, real clarity impact, moderate effort.
 - Customer journey: cross-cutting — every authenticated surface's navigation
 - Surface: `web` (desktop + mobile)
 - Environment and viewport/device: dev server localhost:3000, all widths; per-page nav (e.g. `.profile-nav`) + `apps/web/src/components/AccountMenu.tsx`
 - Found by: Design Lead — black+neon refresh (2026-07-02); direction in `docs/design-refresh-2026.md` §3
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent (Rally)`
 - Related tickets: `CX-20260702-ia-consolidate-guideline-and-legal-pages` (P1, land first — supplies the consolidated destinations), `CX-20260702-dark-neon-theme-tokens`
 
 ## Customer outcome
@@ -61,3 +61,4 @@ Practical/emotional: a stable, minimal nav lowers cognitive load and makes the a
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Depends on `CX-20260702-ia-consolidate-guideline-and-legal-pages` landing first. Status `ready`.
+- 2026-07-02 - Picked up by experience-build-agent; set `in-progress`. Standardizing authenticated primary nav to a shared component (Discover, Host, Safety + AccountMenu).

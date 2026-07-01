@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
+import PrimaryNav from "@/components/PrimaryNav";
 import EmailVerificationControls from "@/components/EmailVerificationControls";
 import PrivacyControls from "@/components/PrivacyControls";
 import CommunicationPreferences from "@/components/CommunicationPreferences";
@@ -13,7 +13,6 @@ import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import SiteFooter from "@/components/SiteFooter";
 import WebSessionControls from "@/components/WebSessionControls";
-import { Wordmark } from "@/lib/brand";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { isPlus } from "@/lib/entitlements";
 import { isBillingConfigured } from "@/lib/stripe";
@@ -81,12 +80,7 @@ export default async function ProfilePage() {
 
   return (
     <main className="profile-page">
-      <nav className="profile-nav">
-        <Link href="/discover" className="logo" aria-label="Rally — go to discover"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <AccountMenu firstName={user.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav firstName={user.firstName} />
       <section className="profile-hero">
         <div>
           <p className="eyebrow">Your private beta profile</p>

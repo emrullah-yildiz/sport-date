@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
+import PrimaryNav from "@/components/PrimaryNav";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventRoomChat from "@/components/EventRoomChat";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
@@ -12,7 +12,7 @@ import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
-import { BRAND_NAME, Wordmark } from "@/lib/brand";
+import { BRAND_NAME } from "@/lib/brand";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
 import { getPeerFeedbackTargets } from "@/lib/peer-feedback";
@@ -62,13 +62,15 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
 
   return (
     <main className="room-page">
-      <nav className="profile-nav">
-        <Link href={room.isHost ? `/events/${room.id}` : `/discover/events/${room.id}`} className="logo" aria-label="Rally — back to the event"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <span>{room.isHost ? "Host room" : "Accepted participant"}</span>
-          <AccountMenu firstName={user.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav
+        firstName={user.firstName}
+        current={room.isHost ? "host" : null}
+        action={
+          <Link href={room.isHost ? `/events/${room.id}` : `/discover/events/${room.id}`} className="primary-nav-link">
+            {room.isHost ? "Back to your event" : "Back to the event"}
+          </Link>
+        }
+      />
       <header className="room-hero">
         <p className="eyebrow">{room.sport} · coordination room</p>
         <h1>{room.title}</h1>

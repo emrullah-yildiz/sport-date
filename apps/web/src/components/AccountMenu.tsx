@@ -37,6 +37,15 @@ export function AccountMenuPanel({
       >
         Your profile
       </Link>
+      <Link
+        href="/feedback"
+        role="menuitem"
+        data-account-item
+        className="account-menu-item"
+        onClick={onNavigate}
+      >
+        Send feedback
+      </Link>
       <button
         type="button"
         role="menuitem"

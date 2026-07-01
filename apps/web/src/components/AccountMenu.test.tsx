@@ -50,20 +50,24 @@ describe("AccountMenu trigger", () => {
 });
 
 describe("AccountMenu panel", () => {
-  it("exposes both a sign-out and a switch-account action plus a profile link", () => {
+  it("exposes both a sign-out and a switch-account action plus profile and feedback links", () => {
     const html = renderPanel();
     expect(html).toContain('role="menu"');
     expect(html).toContain("Your profile");
+    expect(html).toContain("Send feedback");
     expect(html).toContain("Switch account");
     expect(html).toContain("Sign out");
     // The profile link points at /profile so members can always reach their account.
     expect(html).toMatch(/href="\/profile"/);
+    // Feedback is a progressive-disclosure utility link — it lives here, not in the
+    // primary nav bar, per the navigation-simplify refresh.
+    expect(html).toMatch(/href="\/feedback"/);
   });
 
   it("marks every menu entry with role=menuitem and keyboard-reachable roles", () => {
     const html = renderPanel();
     const menuitems = html.match(/role="menuitem"/g) ?? [];
-    expect(menuitems.length).toBe(3);
+    expect(menuitems.length).toBe(4);
   });
 
   it("disables the logout actions and shows progress while signing out", () => {

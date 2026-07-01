@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import AccountMenu from "@/components/AccountMenu";
-import { BRAND_NAME, Wordmark } from "@/lib/brand";
+import PrimaryNav from "@/components/PrimaryNav";
+import { BRAND_NAME } from "@/lib/brand";
 import SiteFooter from "@/components/SiteFooter";
 import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, type HostedEvent } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
@@ -82,13 +82,11 @@ export default async function HostingPage({ searchParams }: { searchParams: Prom
 
   return (
     <main className="hosting-page">
-      <nav className="profile-nav">
-        <Link href="/profile" className="logo" aria-label="Rally — go to your profile"><Wordmark decorative /></Link>
-        <div className="nav-actions">
-          <Link href="/events/new">Host an event</Link>
-          <AccountMenu firstName={user.firstName} />
-        </div>
-      </nav>
+      <PrimaryNav
+        firstName={user.firstName}
+        current="host"
+        action={<Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event</Link>}
+      />
 
       <header className="hosting-header">
         <p className="eyebrow">The events you run</p>
