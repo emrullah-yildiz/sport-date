@@ -1,13 +1,13 @@
 # CX-20260702-typography-right-size-and-scale
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — (Reach 5 × Impact 3 × Confidence 5) / Effort 3 = 25. Every member meets these headings on nearly every surface; the "simple details too big" complaint is a direct owner ask. Broad reach, real polish/clarity impact, high confidence (source-located), moderate effort. Not a functional/safety floor → P1, not P0. Builds on the token layer (`CX-20260702-dark-neon-theme-tokens`) but is independently buildable against the current tokens too.
 - Customer journey: cross-cutting (every surface's headings + meta)
 - Surface: `web` (desktop + mobile; shared CSS)
 - Environment and viewport/device: dev server localhost:3000, all widths; `apps/web/src/app/globals.css`
 - Found by: Design Lead — black+neon refresh (2026-07-02); direction in `docs/design-refresh-2026.md` §2
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Claude Opus 4.8)`
 - Related tickets: **supersedes** `CX-20260701-in-app-page-headers-off-scale-headline-systemic` and `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (both folded in here — see those tickets' updated status notes); relates to `CX-20260630-signup-redundant-double-headline-weak-focal-point` (signup focal point), `CX-20260702-dark-neon-theme-tokens` (theme layer)
 
 ## Customer outcome
@@ -76,16 +76,17 @@ Systemic heading treatment: `letter-spacing: -.02em; line-height: 1.1` (1.05 ok 
 
 ## Acceptance criteria
 
-- [ ] All 12 bespoke off-scale headline clamps are removed; every in-app page h1 uses `--fs-h1` with the systemic `-.02em`/`1.1` treatment — no per-surface `clamp()` for a page h1.
-- [ ] `.auth-card h1` (login/verify-email/reset-password/reset-confirm) uses `--fs-h1`; long headings wrap cleanly with no clipped descenders at 375px.
-- [ ] Only the logged-out marketing hero uses `--fs-display`, and it is the single named token (not a one-off clamp).
-- [ ] "Simple details" are right-sized: section labels/eyebrows/statuses/`dt` use `--fs-label` or `--fs-small`; oversized sub-headings (`.event-form-section h2`, `.privacy-panel h2`, `.accepted-location h2`, `.room-meeting h2`, etc.) map to `--fs-h2`/`--fs-h3`. No label renders headline-sized.
-- [ ] Heading → adjacent sub-text spacing uses a shared token/scale, consistent across hero and panels (absorbs the vertical-rhythm ticket).
-- [ ] No surface introduces horizontal overflow at 1280 or 375 as a result.
-- [ ] Heading semantics (single h1, correct h1→h2 order), contrast, focus, and reduced-motion behavior are unchanged.
-- [ ] No precise location or sensitive data exposed (styling-only).
-- [ ] Relevant automated tests and repository checks pass.
+- [x] All 12 bespoke off-scale headline clamps are removed; every in-app page h1 uses `--fs-h1` with the systemic `-.02em`/`1.1` treatment — no per-surface `clamp()` for a page h1. (Verified live: discover/profile/hosting/events-new/safety/feedback/login h1 all render 42px @1280 / 30px @375, letter-spacing -0.84px, line-height 1.1.)
+- [x] `.auth-card h1` (login/verify-email/reset-password/reset-confirm) uses `--fs-h1`; long headings wrap cleanly with no clipped descenders at 375px (line-height now 1.1, was 1).
+- [x] Only the logged-out marketing hero uses `--fs-display`, and it is the single named token (not a one-off clamp). (Landing `.hero-title`/`.hero h1` → `--fs-display`; verified 40px @375.)
+- [x] "Simple details" are right-sized: oversized sub-headings (`.event-form-section h2`, `.privacy-panel h2`, `.accepted-location h2`, `.room-meeting h2`, `.hosting-card h3`, session/plus/movement/reflection/peer-feedback h2s, etc.) map to `--fs-h2`/`--fs-h3`; big counts/figures (`.movement-count strong`, `.received-rating-number`, `.discovery-when-*`) capped at `--fs-h1`/`--fs-h3`. No label renders headline-sized.
+- [x] Heading → adjacent sub-text spacing uses shared tokens (`--space-1..6`, `--space-heading-gap: 12px`), consistent across hero and panels (absorbs the vertical-rhythm ticket).
+- [x] No surface introduces horizontal overflow at 1280 or 375 as a result. (All page headers no-overflow at both widths. One pre-existing profile @375 overflow traced to `.profile-photos-upload-label`/file input — a component control, unrelated to typography; not introduced here.)
+- [x] Heading semantics (single h1, correct h1→h2 order), contrast (unchanged tokens), focus, and reduced-motion behavior are unchanged.
+- [x] No precise location or sensitive data exposed (styling-only).
+- [x] Relevant automated tests and repository checks pass (typecheck ✓, lint ✓ (only a pre-existing warning in gitignored qa/full-flows.mjs), test 400 passed/12 skipped ✓, production build ✓).
 
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Supersedes the two 2026-07-01 headline/spacing tickets (marked accordingly). Adds the owner's "simple details too big" requirement. Status `ready`.
+- 2026-07-02 - Experience Build Agent (Claude Opus 4.8) took ownership; status `in-progress`. Implementing the restrained scale + right-sizing pass in `apps/web/src/app/globals.css`.

@@ -43,10 +43,13 @@ Measured ratios: text/bg 13.90 (AAA), text/surface 12.51 (AAA), muted/bg 7.13 (A
 green/bg 9.65 (AAA), blue/bg 7.74 (AAA), red/bg 5.59 (AA); bg-on-green 9.65, bg-on-blue 7.74,
 bg-on-red 5.59.
 
-**Typography:** one restrained scale — every in-app page h1 uses `--fs-h1`; only the logged-out
-marketing hero may use `--fs-display`. The 12 bespoke off-scale headline clamps are being
-removed. Right-size "simple details": labels/meta/statuses are small (`--fs-label`/`--fs-small`),
-not headline-sized.
+**Typography:** one restrained scale — every in-app page h1 uses `--fs-h1`
+(`clamp(30px,3.4vw,42px)`); only the logged-out marketing hero uses `--fs-display`
+(`clamp(40px,5vw,60px)`). The 12 bespoke off-scale headline clamps were **removed** (2026-07-02,
+`CX-20260702-typography-right-size-and-scale`); systemic heading treatment is `-.02em` / `1.1`
+(1.05 for `--fs-display`). "Simple details" (labels/eyebrows/meta/statuses/`dt`/counts) are small
+(`--fs-label` 12px / `--fs-small` 14px), not headline-sized. Heading→sub-text rhythm uses shared
+spacing tokens (`--space-1..6`, `--space-heading-gap: 12px`).
 
 **Rules that still hold under the refresh:** energetic is not casino/manipulative — no streaks-
 as-pressure, scores, leaderboards, popularity/attractiveness metrics, artificial scarcity, or
