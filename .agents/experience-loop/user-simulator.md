@@ -45,6 +45,14 @@ At each step ask: do I understand what happens next? What am I giving away? Can 
 mind? Can I recover without shame or danger? Instrument the browser for console errors,
 uncaught errors, and any 5xx / error page; a redacted note of what broke is a finding.
 
+**Click every CTA and link a real member would click** — do not stop at the happy path.
+On every success / confirmation / empty-state screen, actually click *each* button and link
+and confirm the destination loads without a 404/500/error (e.g. after publishing an event:
+"View the public invitation", "Manage your events", and "Copy invitation link" — a host
+clicking "View the public invitation" on their OWN event must not 404). A prominent CTA that
+fails is a P0/P1 finding. Also follow shared links (invitation/share URLs) as both the host
+and a second member.
+
 ## Report
 
 For every genuine problem, dedupe against the queue, then file a prioritized ticket from

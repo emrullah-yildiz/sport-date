@@ -35,8 +35,13 @@ that Tester and User-simulator both use.
 
 ## Ticket lifecycle
 
-`draft → ready → in-progress → implemented → verified`
+`draft → ready → in-progress → implemented → verified → (archived)`
 (`blocked-owner` for escalation-only decisions; reopened to `ready` if a test/journey fails.)
+
+Completed tickets (`verified`/`superseded`) are moved to
+`.agents/customer-feedback/tickets/archive/` to keep the active queue small — agents scan
+only the non-recursive active glob `tickets/CX-*.md`, but still dedup new tickets against
+the archive (see `archive/README.md`).
 
 ## One orchestrator tick (four phases, SEQUENTIAL — never concurrent)
 
