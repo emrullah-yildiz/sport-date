@@ -1,6 +1,6 @@
 # CX-20260701-plus-billing-management-ui
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 3 = 16. The honest member-facing surface for Plus; depends on the entitlement + Stripe tickets. Not on the critical build path until those land, but required before any go-live.
 - Customer journey: intent → commitment (upgrade); coordination (manage / cancel / renewal)
@@ -59,3 +59,4 @@ An honest, easy-to-cancel surface is the difference between ethical monetization
 
 - 2026-07-01 - Filed as the honest Plus upgrade + manage/cancel surface for the €6.99 launch (`docs/marketing/monetization-and-pricing-analysis.md` §0). Cancel-as-easy-as-subscribe via Stripe Billing Portal (EU DFA/UCPD). Depends on the entitlement (P1) and Stripe (P1) tickets. Status `ready`.
 - 2026-07-02 - build: picked up (in-progress, owner experience-build-agent). Added a fail-closed `PlusBilling` profile section (hidden entirely when billing dormant), a `createBillingPortalSession` seam + `/api/billing/portal` route (cancel-easy via Stripe portal, 503 when unconfigured). Free member sees honest €6.99/mo + Upgrade→Checkout; Plus member sees supporter + Manage/cancel→portal. Safety/core stated free-forever, no forbidden perks, no urgency.
+- 2026-07-02 - build: `implemented` in commit `0aca999` (pushed to origin/main; no migration). Files: `apps/web/src/components/PlusBilling.tsx` (+test), `apps/web/src/app/api/billing/portal/route.ts` (+test), `apps/web/src/lib/stripe.ts` (+`createBillingPortalSession`, test extended), `apps/web/src/app/profile/page.tsx`, `apps/web/src/app/globals.css`. Checks: typecheck pass, lint pass (only pre-existing `qa/full-flows.mjs` warning), test pass (391/12 skipped), production `npm run build` pass (`/api/billing/portal` compiled). Verified live with NO keys: pooled free member's /profile shows NO Plus panel/price/upgrade (surface fully hidden), rest of profile unaffected. Ready for independent retest.

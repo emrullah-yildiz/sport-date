@@ -1,6 +1,8 @@
 # CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing
 
-- Status: `ready`
+> **SUPERSEDED 2026-07-02** by `CX-20260702-typography-right-size-and-scale` (black+neon refresh), which introduces the shared heading→sub-text spacing tokens this ticket asks for as part of the consolidated typography pass. Retained for its measured profile-hero rhythm evidence, referenced by the superseding ticket.
+
+- Status: `superseded`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 5 × Impact 2 × Confidence 4) / Effort 2 = 20. Broad, cheap, systemic readability win.
 - Customer journey: cross-cutting (all surfaces)

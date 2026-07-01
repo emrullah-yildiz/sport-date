@@ -1,6 +1,8 @@
 # CX-20260701-in-app-page-headers-off-scale-headline-systemic
 
-- Status: `ready`
+> **SUPERSEDED 2026-07-02** by `CX-20260702-typography-right-size-and-scale` (black+neon refresh). That ticket covers the same 12 off-scale headline selectors listed here, plus the owner's "simple details too big" axis and heading→sub-text spacing, mapped to the refreshed type scale in `docs/design-refresh-2026.md` §2. Do not build this ticket independently; it is retained for its detailed per-selector evidence, which the superseding ticket references.
+
+- Status: `superseded`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 5 × Impact 2 × Confidence 5) / Effort 2 = 25. Every signed-in member meets these headers on nearly every in-app surface (discover, hosting, safety, event detail, room, create, feedback, moderation), so Reach is high, but it is a visual-fidelity/consistency defect, not a functional, safety, privacy, auth, or accessibility floor — so P3. Cheap, token-driven fix. The `/profile` precedent (CX-20260701-profile-hero-off-scale-headline-demotes-member-name, verified) already established that in-app page h1s should sit on `--fs-h1`; this ticket finishes that reconciliation on the surfaces that were left behind.
 - Customer journey: cross-cutting (every authenticated surface's page header) — coordination, trust, reflection
