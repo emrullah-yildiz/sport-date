@@ -1,13 +1,13 @@
 # CX-20260701-no-discoverable-sign-out-or-account-switch
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 5 × Impact 4 × Confidence 5) / Effort 2 = 50. Not being able to find sign-out makes members feel trapped and unsafe on a shared/family device — a trust and account-safety failure.
 - Customer journey: account management / trust / re-entry
 - Surface: `web`
 - Environment and viewport/device: dev localhost:3000, all widths
 - Found by: Owner (direct feedback 2026-07-01, "I do not see a place to sign out or switch accounts")
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-home-landing-not-auth-aware-appears-signed-out` (nav/logo behavior), `CX-20260701-remember-me-optional-persistent-login` (longer sessions make easy sign-out more important), session management (`WebSessionControls`)
 
 ## Customer outcome
@@ -46,3 +46,4 @@ A member on a shared/family/borrowed device who cannot quickly sign out is a rea
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner feedback + confirmed LogoutButton is only on /profile; status `ready`.
+- 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Factoring a shared `AccountMenu` client component (profile link + sign out + switch account) into the `profile-nav` across every authenticated surface.

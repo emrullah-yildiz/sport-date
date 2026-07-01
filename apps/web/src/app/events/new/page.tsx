@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import CreateEventForm from "@/components/CreateEventForm";
 import { getCurrentUser } from "@/lib/session";
 
@@ -11,7 +12,7 @@ export default async function NewEventPage() {
   if (!user) redirect("/login");
   return (
     <main className="new-event-page">
-      <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><span>Hosting as {user.firstName}</span></nav>
+      <nav className="profile-nav"><Link href="/profile" className="logo">Sport Date</Link><div className="nav-actions"><span>Hosting as {user.firstName}</span><AccountMenu firstName={user.firstName} /></div></nav>
       <header className="new-event-header"><p className="eyebrow">Create a real reason to meet</p><h1>Host the kind of game you would actually show up for.</h1><p>Warm expectations, clear logistics, and a private meeting point—held separately from discovery by design.</p></header>
       <section className="host-principles">
         <div>

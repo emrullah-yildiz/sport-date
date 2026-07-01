@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
@@ -56,7 +57,10 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
     <main className="room-page">
       <nav className="profile-nav">
         <Link href={room.isHost ? `/events/${room.id}` : `/discover/events/${room.id}`} className="logo">Sport Date</Link>
-        <span>{room.isHost ? "Host room" : "Accepted participant"}</span>
+        <div className="nav-actions">
+          <span>{room.isHost ? "Host room" : "Accepted participant"}</span>
+          <AccountMenu firstName={user.firstName} />
+        </div>
       </nav>
       <header className="room-hero">
         <p className="eyebrow">{room.sport} · coordination room</p>

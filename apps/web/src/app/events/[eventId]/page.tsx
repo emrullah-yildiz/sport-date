@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
@@ -107,8 +108,11 @@ export default async function HostEventPage({
     <main className="host-event-page">
       <nav className="profile-nav">
         <Link href="/profile" className="logo">Sport Date</Link>
-        <Link href="/hosting">Your events</Link>
-        <Link href="/events/new">Host another</Link>
+        <div className="nav-actions">
+          <Link href="/hosting">Your events</Link>
+          <Link href="/events/new">Host another</Link>
+          <AccountMenu firstName={host.firstName} />
+        </div>
       </nav>
 
       {view.justPublished ? (

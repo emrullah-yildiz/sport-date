@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import SafetyAppealForm from "@/components/SafetyAppealForm";
 import { getMemberSafetyCases } from "@/lib/safety";
 import { getCurrentUser } from "@/lib/session";
@@ -20,7 +21,10 @@ export default async function SafetyCenterPage() {
     <main className="safety-center-page">
       <nav className="profile-nav">
         <Link href="/discover" className="logo">Sport Date</Link>
-        <Link href="/profile">Back to profile</Link>
+        <div className="nav-actions">
+          <Link href="/profile">Back to profile</Link>
+          <AccountMenu firstName={user.firstName} />
+        </div>
       </nav>
       <header className="safety-center-header">
         <p className="eyebrow">Safety center</p>

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import EmailVerificationControls from "@/components/EmailVerificationControls";
-import LogoutButton from "@/components/LogoutButton";
 import PrivacyControls from "@/components/PrivacyControls";
 import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
@@ -74,7 +74,9 @@ export default async function ProfilePage() {
     <main className="profile-page">
       <nav className="profile-nav">
         <Link href="/discover" className="logo">Sport Date</Link>
-        <LogoutButton />
+        <div className="nav-actions">
+          <AccountMenu firstName={user.firstName} />
+        </div>
       </nav>
       <section className="profile-hero">
         <div>

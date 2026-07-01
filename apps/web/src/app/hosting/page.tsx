@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import AccountMenu from "@/components/AccountMenu";
 import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, type HostedEvent } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
@@ -81,7 +82,10 @@ export default async function HostingPage({ searchParams }: { searchParams: Prom
     <main className="hosting-page">
       <nav className="profile-nav">
         <Link href="/profile" className="logo">Sport Date</Link>
-        <Link href="/events/new">Host an event</Link>
+        <div className="nav-actions">
+          <Link href="/events/new">Host an event</Link>
+          <AccountMenu firstName={user.firstName} />
+        </div>
       </nav>
 
       <header className="hosting-header">
