@@ -48,6 +48,22 @@ export function hostSkipButtonLabel(skipCount: number): string {
   return "Skip";
 }
 
+// Short, calm confirmation a live region announces to keyboard / screen-reader
+// members the moment a commitment resolves in place (no full-document reload).
+// Success uses polite phrasing with no manufactured celebration or urgency.
+export function joinRequestConfirmationMessage(status: JoinRequestStatus): string {
+  switch (status) {
+    case "pending":
+      return "Request sent. Your request is now with the host.";
+    case "accepted":
+      return "You have a place. The exact meeting point is now shown below.";
+    case "cancelled":
+      return "Request cancelled. This invitation is closed for your account.";
+    case "declined":
+      return "This request is closed.";
+  }
+}
+
 export function declinedJoinRequestMessage(skipCount: number): string {
   return skipCount >= 3
     ? "This request was quietly closed after the host used all three skips for this event."

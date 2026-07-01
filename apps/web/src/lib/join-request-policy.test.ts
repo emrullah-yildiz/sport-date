@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { declinedJoinRequestMessage, hostSkipButtonLabel, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
+import { declinedJoinRequestMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
 
 describe("join request policy copy", () => {
   it("marks the third skip as a quiet decline", () => {
@@ -24,6 +24,20 @@ describe("join request policy copy", () => {
     expect(hostSkipButtonLabel(1)).toBe("Skip (1/3)");
     expect(hostSkipButtonLabel(2)).toBe("Skip and close (2/3)");
     expect(declinedJoinRequestMessage(3)).toContain("quietly closed");
+  });
+
+  it("announces each in-place commitment result calmly, with skip-count privacy preserved", () => {
+    // These strings are read by the join control's polite aria-live region when a
+    // commitment resolves without a full-document reload, so keyboard and
+    // screen-reader members hear the result. Copy stays calm and honest: no
+    // manufactured urgency or celebration, no exposure of private skip counts.
+    expect(joinRequestConfirmationMessage("pending")).toBe("Request sent. Your request is now with the host.");
+    expect(joinRequestConfirmationMessage("accepted")).toBe("You have a place. The exact meeting point is now shown below.");
+    expect(joinRequestConfirmationMessage("cancelled")).toBe("Request cancelled. This invitation is closed for your account.");
+    expect(joinRequestConfirmationMessage("declined")).toBe("This request is closed.");
+    for (const status of ["pending", "accepted", "cancelled", "declined"] as const) {
+      expect(joinRequestConfirmationMessage(status).toLowerCase()).not.toContain("skip");
+    }
   });
 
   it("summarizes pending-first host request review", () => {
