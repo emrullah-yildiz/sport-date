@@ -1,6 +1,6 @@
 # CX-20260702-event-room-chat-for-accepted-participants
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 4 × Impact 5 × Confidence 4) / Effort 4 = 20. Coordination is the core journey between accepting and meeting; without a way to talk, accepted members can't sort out the practical details of actually meeting.
 - Customer journey: coordination
@@ -44,3 +44,4 @@ A calm, safe in-room chat where the host and accepted participants can post shor
 - 2026-07-02 - Filed from owner feedback; status `ready`.
 - 2026-07-02 - build: picked up, status `in-progress`, owner experience-build-agent. Building smallest safe chat MVP (event_messages table, server-authorized read/write for host + accepted participants, block-filtering both directions, rate-limit + length-cap, report-to-safety, export/deletion coverage).
 - 2026-07-02 - build attempt interrupted (agent connection dropped before any code/commit); reset to `ready` for a fresh build.
+- 2026-07-02 - build: picked up (fresh clean-slate attempt), status `in-progress`, owner experience-build-agent. Building the smallest safe chat MVP (additive `event_messages` table, server-authorized read/write for host + accepted participants, mutual-block filtering both directions, per-user + per-IP posting rate-limit, 1000-char length cap with empty rejected, report-a-message via the existing safety queue, export + deletion coverage).

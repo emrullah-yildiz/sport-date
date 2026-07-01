@@ -1,5 +1,6 @@
 export * from "./entitlements";
 export * from "./event";
+export * from "./event-message";
 export * from "./feedback";
 export * from "./image-metadata";
 export * from "./join-request";

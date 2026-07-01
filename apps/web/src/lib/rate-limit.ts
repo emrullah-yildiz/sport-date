@@ -327,6 +327,14 @@ export function joinRequestRateLimitRules(request: Request, userId: string): rea
   ];
 }
 
+export function eventMessageRateLimitRules(request: Request, userId: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "event-message-ip", limit: 60, windowMs: 5 * 60 * 1000, key: `ip:${ip}` },
+    { name: "event-message-user", limit: 30, windowMs: 5 * 60 * 1000, key: `user:${userId}` },
+  ];
+}
+
 export function safetyReportRateLimitRules(request: Request, userId: string): readonly RateLimitRule[] {
   const ip = getRequestIp(request);
   return [

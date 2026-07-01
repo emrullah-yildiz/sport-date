@@ -58,6 +58,10 @@ export async function POST(request: Request) {
       DELETE FROM event_participants
       USING updated_user
       WHERE event_participants.user_id = updated_user.id
+    ), removed_event_messages AS (
+      DELETE FROM event_messages
+      USING updated_user
+      WHERE event_messages.sender_user_id = updated_user.id
     ), cancelled_join_requests AS (
       UPDATE join_requests SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
       FROM updated_user

@@ -139,6 +139,14 @@ export async function GET() {
     id: string; content_type: string; byte_size: number; alt: string;
     position: number; is_primary: boolean; created_at: string;
   }>;
+  // The member's OWN event-room chat messages (the ones they sent). Included so
+  // their coordination messages are part of their data export. We deliberately
+  // do NOT include other members' messages from those rooms — that is other
+  // people's data, not the requester's.
+  const eventMessagesSent = await sql`
+    SELECT id, event_id, body, created_at
+    FROM event_messages WHERE sender_user_id = ${user.id} ORDER BY created_at
+  `;
   const communicationPreferenceHistory = await sql`
     SELECT id, preference_key, previous_value, new_value, source, lawful_basis_note, created_at
     FROM communication_preference_events
@@ -188,6 +196,7 @@ export async function GET() {
     safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
     privateEventReflections: eventReflections,
+    eventRoomMessagesSent: eventMessagesSent,
     privatePeerFeedbackGiven: peerFeedbackGiven,
     mobileDeviceSessions: mobileDevices,
     productFeedbackSubmitted: productFeedback,

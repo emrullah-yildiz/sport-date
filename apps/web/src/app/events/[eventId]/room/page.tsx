@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import AccountMenu from "@/components/AccountMenu";
 import EventReflectionForm from "@/components/EventReflectionForm";
+import EventRoomChat from "@/components/EventRoomChat";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
 import FirstEventPreparationCard, { shouldShowFirstEventPreparation } from "@/components/FirstEventPreparationCard";
@@ -38,6 +39,11 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   const showPreArrivalBrief = !room.isHost && room.viewerRequest?.status === "accepted" && !room.hasEnded;
   // The first-event preparation card is the warmer, logistics/confidence sibling of
   // that safety brief: only for an accepted participant attending their FIRST event.
+  // Room chat is for the people actually attending: the host, or an accepted
+  // participant. The room itself is already gated to exactly these viewers by
+  // getEventRoom, and the API re-checks server-side on every read/write; this
+  // flag only decides whether to render the surface.
+  const canUseChat = room.isHost || room.viewerRequest?.status === "accepted";
   const showFirstEventPrep = shouldShowFirstEventPreparation({
     isHost: room.isHost,
     hasEnded: room.hasEnded,
@@ -168,16 +174,16 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       <section className="room-rhythm">
         <p className="panel-label">A calm arrival</p>
         <div>
-          <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Keep coordination inside Sport Date when messaging arrives.</p></article>
+          <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Use the room chat below to sort the practical details — keep coordination inside Sport Date.</p></article>
           <article><span>02</span><h3>When you arrive</h3><p>Meet in the stated public venue. You can leave at any time if the situation feels different from the invitation.</p></article>
-          <article><span>03</span><h3>If plans change</h3><p>Cancel your place so the host has an accurate group. Safety and reporting controls arrive before open chat.</p></article>
+          <article><span>03</span><h3>If plans change</h3><p>Post in the room chat or cancel your place so the host has an accurate group. Every message can be reported, and blocking still hides you both ways.</p></article>
         </div>
       </section>
+      {canUseChat ? <EventRoomChat eventId={room.id} timeZone={room.timeZone} /> : null}
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
       {room.hasEnded ? <PeerFeedbackPanel eventId={room.id} targets={peerFeedbackTargets} /> : null}
-      <aside className="room-safety-note"><strong>Why there is no chat yet</strong><p>Open messaging will not launch before blocking, reporting, moderation evidence, and response operations are ready.</p></aside>
     </main>
   );
 }
