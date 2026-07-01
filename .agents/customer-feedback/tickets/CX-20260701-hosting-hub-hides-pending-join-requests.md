@@ -1,6 +1,6 @@
 # CX-20260701-hosting-hub-hides-pending-join-requests
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P2 high` — (Reach 4 × Impact 4 × Confidence 4) / Effort 3 = 21.3. Coordination/trust gap on the core host surface; just below P1 because it is not an auth/safety/privacy regression, but it is the highest-impact state gap on the new hub.
 - Customer journey: coordination / host management (commitment → coordination)
@@ -69,3 +69,4 @@ Practical: requests can sit unseen until they expire or the event passes, so peo
 
 - 2026-07-01 - Filed by Experience & Design Explorer (`/hosting × completeness-of-states`); status `ready`.
 - 2026-07-01 - Picked up by Experience Build Agent (Claude Opus 4.8); status `in-progress`.
+- 2026-07-01 - Implemented by Experience Build Agent (commit `ecafae6`). Each upcoming host card now shows an aggregate pending-request count ("N people waiting for your reply" / "No requests yet") linking to the event's accept/decline flow, plus places-filled-vs-capacity ("N of M places filled" / "All places filled"); past cards mark requests closed. Data path is additive with NO migration: `getMemberEventSummaries` gains two read-only scalar subqueries (accepted seats via `event_participants`, pending via `join_requests`) + `events.capacity`; new `HostCoordination` is attached only when the viewer hosts the event (authz-tested — no other host's counts, no requester identity/skip/location on the hub). New pure helper `summarizeHostCoordination` unit-tested (singular/plural/full). Checks: typecheck pass, lint pass (only pre-existing untouched `qa/full-flows.mjs` warning), test pass (267), production build pass (`/hosting` dynamic). Live-verified as pooled host-A: hub rendered "No requests yet" / "0 of N places filled" from real DB counts with no requester data exposed (seeker join-request end-to-end blocked by login rate-limit this pass; pending>0 branch covered by the shared helper's unit tests). Status `implemented` — awaiting independent Explorer retest. Committed LOCALLY only (prod push held).
