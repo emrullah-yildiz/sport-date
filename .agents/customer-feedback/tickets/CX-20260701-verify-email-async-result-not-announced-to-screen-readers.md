@@ -1,13 +1,13 @@
 # CX-20260701-verify-email-async-result-not-announced-to-screen-readers
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 3 × Impact 4 × Confidence 5) / Effort 2 = 30. Accessibility floor: an assistive-technology member who follows a verification link is never told the outcome (verified / expired / error) because the result is written by an automatic post-load state swap into a non-live `<h1>`. Per the loop's priority rule, accessibility regressions are never below P1 regardless of the arithmetic. Not a privacy/authorization issue.
 - Customer journey: signup → trust check → email verification (first trust gate), unauthenticated entry from an inbox link
 - Surface: `web` (both viewports; single client component)
 - Environment and viewport/device: dev server localhost:3000; source-verified against `apps/web/src/components/EmailVerificationConfirmCard.tsx` and `apps/web/src/app/globals.css`, 2026-07-01
 - Found by: Experience & Design Explorer (verify-email × accessibility / completeness-of-states pass)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-reset-verify-dead-link-no-direct-recovery-path` (same surface, but that one is about the missing one-click *recovery action* on dead-end states; this one is about the *result of the auto-verification never being announced* — different outcome, independently fixable), `CX-20260701-join-request-commitment-hard-reload-no-confirmation` (the same announce-the-async-result + move-focus fix pattern, already applied to the join flow), `CX-20260701-feedback-success-flat-dead-end-no-forward-path` (sibling "success not announced / focus dropped" a11y theme)
 
 ## Customer outcome
@@ -80,3 +80,4 @@ Accessibility: a screen-reader or cognitively-assisted member cannot perceive th
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (verify-email × accessibility / completeness-of-states pass); status `ready`. Source-confirmed the component has zero `role`/`aria-live`/`aria-busy` and swaps the outcome into a non-live `<h1>` via a mount-time `useEffect` fetch; contrasted with the sibling reset card that announces correctly; deduped against the recovery-action ticket on the same surface.
+- 2026-07-01 - Experience Build Agent (Claude Opus 4.8) took ownership; status `in-progress`. Implementing the announce-the-async-result + move-focus fix on `EmailVerificationConfirmCard` mirroring the shipped `JoinRequestControls`/reset-card pattern.
