@@ -1,13 +1,13 @@
 # CX-20260701-event-create-error-recovery-whack-a-mole
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1 high` — owner-blocking: publishing appears to do NOTHING. The form relies on native HTML5 `required` validation, so an incomplete submit is silently blocked by the browser (jumps to the first empty field, easy to miss) and the app shows no visible error near the action. Bumped from P2 after owner report 2026-07-01. Every first-time host hits this; fix is contained.
 - Customer journey: intent → commitment (hosting / event creation → publish)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths; especially 375px and long-scroll desktop
 - Found by: Experience & Design Explorer — pass 13, create-event × completeness-of-states + information/copy (2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-event-create-form-no-step-progress-friction` (ready — that ticket is about breaking the ~18-field wall into ordered steps/progress; THIS ticket is about what happens when a submitted form is rejected — error surfacing, recovery, and prevention — and is independently fixable), `CX-20260630-native-date-inputs-unstyled-mismatch` (verified — datetime field visual styling, not its `min`/validation)
 
 ## Customer outcome
@@ -75,3 +75,7 @@ Multi-error whack-a-mole plus a bottom-anchored, field-detached error turns a re
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 13, create-event × completeness-of-states + information/copy); status `ready`.
 
 - 2026-07-01 - Owner report + repro: filled Sport/Event name/Description only, clicked "Publish the invitation" -> "it just moves here without any error." Cause: fields `startsAt, city, countryCode, areaLabel, venueName, address` (and others) are HTML5 `required`; native validation blocks submit and scroll-jumps to the first empty field with an easily-missed browser bubble; the app-level `.error-message` (bottom of form) only renders for JS/server errors, which are never reached. FIX SCOPE (P1): on submit, if the form is invalid, show a VISIBLE, app-styled summary near the Publish button (e.g. "A few required details are still empty below — please complete them to publish"), and scroll + move focus to the first invalid field with app styling (not just the native bubble); also surface the API `errors[]` array (not just errors[0]) near the action with scroll/focus; add `min` to the datetime-local so past times are rejected client-side. Announce via role=alert/aria-live. So publishing NEVER silently appears to do nothing.
+
+- 2026-07-01 - Experience Build Agent - status `in-progress`, took implementation owner. Implementing: form now `noValidate` and runs `checkValidity()` on submit; an empty/invalid Publish renders a VISIBLE app-styled `role=alert` summary at the top of the form (headline "A few required details are still empty below — please complete them to publish" + a per-field list of what needs attention) AND a `role=status` action-alert just above the Publish button, then scrolls + moves focus to the first invalid field (`.field-error` + `aria-invalid`/`aria-describedby` inline under each input). Server rejections now surface the FULL `errors[]` array (not `errors[0]`), each mapped to its field and ordered top-to-bottom, with the same scroll/focus. Added `min={datetimeLocalMin()}` to the `startsAt` `datetime-local` plus a client `isPastLocalDateTime` guard (minute precision, server stays authoritative). New pure lib `src/lib/event-create-recovery.ts` (message→field map, datetime min, issue ordering) with unit tests. Required constraints, defaults, and the public/private location split unchanged.
+
+- 2026-07-01 - Experience Build Agent - status `implemented`. Files: `apps/web/src/components/CreateEventForm.tsx`, `apps/web/src/app/globals.css`, `apps/web/src/lib/event-create-recovery.ts` (new), `apps/web/src/lib/event-create-recovery.test.ts` (new). Checks: typecheck PASS, lint PASS (only pre-existing warning in the uncommitted `qa/full-flows.mjs`, untouched), test PASS (319 passed / 12 skipped, incl. new multi-error + past-time cases), production `next build` PASS. Live-verified once as pooled `host-A` on http://localhost:3000: `/events/new` renders `min="2026-07-01T21:09"` on start-time; POST /api/events with a past start + short description returns BOTH in `errors[]` (now surfaced together, mapped to startsAt+description); a complete POST returns `{success:true,eventId}` → redirects `/events/{id}?published=1`. No migration. Commit `19e93f6`, pushed to origin/main. Ready for independent Explorer retest (esp. live keyboard/SR focus jump + 375px overflow).
