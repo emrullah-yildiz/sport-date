@@ -1,6 +1,6 @@
 # CX-20260702-event-room-chat-for-accepted-participants
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 4 × Impact 5 × Confidence 4) / Effort 4 = 20. Coordination is the core journey between accepting and meeting; without a way to talk, accepted members can't sort out the practical details of actually meeting.
 - Customer journey: coordination
@@ -45,3 +45,4 @@ A calm, safe in-room chat where the host and accepted participants can post shor
 - 2026-07-02 - build: picked up, status `in-progress`, owner experience-build-agent. Building smallest safe chat MVP (event_messages table, server-authorized read/write for host + accepted participants, block-filtering both directions, rate-limit + length-cap, report-to-safety, export/deletion coverage).
 - 2026-07-02 - build attempt interrupted (agent connection dropped before any code/commit); reset to `ready` for a fresh build.
 - 2026-07-02 - build: picked up (fresh clean-slate attempt), status `in-progress`, owner experience-build-agent. Building the smallest safe chat MVP (additive `event_messages` table, server-authorized read/write for host + accepted participants, mutual-block filtering both directions, per-user + per-IP posting rate-limit, 1000-char length cap with empty rejected, report-a-message via the existing safety queue, export + deletion coverage).
+- 2026-07-02 - build: implemented, status `implemented`, commit `065d119` (NOT pushed — MIGRATION ADDED `db/027_event_messages.sql`; orchestrator migrates prod, then pushes). Files: new `db/027_event_messages.sql`, `packages/domain/src/event-message.ts` (+test), `apps/web/src/lib/event-messages.ts` (+test), `apps/web/src/app/api/events/[eventId]/messages/route.ts`, `apps/web/src/components/EventRoomChat.tsx`; edited room page, globals.css (chat tokens), rate-limit.ts (new rule), account export + deletion routes, domain index. Checks: typecheck PASS, lint PASS (only pre-existing qa/full-flows.mjs warning), web tests 400 PASS + domain 165 PASS (new authz/validation/block-filtering-both-directions/no-location-leak cases), db:migrate clean on dev, production `npm run build` PASS. Live-verified on :3000 with pooled accounts: host + accepted post/read (201/200/thread of 2), non-participant read+post 403, empty & 1001-char 400, anon read 401, block severs room access (403) and hides the blocked member's message from the host both ways. No precise location or private contact exposed; messages in export + removed on deletion (+ FK cascade on hard delete).
