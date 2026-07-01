@@ -1,6 +1,6 @@
 # CX-20260701-stripe-subscription-integration-test-mode
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 3 × / Effort 4) → RICE ≈ 15, held at **P1**: it is the mechanism that turns the €6.99 launch decision into a real (test-mode) subscription and unblocks every downstream Plus surface. Build immediately after the entitlement ticket.
 - Customer journey: commitment (upgrade) / coordination (renewal, cancel) — but NO member charging until go-live
@@ -62,5 +62,6 @@ Done right, the path to the first euro exists in code and can be dry-run in test
 
 ## Handoff and retest log
 
+- 2026-07-01 - Implemented (commit a3e08c1). Added `stripe` server SDK + isolated fail-closed `stripe.ts` seam (reads STRIPE_SECRET_KEY/PRICE_ID/WEBHOOK_SECRET + BILLING_ENABLED, never throws, no charge path when unconfigured — mirrors photo-storage.ts), `POST /api/billing/checkout` (authed + CSRF-safe, subscription-mode session for the €6.99 price, calm 503 when off), signature-verified `POST /api/billing/webhook` (raw-body verify; created/updated → set plus_until = period end, deleted/canceled/past_due → clear; idempotent on event id), pure `subscription-entitlement.ts` mapping, and additive migration 026 (nullable stripe_customer_id/stripe_subscription_id + billing_webhook_events ledger; no card/PAN; outside safety boundary). Tests: Stripe fully MOCKED — fail-closed, configured checkout, bad/missing-signature 400, set/clear Plus, idempotent re-delivery, no client-bundle secret import. Checks: typecheck pass, lint pass (only pre-existing qa warning), web tests 368 pass/12 skipped, domain 160 pass, db:migrate applied clean on dev, production build green with flag off/no keys (fail-closed proven). No secret committed. **MIGRATION ADDED → committed, NOT pushed; awaiting orchestrator push + prod migrate.** Status `implemented`; Explorer retests independently.
 - 2026-07-01 - Picked up by experience-build-agent; set `in-progress`. Building fail-closed test-mode Stripe rails behind `BILLING_ENABLED` (module + checkout route + signature-verified webhook + additive `stripe_customer_id`/`stripe_subscription_id` migration), mirroring `photo-storage.ts`.
 - 2026-07-01 - Filed as the test-mode Stripe subscription integration for the €6.99 Plus launch decision (`docs/marketing/monetization-and-pricing-analysis.md` §0), unblocked by `CX-20260701-owner-decision-payments-processor-and-billing-gate` (Stripe chosen, test-mode build unblocked; go-live stays owner-gated). Build after `CX-20260701-plus-tier-entitlement-model-and-gating`. Fail-closed + flag mirror `apps/web/src/lib/photo-storage.ts`. Status `ready`.
