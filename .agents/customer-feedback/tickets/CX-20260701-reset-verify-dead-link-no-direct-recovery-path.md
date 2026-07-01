@@ -8,7 +8,7 @@
 - Environment and viewport/device: dev server localhost:3000, real Chromium, observed 2026-07-01 at 1280px and 375px
 - Found by: Experience & Design Explorer (reset-password / verify-email × completeness-of-states pass)
 - Implementation owner: `unassigned`
-- Related tickets: `CX-20260701-login-rate-limited-state-no-recovery-guidance` (same "recovery path not surfaced" theme, but on the login *error* state — different surface and trigger; this one is the reset/verify *confirm* dead-ends), `CX-20260630-session-management-web-session-not-listed` (account-security surface where resend-verification lives)
+- Related tickets: `CX-20260701-login-rate-limited-state-no-recovery-guidance` (same "recovery path not surfaced" theme, but on the login *error* state — different surface and trigger; this one is the reset/verify *confirm* dead-ends), `CX-20260630-session-management-web-session-not-listed` (account-security surface where resend-verification lives), `CX-20260701-verify-email-async-result-not-announced-to-screen-readers` (same verify-email surface, but the a11y announcement of the auto-verification result — distinct from this recovery-action gap)
 
 ## Customer outcome
 
