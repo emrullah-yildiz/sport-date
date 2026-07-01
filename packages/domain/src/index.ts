@@ -9,3 +9,4 @@ export * from "./progress";
 export * from "./registration";
 export * from "./reliability";
 export * from "./safety";
+export * from "./subscription-entitlement";

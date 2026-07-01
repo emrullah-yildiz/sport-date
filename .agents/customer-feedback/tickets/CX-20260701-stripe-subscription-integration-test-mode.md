@@ -1,13 +1,13 @@
 # CX-20260701-stripe-subscription-integration-test-mode
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 3 × / Effort 4) → RICE ≈ 15, held at **P1**: it is the mechanism that turns the €6.99 launch decision into a real (test-mode) subscription and unblocks every downstream Plus surface. Build immediately after the entitlement ticket.
 - Customer journey: commitment (upgrade) / coordination (renewal, cancel) — but NO member charging until go-live
 - Surface: `web`
 - Environment and viewport/device: server routes; test mode only
 - Found by: Owner launch decision (2026-07-01) — Stripe chosen, build now in TEST mode behind a flag; `docs/marketing/monetization-and-pricing-analysis.md` §0
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-plus-tier-entitlement-model-and-gating` (P1 — **build first**; the webhook here sets/clears that entitlement), `CX-20260701-owner-decision-payments-processor-and-billing-gate` (blocked-owner — go-live gate this build sits behind; **do NOT** add live keys / accept terms / charge), `CX-20260701-plus-billing-management-ui` (P2 — the surface that starts Checkout and opens the Billing Portal), `CX-20260701-no-automatic-production-migration-on-deploy` (any additive migration here must be flagged for the orchestrator prod-migration process)
 
 ## Customer outcome
@@ -62,4 +62,5 @@ Done right, the path to the first euro exists in code and can be dry-run in test
 
 ## Handoff and retest log
 
+- 2026-07-01 - Picked up by experience-build-agent; set `in-progress`. Building fail-closed test-mode Stripe rails behind `BILLING_ENABLED` (module + checkout route + signature-verified webhook + additive `stripe_customer_id`/`stripe_subscription_id` migration), mirroring `photo-storage.ts`.
 - 2026-07-01 - Filed as the test-mode Stripe subscription integration for the €6.99 Plus launch decision (`docs/marketing/monetization-and-pricing-analysis.md` §0), unblocked by `CX-20260701-owner-decision-payments-processor-and-billing-gate` (Stripe chosen, test-mode build unblocked; go-live stays owner-gated). Build after `CX-20260701-plus-tier-entitlement-model-and-gating`. Fail-closed + flag mirror `apps/web/src/lib/photo-storage.ts`. Status `ready`.
