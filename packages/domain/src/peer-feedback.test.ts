@@ -4,6 +4,7 @@ import {
   PEER_FEEDBACK_ANSWERS,
   PEER_FEEDBACK_CONFIRMATIONS,
   peerFeedbackFlagsSafetyConcern,
+  peerFeedbackHasSubstance,
   validatePeerFeedback,
 } from "./peer-feedback";
 
@@ -68,6 +69,42 @@ describe("peer feedback validation", () => {
   it("rejects a note that leaks precise coordinates or credentials", () => {
     expect(validatePeerFeedback({ ...VALID, note: "meet at 44.4361,26.1027" }).valid).toBe(false);
     expect(validatePeerFeedback({ ...VALID, note: "password: hunter2" }).valid).toBe(false);
+  });
+
+  it("rejects a content-free all-prefer_not_to_say submission with no note", () => {
+    // An idle expand + click would otherwise file an empty row that then occupies the
+    // one-per-pair slot and locks. The validation layer must not accept it.
+    const empty = { showedUp: "prefer_not_to_say", feltRespected: "prefer_not_to_say", feltSafe: "prefer_not_to_say" } as const;
+    const result = validatePeerFeedback(empty);
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors.join(" ")).toMatch(/at least one question|private note/i);
+    // Same, with a whitespace-only note (which normalizes to no note).
+    expect(validatePeerFeedback({ ...empty, note: "   " }).valid).toBe(false);
+  });
+
+  it("accepts a prefer_not_to_say set once any one answer is substantive or a note is left", () => {
+    const empty = { showedUp: "prefer_not_to_say", feltRespected: "prefer_not_to_say", feltSafe: "prefer_not_to_say" } as const;
+    expect(validatePeerFeedback({ ...empty, feltSafe: "yes" }).valid).toBe(true);
+    expect(validatePeerFeedback({ ...empty, feltRespected: "no" }).valid).toBe(true);
+    expect(validatePeerFeedback({ ...empty, note: "quiet but kind" }).valid).toBe(true);
+  });
+});
+
+describe("peerFeedbackHasSubstance (content floor)", () => {
+  const EMPTY = { showedUp: "prefer_not_to_say", feltRespected: "prefer_not_to_say", feltSafe: "prefer_not_to_say", note: null } as const;
+
+  it("is false when nothing was said (all prefer_not_to_say, no note)", () => {
+    expect(peerFeedbackHasSubstance(EMPTY)).toBe(false);
+    expect(peerFeedbackHasSubstance({ ...EMPTY, note: "   " })).toBe(false);
+  });
+
+  it("is true when any confirmation is a substantive yes/no", () => {
+    expect(peerFeedbackHasSubstance({ ...EMPTY, showedUp: "yes" })).toBe(true);
+    expect(peerFeedbackHasSubstance({ ...EMPTY, feltSafe: "no" })).toBe(true);
+  });
+
+  it("is true when only a private note is left", () => {
+    expect(peerFeedbackHasSubstance({ ...EMPTY, note: "something felt off" })).toBe(true);
   });
 });
 

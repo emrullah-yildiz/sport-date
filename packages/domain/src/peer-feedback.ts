@@ -48,6 +48,19 @@ function readAnswer(value: unknown): PeerFeedbackAnswer | null {
   return PEER_FEEDBACK_ANSWERS.includes(value as PeerFeedbackAnswer) ? (value as PeerFeedbackAnswer) : null;
 }
 
+// A submission is only meaningful if the member actually said something: at least
+// one confirmation is a substantive yes/no, or a private note was left. Three
+// `prefer_not_to_say` answers with no note express nothing — persisting that would
+// silently occupy the one-per-pair slot and lock, degrading the honest trust
+// signal. This is the content-floor for the private word.
+export function peerFeedbackHasSubstance(
+  input: Pick<PeerFeedbackInput, "showedUp" | "feltRespected" | "feltSafe" | "note">,
+): boolean {
+  const answered = input.showedUp !== "prefer_not_to_say" || input.feltRespected !== "prefer_not_to_say" || input.feltSafe !== "prefer_not_to_say";
+  const hasNote = typeof input.note === "string" && input.note.trim().length > 0;
+  return answered || hasNote;
+}
+
 export function validatePeerFeedback(raw: unknown): PeerFeedbackValidation {
   if (!raw || typeof raw !== "object") return { valid: false, errors: ["Peer feedback is required."] };
   const input = raw as Record<string, unknown>;
@@ -82,6 +95,14 @@ export function validatePeerFeedback(raw: unknown): PeerFeedbackValidation {
   const forbiddenKeys = ["rating", "stars", "score", "attractiveness", "desirability", "hotness", "wouldDateAgain", "popularity"];
   if (forbiddenKeys.some((key) => key in input)) {
     errors.push("Peer feedback does not accept ratings or scores.");
+  }
+
+  // Reject a content-free signal: three `prefer_not_to_say` answers and no note say
+  // nothing, yet would occupy the one-per-pair slot and lock after the edit window.
+  // We reject rather than silently persist so an accidental idle submit can't file a
+  // misleading empty note about a real person. Only checked once the answers parse.
+  if (showedUp && feltRespected && feltSafe && !peerFeedbackHasSubstance({ showedUp, feltRespected, feltSafe, note })) {
+    errors.push("Answer at least one question, or leave a private note — an empty note is not recorded.");
   }
 
   if (errors.length > 0) return { valid: false, errors };

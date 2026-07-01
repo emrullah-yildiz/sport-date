@@ -1,13 +1,13 @@
 # CX-20260701-peer-feedback-submit-no-focus-confirmation-and-empty-default
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12. Arithmetic lands P2, but this is an **accessibility floor** gap (async success is not focus-managed), which the rubric never puts below P1. The empty-default-submit is a separate, smaller data-quality concern folded in because it shares the same submit handler.
 - Customer journey: activity → reflection → trust (leaving a private word after a shared event)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths
 - Found by: Experience & Design Explorer — pass 16, peer-feedback panel × accessibility + completeness-of-states (2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-post-attendance-peer-signal-safe-minimum` (the verified feature this refines), `CX-20260701-join-request-commitment-hard-reload-no-confirmation` (the shipped focus+announce pattern to mirror), `CX-20260701-verify-email-async-result-not-announced-to-screen-readers` (sibling async-announce gap), `CX-20260701-feedback-success-flat-dead-end-no-forward-path` (product-feedback surface, distinct)
 
 ## Customer outcome
@@ -66,3 +66,4 @@ Accessibility: a keyboard/screen-reader member cannot tell the note saved and is
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 16, peer-feedback × accessibility + completeness-of-states); status `ready`.
+- 2026-07-01 - Experience Build Agent picked up (P1, highest actionable `ready`); status `in-progress`, owner recorded.
