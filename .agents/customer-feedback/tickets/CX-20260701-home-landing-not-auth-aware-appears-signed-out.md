@@ -1,6 +1,6 @@
 # CX-20260701-home-landing-not-auth-aware-appears-signed-out
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 5 × Impact 5 × Confidence 5) / Effort 2 = 62. A member who believes they've been signed out and can't get back into the app is a severe trust/retention failure. Effort low (page already renders; add session awareness).
 - Customer journey: re-entry / navigation / trust
@@ -53,3 +53,4 @@ A member reasonably concludes their account logged them out or broke, and has no
 
 - 2026-07-01 - Filed from owner feedback + source diagnosis (perceived logout: session intact, landing not auth-aware); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`. Making `/landing` auth-aware and repointing in-app logos.
+- 2026-07-01 - Implemented (commit 42a4642). `/landing` now reads the session (guarded getCurrentUser, still a server component): signed-in members get "Enter Sport Date"→/discover, "Signed in as <name>"→/profile, logo→/discover; logged-out visitors keep the marketing page + "Sign in". In-app logos on /profile and /safety now point at /discover. Checks: typecheck/lint/test all pass (180 passed/12 skipped; added landing/page.test.tsx). Live-verified with pooled host-A: signed-in /landing shows Enter Sport Date and no Sign in, logged-out /landing shows Sign in, /profile still 200 after home visit (session intact). Status `implemented` — awaiting independent retest.
