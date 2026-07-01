@@ -8,7 +8,7 @@
 - Environment and viewport/device: dev server localhost:3000, real Chromium, 1280×900. Observed 2026-07-01 with a signed-in synthetic adult requesting a place on a compatible tennis invitation.
 - Found by: experience-design-explorer (event-detail × motion & micro-interaction pass)
 - Implementation owner: `experience-build-agent`
-- Related tickets: `CX-20260701-hosting-hub-hides-pending-join-requests` (host-side visibility of the same request, different surface/fix), `CX-20260630-event-detail-safety-emergency-microcopy-smallest-text` (same page, copy not motion), `CX-20260630-landing-hero-reduced-motion-hydration-error` (motion on a different surface — verified)
+- Related tickets: `CX-20260701-host-accept-decline-hard-reload-no-confirmation` (the HOST-side twin of this exact defect — `HostRequestDecision` still hard-reloads with no announcement; this ticket's shipped fix is the pattern to mirror there), `CX-20260701-hosting-hub-hides-pending-join-requests` (host-side visibility of the same request, different surface/fix), `CX-20260630-event-detail-safety-emergency-microcopy-smallest-text` (same page, copy not motion), `CX-20260630-landing-hero-reduced-motion-hydration-error` (motion on a different surface — verified)
 
 ## Customer outcome
 
