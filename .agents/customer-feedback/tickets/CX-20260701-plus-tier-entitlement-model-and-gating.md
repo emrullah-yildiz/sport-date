@@ -1,6 +1,6 @@
 # CX-20260701-plus-tier-entitlement-model-and-gating
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 4) / Effort 3 = 26.7. Foundation every other Plus ticket depends on; nothing else can be gated honestly until this exists. Build first in the monetization sequence.
 - Customer journey: (foundation — spans profile, discovery, and future Plus surfaces; no charging surface here)
@@ -62,3 +62,4 @@ Without a single fail-closed entitlement seam, later Plus work risks scattered a
 ## Handoff and retest log
 
 - 2026-07-01 - Filed as the entitlement + gating foundation for the owner-approved €6.99 freemium launch (`docs/marketing/monetization-and-pricing-analysis.md` §0). Supersedes/folds in `CX-20260701-membership-tier-scaffolding-non-billing`. Build first in the monetization sequence; the Stripe webhook (`CX-20260701-stripe-subscription-integration-test-mode`) is what sets/clears the entitlement this ticket defines. Status `ready`.
+- 2026-07-01 - build (Claude Opus 4.8): implemented. Migration 025 adds nullable `users.plus_until TIMESTAMPTZ` (NULL = FREE, no backfill; every member defaults free). Pure fail-closed gating in `packages/domain/src/entitlements.ts` (`isPlus` / `canUsePlusCapability` / `memberEntitlements`; Plus only while `plus_until > now`; null/missing/malformed/expired → FREE). Server seam `apps/web/src/lib/entitlements.ts` adapts `SessionUser` (fail-closed on null user). `SessionUser` now carries `plusUntil`, resolved server-side in `getCurrentUser` and `getMobileSession`. HARD GUARDRAIL enforced by type + tests: safety/core capabilities are a separate always-free set the gate cannot touch; a regression guard asserts disjointness and that no forbidden perk is gate-able. No billing/price/charge/"subscribed" claim added; no real perk paywalled. Checks: typecheck ✓, lint ✓ (sole warning is the pre-existing untouched `qa/full-flows.mjs`), web tests 334 passed / domain 145 passed, migration applied + idempotent on DEV, prod build ✓, pooled free member logs in and /profile /discover /hosting /safety all 200; DB confirms 0/108 members Plus. **MIGRATION ADDED — committed, NOT pushed; awaiting orchestrator push + prod migrate.** Commit `ddf858b`. Status `implemented` for independent retest.
