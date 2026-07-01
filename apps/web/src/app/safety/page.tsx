@@ -19,7 +19,7 @@ export default async function SafetyCenterPage() {
   return (
     <main className="safety-center-page">
       <nav className="profile-nav">
-        <Link href="/landing" className="logo">Sport Date</Link>
+        <Link href="/discover" className="logo">Sport Date</Link>
         <Link href="/profile">Back to profile</Link>
       </nav>
       <header className="safety-center-header">

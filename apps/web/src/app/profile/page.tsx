@@ -66,7 +66,7 @@ export default async function ProfilePage() {
   return (
     <main className="profile-page">
       <nav className="profile-nav">
-        <Link href="/landing" className="logo">Sport Date</Link>
+        <Link href="/discover" className="logo">Sport Date</Link>
         <LogoutButton />
       </nav>
       <section className="profile-hero">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { sportEmoji } from "@/lib/sports";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
   title: "Sport Date — Meet through movement",
@@ -73,12 +74,18 @@ const safety = [
   },
 ];
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Auth-aware home: a valid session must never look logged-out. getCurrentUser
+  // returns null when signed out, so the public marketing page is unaffected.
+  // Reading the session here makes this route dynamic, which is correct for a
+  // page whose CTAs depend on who is (or isn't) viewing it.
+  const user = await getCurrentUser();
+
   return (
     <main className="landing-page">
       <header className="navbar">
         <div className="nav-container">
-          <Link className="logo" href="/landing">
+          <Link className="logo" href={user ? "/discover" : "/landing"}>
             <span className="logo-mark" aria-hidden="true">S</span>
             Sport Date
           </Link>
@@ -88,8 +95,19 @@ export default function LandingPage() {
             <a href="#safety">Safety</a>
           </nav>
           <div className="landing-nav-actions">
-            <Link href="/login" className="nav-signin">Sign in</Link>
-            <Link href="/signup" className="btn btn--accent">Create a profile</Link>
+            {user ? (
+              <>
+                <Link href="/profile" className="nav-signin">
+                  Signed in as {user.firstName}
+                </Link>
+                <Link href="/discover" className="btn btn--accent">Enter Sport Date</Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login" className="nav-signin">Sign in</Link>
+                <Link href="/signup" className="btn btn--accent">Create a profile</Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -107,10 +125,23 @@ export default function LandingPage() {
               place.
             </p>
             <div className="hero-cta">
-              <Link href="/signup" className="btn btn--primary btn--lg">Create a profile</Link>
-              <a href="#how-it-works" className="btn btn--secondary btn--lg">See how it works</a>
+              {user ? (
+                <>
+                  <Link href="/discover" className="btn btn--primary btn--lg">Enter Sport Date</Link>
+                  <Link href="/profile" className="btn btn--secondary btn--lg">Your profile</Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/signup" className="btn btn--primary btn--lg">Create a profile</Link>
+                  <a href="#how-it-works" className="btn btn--secondary btn--lg">See how it works</a>
+                </>
+              )}
             </div>
-            <p className="microcopy">Private beta · Adults only · Europe first</p>
+            <p className="microcopy">
+              {user
+                ? `You're signed in — pick up where you left off.`
+                : "Private beta · Adults only · Europe first"}
+            </p>
           </div>
 
           <div className="hero-visual" aria-hidden="true">
@@ -228,10 +259,15 @@ export default function LandingPage() {
       <section className="final-cta" aria-labelledby="cta-title">
         <h2 id="cta-title">Stop performing. Start playing.</h2>
         <p>
-          Create a private beta profile, pick your sports, and help shape how adults meet through
-          movement.
+          {user
+            ? "Your profile is ready. Jump back into what's happening near you."
+            : "Create a private beta profile, pick your sports, and help shape how adults meet through movement."}
         </p>
-        <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
+        {user ? (
+          <Link href="/discover" className="btn btn--accent btn--lg">Enter Sport Date</Link>
+        ) : (
+          <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
+        )}
       </section>
 
       <footer className="landing-footer">
