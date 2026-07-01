@@ -1,13 +1,13 @@
 # CX-20260702-dark-neon-theme-tokens
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 4) / Effort 3 = 26.7. This is the foundation of the owner-requested black+neon refresh: it flips the `:root` semantic tokens every token-driven surface already reads, so the whole app can move to the new theme from one place with verified AA contrast. High reach (every surface), high impact (the headline of the redesign), but not a functional/safety floor on its own — so P1, not P0. Sequenced FIRST; typography and IA tickets build on the token layer.
 - Customer journey: cross-cutting (every surface — discovery, hosting, trust, coordination, reflection)
 - Surface: `web` (desktop + mobile; shared CSS)
 - Environment and viewport/device: dev server localhost:3000, all widths; `apps/web/src/app/globals.css` `:root` (lines ~3–34)
 - Found by: Design Lead — black+neon refresh (2026-07-02); direction in `docs/design-refresh-2026.md`
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260702-typography-right-size-and-scale` (P1, builds on this token layer), `CX-20260702-ia-consolidate-guideline-and-legal-pages`, `CX-20260702-navigation-simplify-primary`, `CX-20260702-ethical-gamified-energy-pass`
 
 ## Customer outcome
@@ -65,3 +65,4 @@ Practical/emotional: the theme is the most visible part of the redesign. Done ri
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Direction + measured ratios in `docs/design-refresh-2026.md`. Sequenced first in the refresh cluster. Status `ready`.
+- 2026-07-02 - experience-build-agent took ownership; Status `ready` → `in-progress`. Flipping `:root` semantic tokens to the black+neon palette at the token layer.
