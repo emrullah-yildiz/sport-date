@@ -47,7 +47,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email or password is incorrect." }, { status: 401 });
     }
 
-    const session = createSession();
+    // Opt-in only: a longer, still-revocable session is created solely when the
+    // member ticks "Remember me". Anything other than an explicit boolean true
+    // (missing, false, string, etc.) keeps today's default 7-day window, so a
+    // shared/public computer is never silently kept signed in.
+    const remember = (body as Record<string, unknown>)?.rememberMe === true;
+    const session = createSession({ remember });
     const previousToken = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
     const previousTokenHash = previousToken ? hashSessionToken(previousToken) : "";
     await sql.transaction((transaction) => [

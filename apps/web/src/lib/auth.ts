@@ -3,6 +3,13 @@ import crypto from "node:crypto";
 import bcrypt from "bcryptjs";
 
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+// Opt-in "Remember me" length. Applied ONLY when the member ticks the box at
+// login; the default stays SESSION_DURATION_MS. The longer window is the sole
+// difference — the cookie's httpOnly/secure/sameSite flags and the server-side
+// hashed token are identical in both branches. The session remains a normal,
+// revocable row in `sessions`, so it lists in and can be ended from the
+// "Signed-in browsers" panel like any other.
+const REMEMBER_ME_SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 const MOBILE_ACCESS_DURATION_MS = 15 * 60 * 1000;
 const MOBILE_REFRESH_DURATION_MS = 30 * 24 * 60 * 60 * 1000;
 const EMAIL_VERIFICATION_DURATION_MS = 24 * 60 * 60 * 1000;
@@ -25,18 +32,21 @@ export function hashSessionToken(token: string): string {
   return crypto.createHash("sha256").update(token, "utf8").digest("hex");
 }
 
-export function createSession(): {
+export function createSession(options?: { remember?: boolean }): {
   id: string;
   token: string;
   tokenHash: string;
   expiresAt: Date;
 } {
   const token = crypto.randomBytes(32).toString("base64url");
+  // Default (unchecked) keeps today's 7-day window; the longer window applies
+  // only when the member explicitly opts in via "Remember me".
+  const durationMs = options?.remember ? REMEMBER_ME_SESSION_DURATION_MS : SESSION_DURATION_MS;
   return {
     id: crypto.randomUUID(),
     token,
     tokenHash: hashSessionToken(token),
-    expiresAt: new Date(Date.now() + SESSION_DURATION_MS),
+    expiresAt: new Date(Date.now() + durationMs),
   };
 }
 

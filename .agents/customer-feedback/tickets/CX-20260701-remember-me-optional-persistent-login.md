@@ -1,13 +1,13 @@
 # CX-20260701-remember-me-optional-persistent-login
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 2 = 24. Convenience that reduces return friction; a missing convenience, not an emergency. Because it touches auth, the security guardrails below are non-negotiable and any security regression would be P1.
 - Customer journey: return visit → login → coordination (staying signed in between sessions)
 - Surface: `web` (mobile-web same code path)
 - Environment and viewport/device: all widths; `/login`
 - Found by: Experience & Design Explorer (owner growth-intake pass, 2026-07-01) — owner-requested "convenience & retention" direction
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260630-session-management-web-session-not-listed` (`verified` — the session-management surface this must integrate with), `CX-20260701-login-rate-limited-state-no-recovery-guidance`
 
 ## Customer outcome
@@ -83,3 +83,4 @@ shorter session (protecting shared/public devices), and must keep the longer ses
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner growth-intake pass); status `ready`.
+- 2026-07-01 - Experience Build Agent took ownership; status `in-progress`.

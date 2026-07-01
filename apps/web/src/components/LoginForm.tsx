@@ -16,6 +16,10 @@ function formatCountdown(seconds: number): string {
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Opt-in only — OFF by default. Checked, it asks the server for a longer,
+  // still-revocable session on this device; unchecked, login behaves exactly
+  // as before (7-day session).
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   // Seconds remaining in a rate-limit cool-down; 0 when not locked out. While
@@ -45,7 +49,7 @@ export default function LoginForm() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe }),
       });
       if (response.ok) {
         window.location.assign("/profile");
@@ -100,6 +104,20 @@ export default function LoginForm() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
+        </div>
+        <div className="form-remember">
+          <label className="remember-toggle" htmlFor="login-remember">
+            <input
+              id="login-remember"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(event) => setRememberMe(event.target.checked)}
+            />
+            <span className="remember-copy">
+              <span className="remember-label">Keep me signed in on this device</span>
+              <span className="remember-hint">Stays signed in for about a month. Use only on your own device — you can end this session anytime from Signed-in browsers.</span>
+            </span>
+          </label>
         </div>
         {error ? (
           <div className="auth-error" role="alert">

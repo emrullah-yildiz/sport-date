@@ -38,6 +38,37 @@ describe("opaque sessions", () => {
     expect(first.expiresAt.getTime()).toBeGreaterThan(Date.now());
   });
 
+  it("defaults to a 7-day session and never the longer window without opt-in", () => {
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    const before = Date.now();
+    // No args, explicit false, and a non-boolean truthy-looking value must all
+    // keep the default. Only an explicit remember:true may widen the window.
+    for (const session of [createSession(), createSession({}), createSession({ remember: false })]) {
+      const ttl = session.expiresAt.getTime() - before;
+      // Allow a small execution slop but assert it is the ~7-day window, well
+      // short of the 30-day remember window.
+      expect(ttl).toBeGreaterThan(sevenDaysMs - 5000);
+      expect(ttl).toBeLessThan(sevenDaysMs + 5000);
+    }
+  });
+
+  it("opts into a longer (~30-day) session only when remember is true", () => {
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+    const before = Date.now();
+    const remembered = createSession({ remember: true });
+    const ttl = remembered.expiresAt.getTime() - before;
+    expect(ttl).toBeGreaterThan(thirtyDaysMs - 5000);
+    expect(ttl).toBeLessThan(thirtyDaysMs + 5000);
+    // The longer window is strictly longer than the default — the only difference.
+    expect(ttl).toBeGreaterThan(sevenDaysMs);
+    // Opt-in changes nothing else about the credential: still a random token,
+    // still stored only as a hash.
+    expect(remembered.token).toMatch(/^[A-Za-z0-9_-]+$/);
+    expect(remembered.tokenHash).toBe(hashSessionToken(remembered.token));
+    expect(remembered.tokenHash).not.toContain(remembered.token);
+  });
+
   it("creates separate short access and rotating refresh credentials for mobile", () => {
     const now = new Date("2026-06-29T10:00:00.000Z");
     const mobile = createMobileSessionTokens(now);
