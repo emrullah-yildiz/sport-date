@@ -10,12 +10,31 @@ async function readJson(response: Response) {
   }
 }
 
-export default function ForgotPasswordPanel() {
+type ForgotPasswordPanelProps = {
+  /**
+   * Optional controlled open state. When provided the parent owns whether the
+   * panel is expanded (used by the login rate-limit recovery state to open the
+   * fastest way back in). When omitted the panel manages its own open state.
+   */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+export default function ForgotPasswordPanel({ open: openProp, onOpenChange }: ForgotPasswordPanelProps = {}) {
   const [email, setEmail] = useState("");
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : uncontrolledOpen;
+
+  function toggleOpen() {
+    const next = !open;
+    if (!isControlled) setUncontrolledOpen(next);
+    onOpenChange?.(next);
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -53,7 +72,7 @@ export default function ForgotPasswordPanel() {
       <button
         className="auth-link-button"
         type="button"
-        onClick={() => setOpen((current) => !current)}
+        onClick={toggleOpen}
         aria-expanded={open}
         aria-controls="forgot-password-panel"
       >

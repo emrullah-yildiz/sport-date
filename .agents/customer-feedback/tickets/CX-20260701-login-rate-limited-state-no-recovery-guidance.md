@@ -1,13 +1,13 @@
 # CX-20260701-login-rate-limited-state-no-recovery-guidance
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 4 × Impact 3 × Confidence 5) / Effort 2 = 30. Reach is broad: any member who mistypes their password a few times, and — because the browser-auth limit is **10 attempts / 15 min per IP** (`rate-limit.ts:292`) — members who share a public IP (office, campus, café, CGNAT mobile carrier) can collectively trip it and lock each other out of *signing in at all*. Impact is a confused member stuck at the front door with no timeline and no clear next step; Confidence is direct live observation. Effort is small (surface the `retry-after` the API already returns, disable the button during the cool-down, point at recovery). This is a **recovery / lockout dead-end on the entry journey** (a member cannot re-enter or is not told how), which the journey standard treats as first-class — hence P1 despite not being an auth/privacy floor. Not a security regression (the limit itself is correct and stays).
 - Customer journey: coordination / re-entry (a returning member signing in) — specifically the rejection + recovery states of login
 - Surface: `web` (desktop + mobile; same component)
 - Environment and viewport/device: `/login`, live dev server localhost:3000, real Chromium at 1280×860 and 375×860. Observed 2026-07-01. The 429 state was reproduced live (the shared browser-auth IP window was exhausted, so a submit returned the real rate-limited response); the wrong-credentials and success states were read from source.
 - Found by: experience-design-explorer (login × completeness-of-states pass)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-join-request-commitment-hard-reload-no-confirmation` (the `window.location`-style hard navigation anti-pattern, fixed there for join/commitment; login success still uses `window.location.assign` — noted here as a secondary observation, not the primary fix), `CX-20260630-signup-redundant-double-headline-weak-focal-point` (adjacent auth surface, different lens). No existing ticket covers login state coverage or the rate-limited recovery state.
 
 ## Customer outcome
@@ -74,3 +74,4 @@ The front door is where a returning member re-enters the relationship with the p
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by experience-design-explorer (login × completeness-of-states pass); status `ready`. Rate-limited state reproduced live at 1280 & 375 (button-enabled + no-duration confirmed in DOM); success/hard-nav and anti-enumeration read from source. Self-contained for an implementer.
+- 2026-07-01 - Picked up by experience-build-agent; status `in-progress`. Implementing: parse the server's `Retry-After` on a 429, show a calm "try again in about N minutes" message, disable the Sign in button for the cool-down window, and surface "Forgot your password?" as the fastest recovery. No change to the limiter/thresholds or anti-enumeration.
