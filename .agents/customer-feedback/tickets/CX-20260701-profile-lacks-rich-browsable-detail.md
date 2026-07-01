@@ -1,6 +1,6 @@
 # CX-20260701-profile-lacks-rich-browsable-detail
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 5 × Impact 4 × Confidence 3) / Effort 4 = 15. High value but broad; sequence after the host/discovery fixes and the photo data model.
 - Customer journey: trust check
@@ -49,3 +49,4 @@ Thin profiles weaken the trust check and make meeting strangers feel riskier and
 
 - 2026-07-01 - Filed from owner feedback; status `ready`.
 - 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Shipping richer humane presentation of existing fields (intro, sports, languages, seeking presented as equals) plus optional/editable/removable personality prompts stored via the existing profile update path (migration 020 adds a length-capped `personality_prompts` JSONB column).
+- 2026-07-01 - experience-build-agent implemented (commit `29b4f06`). /profile reorganised into humane sections (Intro, Looking for with all seeking intents as equals, Languages chips, Account, On the field with human skill/frequency phrases, In their words); added optional/editable/removable personality prompts from a curated list (max 3, answer <= 140 chars) via migration 020 (`personality_prompts` JSONB), wired through getCurrentUser + mobile session + profile PATCH + GDPR export. Guardrails held: no scores/popularity, seeking presented as equals, no precise location/extra contact, on brand, 44px, no new motion, no overflow at 1280/375. Checks: typecheck pass, lint pass (only pre-existing warning in untracked qa/full-flows.mjs), web tests 177 pass/12 skipped, domain tests 64 pass (new prompt cases), migration applied + verified, profile view/edit confirmed logged in as pooled host-A at desktop and mobile. Prompts SHIPPED in this unit (no follow-up split). Ready for independent retest.
