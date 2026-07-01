@@ -1,13 +1,13 @@
 # CX-20260701-event-creation-entry-point-not-discoverable
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 5 × Impact 4 × Confidence 4) / Effort 2 = 40. The core "create" action works but members can't find it.
 - Customer journey: intent / hosting
 - Surface: `web`
 - Environment and viewport/device: dev server localhost:3000, all widths
 - Found by: Owner (direct feedback 2026-07-01, "I cannot publish an event"); publish flow re-tested live and found functional
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-no-web-surface-to-manage-hosted-events`
 
 ## Customer outcome
@@ -56,3 +56,4 @@ A core product action (hosting) is effectively hidden, so members conclude the f
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner feedback (publish works but undiscoverable); status `ready`.
+- 2026-07-01 - experience-build-agent picked up; status `in-progress`. Plan: promote a labelled "Host an event" primary affordance on /discover and /profile (above the fold, lime primary), and add a post-publish success state on the host event page linking to view / manage (/hosting) / share the public invitation.

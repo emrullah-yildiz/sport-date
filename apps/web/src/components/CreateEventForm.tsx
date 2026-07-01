@@ -43,7 +43,7 @@ export default function CreateEventForm() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Event creation failed.");
-      window.location.assign(`/events/${result.eventId}`);
+      window.location.assign(`/events/${result.eventId}?published=1`);
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : "Event creation failed.");
       setSubmitting(false);

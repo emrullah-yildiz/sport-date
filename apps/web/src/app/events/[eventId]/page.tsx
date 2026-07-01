@@ -5,7 +5,9 @@ import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
+import ShareEventLink from "@/components/ShareEventLink";
 import { getEventRoom, getHostEvent, getHostJoinRequests, type HostJoinRequest } from "@/lib/events";
+import { resolveHostEventView } from "@/lib/host-event-view";
 import { summarizeHostRequestQueue } from "@/lib/join-request-policy";
 import { getCurrentUser } from "@/lib/session";
 
@@ -70,11 +72,18 @@ function renderRequestCard(eventId: string, request: HostJoinRequest) {
   );
 }
 
-export default async function HostEventPage({ params }: { params: Promise<{ eventId: string }> }) {
+export default async function HostEventPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ eventId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const host = await getCurrentUser();
   if (!host) redirect("/login");
 
   const { eventId } = await params;
+  const view = resolveHostEventView(eventId, await searchParams);
   const event = await getHostEvent(eventId, host.id);
   if (!event) notFound();
 
@@ -101,6 +110,19 @@ export default async function HostEventPage({ params }: { params: Promise<{ even
         <Link href="/hosting">Your events</Link>
         <Link href="/events/new">Host another</Link>
       </nav>
+
+      {view.justPublished ? (
+        <section className="host-published" role="status" aria-labelledby="host-published-heading">
+          <p className="panel-label">It&apos;s live</p>
+          <h2 id="host-published-heading">Your event is published.</h2>
+          <p>Compatible members can now find it in discovery and request a place. The exact meeting point stays private until you accept a request.</p>
+          <div className="host-published-actions">
+            <Link href={view.publicInvitationPath} className="host-published-primary">View the public invitation <span aria-hidden="true">→</span></Link>
+            <Link href={view.managePath}>Manage your events</Link>
+          </div>
+          <ShareEventLink path={view.publicInvitationPath} />
+        </section>
+      ) : null}
 
       <header className="host-event-hero">
         <p className="eyebrow">Published · {event.sport}</p>
