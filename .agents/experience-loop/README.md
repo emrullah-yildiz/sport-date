@@ -1,48 +1,59 @@
-# Experience loop (continuous explore → build → verify)
+# Experience loop (continuous plan → build → test → use)
 
 A never-ending studio loop that drives Sport Date toward the best possible modern,
-human, trustworthy experience. Two agents, one queue.
+human, trustworthy experience. **Four agents, one queue.**
 
 ```
-        ┌─────────────────────────────────────────────┐
-        ▼                                             │
-  Explorer  ──files prioritized tickets──►  Ticket queue  ──►  Build Agent
-  (.agents/experience-design-explorer.md)   (.agents/customer-   (.agents/
-   one surface × one lens per pass           feedback/tickets/)   experience-build-agent.md)
-   retests `implemented` → `verified`              ▲             implements top P0→P3
-        │                                          │             ticket, checks, commits
-        └──────────── restarts, goes deeper ───────┴──── marks `implemented` ──┘
+   Planner ──► Builder ──► Tester ──► User-simulator ──┐
+  (plans &    (implements  (verifies   (drives real     │
+   prioritizes top ticket,  implemented journeys,       │
+   the queue)  commits+push) → verified) files issues)  │
+       ▲                                                │
+       └──────────── shared CX- ticket queue ◄──────────┘
+        .agents/customer-feedback/tickets/
 ```
 
-## Roles
+## Roles (each is its own agent definition)
 
-- **Explorer** — `.agents/experience-design-explorer.md`. Observes, gets inspired by
-  best-in-class 3D/gamified/award sites, reasons from the member's journey, files
-  **prioritized** tickets (Reach×Impact×Confidence/Effort → P0–P3), and independently
-  retests implemented tickets. Never implements.
-- **Build Agent** — `.agents/experience-build-agent.md`. Pulls the highest-priority
-  `ready` ticket, implements on brand with full state coverage, runs
-  typecheck/lint/test, commits one verified unit per ticket, marks it `implemented`.
-  Never pushes/deploys.
+- **Planner** — `.agents/experience-loop/planner.md`. Grooms + prioritizes the backlog,
+  breaks goals into buildable tickets, names the single next thing to build, keeps
+  `docs/operations/agent-state.md` current. Never codes or tests.
+- **Builder** — `.agents/experience-build-agent.md`. Implements the top `ready` ticket on
+  brand with full state coverage; runs typecheck/lint/test **and a production `npm run
+  build`**; commits **and pushes** one verified unit (a unit that adds a DB migration is
+  committed but left for the orchestrator to push + migrate prod). Marks `implemented`.
+- **Tester** — `.agents/experience-loop/tester.md`. Independent quality gate: proves each
+  `implemented` ticket against its acceptance criteria (repo checks + live/pooled login +
+  guardrails + release/schema safety) → `verified`, or reopens `ready` with evidence.
+- **User-simulator** — `.agents/experience-loop/user-simulator.md`. Drives complete
+  real-member journeys in the browser, watches for breakage/confusion, and files
+  prioritized issue tickets. This is how new work enters the queue.
+
+The Explorer (`.agents/experience-design-explorer.md`) is retained as the shared reference
+for surfaces, lenses, growth tracks, guardrails, and the "Release & deploy safety" lens
+that Tester and User-simulator both use.
 
 ## Ticket lifecycle
 
 `draft → ready → in-progress → implemented → verified`
-(`blocked-owner` for escalation-only decisions; reopened to `ready` if retest fails.)
+(`blocked-owner` for escalation-only decisions; reopened to `ready` if a test/journey fails.)
 
-## One orchestrator tick
+## One orchestrator tick (four phases, SEQUENTIAL — never concurrent)
 
-1. **Build pass** — run the Build Agent. It implements + commits the single
-   highest-priority `ready` ticket, or reports "queue drained."
-2. **Explore pass** — run the Explorer on the next (surface × lens) cell. It first
-   retests any `implemented` tickets (→ `verified`), then files new prioritized
-   tickets. A new `ready` ticket means the next Build pass has work — this is how a
-   "new ticket submit launches the builder."
-3. **Log** — both agents append to `LOG.md`. Advance the rotation and tick again.
+1. **Plan** — run the Planner. It grooms/prioritizes and names the next ticket to build.
+2. **Build** — run the Builder on that ticket. Implements, verifies (incl. prod build),
+   commits, and pushes (migration units → orchestrator pushes + migrates prod).
+3. **Test** — run the Tester on the just-`implemented` ticket → `verified` or reopen.
+4. **Use** — run the User-simulator on the next real journey; it files new prioritized
+   tickets, which feed the next Plan phase.
 
-Seeding bias: while the backlog is thin, weight ticks toward the Explorer to build a
-rich prioritized backlog across surfaces and lenses; once there's depth, alternate
-build and explore so quality keeps pace with discovery.
+Run the four phases in order so they don't race on the queue, `LOG.md`, or git. After the
+Build (and Test) phase the orchestrator bookkeeps and pushes to `origin/main` (owner
+directive: **commit and push always**; migration units get prod-migrated first).
+
+Seeding bias: while the backlog is thin, weight ticks toward the Planner + User-simulator
+to build a rich prioritized backlog; once there's depth, keep all four phases each tick so
+quality and discovery keep pace with delivery.
 
 Growth mode: when no defects or owner items remain, the Explorer shifts from fixing to
 growing — new features, a monetization & pricing proposal (research-backed; final
