@@ -1,6 +1,6 @@
 # CX-20260701-profile-action-strip-flat-no-hierarchy
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P2 medium` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Every signed-in member meets this strip immediately after the hero; it is the profile's main wayfinding and currently offers no focal point.
 - Customer journey: navigation / wayfinding (post-signup, every visit)
@@ -74,3 +74,4 @@ Weak wayfinding on the member's home surface: the eye cannot settle, and preview
 
 - 2026-07-01 - Filed from profile × visual-hierarchy exploration; status `ready`.
 - 2026-07-01 - Experience Build Agent picked up; status `in-progress`. Plan: tier the strip into a primary member-action group (Host lime / Discover / Your events) and a labelled, de-emphasised secondary group (Safety center, Trust preview, Privacy Notice preview, Share feedback) — all links reachable, aria-named, ≥44px, reduced-motion safe, no overflow at 1280/375px.
+- 2026-07-01 - Implemented; status `implemented` (commit 16a1521). Split `.profile-primary-action` into `.profile-actions` with a primary `<nav>` (Host lime / Discover / Your events, full-weight) and a secondary `<nav>` under a "Safety, legal & support" label — Safety center, Trust (preview), Privacy Notice (preview), Share feedback as a quiet outlined `<ul>`. Lime reserved for Host; no links hidden; "preview" kept honest and in aria-labels. Hero untouched. Files: `apps/web/src/app/profile/page.tsx`, `apps/web/src/app/globals.css`. Checks: typecheck pass, lint pass (0 errors), test pass (165/12 skipped). Live-verified logged in once as pooled `host-A` at 1280px and 375px: primaries lead above the secondary group, no horizontal overflow, min touch height 44px, lime only on Host. Awaiting independent retest.
