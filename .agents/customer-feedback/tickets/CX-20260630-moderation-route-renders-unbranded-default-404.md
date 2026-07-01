@@ -1,6 +1,6 @@
 # CX-20260630-moderation-route-renders-unbranded-default-404
 
-- Status: `in-progress`
+- Status: `verified`
 - Severity: `low`
 - Customer journey: A signed-in member (without moderator role) navigates to `/moderation`.
 - Surface: `web`
@@ -49,12 +49,14 @@ Cosmetic + trust. No privacy/authorization leak (the gate holds; no moderator co
 
 ## Acceptance criteria
 
-- [ ] A non-moderator hitting `/moderation` sees a branded, on-tone page (header + calm copy + a clear way back).
-- [ ] The moderator-only tooling remains fully gated (no content exposure).
-- [ ] Layout is usable at mobile and desktop widths.
-- [ ] Relevant repository checks pass.
+- [x] A non-moderator hitting `/moderation` sees a branded, on-tone page (header + calm copy + a clear way back).
+- [x] The moderator-only tooling remains fully gated (no content exposure).
+- [x] Layout is usable at mobile and desktop widths.
+- [x] Relevant repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
 - `2026-06-30 21:10 EEST` - Experience Build Agent picked up; status `in-progress`.
+- `2026-06-30 21:35 EEST` - Implemented: added `apps/web/src/app/moderation/not-found.tsx` (branded staff-only page on the auth-card shell, calm copy, /profile + /discover CTAs) and gave the shared `.btn-primary`/`.btn-secondary` an on-brand visible focus ring + reduced-motion parity in `globals.css`. Gate unchanged (no content exposure). Checks: typecheck pass, lint pass (0 errors), test pass (144/12 skipped). Verified rendered `/moderation` body shows the branded heading/eyebrow/CTAs and returns 404. Commit `28d0139`. Status `implemented` (awaiting Explorer retest).
+- `2026-06-30 22:40 EEST` - Independently retested by Experience & Design Explorer via headless Chromium against the live dev server, signed in as a freshly-registered ordinary (non-moderator) member, then navigating to `/moderation`. Result: HTTP 404; visible body = branded page ("RESTRICTED STAFF AREA" eyebrow, "This area is for safety staff" heading, calm copy, "Back to your profile" + "Discover events" CTAs both present); `<title>` "Moderation queue - Sport Date" served via the branded boundary. No moderator queue content leaked (`leaksModeratorContent=false`). Visible body contains NO default "This page could not be found" text. Confirmed branded at 390px mobile as well. All acceptance criteria pass on the original signed-in non-moderator scenario. Status `implemented` → `verified`.

@@ -1,6 +1,6 @@
 # CX-20260630-landing-hero-reduced-motion-hydration-error
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Customer journey: First impression — a reduced-motion visitor opens the public landing page (`/landing`)
 - Surface: `web`
@@ -68,7 +68,7 @@ Low. The hero copy stays visible and the primary CTA works, so no customer is bl
 
 ## Acceptance criteria
 
-- [ ] `/landing` hydrates with a clean browser console under `prefers-reduced-motion: reduce` (no hydration-mismatch error). _(customer retest — left for tester)_
+- [x] `/landing` hydrates with a clean browser console under `prefers-reduced-motion: reduce` (no hydration-mismatch error). _(retest 2026-06-30: 0 console errors, 0 page errors, 0 hydration-mismatch warnings under reduced motion)_
 - [x] The hero eyebrow, headline, subtitle, CTA, and microcopy remain visible immediately in both motion modes (no regression to the current visible-by-default behavior).
 - [x] The "Start your profile" CTA continues to navigate to `/signup` in both motion modes.
 - [x] Server-rendered and first-client-rendered inline styles for the hero copy match in the reduced-motion case (no `transform:none` vs absent disagreement).
@@ -85,3 +85,4 @@ Removed criteria: precise-location/data-exposure criterion deleted — this page
   - Fix (`apps/web/src/app/landing/page.tsx`): gated the framer-motion entrance behind `useMounted()` (the existing `useSyncExternalStore` idiom: `false` on server + first client paint, `true` after hydration). Before mount, the hero `.hero-content` block and the `.hero-3d` wrapper render as **plain, animation-free markup** — `<div>/<p>/<h1>` with no `motion.*`, no `initial`/`animate`, and no inline `opacity`/`transform`. After mount we render the `motion.*` versions with `initial="hidden"` / `animate="show"`, so the staggered entrance plays once, client-side only. SSR HTML and the first client render are now byte-identical in *every* motion setting → no motion-injected inline styles pre-mount → no hydration mismatch. Non-reduced-motion entrance and the 3D scene are untouched.
   - Checks: `npx eslint src/` → 0 problems. `npm run typecheck` → green. `npm test` (full workspaces) → 188 passed (131 web + 57 contracts) | 12 skipped, none shrunk. `npm run build --workspace @sport-date/web` → Turbopack "Compiled successfully", `/landing` prerendered static.
   - Left the customer-retest acceptance criterion (clean console under reduced motion) unticked for the QA tester's screenshot verification.
+- `2026-06-30 22:40 EEST` - Independently retested by Experience & Design Explorer via headless Chromium against the live dev server with `reducedMotion: "reduce"`. Loaded `/landing`, waited for network idle + settle, captured all console + pageerror signal. Result: **0 console errors, 0 pageerrors, 0 hydration-mismatch warnings**. Hero `h1#hero-title` visible, `.hero-content` computed `opacity = 1`, primary CTA `href = /signup`. Re-ran with motion ON: also 0 errors. Note: the current `/landing/page.tsx` is now fully static (no `framer-motion`, no `motion.*`, no `useMounted`, no 3D canvas, no inline `opacity`/`transform`), so the mismatch source is structurally removed rather than merely deferred — SSR and client markup are byte-identical in both motion modes. All acceptance criteria pass. Status `implemented` → `verified`.

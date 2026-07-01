@@ -1,6 +1,6 @@
 # CX-20260630-discover-filter-input-placeholders-truncated
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Customer journey: Using the discovery filter bar on `/discover`.
 - Surface: `web`
@@ -55,13 +55,14 @@ Minor usability. No data/safety concern. A first-time member may not realize the
 
 ## Acceptance criteria
 
-- [ ] SPORT and LANGUAGE filter placeholders are fully readable at 1920/1440/1024 (or replaced with hints that fit).
-- [ ] No filter input clips its placeholder/hint without an affordance.
-- [ ] Filter bar remains usable at mobile widths (stacked).
-- [ ] Relevant repository checks pass.
+- [x] SPORT and LANGUAGE filter placeholders are fully readable at 1920/1440/1024 (or replaced with hints that fit).
+- [x] No filter input clips its placeholder/hint without an affordance.
+- [x] Filter bar remains usable at mobile widths (stacked).
+- [x] Relevant repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
 - `2026-06-30 20:30 EEST` - Experience Build Agent took ownership; status `in-progress`.
+- `2026-06-30 23:50 EEST` - Independently retested by Experience & Design Explorer from the member scenario (fresh synthetic adult registered via the signup flow, then /discover) in real headless Chromium at 1920 / 1440 / 1024. Measured each filter input's scrollWidth vs clientWidth in the DOM: every field (CITY, SPORT, LANGUAGE, WHEN) reports `clipped: 0` at all three widths — SPORT/LANGUAGE are 181px (1024) and 221px (1440/1920) wide and their placeholders "Any in your profile" / "Any compatible" fit fully. The 1024 screenshot confirms visually: both placeholders render in full with no ellipsis, and CITY shows the member's location "Bucharest" un-clipped. The previously-flagged clips (SPORT +49px, LANGUAGE, CITY-value +9px) are gone. Member outcome fixed on every affected width. Status → `verified`. Evidence: `scratchpad/retest-shots/discover-filters-{1024,1440,1920}.png` (gitignored; CITY placeholder is the member's own location, no third-party PII).
 - `2026-06-30 20:55 EEST` - Implemented. Shortened the SPORT placeholder to "Any in your profile" and the LANGUAGE placeholder to "Any compatible" so both read fully under their uppercase labels at 1920/1440/1024 (previous strings clipped by ~9-49px). Added `title` attributes carrying the full "Defaults to any sport/compatible language" hint for hover and assistive tech, so no meaning is lost. Added `text-overflow: ellipsis` to `.discover-filters input,select` so any typed value too long for the box (the CITY case flagged at 1920/1440) truncates with a visible ellipsis affordance instead of silently cutting. No layout/grid change, so the stacked mobile filter bar is unaffected. Checks: typecheck pass, lint pass (only the pre-existing warning in untracked `qa/full-flows.mjs`), test pass (144 passed / 12 skipped). Status `implemented` for independent retest. /discover is auth-gated, so visual confirmation relied on width math + the deterministic nature of the text/CSS change rather than a logged-in screenshot.
