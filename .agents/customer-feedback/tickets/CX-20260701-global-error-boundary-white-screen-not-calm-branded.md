@@ -1,13 +1,13 @@
 # CX-20260701-global-error-boundary-white-screen-not-calm-branded
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 3 × Impact 4 × Confidence 4) / Effort 2 = 24. When a broadly-rendered server path throws (missing `DATABASE_URL`, or a missing-migration `column does not exist`, or any RSC render error), the app-wide fallback renders a bare, unbranded, un-worded Next.js error page — the white-screen 500 the Release & deploy safety lens explicitly says required env/secret failures must NOT produce. Reliability/trust regression at the worst moment.
 - Customer journey: (whole product / error + offline + deploy safety) — the last-resort fallback when a server component throws
 - Surface: `web` (App Router global error boundary)
 - Environment and viewport/device: dev + prod; source-verified against `apps/web/src/app/global-error.tsx`, 2026-07-01
 - Found by: Experience & Design Explorer (Release & deploy safety lens 13c — env/secrets fail closed and calm, pass 19)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-no-automatic-production-migration-on-deploy` and `CX-20260701-prod-behind-migrations-020-024-broadly-rendered-500s` (this is the fallback those failures land in — a calm fallback would turn the outage's white-screen into a calm, on-brand "we're having a problem" page while the DB/migration is fixed), `CX-20260630-moderation-route-renders-unbranded-default-404` (same theme: an unbranded default framework page shipped where a calm branded one is expected).
 
 ## Customer outcome
@@ -70,3 +70,4 @@ Trust/reliability: a white "Error" screen at any server failure reads as "the wh
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (Release & deploy safety lens 13c — env/secrets must fail closed and calm). Source-confirmed the app-wide `global-error.tsx` renders a bare `<NextError statusCode={0} />`, that `getDatabase()` throwing bubbles here as a white screen (the DB path does NOT fail calm, unlike the BLOB/photo path which does), and that this is the fallback the 2026-07-01 migration outage landed in. Cross-linked to the two deploy-safety tickets; status `ready`.
+- 2026-07-01 - Experience Build Agent picked up; status `in-progress`, owner recorded. Scope: the app-wide `global-error.tsx` only (route-level `error.tsx`/`not-found` alignment left as a follow-up).
