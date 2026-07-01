@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
+import FirstEventPreparationCard, { shouldShowFirstEventPreparation } from "@/components/FirstEventPreparationCard";
 import PeerFeedbackPanel from "@/components/PeerFeedbackPanel";
 import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
@@ -34,6 +35,22 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   // The pre-arrival safety brief is for an accepted participant heading to an
   // in-person meeting — not the host, and not once the event is over.
   const showPreArrivalBrief = !room.isHost && room.viewerRequest?.status === "accepted" && !room.hasEnded;
+  // The first-event preparation card is the warmer, logistics/confidence sibling of
+  // that safety brief: only for an accepted participant attending their FIRST event.
+  const showFirstEventPrep = shouldShowFirstEventPreparation({
+    isHost: room.isHost,
+    hasEnded: room.hasEnded,
+    viewerIsFirstTimer: room.viewerIsFirstTimer,
+    viewerRequestStatus: room.viewerRequest?.status,
+  });
+  const startsAtShort = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: room.timeZone,
+  }).format(new Date(room.startsAt));
 
   return (
     <main className="room-page">
@@ -47,11 +64,23 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         <p>{startsAt}</p>
       </header>
       {showPreArrivalBrief ? (
-        <PreArrivalSafetyBrief
-          eventId={room.id}
-          startsAt={room.startsAt}
-          safetyControlsId="room-people"
-          leaveControlId="room-leave"
+        <div id="prearrival-brief">
+          <PreArrivalSafetyBrief
+            eventId={room.id}
+            startsAt={room.startsAt}
+            safetyControlsId="room-people"
+            leaveControlId="room-leave"
+          />
+        </div>
+      ) : null}
+      {showFirstEventPrep ? (
+        <FirstEventPreparationCard
+          sport={room.sport}
+          experienceLevels={room.experienceLevels}
+          startsAtLabel={startsAtShort}
+          areaLabel={room.areaLabel}
+          hostFirstName={room.host.firstName}
+          safetyBriefId={showPreArrivalBrief ? "prearrival-brief" : "room-leave"}
         />
       ) : null}
       {room.updates.length > 0 ? (

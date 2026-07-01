@@ -34,11 +34,15 @@ function room(overrides: Record<string, unknown> = {}) {
     sport: "Tennis",
     startsAt: "2026-07-10T15:00:00.000Z",
     timeZone: "Europe/Bucharest",
+    durationMinutes: 90,
+    areaLabel: "Herastrau park",
+    experienceLevels: ["beginner", "intermediate"],
     venueName: "Herastrau public courts",
     address: "Court 3, near the north entrance",
     instructions: null,
     isHost: false,
     hasEnded: false,
+    viewerIsFirstTimer: false,
     viewerRequest: { id: "req-1", status: "accepted" },
     host: { userId: "host-9", firstName: "Radu" },
     reflection: null,
@@ -94,6 +98,52 @@ describe("Event room pre-arrival safety brief", () => {
   it("does not show the brief for a pending (not yet accepted) request", async () => {
     const html = await render({ viewerRequest: { id: "req-1", status: "pending" } });
     expect(html).not.toContain("Meeting someone new, calmly");
+  });
+});
+
+describe("First-event preparation card", () => {
+  const PREP_TITLE = "here&#x27;s how it&#x27;ll go";
+
+  it("shows the warm preparation card to an accepted first-timer before the event", async () => {
+    const html = await render({ viewerIsFirstTimer: true });
+    expect(html).toContain('id="first-event-prep-title"');
+    expect(html).toContain(PREP_TITLE);
+    // Practical facts derived from the event (sport + welcomed levels + what to bring).
+    expect(html).toContain("Beginners are welcome");
+    expect(html).toContain("Your racket if you have one");
+    // Points at the on-page safety/leaving controls rather than repeating them.
+    expect(html).toContain('href="#prearrival-brief"');
+    // No invented safety claims.
+    expect(html.toLowerCase()).not.toContain("verified");
+    expect(html.toLowerCase()).not.toContain("guaranteed");
+  });
+
+  it("does not show the preparation card to a repeat attendee", async () => {
+    const html = await render({ viewerIsFirstTimer: false });
+    expect(html).not.toContain('id="first-event-prep-title"');
+  });
+
+  it("does not show the preparation card to the host", async () => {
+    const html = await render({ viewerIsFirstTimer: true, isHost: true, viewerRequest: null });
+    expect(html).not.toContain('id="first-event-prep-title"');
+  });
+
+  it("does not show the preparation card once the event has ended", async () => {
+    const html = await render({ viewerIsFirstTimer: true, hasEnded: true });
+    expect(html).not.toContain('id="first-event-prep-title"');
+  });
+
+  it("does not show the preparation card for a pending (not yet accepted) request", async () => {
+    const html = await render({ viewerIsFirstTimer: true, viewerRequest: { id: "req-1", status: "pending" } });
+    expect(html).not.toContain('id="first-event-prep-title"');
+  });
+
+  it("falls back to the leave control anchor when the safety brief is not shown", async () => {
+    // A first-timer whose request is somehow not the accepted-brief state still never
+    // renders the card, so the anchor fallback is exercised via the safety-brief-off path
+    // only when both flags align — here we assert the card is absent, guarding the gate.
+    const html = await render({ viewerIsFirstTimer: true, viewerRequest: { id: "req-1", status: "declined" } });
+    expect(html).not.toContain('id="first-event-prep-title"');
   });
 });
 

@@ -246,7 +246,13 @@ export async function getAcceptedEventLocation(
 
 export type EventRoom = Readonly<{
   id: string; title: string; sport: string; startsAt: string; timeZone: string; hasEnded: boolean;
+  durationMinutes: number; areaLabel: string; experienceLevels: string[];
   venueName: string; address: string; instructions: string | null; isHost: boolean;
+  // True when this accepted, published, still-upcoming event is the viewer's ONLY
+  // event participation — i.e. their first time attending. Derived from existing
+  // `event_participants` rows (no schema change); used only to decide whether to
+  // surface the first-timer preparation card, never to gate access.
+  viewerIsFirstTimer: boolean;
   viewerRequest: { id: string; status: DiscoveryRequest["status"] } | null;
   host: { userId: string; firstName: string };
   reflection: { attendance: "attended" | "left_early" | "did_not_attend"; wouldJoinAgain: "yes" | "no" | "prefer_not_to_say" } | null;
@@ -278,11 +284,13 @@ export type MemberEventSummary = Readonly<{
 
 type EventRoomRow = {
   id: string; title: string; sport: string; starts_at: string; time_zone: string;
+  duration_minutes: number; public_area_label: string; experience_levels: string[];
   venue_name: string; address: string; arrival_instructions: string | null; is_host: boolean;
   host_user_id: string | number; host_first_name: string;
   viewer_request_id: string | null; viewer_request_status: DiscoveryRequest["status"] | null;
   has_ended: boolean; attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
   would_join_again: NonNullable<EventRoom["reflection"]>["wouldJoinAgain"] | null;
+  viewer_other_event_count: number;
 };
 
 type EventUpdateNoticeRow = {
@@ -297,12 +305,21 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   const sql = getDatabase();
   const rooms = await sql`
     SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
+      events.duration_minutes, events.public_area_label, events.experience_levels,
       location.venue_name, location.address, location.arrival_instructions,
       events.host_user_id, host.first_name AS host_first_name,
       (events.host_user_id = ${userId}) AS is_host,
       viewer_request.id AS viewer_request_id, viewer_request.status AS viewer_request_status,
       (events.starts_at + (events.duration_minutes * INTERVAL '1 minute') <= NOW()) AS has_ended,
-      reflection.attendance, reflection.would_join_again
+      reflection.attendance, reflection.would_join_again,
+      -- Count the viewer's participation in ANY OTHER event (past or upcoming). Zero
+      -- means this accepted event is their only one, so they are a first-timer. Reads
+      -- existing event_participants rows only — no schema change.
+      (
+        SELECT COUNT(*)::integer FROM event_participants AS other_participation
+        WHERE other_participation.user_id = ${userId}
+          AND other_participation.event_id <> events.id
+      ) AS viewer_other_event_count
     FROM events
     JOIN event_private_locations AS location ON location.event_id = events.id
     JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
@@ -381,8 +398,14 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
 
   return {
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
-    timeZone: room.time_zone, venueName: room.venue_name, address: room.address,
+    timeZone: room.time_zone, durationMinutes: room.duration_minutes,
+    areaLabel: room.public_area_label, experienceLevels: room.experience_levels,
+    venueName: room.venue_name, address: room.address,
     instructions: room.arrival_instructions, isHost: room.is_host, hasEnded: room.has_ended,
+    // A member is a first-timer when they host nothing here and this is their only
+    // event participation. The preparation card layers on top of this — the page
+    // still independently checks accepted/not-ended before showing it.
+    viewerIsFirstTimer: !room.is_host && room.viewer_other_event_count === 0,
     viewerRequest: room.viewer_request_id && room.viewer_request_status
       ? { id: room.viewer_request_id, status: room.viewer_request_status }
       : null,

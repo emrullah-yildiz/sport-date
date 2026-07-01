@@ -1,13 +1,13 @@
 # CX-20260701-first-event-preparation-card
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 3) / Effort 3 = 20. Reduces first-timer anxiety; supports attendance and safe completion.
 - Customer journey: commitment → arrival
 - Surface: `web` (mobile follow-up)
 - Environment and viewport/device: all widths
 - Found by: Product/growth strategist review (2026-07-01), member-journey analysis for `docs/marketing/feature-roadmap-proposal.md` (b4)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-pre-arrival-safety-micro-brief` (safety orientation), `CX-20260701-event-room-stays-future-tense-after-event-ends`
 
 ## Customer outcome
@@ -60,3 +60,4 @@ regression, but the card must respect approximate-location rules.
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
+- 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Adding a warm, practical first-event preparation card in the event room for an accepted first-timer (no prior accepted participation), coordinated with (not duplicating) the shipped pre-arrival safety micro-brief. Deriving "first event" from existing `event_participants` data — no migration.
