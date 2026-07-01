@@ -28,6 +28,7 @@ export async function PATCH(request: Request) {
     name: sport.name, skill_level: sport.skillLevel, frequency: sport.frequency,
   })));
   const languagesJson = JSON.stringify(input.languages);
+  const promptsJson = JSON.stringify(input.prompts.map((prompt) => ({ prompt: prompt.prompt, answer: prompt.answer })));
   const sql = getDatabase();
   const results = await sql.transaction((transaction) => [
     transaction`
@@ -35,6 +36,7 @@ export async function PATCH(request: Request) {
       SET first_name = ${input.firstName}, last_name = ${input.lastName},
           location = ${input.location}, bio = ${input.bio},
           languages = ARRAY(SELECT jsonb_array_elements_text(${languagesJson}::jsonb)),
+          personality_prompts = ${promptsJson}::jsonb,
           seeking = ${input.seeking}, updated_at = NOW()
       WHERE id = ${user.id} AND account_status = 'active'
       RETURNING id

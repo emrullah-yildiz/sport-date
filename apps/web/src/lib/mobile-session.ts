@@ -17,6 +17,7 @@ type MobileSessionUserRow = {
   seeking: SessionUser["seeking"];
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
+  prompts: Array<{ prompt: string; answer: string }> | null;
 };
 
 export type MobileSessionContext = Readonly<{ sessionId: string; user: SessionUser }>;
@@ -48,7 +49,7 @@ export async function getMobileSession(request: Request): Promise<MobileSessionC
     SELECT active_session.id AS session_id, users.id, users.email,
       DATE_PART('year', AGE(CURRENT_DATE, users.date_of_birth))::integer AS age,
       users.first_name, users.last_name, users.location, users.bio, users.languages,
-      users.seeking, users.email_verified,
+      users.seeking, users.email_verified, users.personality_prompts AS prompts,
       COALESCE(jsonb_agg(jsonb_build_object(
         'name', user_sports.sport, 'skillLevel', user_sports.skill_level, 'frequency', user_sports.frequency
       ) ORDER BY user_sports.created_at) FILTER (WHERE user_sports.id IS NOT NULL), '[]'::jsonb) AS sports
@@ -66,7 +67,7 @@ export async function getMobileSession(request: Request): Promise<MobileSessionC
       id: String(row.id), email: row.email, age: row.age, firstName: row.first_name,
       lastName: row.last_name, location: row.location, bio: row.bio,
       languages: row.languages, seeking: row.seeking, emailVerified: row.email_verified,
-      sports: row.sports,
+      sports: row.sports, prompts: Array.isArray(row.prompts) ? row.prompts : [],
     },
   };
 }

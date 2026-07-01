@@ -22,6 +22,7 @@ type AccountExportRow = {
   accepted_terms_at: string;
   created_at: string;
   updated_at: string;
+  personality_prompts: Array<{ prompt: string; answer: string }> | null;
   sports: Array<{ name: string; skillLevel: string; frequency: string }>;
 };
 
@@ -35,6 +36,7 @@ export async function GET() {
       users.id, users.email, users.first_name, users.last_name, users.date_of_birth,
       users.location, users.timezone, users.bio, users.languages, users.seeking,
       users.email_verified, users.accepted_terms_at, users.created_at, users.updated_at,
+      users.personality_prompts,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -148,6 +150,7 @@ export async function GET() {
       acceptedTermsAt: account.accepted_terms_at,
       createdAt: account.created_at,
       updatedAt: account.updated_at,
+      personalityPrompts: account.personality_prompts ?? [],
       sports: account.sports,
     },
     hostedEvents,

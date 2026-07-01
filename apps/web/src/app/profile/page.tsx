@@ -11,9 +11,49 @@ import MobileSessionControls from "@/components/MobileSessionControls";
 import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
 import { getMemberMovementProgress } from "@/lib/progress";
-import { getCurrentUser } from "@/lib/session";
+import { getCurrentUser, type SessionUser } from "@/lib/session";
 
 export const metadata = { title: "Your profile — Sport Date" };
+
+const SEEKING_HEADLINES: Record<SessionUser["seeking"], string> = {
+  dating: "Dating",
+  friendship: "Friendship",
+  group: "Group games",
+};
+
+const SEEKING_SUMMARIES: Record<SessionUser["seeking"], string> = {
+  dating: "Open to dating through sport.",
+  friendship: "Here to make friends through sport.",
+  group: "Here for group games and good company.",
+};
+
+const SKILL_PHRASES: Record<SessionUser["sports"][number]["skillLevel"], string> = {
+  beginner: "Just starting out",
+  intermediate: "Plays at an intermediate level",
+  advanced: "Plays at an advanced level",
+};
+
+const FREQUENCY_PHRASES: Record<SessionUser["sports"][number]["frequency"], string> = {
+  weekly: "most weeks",
+  biweekly: "every couple of weeks",
+  monthly: "about once a month",
+  casual: "now and then",
+};
+
+function seekingHeadline(seeking: SessionUser["seeking"]): string {
+  return SEEKING_HEADLINES[seeking];
+}
+
+function seekingSummary(seeking: SessionUser["seeking"]): string {
+  return SEEKING_SUMMARIES[seeking];
+}
+
+function describeSport(
+  skillLevel: SessionUser["sports"][number]["skillLevel"],
+  frequency: SessionUser["sports"][number]["frequency"],
+): string {
+  return `${SKILL_PHRASES[skillLevel]} · ${FREQUENCY_PHRASES[frequency]}`;
+}
 
 export default async function ProfilePage() {
   const user = await getCurrentUser();
@@ -33,7 +73,14 @@ export default async function ProfilePage() {
         <div>
           <p className="eyebrow">Your private beta profile</p>
           <h1>{user.firstName} {user.lastName}</h1>
-          <p>Ready when the right game appears. This is your private account record, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
+          <p className="profile-hero-meta">
+            <span className="profile-hero-fact">{user.location}</span>
+            <span aria-hidden="true">·</span>
+            <span className="profile-hero-fact">{user.age}</span>
+            <span aria-hidden="true">·</span>
+            <span className="profile-hero-fact profile-hero-seeking">{seekingSummary(user.seeking)}</span>
+          </p>
+          <p>Ready when the right game appears. This is how you&rsquo;ll come across to people deciding whether to play — a warm, honest picture, no scores, no ranking. It stays your private account record too, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
         </div>
         <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
       </section>
@@ -55,20 +102,66 @@ export default async function ProfilePage() {
       </div>
       <section className="profile-grid">
         <article className="profile-panel">
-          <p className="panel-label">About</p>
-          <h2>{user.location}</h2>
-          <p>Where you move · {user.firstName}&rsquo;s home base for meeting people through sport.</p>
-          {user.bio ? <blockquote>{user.bio}</blockquote> : <p className="profile-empty">Add a short introduction when profile editing arrives.</p>}
+          <p className="panel-label">Intro</p>
+          <h2>A little about {user.firstName}</h2>
+          {user.bio
+            ? <blockquote>{user.bio}</blockquote>
+            : <p className="profile-empty">No intro yet. A sentence or two about why you play helps people say yes — add one under &ldquo;Edit your profile&rdquo; below.</p>}
         </article>
         <article className="profile-panel">
-          <p className="panel-label">Connection</p>
-          <h2 className="capitalize">{user.seeking}</h2>
+          <p className="panel-label">Looking for</p>
+          <h2 className="capitalize">{seekingHeadline(user.seeking)}</h2>
+          <p>{seekingSummary(user.seeking)} Dating, friendship, and group games are all first-class here — pick whatever fits you now, change it whenever.</p>
+        </article>
+        <article className="profile-panel">
+          <p className="panel-label">Languages</p>
+          {user.languages.length > 0 ? (
+            <>
+              <h2>{user.languages.length === 1 ? "Speaks" : "Comfortable in"}</h2>
+              <ul className="profile-chip-list" aria-label="Languages you are comfortable in">
+                {user.languages.map((language) => <li className="profile-chip" key={language}>{language}</li>)}
+              </ul>
+            </>
+          ) : (
+            <>
+              <h2>Languages</h2>
+              <p className="profile-empty">No languages listed yet. Adding them helps people who share one find you.</p>
+            </>
+          )}
+        </article>
+        <article className="profile-panel">
+          <p className="panel-label">Account</p>
+          <h2>Contact &amp; sign-in</h2>
           <p>{user.email}</p>
           <EmailVerificationControls emailVerified={user.emailVerified} />
         </article>
         <article className="profile-panel profile-sports">
-          <p className="panel-label">Your movement</p>
-          <div className="profile-sport-list">{user.sports.map((sport) => <div className="profile-sport" key={sport.name}><strong>{sport.name}</strong><span>{sport.skillLevel} · {sport.frequency}</span></div>)}</div>
+          <p className="panel-label">On the field</p>
+          <h2>The sports {user.firstName} plays</h2>
+          {user.sports.length > 0 ? (
+            <div className="profile-sport-list">{user.sports.map((sport) => (
+              <div className="profile-sport" key={sport.name}>
+                <strong>{sport.name}</strong>
+                <span>{describeSport(sport.skillLevel, sport.frequency)}</span>
+              </div>
+            ))}</div>
+          ) : (
+            <p className="profile-empty">No sports listed yet. Add at least one so compatible events can find you.</p>
+          )}
+        </article>
+        <article className="profile-panel profile-prompts">
+          <p className="panel-label">In their words</p>
+          <h2>A few things about {user.firstName}</h2>
+          {user.prompts.length > 0 ? (
+            <dl className="profile-prompt-list">{user.prompts.map((prompt) => (
+              <div className="profile-prompt" key={prompt.prompt}>
+                <dt>{prompt.prompt}</dt>
+                <dd>{prompt.answer}</dd>
+              </div>
+            ))}</dl>
+          ) : (
+            <p className="profile-empty">No prompts answered yet. Optional one-liners like &ldquo;A perfect Saturday game is…&rdquo; give people a real sense of you. Add up to three under &ldquo;Edit your profile&rdquo; below.</p>
+          )}
         </article>
       </section>
       <MovementArc progress={movementProgress} />

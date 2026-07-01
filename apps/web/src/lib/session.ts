@@ -24,6 +24,7 @@ export type SessionUser = Readonly<{
     skillLevel: "beginner" | "intermediate" | "advanced";
     frequency: "weekly" | "biweekly" | "monthly" | "casual";
   }>;
+  prompts: ReadonlyArray<{ prompt: string; answer: string }>;
 }>;
 
 type SessionUserRow = {
@@ -38,6 +39,7 @@ type SessionUserRow = {
   seeking: SessionUser["seeking"];
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
+  prompts: Array<{ prompt: string; answer: string }> | null;
 };
 
 export function setSessionCookie(
@@ -74,6 +76,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       DATE_PART('year', AGE(CURRENT_DATE, users.date_of_birth))::integer AS age,
       users.first_name, users.last_name, users.location,
       users.bio, users.languages, users.seeking, users.email_verified,
+      users.personality_prompts AS prompts,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -108,6 +111,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     seeking: row.seeking,
     emailVerified: row.email_verified,
     sports: row.sports,
+    prompts: Array.isArray(row.prompts) ? row.prompts : [],
   };
 }
 

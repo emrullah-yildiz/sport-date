@@ -101,4 +101,75 @@ describe("profile update validation", () => {
     expect(result.valid).toBe(false);
     if (!result.valid) expect(result.errors).toEqual(expect.arrayContaining(["Choose each language only once.", "Choose each sport only once."]));
   });
+
+  it("accepts and trims optional personality prompts from the curated list", () => {
+    const result = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "group",
+      languages: ["Romanian"], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [{ prompt: "A perfect Saturday game is…", answer: "  doubles, then coffee  " }],
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.prompts).toEqual([{ prompt: "A perfect Saturday game is…", answer: "doubles, then coffee" }]);
+    }
+  });
+
+  it("treats prompts as optional: missing or blank-answer prompts are dropped", () => {
+    const withoutPrompts = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "friendship",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+    });
+    expect(withoutPrompts.valid).toBe(true);
+    if (withoutPrompts.valid) expect(withoutPrompts.data.prompts).toEqual([]);
+
+    const blankAnswer = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "friendship",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [{ prompt: "A perfect Saturday game is…", answer: "   " }],
+    });
+    expect(blankAnswer.valid).toBe(true);
+    if (blankAnswer.valid) expect(blankAnswer.data.prompts).toEqual([]);
+  });
+
+  it("rejects unknown prompts, over-long answers, too many, and duplicates", () => {
+    const unknown = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "dating",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [{ prompt: "Where do you live exactly?", answer: "Downtown" }],
+    });
+    expect(unknown.valid).toBe(false);
+    if (!unknown.valid) expect(unknown.errors).toContain("Choose a prompt from the list.");
+
+    const tooLong = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "dating",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [{ prompt: "A perfect Saturday game is…", answer: "x".repeat(141) }],
+    });
+    expect(tooLong.valid).toBe(false);
+    if (!tooLong.valid) expect(tooLong.errors).toContain("Keep each prompt answer to 140 characters or fewer.");
+
+    const duplicate = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "dating",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [
+        { prompt: "A perfect Saturday game is…", answer: "doubles" },
+        { prompt: "A perfect Saturday game is…", answer: "singles" },
+      ],
+    });
+    expect(duplicate.valid).toBe(false);
+    if (!duplicate.valid) expect(duplicate.errors).toContain("Answer each prompt only once.");
+
+    const tooMany = validateProfileUpdate({
+      firstName: "Ana", lastName: "Popescu", location: "Bucharest", bio: "", seeking: "dating",
+      languages: [], sports: [{ name: "Tennis", skillLevel: "beginner", frequency: "casual" }],
+      prompts: [
+        { prompt: "A perfect Saturday game is…", answer: "a" },
+        { prompt: "After the match I'm up for…", answer: "b" },
+        { prompt: "The sport I'd love to try next is…", answer: "c" },
+        { prompt: "You'll get on with me if…", answer: "d" },
+      ],
+    });
+    expect(tooMany.valid).toBe(false);
+    if (!tooMany.valid) expect(tooMany.errors).toContain("Answer up to 3 prompts.");
+  });
 });

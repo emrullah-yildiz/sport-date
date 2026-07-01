@@ -481,8 +481,19 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 .verification-action { justify-self: start; min-height: 44px; }
 .verification-feedback { margin: 0; padding: 11px 13px; border-radius: 12px; background: #eef5da; color: #344126; font-size: 13px; line-height: 1.5; }
 .profile-sports { grid-column: 1 / -1; }.profile-sport-list { margin-top: 26px; display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; }.profile-sport { display: grid; gap: 7px; padding: 18px; border-radius: 17px; background: var(--cream); }
-.profile-sport span { color: var(--muted); font-size: var(--fs-small); text-transform: capitalize; }
-@media (max-width: 700px) { .auth-card { padding: 32px 24px; }.profile-page { padding-inline: 20px; }.profile-hero { grid-template-columns: 1fr; }.profile-initials { width: 92px; height: 92px; font-size: 28px; }.profile-grid { grid-template-columns: 1fr; }.profile-sports { grid-column: auto; }.landing-nav-actions { gap: 11px; }.nav-signin { display: none; } }
+.profile-sport span { color: var(--muted); font-size: var(--fs-small); }
+.profile-hero-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 14px 0 0 !important; color: #3d4b42 !important; font-weight: 800; }
+.profile-hero-meta > span[aria-hidden] { color: var(--muted) !important; font-weight: 700; }
+.profile-hero-fact { display: inline-block; }
+.profile-hero-seeking { padding: 4px 12px; border-radius: 999px; background: var(--lime); color: var(--ink); }
+.profile-chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; padding: 0; list-style: none; }
+.profile-chip { padding: 8px 14px; border-radius: 999px; background: var(--cream); border: 1px solid rgba(23,36,29,.10); font-size: var(--fs-small); font-weight: 800; color: #3d4b42; }
+.profile-prompts { grid-column: 1 / -1; }
+.profile-prompt-list { margin: 26px 0 0; display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 12px; }
+.profile-prompt { display: grid; gap: 6px; padding: 18px; border-radius: 17px; background: var(--cream); border-left: 3px solid var(--lime); }
+.profile-prompt dt { margin: 0; color: #496253; font-size: 12px; font-weight: 900; letter-spacing: .02em; }
+.profile-prompt dd { margin: 0; color: #3d4b42; line-height: 1.5; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .auth-card { padding: 32px 24px; }.profile-page { padding-inline: 20px; }.profile-hero { grid-template-columns: 1fr; }.profile-initials { width: 92px; height: 92px; font-size: 28px; }.profile-grid { grid-template-columns: 1fr; }.profile-sports,.profile-prompts { grid-column: auto; }.landing-nav-actions { gap: 11px; }.nav-signin { display: none; } }
 .privacy-panel { max-width: 1120px; margin: 18px auto 0; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 34px; border-radius: 25px; background: var(--ink); color: white; }.privacy-panel h2 { max-width: 600px; margin: 20px 0 10px; font-size: clamp(28px,4vw,44px); line-height: 1; letter-spacing: -.045em; }.privacy-panel p { color: #bdc8c1; line-height: 1.55; }.privacy-panel .panel-label { color: var(--lime) !important; }
 .privacy-inline-note { max-width: 640px; margin: 0; font-size: 13px; }.privacy-inline-note a { color: var(--lime); text-decoration: underline; text-underline-offset: 3px; font-weight: 800; }
 .privacy-action,.danger-action { min-height: 46px; border: 0; border-radius: 14px; padding: 0 18px; font-weight: 900; cursor: pointer; }.privacy-action { margin-top: 12px; background: var(--lime); color: var(--ink); }.danger-action { margin-top: 7px; background: var(--coral); color: #32110b; }.privacy-action:disabled,.danger-action:disabled { opacity: .55; cursor: not-allowed; }
@@ -502,7 +513,9 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 .communication-history li:last-child { padding-bottom: 0; border-bottom: 0; }
 @media (max-width: 700px) { .privacy-panel { grid-template-columns: 1fr; padding: 26px 20px; }.privacy-message { grid-column: auto; } }
 .edit-profile { max-width: 1120px; margin: 18px auto 0; padding: 24px 30px; border: 1px solid rgba(23,36,29,.12); border-radius: 22px; background: white; }.edit-profile summary { cursor: pointer; font-size: 18px; font-weight: 900; }.edit-profile form { display: grid; gap: 16px; margin-top: 24px; }.edit-profile label { display: grid; gap: 7px; color: #4d5f53; font-size: 12px; font-weight: 800; }.edit-profile input,.edit-profile textarea,.edit-profile select { width: 100%; min-height: 44px; border: 1px solid rgba(23,36,29,.16); border-radius: 12px; padding: 10px 12px; background: white; color: var(--ink); font: inherit; }.edit-profile-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }.edit-profile fieldset { display: grid; gap: 10px; margin: 0; padding: 18px; border: 1px solid rgba(23,36,29,.12); border-radius: 15px; }.edit-profile legend { padding: 0 7px; font-weight: 900; }.edit-sport-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr auto; gap: 8px; }.edit-profile .privacy-action { justify-self: start; }.add-sport,.remove-sport { min-height: 42px; border: 1px solid rgba(23,36,29,.16); border-radius: 11px; padding: 0 13px; background: var(--cream); color: var(--ink); font-weight: 800; cursor: pointer; }.add-sport { justify-self: start; }.add-sport:disabled,.remove-sport:disabled { opacity: .45; cursor: not-allowed; }
-@media (max-width: 700px) { .edit-profile { padding: 22px 18px; }.edit-profile-row,.edit-sport-row { grid-template-columns: 1fr; } }
+.edit-prompts-hint { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; font-weight: 600; }
+.edit-prompt-row { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 8px; }
+@media (max-width: 700px) { .edit-profile { padding: 22px 18px; }.edit-profile-row,.edit-sport-row,.edit-prompt-row { grid-template-columns: 1fr; }.edit-prompt-row .remove-sport { justify-self: start; } }
 .profile-actions { max-width: 1120px; margin: -24px auto 30px; display: grid; gap: 16px; }
 .profile-actions-primary { display: flex; flex-wrap: wrap; gap: 10px; }
 .profile-action-primary { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 16px 21px; border-radius: 16px; background: var(--ink); color: white; font-weight: 900; }

@@ -52,6 +52,34 @@ export function validateLogin(raw: unknown): LoginValidation {
     : { valid: true, data: { email, password } };
 }
 
+/**
+ * Curated, opt-in conversation prompts a member can answer to show personality
+ * without opening a free-text field that invites contact details or scraping
+ * bait. A member may answer up to {@link MAX_PERSONALITY_PROMPTS} of these; each
+ * answer is optional, editable, and removable. Keep the list warm, activity-
+ * anchored, and neutral to whether someone seeks dating, friendship, or a group.
+ */
+export const PERSONALITY_PROMPT_QUESTIONS = [
+  "A perfect Saturday game is…",
+  "After the match I'm up for…",
+  "The sport I'd love to try next is…",
+  "You'll get on with me if…",
+  "My go-to warm-up song is…",
+  "I'm at my best on the pitch when…",
+  "The best place I've played is…",
+  "My idea of a good rivalry is…",
+] as const;
+
+export type PersonalityPromptQuestion = (typeof PERSONALITY_PROMPT_QUESTIONS)[number];
+
+export const MAX_PERSONALITY_PROMPTS = 3;
+export const PERSONALITY_PROMPT_ANSWER_MAX = 140;
+
+export type PersonalityPrompt = Readonly<{
+  prompt: string;
+  answer: string;
+}>;
+
 export type ProfileUpdateInput = Readonly<{
   firstName: string;
   lastName: string;
@@ -60,6 +88,7 @@ export type ProfileUpdateInput = Readonly<{
   seeking: Seeking;
   languages: readonly string[];
   sports: readonly RegistrationSport[];
+  prompts: readonly PersonalityPrompt[];
 }>;
 
 export type ProfileUpdateValidation =
@@ -78,6 +107,7 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
     ? input.languages.filter((language): language is string => typeof language === "string").map((language) => language.trim()).filter(Boolean)
     : [];
   const rawSports = Array.isArray(input.sports) ? input.sports : [];
+  const rawPrompts = Array.isArray(input.prompts) ? input.prompts : [];
   const errors: string[] = [];
 
   if (!firstName || firstName.length > 80) errors.push("Enter a first name of 80 characters or fewer.");
@@ -88,6 +118,22 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
   if (languages.length > 5 || languages.some((language) => language.length > 35)) errors.push("Choose up to five languages of 35 characters or fewer.");
   if (new Set(languages.map((language) => language.toLowerCase())).size !== languages.length) errors.push("Choose each language only once.");
   if (rawSports.length < 1 || rawSports.length > 5) errors.push("Choose between one and five sports.");
+
+  const prompts: PersonalityPrompt[] = [];
+  if (rawPrompts.length > MAX_PERSONALITY_PROMPTS) errors.push(`Answer up to ${MAX_PERSONALITY_PROMPTS} prompts.`);
+  for (const rawPrompt of rawPrompts) {
+    if (!rawPrompt || typeof rawPrompt !== "object") { errors.push("Each prompt answer must be valid."); continue; }
+    const promptEntry = rawPrompt as Record<string, unknown>;
+    const prompt = typeof promptEntry.prompt === "string" ? promptEntry.prompt.trim() : "";
+    const answer = typeof promptEntry.answer === "string" ? promptEntry.answer.trim() : "";
+    if (!PERSONALITY_PROMPT_QUESTIONS.includes(prompt as PersonalityPromptQuestion)) { errors.push("Choose a prompt from the list."); continue; }
+    // An empty answer means the member has not filled this prompt; drop it so
+    // prompts stay genuinely optional and removable without an error.
+    if (!answer) continue;
+    if (answer.length > PERSONALITY_PROMPT_ANSWER_MAX) { errors.push(`Keep each prompt answer to ${PERSONALITY_PROMPT_ANSWER_MAX} characters or fewer.`); continue; }
+    prompts.push({ prompt, answer });
+  }
+  if (new Set(prompts.map((prompt) => prompt.prompt)).size !== prompts.length) errors.push("Answer each prompt only once.");
 
   const sports: RegistrationSport[] = [];
   for (const rawSport of rawSports) {
@@ -104,7 +150,7 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
   if (new Set(sports.map((sport) => sport.name.toLowerCase())).size !== sports.length) errors.push("Choose each sport only once.");
   return errors.length > 0
     ? { valid: false, errors }
-    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports } };
+    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports, prompts } };
 }
 
 export function ageOnDate(dateOfBirth: string, today = new Date()): number | null {

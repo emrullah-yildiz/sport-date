@@ -1,13 +1,13 @@
 # CX-20260701-profile-lacks-rich-browsable-detail
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 5 × Impact 4 × Confidence 3) / Effort 4 = 15. High value but broad; sequence after the host/discovery fixes and the photo data model.
 - Customer journey: trust check
 - Surface: `web`
 - Environment and viewport/device: all widths
 - Found by: Owner (direct feedback 2026-07-01, "improve details about a person's profile as if it is a Tinder profile")
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-profile-photo-series-up-to-six`
 
 ## Customer outcome
@@ -48,3 +48,4 @@ Thin profiles weaken the trust check and make meeting strangers feel riskier and
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner feedback; status `ready`.
+- 2026-07-01 - experience-build-agent took ownership; status `in-progress`. Shipping richer humane presentation of existing fields (intro, sports, languages, seeking presented as equals) plus optional/editable/removable personality prompts stored via the existing profile update path (migration 020 adds a length-capped `personality_prompts` JSONB column).
