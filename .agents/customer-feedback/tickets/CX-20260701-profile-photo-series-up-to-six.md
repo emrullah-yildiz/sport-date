@@ -1,8 +1,9 @@
 # CX-20260701-profile-photo-series-up-to-six
 
-- Status: `ready`
+- Status: `blocked-owner`
 - Severity: `high`
-- Priority: `P1 high` — (Reach 5 × Impact 5 × Confidence 4) / Effort 4 = 25, held at P1: owner-requested and central to "who am I meeting" trust. NOTE: production image storage + moderation choices are an owner decision — see escalation note.
+- Priority: `P1 high` — (Reach 5 × Impact 5 × Confidence 4) / Effort 4 = 25, held at P1: owner-requested and central to "who am I meeting" trust. BLOCKED: owner is choosing the production image storage stack before build begins.
+- Owner decision (2026-07-01): HOLD build until the owner selects a production storage provider. Launch moderation stance chosen = **report-based + manual review** (photos visible on upload; members can report; existing moderation queue handles takedowns) — build to this model once unblocked. Do not scaffold against a stub in the meantime.
 - Customer journey: trust check / intent
 - Surface: `web` (and mobile later)
 - Environment and viewport/device: all widths
@@ -50,3 +51,4 @@ This needs decisions that fall under the escalation policy before production: im
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from owner feedback; status `ready` (storage/moderation sub-parts pending owner decision).
+- 2026-07-01 - Owner elected to HOLD until a production storage stack is chosen; moderation stance set to report-based + manual review. Status → `blocked-owner`. Loop skips this ticket until the owner unblocks the storage choice.
