@@ -1,13 +1,13 @@
 # CX-20260701-profile-action-strip-flat-no-hierarchy
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Priority: `P2 medium` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Every signed-in member meets this strip immediately after the hero; it is the profile's main wayfinding and currently offers no focal point.
 - Customer journey: navigation / wayfinding (post-signup, every visit)
 - Surface: `web`
 - Environment and viewport/device: dev server localhost:3000, observed at 1280px and 390px
 - Found by: Experience & Design Explorer (profile × visual-hierarchy pass, 2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-event-creation-entry-point-not-discoverable` (host CTA prominence — overlapping strip, different outcome), `CX-20260701-profile-lacks-rich-browsable-detail` (profile content richness), `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (hero spacing)
 
 ## Customer outcome
@@ -73,3 +73,4 @@ Weak wayfinding on the member's home surface: the eye cannot settle, and preview
 ## Handoff and retest log
 
 - 2026-07-01 - Filed from profile × visual-hierarchy exploration; status `ready`.
+- 2026-07-01 - Experience Build Agent picked up; status `in-progress`. Plan: tier the strip into a primary member-action group (Host lime / Discover / Your events) and a labelled, de-emphasised secondary group (Safety center, Trust preview, Privacy Notice preview, Share feedback) — all links reachable, aria-named, ≥44px, reduced-motion safe, no overflow at 1280/375px.

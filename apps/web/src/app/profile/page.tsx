@@ -37,7 +37,22 @@ export default async function ProfilePage() {
         </div>
         <div className="profile-initials" aria-hidden="true">{user.firstName.charAt(0)}{user.lastName.charAt(0)}</div>
       </section>
-      <div className="profile-primary-action"><Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event <span aria-hidden="true">→</span></Link><Link href="/discover">Discover events <span aria-hidden="true">→</span></Link><Link href="/hosting">Your events <span aria-hidden="true">→</span></Link><Link href="/safety">Safety center <span aria-hidden="true">→</span></Link><Link href="/trust">Trust preview <span aria-hidden="true">→</span></Link><Link href="/privacy">Privacy Notice preview <span aria-hidden="true">→</span></Link><Link href="/feedback">Share feedback <span aria-hidden="true">→</span></Link></div>
+      <div className="profile-actions">
+        <nav className="profile-actions-primary" aria-label="Your main actions">
+          <Link href="/events/new" className="nav-host-cta profile-action-primary" aria-label="Host an event — create a new game">Host an event <span aria-hidden="true">→</span></Link>
+          <Link href="/discover" className="profile-action-primary" aria-label="Discover events to join">Discover events <span aria-hidden="true">→</span></Link>
+          <Link href="/hosting" className="profile-action-primary" aria-label="Your events and hosting">Your events <span aria-hidden="true">→</span></Link>
+        </nav>
+        <nav className="profile-actions-secondary" aria-label="Safety, legal, and support">
+          <p className="profile-actions-secondary-label" id="profile-actions-secondary-label">Safety, legal &amp; support</p>
+          <ul aria-labelledby="profile-actions-secondary-label">
+            <li><Link href="/safety" className="profile-action-secondary" aria-label="Safety center">Safety center</Link></li>
+            <li><Link href="/trust" className="profile-action-secondary" aria-label="Trust preview — pre-launch">Trust <span className="profile-action-tag">preview</span></Link></li>
+            <li><Link href="/privacy" className="profile-action-secondary" aria-label="Privacy Notice preview — pre-launch">Privacy Notice <span className="profile-action-tag">preview</span></Link></li>
+            <li><Link href="/feedback" className="profile-action-secondary" aria-label="Share feedback">Share feedback</Link></li>
+          </ul>
+        </nav>
+      </div>
       <section className="profile-grid">
         <article className="profile-panel">
           <p className="panel-label">About</p>
