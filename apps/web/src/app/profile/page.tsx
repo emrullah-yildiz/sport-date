@@ -8,10 +8,13 @@ import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
+import PlusBilling from "@/components/PlusBilling";
 import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
+import { isPlus } from "@/lib/entitlements";
+import { isBillingConfigured } from "@/lib/stripe";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
 import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
@@ -69,6 +72,10 @@ export default async function ProfilePage() {
     listProfilePhotos(user.id),
   ]);
   const primaryPhoto = photos.find((photo) => photo.isPrimary) ?? photos[0] ?? null;
+  // Server-computed billing/entitlement state. The Plus surface is fully hidden
+  // when billing is dormant (flag off / no keys); `isPlus` fails closed to FREE.
+  const billingConfigured = isBillingConfigured();
+  const memberIsPlus = isPlus(user);
 
   return (
     <main className="profile-page">
@@ -198,6 +205,7 @@ export default async function ProfilePage() {
         </article>
       </section>
       <ProfilePhotos firstName={user.firstName} />
+      <PlusBilling billingConfigured={billingConfigured} isPlus={memberIsPlus} />
       <MovementArc progress={movementProgress} />
       <ReceivedRatingSummary aggregate={receivedRating} />
       <CommunicationPreferences preferences={communicationPreferences} />

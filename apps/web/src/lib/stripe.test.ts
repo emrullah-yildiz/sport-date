@@ -5,25 +5,27 @@ vi.mock("server-only", () => ({}));
 // Mock the Stripe SDK constructor. Every instance shares these mock fns so tests
 // can assert on the calls without any network / real charge. Defined via
 // vi.hoisted so the vi.mock factory (hoisted to the top) can safely reference them.
-const { checkoutCreate, customersCreate, constructEvent, StripeMock } = vi.hoisted(() => {
+const { checkoutCreate, customersCreate, constructEvent, portalCreate, StripeMock } = vi.hoisted(() => {
   const checkoutCreate = vi.fn();
   const customersCreate = vi.fn();
   const constructEvent = vi.fn();
+  const portalCreate = vi.fn();
   class StripeMock {
     static instances = 0;
     checkout = { sessions: { create: checkoutCreate } };
     customers = { create: customersCreate };
     webhooks = { constructEvent };
+    billingPortal = { sessions: { create: portalCreate } };
     constructor() {
       StripeMock.instances += 1;
     }
   }
-  return { checkoutCreate, customersCreate, constructEvent, StripeMock };
+  return { checkoutCreate, customersCreate, constructEvent, portalCreate, StripeMock };
 });
 
 vi.mock("stripe", () => ({ default: StripeMock }));
 
-import { createSubscriptionCheckout, isBillingConfigured, verifyWebhook } from "./stripe";
+import { createBillingPortalSession, createSubscriptionCheckout, isBillingConfigured, verifyWebhook } from "./stripe";
 
 const KEYS = {
   STRIPE_SECRET_KEY: "sk_test_dummy",
@@ -43,6 +45,7 @@ beforeEach(() => {
   checkoutCreate.mockReset();
   customersCreate.mockReset();
   constructEvent.mockReset();
+  portalCreate.mockReset();
   StripeMock.instances = 0;
   clearConfig();
 });
@@ -85,6 +88,13 @@ describe("fail closed when the flag is off / keys absent (dev/CI/default-prod)",
   it("webhook verification returns not-configured and never verifies", () => {
     expect(verifyWebhook("{}", "sig")).toEqual({ ok: false, reason: "not-configured" });
     expect(constructEvent).not.toHaveBeenCalled();
+  });
+
+  it("billing portal returns not-configured and NEVER constructs Stripe", async () => {
+    const result = await createBillingPortalSession({ customerId: "cus_x", returnUrl: "https://app/profile" });
+    expect(result).toEqual({ ok: false, reason: "not-configured" });
+    expect(StripeMock.instances).toBe(0);
+    expect(portalCreate).not.toHaveBeenCalled();
   });
 });
 
@@ -162,5 +172,26 @@ describe("when fully configured (all keys + flag on)", () => {
   it("rejects a missing signature without calling Stripe", () => {
     expect(verifyWebhook("raw-body", null)).toEqual({ ok: false, reason: "invalid-signature" });
     expect(constructEvent).not.toHaveBeenCalled();
+  });
+
+  it("opens a billing portal session for an existing customer (cancel-easy via Stripe)", async () => {
+    portalCreate.mockResolvedValue({ url: "https://billing.stripe.test/session" });
+    const result = await createBillingPortalSession({ customerId: "cus_existing", returnUrl: "https://app/profile" });
+    expect(result).toEqual({ ok: true, url: "https://billing.stripe.test/session" });
+    const arg = portalCreate.mock.calls[0][0];
+    expect(arg.customer).toBe("cus_existing");
+    expect(arg.return_url).toBe("https://app/profile");
+  });
+
+  it("returns error (never throws) when the member has no Stripe customer to manage", async () => {
+    const result = await createBillingPortalSession({ customerId: null, returnUrl: "https://app/profile" });
+    expect(result).toEqual({ ok: false, reason: "error" });
+    expect(portalCreate).not.toHaveBeenCalled();
+  });
+
+  it("returns error (never throws) when Stripe portal creation fails", async () => {
+    portalCreate.mockRejectedValue(new Error("stripe down"));
+    const result = await createBillingPortalSession({ customerId: "cus_existing", returnUrl: "https://app/profile" });
+    expect(result).toEqual({ ok: false, reason: "error" });
   });
 });

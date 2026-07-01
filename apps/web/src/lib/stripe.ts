@@ -31,6 +31,8 @@ export type BillingUnavailable = { ok: false; reason: "not-configured" | "error"
 
 export type CheckoutSessionResult = { ok: true; url: string } | BillingUnavailable;
 
+export type BillingPortalResult = { ok: true; url: string } | BillingUnavailable;
+
 export type WebhookEvent =
   | { ok: true; event: Stripe.Event }
   | { ok: false; reason: "not-configured" | "invalid-signature" };
@@ -152,6 +154,37 @@ export async function createSubscriptionCheckout(params: {
       client_reference_id: params.userId,
       subscription_data: { metadata: { sportDateUserId: params.userId } },
       allow_promotion_codes: false,
+    });
+    if (!session.url) return { ok: false, reason: "error" };
+    return { ok: true, url: session.url };
+  } catch {
+    return { ok: false, reason: "error" };
+  }
+}
+
+/**
+ * Open the Stripe-hosted Billing Portal for an existing customer and return its
+ * URL. This is the "manage / cancel" seam: cancel-as-easy-as-subscribe (EU DFA /
+ * UCPD) is delegated entirely to Stripe's hosted portal, so the app never builds a
+ * custom cancel flow (and never a guilt loop). Fails closed (not-configured) when
+ * billing is off; returns error (never throws) for a missing customer or any Stripe
+ * error. The app itself never charges — the member self-serves on Stripe.
+ */
+export async function createBillingPortalSession(params: {
+  customerId: string | null;
+  returnUrl: string;
+}): Promise<BillingPortalResult> {
+  const client = getStripe();
+  if (!client) return { ok: false, reason: "not-configured" };
+  // A member with no Stripe customer has never checked out — there is nothing to
+  // manage. Treat as an error (the route surfaces a calm message) rather than
+  // inventing a customer.
+  if (!params.customerId) return { ok: false, reason: "error" };
+
+  try {
+    const session = await client.stripe.billingPortal.sessions.create({
+      customer: params.customerId,
+      return_url: params.returnUrl,
     });
     if (!session.url) return { ok: false, reason: "error" };
     return { ok: true, url: session.url };

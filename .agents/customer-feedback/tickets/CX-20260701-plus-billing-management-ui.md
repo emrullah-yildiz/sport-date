@@ -1,13 +1,13 @@
 # CX-20260701-plus-billing-management-ui
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 3 = 16. The honest member-facing surface for Plus; depends on the entitlement + Stripe tickets. Not on the critical build path until those land, but required before any go-live.
 - Customer journey: intent → commitment (upgrade); coordination (manage / cancel / renewal)
 - Surface: `web` (mobile parity later)
 - Environment and viewport/device: all widths
 - Found by: Owner launch decision (2026-07-01); `docs/marketing/monetization-and-pricing-analysis.md` §0
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-plus-tier-entitlement-model-and-gating` (P1 — reads `isPlus(user)` to decide upgrade-vs-manage), `CX-20260701-stripe-subscription-integration-test-mode` (P1 — starts Checkout / opens the Billing Portal), `CX-20260701-owner-decision-payments-processor-and-billing-gate` (blocked-owner — cancel-easy is a binding EU requirement recorded there), `CX-20260701-plus-perks-advanced-discovery-filters` (P2 — the perks this surface honestly describes)
 
 ## Customer outcome
@@ -58,3 +58,4 @@ An honest, easy-to-cancel surface is the difference between ethical monetization
 ## Handoff and retest log
 
 - 2026-07-01 - Filed as the honest Plus upgrade + manage/cancel surface for the €6.99 launch (`docs/marketing/monetization-and-pricing-analysis.md` §0). Cancel-as-easy-as-subscribe via Stripe Billing Portal (EU DFA/UCPD). Depends on the entitlement (P1) and Stripe (P1) tickets. Status `ready`.
+- 2026-07-02 - build: picked up (in-progress, owner experience-build-agent). Added a fail-closed `PlusBilling` profile section (hidden entirely when billing dormant), a `createBillingPortalSession` seam + `/api/billing/portal` route (cancel-easy via Stripe portal, 503 when unconfigured). Free member sees honest €6.99/mo + Upgrade→Checkout; Plus member sees supporter + Manage/cancel→portal. Safety/core stated free-forever, no forbidden perks, no urgency.

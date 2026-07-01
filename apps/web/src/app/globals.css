@@ -675,6 +675,22 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
 .mobile-session-panel { max-width: 1120px; margin: 18px auto 0; padding: 28px; border: 1px solid rgba(23,36,29,.12); border-radius: 24px; background: white; }.mobile-session-panel h2 { margin: 18px 0 7px; font-size: 32px; }.mobile-session-panel > p:not(.panel-label) { color: var(--muted); }.mobile-device-list { display: grid; gap: 9px; margin-top: 20px; }.mobile-device-list article { display: grid; gap: 9px; padding: 16px; border-radius: 14px; background: var(--cream); }.mobile-device-list article > div { display: flex; justify-content: space-between; gap: 15px; }.mobile-device-list span,.mobile-device-list small { color: var(--muted); font-size: 11px; }.mobile-device-list button,.mobile-session-panel > button { justify-self: start; border: 0; border-radius: 10px; padding: 9px 12px; background: #ffe0d4; color: #713b31; font-weight: 900; cursor: pointer; }.mobile-session-message { padding: 11px; border-radius: 10px; background: #eef5da; }
 .web-session-panel { max-width: 1120px; margin: 18px auto 0; padding: 28px; border: 1px solid rgba(23,36,29,.12); border-radius: 24px; background: white; }.web-session-panel h2 { margin: 18px 0 7px; font-size: 32px; }.web-session-panel > p:not(.panel-label) { color: var(--muted); }.web-session-empty { padding: 11px 13px; border-radius: 12px; background: var(--cream); }.web-session-list { display: grid; gap: 9px; margin: 20px 0 0; padding: 0; list-style: none; }.web-session-list > li { display: grid; gap: 9px; padding: 16px; border-radius: 14px; background: var(--cream); }.web-session-row-head { display: flex; align-items: center; gap: 10px; }.web-session-badge { padding: 4px 10px; border-radius: 99px; background: var(--lime); color: var(--ink); font-size: 11px; font-weight: 900; }.web-session-list small { color: var(--muted); font-size: 11px; }.web-session-list button { justify-self: start; border: 0; border-radius: 10px; padding: 9px 12px; background: #ffe0d4; color: #713b31; font-weight: 900; cursor: pointer; }.web-session-list button:disabled { opacity: .55; cursor: progress; }.web-session-message { padding: 11px; border-radius: 10px; background: #eef5da; }
 
+.plus-panel { max-width: 1120px; margin: 18px auto 0; padding: 28px; border: 1px solid rgba(23,36,29,.12); border-radius: 24px; background: white; }
+.plus-panel h2 { margin: 18px 0 7px; font-size: 32px; letter-spacing: -.02em; }
+.plus-panel > p:not(.panel-label):not(.plus-price) { color: var(--muted); line-height: 1.6; }
+.plus-price { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 12px; }
+.plus-price strong { font-size: 26px; color: var(--ink); }
+.plus-price span { font-size: 12px; color: var(--muted); }
+.plus-perks { display: grid; gap: 9px; margin: 16px 0; padding: 0; list-style: none; }
+.plus-perks > li { padding: 12px 14px; border-radius: 12px; background: var(--cream); color: #435649; line-height: 1.5; }
+.plus-upgrade, .plus-manage { min-height: 44px; justify-self: start; border: 0; border-radius: 12px; padding: 12px 20px; background: var(--lime); color: var(--ink); font-weight: 900; font-size: 15px; cursor: pointer; transition: transform .12s ease, box-shadow .12s ease; }
+.plus-upgrade:hover, .plus-manage:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(23,36,29,.14); }
+.plus-upgrade:focus-visible, .plus-manage:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.plus-upgrade:disabled, .plus-manage:disabled { opacity: .6; cursor: progress; transform: none; box-shadow: none; }
+.plus-fineprint { margin: 12px 0 0; font-size: 12px; }
+.plus-message { margin-top: 14px; padding: 11px 13px; border-radius: 10px; background: #eef5da; }
+@media (prefers-reduced-motion: reduce) { .plus-upgrade, .plus-manage { transition: none; } .plus-upgrade:hover, .plus-manage:hover { transform: none; } }
+
 .legal-page { min-height: 100vh; padding: 0 32px 80px; background: linear-gradient(180deg, var(--cream), #fff 70%); }
 .legal-hero { max-width: 1120px; margin: 0 auto; padding: 60px 0 34px; display: grid; gap: 16px; }
 .legal-hero h1 { max-width: 860px; margin: 0; font-size: clamp(44px, 7vw, 78px); line-height: .95; letter-spacing: -.06em; }
