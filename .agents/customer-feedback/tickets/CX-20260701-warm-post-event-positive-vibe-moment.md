@@ -1,13 +1,13 @@
 # CX-20260701-warm-post-event-positive-vibe-moment
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P0` — (Reach 5 × Impact 4 × Confidence 3) / Effort 2 = 30. Cheap warmth that reinforces the core emotional payoff and repeat intent — without any engagement mechanic.
 - Customer journey: activity → graceful exit → reflection
 - Surface: `web` (mobile follow-up)
 - Environment and viewport/device: all widths
 - Found by: Product/growth strategist review (2026-07-01), member-journey analysis for `docs/marketing/feature-roadmap-proposal.md` (b3)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-event-room-stays-future-tense-after-event-ends`, `CX-20260701-hosting-past-events-no-reflection-or-outcome`
 
 ## Customer outcome
@@ -68,3 +68,4 @@ safe-completed-event, repeat-intent north-star. No auth/privacy dimension.
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
+- 2026-07-01 - Picked up by experience-build-agent; status `in-progress`. Implementing a warm host-toned afterglow acknowledgement in the ended event room, above the existing reflection form, with a calm skippable forward path (discover / host); no streaks, scores, or pressure.

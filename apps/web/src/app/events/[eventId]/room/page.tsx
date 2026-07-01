@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
 import EventUpdateSeenPing from "@/components/EventUpdateSeenPing";
+import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
@@ -134,6 +135,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         </div>
       </section>
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /></div> : null}
+      {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
       <aside className="room-safety-note"><strong>Why there is no chat yet</strong><p>Open messaging will not launch before blocking, reporting, moderation evidence, and response operations are ready.</p></aside>
     </main>

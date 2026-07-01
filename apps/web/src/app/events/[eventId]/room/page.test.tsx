@@ -93,3 +93,48 @@ describe("Event room pre-arrival safety brief", () => {
     expect(html).not.toContain("Meeting someone new, calmly");
   });
 });
+
+describe("Post-event warm afterglow moment", () => {
+  it("does not show before the event has ended", async () => {
+    const html = await render({ hasEnded: false });
+    expect(html).not.toContain("afterglow-title");
+    expect(html).not.toContain("Glad you got out and moved");
+  });
+
+  it("shows a warm participant acknowledgement once the event has ended", async () => {
+    const html = await render({ hasEnded: true });
+    expect(html).toContain('id="afterglow-title"');
+    expect(html).toContain("Glad you got out and moved");
+    // Reflection is framed as clearly optional and skippable.
+    expect(html).toContain("entirely up to you");
+    expect(html).toContain("if you skip it");
+    // A calm forward path exists (discover + host), not a dead end.
+    expect(html).toContain('href="/discover"');
+    expect(html).toContain('href="/events/new"');
+    // It offers a jump to the optional reflection form below, not a demand.
+    expect(html).toContain("#event-reflection-title");
+  });
+
+  it("shows a host-toned acknowledgement to the host once the event has ended", async () => {
+    const html = await render({ hasEnded: true, isHost: true, viewerRequest: null });
+    expect(html).toContain("You made this happen");
+    expect(html).toContain("hosting is generous");
+  });
+
+  it("acknowledges an existing reflection without renagging or offering a duplicate jump", async () => {
+    const html = await render({
+      hasEnded: true,
+      reflection: { attendance: "attended", wouldJoinAgain: "yes" },
+    });
+    expect(html).toContain("you can update it any time");
+    // No "reflect below" jump once a reflection already exists.
+    expect(html).not.toContain("Reflect below");
+  });
+
+  it("contains no streak, score, popularity, or pressure mechanics in the warm moment", async () => {
+    const html = (await render({ hasEnded: true })).toLowerCase();
+    for (const forbidden of ["streak", "score", "popularity", "leaderboard", "don't lose", "do not lose", "points", "ranking"]) {
+      expect(html).not.toContain(forbidden);
+    }
+  });
+});
