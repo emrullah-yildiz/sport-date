@@ -64,6 +64,28 @@ export function joinRequestConfirmationMessage(status: JoinRequestStatus): strin
   }
 }
 
+// Calm confirmation a polite live region announces to the HOST the moment an
+// accept/skip resolves in place (no full-document reload). Success on accept is
+// warm but not manufactured; skip/close stays respectful and PRIVATE — it never
+// exposes the skip count or the requester's history to anyone. `firstName` is a
+// name the host already sees on the request card, so naming it exposes no new data.
+export function hostDecisionConfirmationMessage(
+  status: JoinRequestStatus,
+  firstName: string,
+): string {
+  const who = firstName.trim() || "This member";
+  switch (status) {
+    case "accepted":
+      return `You welcomed ${who}. They can now see the exact meeting point.`;
+    case "declined":
+      return "Request closed quietly. Skip counts stay private.";
+    case "pending":
+      return "Request skipped. Nothing is shown to them; skip counts stay private.";
+    case "cancelled":
+      return "Request closed. Skip counts stay private.";
+  }
+}
+
 export function declinedJoinRequestMessage(skipCount: number): string {
   return skipCount >= 3
     ? "This request was quietly closed after the host used all three skips for this event."

@@ -65,7 +65,7 @@ function renderRequestCard(eventId: string, request: HostJoinRequest) {
       {request.introduction ? <blockquote>{request.introduction}</blockquote> : null}
       <footer>
         <span className="capitalize">{request.status}</span>
-        {request.status === "pending" ? <HostRequestDecision eventId={eventId} requestId={request.id} skipCount={request.skipCount} /> : null}
+        {request.status === "pending" ? <HostRequestDecision eventId={eventId} requestId={request.id} skipCount={request.skipCount} requesterName={request.requester.firstName} /> : null}
       </footer>
       <ReportSafetyControls eventId={eventId} subjectUserId={request.requesterId} subjectName={request.requester.firstName} />
     </article>

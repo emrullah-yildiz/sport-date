@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { declinedJoinRequestMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
+import { declinedJoinRequestMessage, hostDecisionConfirmationMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
 
 describe("join request policy copy", () => {
   it("marks the third skip as a quiet decline", () => {
@@ -37,6 +37,26 @@ describe("join request policy copy", () => {
     expect(joinRequestConfirmationMessage("declined")).toBe("This request is closed.");
     for (const status of ["pending", "accepted", "cancelled", "declined"] as const) {
       expect(joinRequestConfirmationMessage(status).toLowerCase()).not.toContain("skip");
+    }
+  });
+
+  it("announces each host accept/skip result calmly, naming only what the host already sees and never leaking skip counts", () => {
+    // These strings are read by HostRequestDecision's polite aria-live region when
+    // an accept/skip resolves in place (no window.location.reload). Accept names
+    // the requester (a first name already on the card) warmly; skip/close stays
+    // respectful and private and NEVER exposes the skip count or their history.
+    expect(hostDecisionConfirmationMessage("accepted", "Mara")).toBe("You welcomed Mara. They can now see the exact meeting point.");
+    expect(hostDecisionConfirmationMessage("declined", "Mara")).toBe("Request closed quietly. Skip counts stay private.");
+    expect(hostDecisionConfirmationMessage("pending", "Mara")).toBe("Request skipped. Nothing is shown to them; skip counts stay private.");
+    expect(hostDecisionConfirmationMessage("cancelled", "Mara")).toBe("Request closed. Skip counts stay private.");
+    // A blank / whitespace name degrades gracefully without exposing an empty slot.
+    expect(hostDecisionConfirmationMessage("accepted", "   ")).toBe("You welcomed This member. They can now see the exact meeting point.");
+    // The skip/close copy never names a number or the private "skip" mechanic to
+    // the requester side; the accept copy carries no manufactured urgency.
+    for (const status of ["declined", "pending", "cancelled"] as const) {
+      const message = hostDecisionConfirmationMessage(status, "Mara").toLowerCase();
+      expect(message).not.toMatch(/\d/);
+      expect(message).toContain("private");
     }
   });
 

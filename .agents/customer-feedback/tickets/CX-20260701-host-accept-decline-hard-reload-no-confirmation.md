@@ -1,13 +1,13 @@
 # CX-20260701-host-accept-decline-hard-reload-no-confirmation
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1 high` — (Reach 3 × Impact 4 × Confidence 5) / Effort 2 = 30. Accessibility regressions are never below P1 regardless of the arithmetic: this is the host mirror of the already-`verified` seeker-side join-request a11y floor.
 - Customer journey: coordination / host management (commitment → coordination) — the host's accept/decline decision on a real person's join request
 - Surface: `web`
 - Environment and viewport/device: dev server localhost:3000, source-confirmed in `HostRequestDecision.tsx`; parallel to the seeker-side control observed live at commit `1d1897a`
 - Found by: Experience & Design Explorer — `host accept/decline flow × completeness-of-states / accessibility` pass, 2026-07-01
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260701-join-request-commitment-hard-reload-no-confirmation` (the seeker-side twin, now `verified` — this is the same defect on the host side, and its shipped fix is the pattern to mirror); `CX-20260701-hosting-hub-hides-pending-join-requests` (the hub that routes the host here, `verified`); `CX-20260701-peer-feedback-submit-no-focus-confirmation-and-empty-default` (same focus-on-async-resolve pattern)
 
 ## Customer outcome
@@ -69,3 +69,4 @@ Practical: a host acting on requests — the coordination step this whole surfac
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (`host accept/decline flow × completeness-of-states / accessibility`); status `ready`.
+- 2026-07-01 - experience-build-agent took ownership; status `ready` → `in-progress`. Mirroring the shipped seeker-side `JoinRequestControls` fix: replacing the `window.location.reload()` accept/skip path with in-place local client state, a polite `role="status"`/`aria-live` announcement of the outcome, focus moved to the confirmation heading (never `<body>`) via the same `attachConfirmation` callback-ref pattern, `router.refresh()` on accept (re-asserting focus after the RSC merge), and a `prefers-reduced-motion`-safe framer-motion swap. Calm, private copy (no skip-count exposure).
