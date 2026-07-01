@@ -1,6 +1,6 @@
 # CX-20260701-owner-decision-brand-name-and-logo
 
-- Status: `blocked-owner`
+- Status: `verified`
 - Severity: `high`
 - Priority: `P1` — foundational brand/identity decision that gates any rename or logo swap across the app; not member-buildable until decided. (Brand identity is never below P1 as an owner gate; RICE not applicable to a pure decision.)
 - Customer journey: (brand/company identity — no member surface until decided)
@@ -65,3 +65,5 @@ the final name/handle is picked. Delay simply defers those two.
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer with recommendation and `docs/marketing/brand-refresh-proposal.md`; status `blocked-owner` (awaiting owner decision).
+
+- 2026-07-02 - DECISION MADE (owner delegated "You decide"): name = **Rally**; logo = neon motion-mark (rally-arc glyph in --accent green + bold Rally wordmark on anthracite). Runner-up Meetmove kept on record. Trademark clearance flagged as an owner/legal step before paid launch. Implementation tracked in `CX-20260702-rebrand-to-rally-name-and-neon-logo` (P1). Status → verified (decision resolved).
