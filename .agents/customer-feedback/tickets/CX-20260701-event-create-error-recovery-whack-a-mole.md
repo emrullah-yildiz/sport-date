@@ -2,7 +2,7 @@
 
 - Status: `ready`
 - Severity: `medium`
-- Priority: `P2` — (Reach 4 × Impact 4 × Confidence 4) / Effort 3 = 21. Every first-time host who mistypes one of ~18 fields hits this; the fix is contained (surface the array the API already returns + prevent past dates + move focus). Host supply is the scarce side, so recovery friction here suppresses event liquidity. P2 medium.
+- Priority: `P1 high` — owner-blocking: publishing appears to do NOTHING. The form relies on native HTML5 `required` validation, so an incomplete submit is silently blocked by the browser (jumps to the first empty field, easy to miss) and the app shows no visible error near the action. Bumped from P2 after owner report 2026-07-01. Every first-time host hits this; fix is contained.
 - Customer journey: intent → commitment (hosting / event creation → publish)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths; especially 375px and long-scroll desktop
@@ -73,3 +73,5 @@ Multi-error whack-a-mole plus a bottom-anchored, field-detached error turns a re
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 13, create-event × completeness-of-states + information/copy); status `ready`.
+
+- 2026-07-01 - Owner report + repro: filled Sport/Event name/Description only, clicked "Publish the invitation" -> "it just moves here without any error." Cause: fields `startsAt, city, countryCode, areaLabel, venueName, address` (and others) are HTML5 `required`; native validation blocks submit and scroll-jumps to the first empty field with an easily-missed browser bubble; the app-level `.error-message` (bottom of form) only renders for JS/server errors, which are never reached. FIX SCOPE (P1): on submit, if the form is invalid, show a VISIBLE, app-styled summary near the Publish button (e.g. "A few required details are still empty below — please complete them to publish"), and scroll + move focus to the first invalid field with app styling (not just the native bubble); also surface the API `errors[]` array (not just errors[0]) near the action with scroll/focus; add `min` to the datetime-local so past times are rejected client-side. Announce via role=alert/aria-live. So publishing NEVER silently appears to do nothing.
