@@ -1,6 +1,6 @@
 # CX-20260701-remember-me-optional-persistent-login
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 2 = 24. Convenience that reduces return friction; a missing convenience, not an emergency. Because it touches auth, the security guardrails below are non-negotiable and any security regression would be P1.
 - Customer journey: return visit → login → coordination (staying signed in between sessions)
@@ -84,3 +84,4 @@ shorter session (protecting shared/public devices), and must keep the longer ses
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner growth-intake pass); status `ready`.
 - 2026-07-01 - Experience Build Agent took ownership; status `in-progress`.
+- 2026-07-01 - Experience Build Agent implemented (commit cb1ff3c); status `implemented`. Opt-in "Keep me signed in on this device" checkbox at `/login` (OFF by default, 44px target, real `<label>`, visible focus, calm honest copy). `createSession({ remember })` selects a 30-day window ONLY on explicit `rememberMe === true`; default stays 7 days. Cookie keeps httpOnly/secure(prod)/sameSite=lax + hashed token in both branches — only expiry differs. Longer session is a normal revocable row; NO migration (derives from `expires_at`, which the sessions table + `getWebSessions`/`WebSessionControls` panel already order by). Checks: typecheck/lint/test (298 passed; new tests assert default-off short expiry, opt-in long expiry, cookie flags unchanged both branches, and default-is-never-long regression) + production build all pass. Dev-server verified: unchecked = 7-day cookie, fresh remember=true = 30-day cookie (httpOnly+sameSite intact), remembered session lists as current+revocable in the Signed-in browsers panel. Awaiting independent retest by Explorer.

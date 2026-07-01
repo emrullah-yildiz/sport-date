@@ -1,6 +1,6 @@
 # CX-20260701-prod-behind-migrations-020-024-broadly-rendered-500s
 
-- Status: `ready`
+- Status: `verified`
 - Severity: `critical`
 - Priority: `P0 blocker` — (Reach 5 × Impact 5 × Confidence 5) / Effort 3 = 41.7. Prod is CURRENTLY missing migrations 020–024 (confirmed by the 2026-07-01 outage: `column users.personality_prompts does not exist`). Every dynamic server route that reads a 020–024 column 500s in prod for any signed-in member. Reliability/availability regression → never below P0.
 - Customer journey: (whole product / reliability + deploy safety) — release-ordering coupling between code and DB migrations
@@ -93,3 +93,5 @@ Availability: signed-in members cannot use the product at all while prod is behi
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (Release & deploy safety lens). Enumerated the prod-broken vs surviving route set across migrations 020–024 with the per-migration read map, confirmed the production build passes locally (does not catch the prod-schema gap), and analysed migration additivity (additive; the fix is release-ordering + a preflight tripwire, not per-read defensiveness). Cross-linked to the root-cause P0 `CX-20260701-no-automatic-production-migration-on-deploy`; status `ready`.
+
+- 2026-07-01 - RESOLVED: orchestrator applied migrations 020–024 to the prod DB (via `vercel env pull` + migrate) with owner approval; all prod routes healthy (200). Status `verified`. The permanent fix (auto-migration on deploy) remains tracked in `CX-20260701-no-automatic-production-migration-on-deploy`.
