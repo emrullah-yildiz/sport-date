@@ -1168,13 +1168,18 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 .feedback-ticket-list { display: grid; gap: 11px; margin-top: 20px; }
 .feedback-ticket { display: grid; gap: 11px; padding: 17px; border-radius: 15px; background: var(--surface-raised); }
 .feedback-ticket > header { display: flex; justify-content: space-between; gap: 10px; }
-.feedback-ticket > header span { color: var(--muted); font-size: 10px; font-weight: 900; text-transform: capitalize; }
+.feedback-ticket > header span { color: var(--muted); font-size: 10px; font-weight: 900; }
 .feedback-ticket h3 { margin: 0; font-size: 18px; }
 .feedback-ticket > p { display: -webkit-box; overflow: hidden; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .feedback-ticket dl { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 0; }
 .feedback-ticket dl > div { min-width: 0; }
 .feedback-ticket dt { color: var(--muted); font-size: 9px; font-weight: 900; text-transform: uppercase; }
-.feedback-ticket dd { overflow-wrap: anywhere; margin: 3px 0 0; font-size: 11px; text-transform: capitalize; }
+/* CX-20260702: no text-transform here. The Page value is member-authored free
+   text (e.g. `/discover`) and must echo back verbatim; the Surface/Impact/Status
+   values are already humanised via displayLabel() into calm sentence-case labels,
+   which `capitalize` would distort ("Small friction" -> "Small Friction"). The
+   <dt> chrome labels keep their own uppercase styling below. */
+.feedback-ticket dd { overflow-wrap: anywhere; margin: 3px 0 0; font-size: 11px; }
 @media (max-width: 850px) { .feedback-layout { grid-template-columns: 1fr; }.feedback-history { position: static; }.feedback-form-panel,.feedback-history { padding: 24px 20px; } }
 @media (max-width: 600px) { .feedback-page { padding-inline: 18px; }.feedback-header { margin-top: 36px; }.feedback-form-row,.feedback-severity-options { grid-template-columns: 1fr; }.feedback-ticket dl { grid-template-columns: 1fr; } }
 

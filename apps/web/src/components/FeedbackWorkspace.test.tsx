@@ -7,6 +7,19 @@ import { describe, expect, it } from "vitest";
 import { FeedbackConfirmation } from "./FeedbackWorkspace";
 
 const source = readFileSync(fileURLToPath(new URL("./FeedbackWorkspace.tsx", import.meta.url)), "utf8");
+const globalsCss = readFileSync(
+  fileURLToPath(new URL("../app/globals.css", import.meta.url)),
+  "utf8",
+);
+
+// Pull a single CSS rule body (`{ ... }`) for a selector out of globals.css so we
+// can assert what it does — and does not — declare.
+function ruleBody(selector: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = globalsCss.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`));
+  if (!match) throw new Error(`rule not found: ${selector}`);
+  return match[1];
+}
 
 // The container (FeedbackWorkspace) fetches on mount and only renders the
 // confirmation after a successful submit, neither of which renderToStaticMarkup
@@ -52,6 +65,41 @@ describe("FeedbackConfirmation success state", () => {
   it("stays dignified — no gamification of feedback volume", () => {
     const html = render();
     expect(html).not.toMatch(/streak|score|points|badge|you(&#x27;|')ve submitted \d|keep it up|again/i);
+  });
+});
+
+// Regression target: CX-20260702-feedback-history-page-value-capitalized-distorts-member-text.
+// The "What you've shared" history rendered the <dd> value cells (and the header
+// spans) with `text-transform: capitalize`. The Page cell echoes the member's own
+// free-text path (`/discover`), so capitalize silently rewrote their words
+// (`/discover` -> `/Discover`, case-meaningful for a path); it also title-cased the
+// calm sentence-case labels ("Small friction" -> "Small Friction"). The member's
+// text must be shown verbatim, and controlled values must map to a proper human
+// label — never a raw enum or CSS-mangled casing.
+describe("feedback history renders member text and labels faithfully (no forced capitalize)", () => {
+  it("does not force-capitalize the value cells that carry the member's free-text Page value", () => {
+    // The Page (<dd>{ticket.currentPath}</dd>) is member-authored free text and must
+    // echo back verbatim, so the shared value cell must not transform casing.
+    expect(ruleBody(".feedback-ticket dd")).not.toMatch(/text-transform\s*:\s*(capitalize|uppercase|lowercase)/);
+  });
+
+  it("does not force-capitalize the category/status header labels either", () => {
+    // These spans render displayLabel() output — already calm sentence-case human
+    // labels — so capitalize would distort them ("An idea for improvement").
+    expect(ruleBody(".feedback-ticket > header span")).not.toMatch(
+      /text-transform\s*:\s*(capitalize|uppercase|lowercase)/,
+    );
+  });
+
+  it("renders the member's Page value verbatim in the history (casing preserved)", () => {
+    // The JSX outputs the raw currentPath into the Page cell with no transform.
+    expect(source).toMatch(/<dt>Page<\/dt><dd>\{ticket\.currentPath\}<\/dd>/);
+  });
+
+  it("keeps the <dt> chrome labels' own uppercase styling on the chrome, not member content", () => {
+    // The static column labels (Surface/Impact/Page/Shared) are UI chrome and may be
+    // uppercased — that styling stays on the <dt>, never on the member's <dd> value.
+    expect(ruleBody(".feedback-ticket dt")).toMatch(/text-transform\s*:\s*uppercase/);
   });
 });
 
