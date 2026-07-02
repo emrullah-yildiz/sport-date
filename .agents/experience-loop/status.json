@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T14:36:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"photo-375 re-fix VERIFIED live + archived. join-controls reduced-motion hydration fixed (ada3e8d, implemented — mount-gated motion). User-sim filed P2 hosting-card-manage-cta-no-hover-glow. Chaining next tick: BUILD hosting-card-manage-cta glow (close another glow gap); TEST join-controls-hydration (ada3e8d, worktree-isolated); USE always-on user-sim.",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T14:36:00.000Z"},
-  "Planner":{"state":"idle","ticket":"next build=hosting-card-manage-cta-no-hover-glow (P2)","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260702-hosting-card-manage-cta-no-hover-glow","since":"2026-07-02T14:36:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify ada3e8d (join-controls reduced-motion hydration) — worktree-isolated","since":"2026-07-02T14:36:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T14:36:00.000Z"} } }
+{ "updatedAt":"2026-07-02T15:08:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"join-controls reduced-motion hydration VERIFIED+archived (ada3e8d; Tester flagged the regression test as a tautology → filed P3 strengthen follow-up). hosting-card CTA glow implemented (721d874). User-sim discover-filters pass: textbook ethical freemium (free discovery complete, Plus facets fail-closed); filed P2 discover-filter-submit-no-focus-visible-ring (a11y). Chaining: BUILD discover-filter focus ring (P2 a11y); TEST hosting-card glow (721d874, worktree-isolated); USE always-on user-sim.",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T15:08:00.000Z"},
+  "Planner":{"state":"idle","ticket":"next build=discover-filter-submit-no-focus-visible-ring (P2 a11y)","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-discover-filter-submit-no-focus-visible-ring","since":"2026-07-02T15:08:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 721d874 (hosting-card CTA glow) — worktree-isolated","since":"2026-07-02T15:08:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T15:08:00.000Z"} } }

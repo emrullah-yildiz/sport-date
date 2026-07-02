@@ -1,6 +1,6 @@
 # CX-20260702-hosting-card-manage-cta-no-hover-glow
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P2` — a primary green CTA on the hosting hub (present on every hosted-event card, N cards for an active host) breaks the owner-mandated "neon glow on every button, always" standard. Visual-consistency polish, not a functional block, so P2; but it is the main action a host clicks to manage each event, so it is seen constantly.
 - Customer journey: Host — manage hosted events
@@ -62,3 +62,4 @@ Cosmetic/consistency: the hub's primary action feels slightly dead and off-syste
 
 - 2026-07-02 - Filed by user-sim (experience loop); status `ready`.
 - 2026-07-02 - Picked up by experience-build-agent; status `in-progress`.
+- 2026-07-02 - Implemented by experience-build-agent (commit `721d874`). Selector `.hosting-card footer a` in `apps/web/src/app/globals.css`: added `:hover { box-shadow: var(--glow-accent) }` (GREEN, positive/navigational manage action) for the upcoming (lime) pill, and `.hosting-card.past footer a:hover { border-color: var(--accent); box-shadow: var(--glow-accent) }` for the past "Review this event" variant; added explicit `transition: box-shadow/background/border-color .18s ease`; confirmed `:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px }` on the link directly (unscoped-ish, cannot drift). Box-shadow only, no transform → glow persists under prefers-reduced-motion (nothing to drop); skeleton/disabled render no link so no glow. Tokens only, no new hex, no layout shift/overflow (375/1280). The hosting page has a single CTA link per card (`hosting/page.tsx` footer `<Link>`, empty className), all covered by the descendant rule. Checks (apps/web): typecheck pass, lint pass (0 errors), test 570 pass, next build pass. No migration. Status `implemented` — awaiting independent Explorer retest. `→` NOTE: the message-file commit and origin/main push both succeeded within timeout.
