@@ -952,6 +952,21 @@ a.logo:hover { color: var(--text); }
 .feedback-message,.feedback-safety-route { margin: 0; padding: 13px; border-radius: 10px; background: rgba(59,234,126,.12); border: 1px solid rgba(59,234,126,.28); color: var(--text); font-size: 13px; line-height: 1.5; }
 .feedback-safety-route { background: rgba(255,110,104,.1); border-color: rgba(255,110,104,.3); color: var(--text); }
 .feedback-safety-route a { text-decoration: underline; font-weight: 900; }
+.feedback-message--error { background: rgba(255,110,104,.12); border-color: rgba(255,110,104,.3); }
+/* Warm success confirmation (CX-20260701-feedback-success-flat-dead-end-no-forward-path):
+   a calm, focusable close-of-loop with a forward path. Text is --text (13.9 AAA on
+   --surface-raised) and the quiet link is --accent-2 (7.74 AAA). No animation is
+   required to convey success — it renders instantly, so reduced-motion is inherent. */
+.feedback-confirmation { display: grid; gap: 8px; margin: 4px 0 0; padding: 18px; border-radius: 14px; background: var(--surface-raised); border: 1px solid rgba(59,234,126,.28); color: var(--text); line-height: 1.55; }
+.feedback-confirmation .panel-label { margin: 0; }
+.feedback-confirmation-title { margin: 0; font-size: 18px; line-height: 1.25; }
+.feedback-confirmation-title:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.feedback-confirmation p { margin: 0; font-size: 14px; }
+.feedback-confirmation-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.feedback-confirmation-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--lime); color: var(--bg); font-size: 14px; font-weight: 900; text-decoration: none; }
+.feedback-confirmation-link--quiet { background: transparent; border: 1px solid var(--line); color: var(--accent-2); }
+.feedback-confirmation-link--quiet:hover { border-color: var(--text); }
+.feedback-confirmation-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .feedback-history { position: sticky; top: 20px; }
 .feedback-history > header { display: flex; align-items: start; justify-content: space-between; gap: 15px; }
 .feedback-history > header > span { display: grid; place-items: center; min-width: 35px; height: 35px; border-radius: 50%; background: var(--lime); color: var(--bg); font-weight: 900; }

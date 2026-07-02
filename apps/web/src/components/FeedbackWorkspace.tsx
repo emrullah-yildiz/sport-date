@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Ticket = {
   id: string;
@@ -79,13 +79,64 @@ function errorFrom(result: unknown, fallback: string) {
   return fallback;
 }
 
+// Presentational success confirmation. Kept as a separate, prop-driven component
+// (no fetch, no effects) so its markup — the focusable heading, the polite live
+// region, and the forward-path links — can be asserted with renderToStaticMarkup.
+// The container owns moving focus here on submit (via attachConfirmation); this
+// piece only guarantees the heading is a keyboard/AT focus target.
+export function FeedbackConfirmation({
+  headingRef,
+}: {
+  headingRef?: (node: HTMLElement | null) => void;
+}) {
+  return (
+    <div className="feedback-confirmation" role="status" aria-live="polite">
+      <p className="panel-label">Shared</p>
+      <h3 className="feedback-confirmation-title" tabIndex={-1} ref={headingRef}>
+        Thank you — your feedback is with the team.
+      </h3>
+      <p>
+        It&apos;s now in <strong>&ldquo;What you&apos;ve shared&rdquo;</strong>, where you can follow where it lands. There&apos;s
+        nothing more you need to do.
+      </p>
+      <div className="feedback-confirmation-actions">
+        <a className="feedback-confirmation-link" href="#feedback-history-title">
+          See it in what you&apos;ve shared
+        </a>
+        <Link className="feedback-confirmation-link feedback-confirmation-link--quiet" href="/profile">
+          Back to profile
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function FeedbackWorkspace() {
   const [values, setValues] = useState<FormValues>(EMPTY_FORM);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [loadError, setLoadError] = useState("");
-  const [message, setMessage] = useState("");
+  // Split the flat `message` into a distinct success state and error string.
+  // Success renders a warm, focusable confirmation with a forward path; errors
+  // stay an inline alert so the member keeps their typed note and can retry.
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  // A ref (not state) so consuming it never triggers a render: set true only when
+  // a submit succeeds in this session, so we move focus to the confirmation
+  // heading (never leaving a keyboard / screen-reader member on <body>). Ordinary
+  // renders leave it false so we never steal focus.
+  const focusOnConfirmRef = useRef(false);
+
+  // Callback ref: fires when the confirmation heading attaches to the DOM after a
+  // successful submit. Focusing here (rather than in an effect) reliably lands
+  // focus on the freshly mounted heading the moment it exists.
+  function attachConfirmation(node: HTMLElement | null) {
+    if (node && focusOnConfirmRef.current) {
+      focusOnConfirmRef.current = false;
+      node.focus();
+    }
+  }
 
   async function loadTickets() {
     setLoading(true);
@@ -129,7 +180,8 @@ export default function FeedbackWorkspace() {
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitting(true);
-    setMessage("");
+    setError("");
+    setSubmitted(false);
     try {
       const response = await fetch("/api/feedback", {
         method: "POST",
@@ -139,10 +191,11 @@ export default function FeedbackWorkspace() {
       const result = await readJson(response);
       if (!response.ok) throw new Error(errorFrom(result, "Your feedback could not be shared."));
       setValues((current) => ({ ...EMPTY_FORM, surface: current.surface }));
-      setMessage("Thank you. Your feedback is now with the team.");
+      focusOnConfirmRef.current = true;
+      setSubmitted(true);
       await loadTickets();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Your feedback could not be shared.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Your feedback could not be shared.");
     } finally {
       setSubmitting(false);
     }
@@ -223,7 +276,8 @@ export default function FeedbackWorkspace() {
             This channel is for product experience. Member-specific or urgent safety concerns belong in the <Link href="/safety">Safety center</Link>. This service is not an emergency responder.
           </p>
           <button type="submit" disabled={submitting}>{submitting ? "Sharing..." : "Share feedback"}</button>
-          {message ? <p className="feedback-message" role="status">{message}</p> : null}
+          {submitted ? <FeedbackConfirmation headingRef={attachConfirmation} /> : null}
+          {error ? <p className="feedback-message feedback-message--error" role="alert">{error}</p> : null}
         </form>
       </section>
 
