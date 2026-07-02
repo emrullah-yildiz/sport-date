@@ -1,6 +1,6 @@
 # CX-20260701-graceful-exit-no-show-non-punitive-handling
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. Important dignity/safety path, but less frequent than the core-loop P0s; sequence after them.
 - Customer journey: graceful exit / no-show / recovery
@@ -89,3 +89,4 @@ members will hesitate to protect themselves — a direct safety and dignity harm
   migration; not pushed). MIGRATION ADDED: `029_join_request_exit_reasons.sql` (deploy-ordering hazard: apply to
   production before/with this code; columns are write-only on the member's own cancel path, never read by a
   broadly-rendered path).
+- 2026-07-02 - VERIFIED (Tester, independent, worktree-isolated at clean HEAD incl. d922397; migration 029 applied to prod). All 7 properties hold: (1) leaving always allowed + non-punitive, calm reassurance incl. "leaving to look after yourself is always the right call"; (2) reason+note OPTIONAL & PRIVATE — `normalizeGracefulExit` never rejects (unknown→default, non-string/over-long note→dropped/truncated 280; concrete-value tests), route parses body best-effort in try/catch so malformed JSON still leaves 200 (test asserts); (3) `felt_unsafe` → always-free one-step link to `#room-people` (anchor confirmed) and `viaSafetyPath` short-circuits reliability to false — dedicated test "never counts a safety exit even if late+accepted"; existing reliability rule untouched; (4) `exit_reason`/`exit_note` written ONLY in cancelEventJoinRequest, selected NOWHERE (grep), not in getCurrentUser/layout/landing/middleware — migration 029 additive+nullable+CHECK; no public no-show/skip/score exposed; (5) calm role=status success with two real next steps (find another event / back to profile), error role=alert "your place is still yours" + retry; (6) focus moves to confirm panel + acknowledgement, aria-labelledby/fieldset/legend, 44px, visible focus, role-coloured glow (danger for leave/safety, accent for stay) static box-shadow → reduced-motion safe, no hardcoded hex; (7) tests non-tautological. Checks the Tester ran itself: typecheck PASS, lint PASS, web tests 532 passed/12 skipped, domain 170 passed, prod build PASS. Orchestrator applied `verified` in main tree and archived.

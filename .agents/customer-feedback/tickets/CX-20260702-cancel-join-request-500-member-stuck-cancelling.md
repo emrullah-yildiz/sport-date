@@ -1,6 +1,6 @@
 # CX-20260702-cancel-join-request-500-member-stuck-cancelling
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 5) / Effort 2 = 50. Core commit-loop action (cancel a pending request / leave an accepted place) is completely broken on the live QA environment and the button hangs forever; owner-reported-style breakage.
 - Customer journey: commit — request a place → pending → cancel/unjoin (and the accepted-place graceful exit, same code path)
@@ -86,6 +86,8 @@ Separately: this is an authorization/data-integrity-adjacent reliability failure
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim (commit-journey live pass); status `ready`.
+
+- 2026-07-02 - build (experience build agent): status `implemented` (commit `6425f5b`). Resilience shipped so this class of failure can never strand a member again. (1) Route hardening — `apps/web/src/app/api/events/[eventId]/requests/[requestId]/route.ts` now wraps the whole handler in try/catch: any throw returns a calm, readable JSON `{ error }` body (503 for `DatabaseNotConfiguredError`, 500 otherwise), never a raw empty 500; the underlying error is logged server-side only, redacted (no event/request/user IDs, no stack/internals to the member). (2) UI recovery on BOTH cancel surfaces — new shared client-safe helper `apps/web/src/lib/cancel-join-request.ts` (used by `JoinRequestControls` "Cancel request"/"Cancel my place" AND `RoomLeaveControl` in-room graceful exit) adds an `AbortController` client-side timeout so a hung/slow request can never spin the button forever; on any failure it re-enables the control, restores the pre-submit label, and shows the calm recoverable "Your place is still yours — nothing changed. Please try again." with `role="alert"`; on success the existing calm confirmation is unchanged. Graceful-exit reason/note passthrough, non-punitive framing, anti-enumeration/security, and the safety path all preserved; no new migration (029 already applied). Tests added: route DB-error → calm JSON error (not empty 500) + not-configured → calm 503; helper timeout/abort/network/non-OK/unreadable-body → recoverable message and success passthrough. Checks (from `apps/web`): typecheck pass, lint pass (0 errors), test pass (540 passed / 12 skipped), production build pass. Commit pushed to origin/main. Left for the next User-simulator pass: live re-drive of cancel (pending) and graceful-exit (accepted) on the running app.
 
 - 2026-07-02 - build (experience build agent): status `in-progress`, implementation owner. Scope = route/UI resilience per orchestrator note (acute DB cause already fixed via applied migration 029). Hardening the DELETE route (no raw empty 500) and both cancel/leave UI surfaces (no indefinite "Cancelling…"; client-side timeout/abort + recoverable "your place is still yours" alert).
 
