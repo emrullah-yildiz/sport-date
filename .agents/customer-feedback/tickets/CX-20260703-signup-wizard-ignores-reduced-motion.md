@@ -1,6 +1,6 @@
 # CX-20260703-signup-wizard-ignores-reduced-motion
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — RICE (4 × 2 × 0.9) / 0.6 = 12. Reach 4 (members who keep "reduce motion" on — a minority, but the exact audience the design system's parity rule protects — multiplied across all 5 signup steps), Impact 2 (a stated non-negotiable a11y rule is violated: the whole step content slides horizontally on every Next/Back, and the card fades/rises on entry, for people who asked the OS to stop that), Confidence 0.9 (confirmed no `useReducedMotion` in the signup tree while three sibling components use it), Effort 0.6 (adopt the existing `useReducedMotion` pattern). Not safety/privacy/auth-gated.
 - Customer journey: Signing up — a member with `prefers-reduced-motion: reduce` moves through the 5-step signup wizard.
@@ -74,3 +74,4 @@ Accessibility: a member who explicitly requested reduced motion still gets repea
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; gated SignUpForm's framer-motion card entrance (line ~97) and per-step slide (line ~105) on `useReducedMotion()`, mirroring the MomentGlow sibling: `initial` kept unconditional (hydration-safe SSR/first-paint parity), `transition={reducedMotion ? { duration: 0 } : undefined}` so reduced-motion members get an instant snap (no rise, no horizontal slide) while step content still switches; motion unchanged when off. Added a source-scan tripwire to SignUpForm.test.tsx (asserts the gate + gated transition on every motion element). Checks: typecheck clean, lint clean (only pre-existing qa/full-flows.mjs + member-profile.test.ts warnings), test 757 passed/12 skipped, production build compiled successfully. status `implemented`.

@@ -1,3 +1,7 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
@@ -65,5 +69,40 @@ describe("SignUpForm reciprocal sign-in cross-link", () => {
     expect(html).toContain('href="/login"');
     // …and be framed as a sign-in path for someone who already has a profile.
     expect(html).toMatch(/Already have a profile\?/);
+  });
+});
+
+/**
+ * Tripwire for CX-20260703-signup-wizard-ignores-reduced-motion.
+ *
+ * framer-motion does not honour prefers-reduced-motion on its own, so the card
+ * entrance rise and the per-step horizontal slide must be gated on
+ * `useReducedMotion()` — the same established pattern the sibling motion
+ * surfaces (MomentGlow, JoinRequestControls, HostRequestDecision) use. jsdom
+ * cannot exercise framer-motion's media-query branch reliably, so — like the
+ * ethical-energy guardrail — we assert on the source that the gate is present.
+ * This fails the build if the signup wizard ever animates unconditionally again.
+ */
+describe("SignUpForm reduced-motion parity", () => {
+  const source = readFileSync(
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "SignUpForm.tsx"),
+    "utf8",
+  );
+
+  it("consults useReducedMotion from framer-motion", () => {
+    expect(source).toMatch(/useReducedMotion\b[^;]*from "framer-motion"/);
+    expect(source).toContain("useReducedMotion(");
+  });
+
+  it("gates its motion transition on the reduced-motion preference", () => {
+    // Every framer-motion element that animates must receive the gated
+    // transition, so a reduced-motion member gets an instant snap (duration 0)
+    // rather than the rise / horizontal slide.
+    expect(source).toMatch(/reducedMotion \? \{ duration: 0 \}/);
+    const motionTags = source.match(/<motion\.div[^>]*>/g) ?? [];
+    expect(motionTags.length).toBeGreaterThan(0);
+    for (const tag of motionTags) {
+      expect(tag).toContain("transition={snapTransition}");
+    }
   });
 });

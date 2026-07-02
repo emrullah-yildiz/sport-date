@@ -1,7 +1,7 @@
 "use client";
 
 import { dateOfBirthError, validateRegistration } from "@sport-date/domain";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -38,6 +38,16 @@ export default function SignUpForm() {
   const step = useSignUpStore((state) => state.step);
   const setStep = useSignUpStore((state) => state.setStep);
   const reset = useSignUpStore((state) => state.reset);
+  // Reduced-motion parity (docs/design-system.md — non-negotiable), mirroring
+  // MomentGlow / JoinRequestControls / HostRequestDecision. framer-motion does
+  // NOT honour prefers-reduced-motion on its own, so we gate it here. To stay
+  // hydration-safe we keep `initial` unconditional (identical SSR + first client
+  // paint — the MomentGlow lesson) and only zero the `transition` under reduced
+  // motion: framer snaps straight to the `animate` value with no frames, so the
+  // card entrance rise and the per-step horizontal slide play no animation while
+  // the step content still switches instantly. Motion is unchanged when off.
+  const reducedMotion = useReducedMotion();
+  const snapTransition = reducedMotion ? { duration: 0 } : undefined;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState("");
@@ -94,7 +104,7 @@ export default function SignUpForm() {
 
   return (
     <div className="signup-container">
-      <motion.div className="signup-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div className="signup-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={snapTransition}>
         <div className="signup-header">
           <p className="signup-brand">Join {BRAND_NAME}</p>
           <p className="step-indicator">Step {step} of {steps.length}</p>
@@ -102,7 +112,7 @@ export default function SignUpForm() {
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={snapTransition}>
             <CurrentStep />
           </motion.div>
         </AnimatePresence>
