@@ -1,6 +1,6 @@
 # CX-20260703-profile-empty-cta-opens-collapsed-editor
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Customer journey: New/incomplete member completes their profile from the empty-state prompts (`/profile`)
 - Surface: `web`
@@ -73,3 +73,4 @@ Smallest fix: ensure that reaching the editor via a CTA opens it and reaches the
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
 - 2026-07-03 - Implemented by Build agent; new `ProfileEmptyAction` client component upgrades each empty-state CTA to open the `<details id="edit-profile">` and move focus to its named field (intro→`#edit-profile-bio`, language→`#edit-profile-languages`, sport→`#edit-profile-sports` add button, prompt→`#edit-profile-prompts` add button), keeping the `#<field>` fragment as a no-JS fallback; already-open editor just focuses; scroll gated on prefers-reduced-motion (instant). Added `ProfileEmptyAction.test.tsx` tripwire. Checks: typecheck pass; lint 0 errors (2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts, not mine); test 761 passed/12 skipped; production build pass. Not driven on a live dev server this pass. status `implemented`.
+- 2026-07-03 - Independently verified by orchestrator (source + repo checks): new `ProfileEmptyAction` client component replaces the plain `#edit-profile` links — on activation it opens the `<details id="edit-profile">` editor (`HTMLDetailsElement.open = true`, no-op if already open) and moves focus to the named field (`field.focus({preventScroll:true})`), then scrolls it into view with behavior gated on `prefers-reduced-motion` (instant for reduce). All four target ids exist in EditProfileForm (edit-profile-bio:139, -languages:137, -sports:140 button, -prompts:167 button) and profile/page.tsx points each empty-state CTA at the right one (intro→bio, language→languages, sport→sports, prompt→prompts). Keyboard-operable anchor keeps the 44px `.profile-empty-action` target + visible focus; `#field` fragment is a no-JS fallback. Chose an explicit onClick over hashchange because Next Link uses pushState (no hashchange). typecheck/lint/761 tests/prod build pass (commit c7b6554). Status `verified`.
