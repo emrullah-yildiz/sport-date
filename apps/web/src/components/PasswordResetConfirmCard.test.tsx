@@ -5,6 +5,7 @@ import PasswordResetConfirmCard, {
   PasswordResetConfirmBody,
   isServerTokenRejection,
 } from "./PasswordResetConfirmCard";
+import { PASSWORD_MIN_LENGTH, passwordRequirementsText } from "@/lib/auth-flow";
 
 // renderToStaticMarkup never runs effects, so the container (PasswordResetConfirmCard)
 // only exposes the synchronous states: the initial missing/malformed dead-ends and the
@@ -68,6 +69,35 @@ describe("PasswordResetConfirmCard dead-end recovery action", () => {
     expect(html).toMatch(/id="reset-password"/);
     expect(html).toMatch(/autocomplete="new-password"/i);
     expect(html).not.toContain("Send me a new reset link");
+  });
+});
+
+describe("PasswordResetConfirmCard up-front password requirements", () => {
+  it("states the full requirements (incl. the enforced minimum) BEFORE submit", () => {
+    const html = render(VALID_TOKEN);
+    // The requirements are visible on the initial render, not only after a rejected submit.
+    expect(html).toContain(passwordRequirementsText());
+    // The concrete enforced minimum length is disclosed up front.
+    expect(html).toContain(String(PASSWORD_MIN_LENGTH));
+  });
+
+  it("associates the requirements with the new-password field via aria-describedby", () => {
+    const html = render(VALID_TOKEN);
+    // Screen readers announce the rules when the field is focused (not only as a
+    // post-submit error). The input points at the requirements node's id.
+    expect(html).toMatch(/id="reset-password-requirements"/);
+    expect(html).toMatch(/id="reset-password"[^>]*aria-describedby="reset-password-requirements"/);
+    // And the field advertises the same minimum the validator enforces.
+    expect(html).toMatch(new RegExp(`minlength="${PASSWORD_MIN_LENGTH}"`, "i"));
+  });
+
+  it("keeps the requirements sourced from validateBrowserPasswordStrength's constant (drift-proof)", () => {
+    // The rendered copy IS passwordRequirementsText(), which derives from
+    // PASSWORD_MIN_LENGTH — the same constant the validator checks. A future change to the
+    // minimum updates both the disclosed rule and the enforced rule together.
+    const html = render(VALID_TOKEN);
+    expect(passwordRequirementsText()).toContain(String(PASSWORD_MIN_LENGTH));
+    expect(html).toContain(passwordRequirementsText());
   });
 });
 

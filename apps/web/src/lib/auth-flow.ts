@@ -15,9 +15,24 @@ export function isBrowserPasswordResetToken(value: unknown): value is string {
   return typeof value === "string" && PASSWORD_RESET_TOKEN_PATTERN.test(value);
 }
 
+// The enforced minimum password length. This is the single source of truth: the
+// validator below AND any up-front UI requirements copy must derive from it, so the
+// stated rules can never silently drift from what is actually enforced on submit.
+export const PASSWORD_MIN_LENGTH = 12;
+
+// Plain-language statement of the FULL password policy, for showing before submit
+// (e.g. under the new-password field via aria-describedby). Derived from the same
+// PASSWORD_MIN_LENGTH the validator checks, so the disclosed rules and the enforced
+// rules stay in lockstep.
+export function passwordRequirementsText(): string {
+  return `At least ${PASSWORD_MIN_LENGTH} characters, including upper-case and lower-case letters and a number.`;
+}
+
 export function validateBrowserPasswordStrength(password: string): string[] {
   const errors: string[] = [];
-  if (password.length < 12) errors.push("Password must be at least 12 characters.");
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    errors.push(`Password must be at least ${PASSWORD_MIN_LENGTH} characters.`);
+  }
   if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/\d/.test(password)) {
     errors.push("Password must include upper-case, lower-case, and numeric characters.");
   }

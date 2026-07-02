@@ -4,7 +4,12 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 
 import ForgotPasswordPanel from "./ForgotPasswordPanel";
-import { isBrowserPasswordResetToken, validatePasswordResetDraft } from "@/lib/auth-flow";
+import {
+  PASSWORD_MIN_LENGTH,
+  isBrowserPasswordResetToken,
+  passwordRequirementsText,
+  validatePasswordResetDraft,
+} from "@/lib/auth-flow";
 
 async function readJson(response: Response) {
   try {
@@ -100,11 +105,22 @@ export function PasswordResetConfirmBody({
       {showPasswordForm ? (
         <form className="auth-flow-form" onSubmit={onSubmit}>
           <label htmlFor="reset-password">New password</label>
+          {/* Full requirements shown BEFORE submit and wired to the field via
+              aria-describedby, so assistive tech announces them on focus instead of the
+              member (or a screen-reader user) only discovering the 12-char minimum via a
+              post-submit error. Copy comes from passwordRequirementsText(), which derives
+              from the same PASSWORD_MIN_LENGTH validateBrowserPasswordStrength enforces —
+              the disclosed rules can't drift from the enforced ones. */}
+          <p id="reset-password-requirements" className="field-help">
+            {passwordRequirementsText()}
+          </p>
           <input
             id="reset-password"
             type="password"
             autoComplete="new-password"
             required
+            minLength={PASSWORD_MIN_LENGTH}
+            aria-describedby="reset-password-requirements"
             value={password}
             onChange={(event) => onPasswordChange?.(event.target.value)}
           />

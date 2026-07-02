@@ -1,6 +1,6 @@
 # CX-20260703-reset-password-requirements-hidden-until-error
 
-- Status: `ready`
+- Status: `implemented`
 - Priority: `P2` — RICE (3 reach × 1.0 impact × 0.9 confidence) / 0.5 effort = 5.4. Friction at a security-recovery moment; small copy/markup fix.
 - Severity: `medium`
 - Customer journey: Setting a new password from a recovery link (`/reset-password`).
@@ -80,3 +80,4 @@ Practical: avoidable failed submissions at a moment the member is often already 
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; added exported `PASSWORD_MIN_LENGTH` (12) + `passwordRequirementsText()` in `auth-flow.ts` as the single source both the validator and the reset-form copy consume; reset card now shows the full requirements (incl. 12-char min) up front, wired to the new-password field via `aria-describedby` + `minLength`; extended `auth-flow.test.ts` and `PasswordResetConfirmCard.test.tsx` to assert visibility, association, and drift-proofing. No show/hide toggle (optional, deferred). Checks: typecheck OK, lint 0 errors (2 pre-existing warnings in non-owned files), test 753 passed/12 skipped, prod build OK; status `implemented`.
