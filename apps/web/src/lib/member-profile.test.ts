@@ -18,7 +18,7 @@ vi.mock("@/lib/db", () => ({ getDatabase: () => fakeSql }));
 
 // The photo lookup is a separate, already block-gated call; stub it so the test is
 // about the authorization boundary, not photo storage.
-const listProfilePhotos = vi.fn((): Promise<unknown[]> => Promise.resolve([]));
+const listProfilePhotos = vi.fn((_userId: string): Promise<unknown[]> => Promise.resolve([]));
 vi.mock("@/lib/photos", () => ({ listProfilePhotos: (userId: string) => listProfilePhotos(userId) }));
 
 import { getViewableMemberProfile } from "./member-profile";
