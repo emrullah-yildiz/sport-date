@@ -1,6 +1,6 @@
 # CX-20260701-event-room-host-zero-participants-cold-empty-state
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 4 × Impact 3 × Confidence 4) / Effort 1.5 = 32. Not safety/privacy/a11y, so bucketed P2 despite the score: it is a warmth/convenience empty-state gap at an emotionally raw moment (a host who just published, waiting alone).
 - Customer journey: coordination (hosting → open coordination room → wait for the first request/place)
@@ -72,3 +72,4 @@ The coordination room is where a host lands right after the generous act of publ
 
 - 2026-07-01 - Filed by Experience & Design Explorer (event room × completeness-of-states / empty-states). Zero-participant host people-panel observed live as a cold "0 people joining" + empty container; source-confirmed no empty branch exists. Status `ready`.
 - 2026-07-02 - Picked up by Experience Build Agent; status `in-progress`. Implementing a warm zero-participants empty state in the room's "Who has a place" panel (host: acknowledge live + reassure + share invitation/view public invitation/manage next steps; accepted-solo non-host: "you're the first" calm copy, no "0 people joining" contradiction). Reusing ShareEventLink + host-event-view paths; no schema change.
+- 2026-07-02 - Implemented by Experience Build Agent (commit 13013aa, pushed to origin/main). Host with zero accepted participants now sees "No one has a place yet" + reassurance ("Your event is live", requests take a little time) + one calm next step (reuse ShareEventLink approximate-only /discover/events/[id] path, plus View the public invitation + Manage your events /hosting links); accepted sole non-host guest sees a "you're the first" note instead of any 0-count contradiction. No fabricated counts/"people near you"/scarcity/streak. 44px focus-visible keyboard-reachable, AA, reduced-motion, responsive 1280/375; share button restyled for the dark surface. Checks: typecheck pass, lint pass (0 errors; sole warning is in pre-existing untracked qa/full-flows.mjs, untouched), test pass (442 passed/12 skipped incl. 3 new room empty-state tests), production `npm run build` pass. Verified live on dev :3000 as pooled host-A (published event, opened its room with 0 participants, confirmed warm empty state, no "0 people joining"). No DB migration. Status `implemented` — ready for independent Explorer retest.
