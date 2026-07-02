@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T23:35:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"Host past-event reflection VERIFIED+archived (aff5f8a). Brand-mark swap mechanism SHIPPED (2e5dec4 — single documented swap point, appearance unchanged, 675 tests, guardrails green). User-sim caught + orchestrator FIXED DIRECTLY two issues: host acknowledgement claimed attendance on empty events (a7d34c4 — now turnout-agnostic + honesty test) and MomentGlow hydration mismatch under reduced-motion (a2605c3 — initial made unconditional). Chaining: BUILD event-detail-approximate-location-no-spatial-cue; TEST brand-mark 2e5dec4 (worktree-isolated); USE user-sim (report-only, re-verify both fixes live).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T23:35:00.000Z"},
-  "Planner":{"state":"idle","ticket":"polish queue ~17; no new tickets; fix-directly mode","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260701-event-detail-approximate-location-no-spatial-cue","since":"2026-07-02T23:35:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 2e5dec4 (brand-mark swap mechanism) — worktree-isolated","since":"2026-07-02T23:35:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"report-only: rotate journey + re-verify host-acknowledgement + MomentGlow fixes","since":"2026-07-02T23:35:00.000Z"} } }
+{ "updatedAt":"2026-07-03T00:05:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Brand-mark swap mechanism VERIFIED+archived (2e5dec4). Event-detail approximate-area spatial cue SHIPPED (29715d8 — self-contained SVG 'area not pin', coarse-only, exact venue never joined on that surface, 707 tests, guardrails green). User-sim RE-VERIFIED both prior fixes live: host acknowledgement now turnout-agnostic (a7d34c4 PASS) and MomentGlow reduced-motion hydration clean (a2605c3 PASS); fresh event-detail journey clean, no new findings. Chaining: BUILD landing-how-it-works-steps-color-hierarchy; TEST event-detail spatial cue 29715d8 (worktree-isolated); USE user-sim (report-only, rotate).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-03T00:05:00.000Z"},
+  "Planner":{"state":"idle","ticket":"polish queue ~15; no new tickets; fix-directly mode","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260701-landing-how-it-works-steps-color-hierarchy","since":"2026-07-03T00:05:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 29715d8 (event-detail approximate-area spatial cue) — worktree-isolated","since":"2026-07-03T00:05:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"report-only: rotate journey + audit","since":"2026-07-03T00:05:00.000Z"} } }
