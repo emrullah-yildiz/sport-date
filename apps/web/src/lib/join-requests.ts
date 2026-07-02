@@ -115,10 +115,37 @@ export async function createEventJoinRequest(
         WHERE (blocker_user_id = candidate.id AND blocked_user_id = events.host_user_id)
            OR (blocker_user_id = events.host_user_id AND blocked_user_id = candidate.id)
       )
-    ON CONFLICT (event_id, requester_user_id) DO NOTHING
+    -- Reversibility (CX-20260702): a member who cancelled their OWN pending request
+    -- can ask again on the same still-open event, so one tap of "Cancel" is never a
+    -- permanent, silent lockout (matching the "cancel quietly at any time" promise).
+    -- The reopen is scoped to the member's own 'cancelled' row only — an accepted,
+    -- declined (host-skipped-out), or already-pending row is left untouched, so this
+    -- cannot reopen a state a host closed or double-submit a live request. Every join
+    -- guard still lives in the SELECT above: if the event is closed/full, the member
+    -- is blocked/excluded/ineligible, or the age/skill/language rules fail, the SELECT
+    -- yields no row, there is no conflict, and nothing is reopened. The reliability
+    -- cool-down is enforced earlier (standing.paused returns before this INSERT), so a
+    -- legitimate active pause is never bypassed by a re-request.
+    ON CONFLICT (event_id, requester_user_id) DO UPDATE
+      SET status = 'pending',
+          introduction = EXCLUDED.introduction,
+          requested_at = NOW(),
+          updated_at = NOW(),
+          skip_count = 0,
+          last_skipped_at = NULL,
+          responded_at = NULL,
+          cancelled_at = NULL,
+          exit_reason = NULL,
+          exit_note = NULL
+      WHERE join_requests.status = 'cancelled'
     RETURNING id, status
   `;
-  return rows.length > 0 ? { requestId, status: "pending" as const } : null;
+  // Return the row's real id: on a reopen (DO UPDATE) the id is the original
+  // cancelled row's, not the freshly generated one, so the client can cancel it
+  // again. A conflicting row that is NOT cancelled (accepted/declined/pending)
+  // fails the DO UPDATE WHERE, returns nothing, and is correctly reported as
+  // unavailable.
+  return rows.length > 0 ? { requestId: String(rows[0].id), status: "pending" as const } : null;
 }
 
 export async function cancelEventJoinRequest(

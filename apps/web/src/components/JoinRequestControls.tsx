@@ -203,10 +203,26 @@ export default function JoinRequestControls({
       );
     }
     if (status === "cancelled") {
+      // Reversible by design (CX-20260702): cancelling is low-stakes, so this is
+      // never a dead end. The join form returns on request, matching the pending
+      // promise that you can "cancel quietly at any time". Skip counts stay private.
       return (
         <motion.div key="cancelled" className="join-state closed" {...panelMotion}>
           <strong tabIndex={-1} ref={attachConfirmation}>Request cancelled.</strong>
-          <p>This invitation is closed for your account.</p>
+          <p>No pressure either way. If you change your mind, you can ask again while this game still has room. Skip counts stay private.</p>
+          <button
+            type="button"
+            onClick={() => {
+              // Return to the join form. Re-requesting reopens the member's own
+              // cancelled row server-side, honouring every join guard and any
+              // active reliability pause.
+              setError("");
+              setStatus(null);
+              focusOnResolveRef.current = true;
+            }}
+          >
+            Request a place again
+          </button>
         </motion.div>
       );
     }
@@ -218,6 +234,10 @@ export default function JoinRequestControls({
         <label htmlFor="join-introduction">A short note to the host <span>optional</span></label>
         <textarea
           id="join-introduction"
+          // Lands focus here when the member chooses to ask again from the
+          // cancelled state, so a keyboard / screen-reader member is never
+          // stranded on <body> when the join form returns.
+          ref={attachConfirmation}
           maxLength={500}
           rows={4}
           value={introduction}
