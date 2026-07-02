@@ -1,33 +1,104 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it, vi } from "vitest";
+import { AnimatePresence, motion } from "framer-motion";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 // next/navigation's useRouter is only reached for its refresh() on an in-place
 // resolution, which renderToStaticMarkup never triggers; stub it so the server
 // render (the pass this test exercises) runs outside an app-router context.
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: () => {} }) }));
 
+// useReducedMotion is mocked per-test (see below) so we can drive BOTH the
+// default and the reduced-motion `panelMotion` branch deterministically. Under
+// the vitest `node` environment the real hook returns false (no matchMedia), so
+// without this mock the reduced-motion branch — the exact setting the reported
+// hydration mismatch occurred under — would never be exercised at all.
+const reducedMotionMock = vi.fn<() => boolean>(() => false);
+vi.mock("framer-motion", async (importActual) => {
+  const actual = await importActual<typeof import("framer-motion")>();
+  return { ...actual, useReducedMotion: () => reducedMotionMock() };
+});
+
 import JoinRequestControls from "./JoinRequestControls";
 
 /**
- * Tripwire for CX-20260702-join-controls-reduced-motion-hydration-mismatch.
+ * Tripwire for CX-20260702-join-controls-reduced-motion-hydration-mismatch,
+ * hardened by CX-20260702-join-controls-hydration-test-is-tautology-strengthen.
  *
- * A framer-motion `motion.div` serializes its resolved inline style differently
- * on the server vs the client (the server emits `transform:none` that the
- * client's post-mount render omits), which React "won't patch up" — a hydration
- * mismatch on the `.join-request-box`. The fix gates the motion wrapper behind a
- * `mounted` flag (useSyncExternalStore, server snapshot = false), so the server
- * render — the pass renderToStaticMarkup exercises here — emits a PLAIN `<div>`
- * with no motion-injected inline `opacity` / `transform` style. The first client
- * render (also pre-mount) produces the same plain markup, so SSR and hydration
- * agree in every motion setting. This test fails the build if a motion wrapper
- * (its telltale inline transform/opacity style) re-enters the server render.
+ * THE INVARIANT: a framer-motion `motion.div` serializes its resolved inline
+ * style differently on the server than the client's pre-mount render (the
+ * server emits `opacity` / `transform:none` the client omits), which React
+ * "won't patch up" — a hydration mismatch on the join panels. The fix gates the
+ * motion wrapper behind a `mounted` flag (useSyncExternalStore, server snapshot
+ * = false), so the server render (the pass renderToStaticMarkup exercises here)
+ * emits a PLAIN `<div>` with no motion-injected inline style, byte-identical to
+ * the first client render.
+ *
+ * WHY THIS IS NOT A TAUTOLOGY: a plain `not.toContain("style")` assertion could
+ * pass simply because framer-motion happened to emit nothing in this env. To
+ * prove the assertion has teeth we FIRST establish a positive control — that the
+ * ungated `motion.div`, in BOTH motion settings, really does emit the offending
+ * inline style on this exact server-render path (see "positive control" below).
+ * Only against that baseline does "the gated component emits none" actually pin
+ * the fix. We also drive the reduced-motion branch (mocked), the setting the bug
+ * was reported under, which the previous test never reached. Reverting the
+ * `mounted` gate makes `Panel` render the `motion.div` on the server pass, which
+ * these tests then catch in every motion setting.
  */
 
 function serverHtml(request: Parameters<typeof JoinRequestControls>[0]["request"]) {
   return renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={request} />);
 }
 
+afterEach(() => {
+  reducedMotionMock.mockReturnValue(false);
+});
+
+// The motion variants the component would apply to `Panel` after mount, kept in
+// sync with JoinRequestControls' `panelMotion`. These feed the positive control.
+const defaultMotion = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.28, ease: "easeOut" as const },
+};
+const reducedMotionVariant = {
+  initial: false as const,
+  animate: { opacity: 1 },
+  exit: { opacity: 1 },
+  transition: { duration: 0 },
+};
+
+function ungatedPanelHtml(variant: typeof defaultMotion | typeof reducedMotionVariant) {
+  // Reproduces exactly what `Panel` renders when the `mounted` gate is REMOVED:
+  // the motion.div, inside AnimatePresence initial={false} (as the component
+  // wraps it), on the server-render path.
+  return renderToStaticMarkup(
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div key="p" className="join-request-box" {...variant}>
+        hi
+      </motion.div>
+    </AnimatePresence>,
+  );
+}
+
 describe("JoinRequestControls server render (hydration parity)", () => {
+  // Positive control: PROVE the assertions below can fail. If the gate were
+  // removed, the server pass renders this motion.div — and it demonstrably
+  // carries the telltale inline style in BOTH motion settings, so a green
+  // "no inline style" result on the real component is meaningful, not vacuous.
+  it("positive control: an ungated motion panel DOES emit motion inline style on the server (both motion settings)", () => {
+    const defaultHtml = ungatedPanelHtml(defaultMotion);
+    // The exact reported mismatch string for the default (animated) branch.
+    expect(defaultHtml).toMatch(/style="[^"]*transform/i);
+    expect(defaultHtml).toMatch(/style="[^"]*opacity/i);
+
+    const reducedHtml = ungatedPanelHtml(reducedMotionVariant);
+    // Under reduced-motion the offending style is `opacity:1` (no transform) —
+    // the setting the bug was actually reported under. Still non-empty, so a
+    // missing gate is caught here too.
+    expect(reducedHtml).toMatch(/style="[^"]*opacity/i);
+  });
+
   it("renders the join form as a plain box with no motion-injected inline style", () => {
     const html = serverHtml(null);
     // The default join box is present as static, hydration-safe markup...
@@ -45,5 +116,32 @@ describe("JoinRequestControls server render (hydration parity)", () => {
     expect(html).toContain("Your request is with the host.");
     expect(html).not.toMatch(/style="[^"]*transform/i);
     expect(html).not.toMatch(/style="[^"]*opacity/i);
+  });
+
+  it("stays plain under prefers-reduced-motion — the setting the mismatch was reported under", () => {
+    // Drive the reduced-motion `panelMotion` branch, which the vitest node env
+    // never reaches on its own. If the `mounted` gate is removed, `Panel` now
+    // renders the reduced-motion motion.div on the server, emitting `opacity:1`
+    // (see the positive control) — which this assertion would catch. With the
+    // gate in place the server pass is a plain <div>, so it stays clean.
+    reducedMotionMock.mockReturnValue(true);
+    const html = serverHtml(null);
+    expect(html).toContain('class="join-request-box"');
+    expect(html).not.toMatch(/style="[^"]*opacity/i);
+    expect(html).not.toMatch(/style="[^"]*transform/i);
+    expect(html).toContain("Request a place");
+  });
+
+  it("server render is byte-identical across motion settings (the gate makes SSR motion-independent)", () => {
+    // The whole point of the gate: the server / pre-mount render must not depend
+    // on the motion setting, so SSR and the first (still pre-mount) client render
+    // agree no matter what the client's prefers-reduced-motion resolves to.
+    // Remove the gate and these diverge — default emits `transform:none`, reduced
+    // emits `opacity:1` — so this equality is a direct assertion of the fix.
+    reducedMotionMock.mockReturnValue(false);
+    const defaultServer = serverHtml(null);
+    reducedMotionMock.mockReturnValue(true);
+    const reducedServer = serverHtml(null);
+    expect(reducedServer).toBe(defaultServer);
   });
 });
