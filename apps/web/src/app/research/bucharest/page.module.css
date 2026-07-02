@@ -51,15 +51,15 @@
 
 .heroCopy { min-width: 0; }
 
-.heroVisual { position: relative; width: 100%; min-width: 0; min-height: 550px; border-radius: 50% 50% 43% 57% / 45% 42% 58% 55%; background: var(--research-lime); }
+.heroVisual { position: relative; width: 100%; min-width: 0; min-height: 550px; border-radius: 50% 50% 43% 57% / 45% 42% 58% 55%; background: var(--research-lime); overflow: hidden; }
 .route { position: absolute; inset: 13%; border: 1px solid rgba(23, 36, 29, .38); border-radius: 50%; transform: rotate(-18deg); }
-.route::before { content: ""; position: absolute; left: -4%; right: -4%; top: 50%; border-top: 2px dashed rgba(23, 36, 29, .45); }
+.route::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px dashed rgba(23, 36, 29, .45); }
 .route span { position: absolute; top: calc(50% - 7px); width: 14px; height: 14px; border: 3px solid var(--research-lime); border-radius: 50%; background: var(--research-ink); }
 .route span:nth-child(1) { left: 12%; }.route span:nth-child(2) { left: 49%; }.route span:nth-child(3) { right: 10%; }
 .routeLabel { position: absolute; top: 9%; left: 16%; margin: 0; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; transform: rotate(-5deg); }
-.miniEvent { position: absolute; z-index: 2; box-sizing: border-box; width: min(270px, 64%); max-width: 100%; padding: 21px; display: grid; gap: 7px; border: 1px solid rgba(23, 36, 29, .12); border-radius: 22px; background: rgba(255, 255, 255, .94); box-shadow: 0 24px 55px rgba(23, 36, 29, .16); }
+.miniEvent { position: absolute; z-index: 2; box-sizing: border-box; width: min(270px, 60%); max-width: 100%; padding: 21px; display: grid; gap: 7px; border: 1px solid rgba(23, 36, 29, .12); border-radius: 22px; background: rgba(255, 255, 255, .94); box-shadow: 0 18px 40px rgba(23, 36, 29, .16); }
 .miniEvent > span { color: #69766d; font-size: 9px; font-weight: 900; letter-spacing: .15em; }.miniEvent strong { font-size: 25px; letter-spacing: -.045em; }.miniEvent small { color: #5f6b63; }
-.runCard { top: 24%; left: -5%; transform: rotate(-5deg); }.padelCard { right: -4%; bottom: 19%; transform: rotate(5deg); }
+.runCard { top: 24%; left: 2%; transform: rotate(-5deg); }.padelCard { right: 2%; bottom: 19%; transform: rotate(5deg); }
 .visualNote { position: absolute; right: 11%; bottom: 4%; width: 240px; margin: 0; font-size: 10px; line-height: 1.5; text-align: right; }
 
 .formats { padding: 120px max(24px, calc((100vw - 1240px) / 2)); background: var(--research-ink); color: white; }
@@ -103,8 +103,8 @@
   .heroVisual { min-height: 410px; }
   .miniEvent { width: min(250px, 72%); padding: 18px; }
   .miniEvent strong { font-size: 22px; }
-  .runCard { left: 0; }
-  .padelCard { right: 0; }
+  .runCard { left: 3%; }
+  .padelCard { right: 3%; }
   .visualNote { display: none; }
   .formats, .belief, .principles, .research { padding-block: 80px; }.formatCard { min-height: 390px; padding: 25px; }.formatCard h3 { margin-top: 90px; }.formatCard dl { grid-template-columns: 1fr; }
   .belief { min-height: 520px; }.principles article { grid-template-columns: 34px 1fr; gap: 15px; }.footer { flex-direction: column; }.footer p { text-align: left; }
