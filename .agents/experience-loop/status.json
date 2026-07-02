@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T13:04:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"Permanent-lockout fix VERIFIED+archived (b5cdddd). join-request commit-button glow closed (7f1e301, implemented). User-sim onboarding pass clean. Chaining next tick: BUILD web-sessions-indistinguishable P2 (device hint + bulk sign-out; may add a migration → migrate prod+dev first); TEST join-cancel-glow (7f1e301, worktree-isolated); USE always-on user-sim.",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T13:04:00.000Z"},
-  "Planner":{"state":"idle","ticket":"next build=web-sessions-indistinguishable (P2 trust)","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260702-web-sessions-indistinguishable-no-device-hint-or-bulk-signout","since":"2026-07-02T13:04:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 7f1e301 (join-request cancel-button glow) — worktree-isolated","since":"2026-07-02T13:04:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T13:04:00.000Z"} } }
+{ "updatedAt":"2026-07-02T13:36:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"P0 login/signup 500 RESOLVED: migration 030 applied to prod+dev, web-sessions device-hints/bulk-signout pushed (891ec8d, implemented). join-request cancel-button glow verified+archived. Chaining next tick: BUILD profile-photo-upload-375-overflow (P3); TEST web-sessions 891ec8d (worktree-isolated — bulk-signout-never-current + device-label privacy); USE always-on user-sim (RE-VERIFY login/signup 200, then safety/report-block journey).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T13:36:00.000Z"},
+  "Planner":{"state":"idle","ticket":"next build=profile-photo-upload-375-overflow (P3)","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-profile-photo-upload-input-overflows-mobile-375","since":"2026-07-02T13:36:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 891ec8d (web-sessions device-hints + bulk-signout) — worktree-isolated","since":"2026-07-02T13:36:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: re-verify login/signup 200 (P0 follow-up) + safety/report-block journey","since":"2026-07-02T13:36:00.000Z"} } }
