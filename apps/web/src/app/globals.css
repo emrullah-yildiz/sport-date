@@ -154,6 +154,37 @@ body::before {
 h1, h2, h3, h4, .display { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; line-height: 1.1; }
 a { color: inherit; text-decoration: none; }
 
+/* ---- Global :focus-visible safety-net (CX-20260702-global-focus-visible-
+   fallback-for-interactive-elements) ----
+   Base-layer fallback so EVERY natively-focusable / interactive element gets a
+   visible neon ring on keyboard focus by default — closing the WCAG 2.4.7 /
+   1.4.11 focus-ring-gap CLASS (classless / not-yet-covered <button>, <a href>,
+   <summary>, [role=button], [tabindex] controls were falling back to the ~1px
+   UA outline, invisible on anthracite). Mirrors how the shared --glow-* tokens
+   closed the hover-affordance class.
+   Uses :focus-visible (never :focus) so mouse clicks don't ring; outline/offset
+   only, so NO layout shift. The selector list is deliberately low-specificity
+   (bare element / single attribute / single pseudo-class), so every existing
+   per-component :focus-visible rule below — whether higher-specificity (.class…)
+   or same-specificity but later in source order — still WINS and keeps its own
+   offset/radius. Where a component already sets `outline: 3px solid var(--focus)`
+   this default is identical (harmless). Disabled controls can't match
+   :focus-visible, so they get no ring.
+   FORM CONTROLS (input / select / textarea) are intentionally NOT listed here:
+   they already have good, distinct focus styles that use `outline: none` +
+   `border-color: var(--lime/--accent)` + a green box-shadow ring (select,
+   input[type=date/datetime-local], .form-group input, .custom-sport-row input,
+   room-leave-note textarea, feedback-form, …). Adding a bare `input/select/
+   textarea:focus-visible` outline here would stack a second (outline) indicator
+   on top of those box-shadow rings — an ugly double indicator — so we leave form
+   controls to their existing rules. This rule only fixes the button/link/
+   summary/role=button/tabindex gap. */
+a[href]:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
 /* ---- Button system: primary / secondary / ghost ---- */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 26px; border: 1px solid transparent; border-radius: var(--radius); font-family: var(--font-sans); font-size: 15px; font-weight: 700; cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease; }
 .btn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
