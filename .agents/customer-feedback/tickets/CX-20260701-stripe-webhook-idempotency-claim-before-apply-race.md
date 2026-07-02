@@ -1,6 +1,6 @@
 # CX-20260701-stripe-webhook-idempotency-claim-before-apply-race
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 3 × Impact 4 × Confidence 4) / Effort 2 = 24. Test-mode only today (billing is dark), but it is a correctness bug on the money/entitlement path — **must be fixed before go-live** or a member could pay and not receive Plus.
 - Customer journey: billing / entitlement
@@ -44,3 +44,4 @@ Once billing is live, a paid member could fail to receive Plus with no automatic
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by the Tester during verification of the Stripe integration; status `ready`.
+- 2026-07-02 - Implemented (Builder). Fixed the claim-before-apply race by folding the idempotency claim and the entitlement write into ONE atomic SQL statement in `apps/web/src/lib/billing.ts`: a CTE `INSERT INTO billing_webhook_events (event_id) ... ON CONFLICT (event_id) DO NOTHING RETURNING event_id`, then `UPDATE users ... WHERE id = <member> AND EXISTS (SELECT 1 FROM claim)`. A single Postgres statement is atomic, so claim + apply commit or roll back together — a failed apply leaves the event un-claimed (no poisoned marker) and Stripe's retry re-applies; a duplicate/concurrent delivery conflicts on the ledger PK, the claim CTE is empty, and the guarded UPDATE is a no-op (no double-apply). Exactly-once per event id. Unactionable events (no member resolves) are still recorded processed via a standalone idempotent INSERT so Stripe stops retrying. NO migration — reuses the existing `billing_webhook_events(event_id PRIMARY KEY)` ledger from migration 026 as the idempotency/concurrency guard. Signature verification and fail-closed 503 unchanged. Tests added in `billing.test.ts` prove: (a) duplicate delivery applies once (guarded ON CONFLICT + EXISTS(claim)); (b) apply-throws leaves the event un-claimed and a retry re-applies `plus_until`; (c) concurrent delivery uses the guarded atomic path. Checks: typecheck, lint, unit tests (503 pass), and prod build all green. Commit `7229c2d`, pushed to origin/main (no migration). Handing back for independent retest.

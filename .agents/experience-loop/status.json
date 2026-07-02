@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T08:22:00.000Z","loop":"running","phase":"idle-between-ticks",
-  "note":"Tick done: built private-beta explainer disclosure (3338ff8, implemented); Tester verified + archived discover geo-radius (112e665) — ran all 4 gates itself, confirmed privacy properties live, filed a P3 defense-in-depth (coarsen event approx coord on write/response). Next: verify private-beta (3338ff8), then monetization P2 stripe-webhook-idempotency-race.",
+{ "updatedAt":"2026-07-02T08:58:00.000Z","loop":"running","phase":"idle-between-ticks",
+  "note":"Tick done: shipped stripe-webhook exactly-once idempotency (7229c2d, atomic CTE claim+apply, no migration, implemented — awaits independent Tester next tick); private-beta explainer VERIFIED+archived (Tester reopen was concurrent-worktree contamination; orchestrator re-ran build green at 7229c2d). Next: verify stripe-webhook (7229c2d) on a clean tree, then build plus-perks-advanced-discovery-filters.",
   "agents":{ "Orchestrator":{"state":"idle","ticket":"awaiting next tick","since":null},
-  "Planner":{"state":"idle","ticket":"next=stripe-webhook-idempotency-claim-before-apply-race (P2, money-path correctness)","since":null},
-  "Builder":{"state":"idle","ticket":"just finished: private-beta explainer (3338ff8)","since":null},
-  "Tester":{"state":"idle","ticket":"verified+archived geo-radius; filed P3 event-approx-coord hardening","since":null},
+  "Planner":{"state":"idle","ticket":"next=verify stripe-webhook (7229c2d); then plus-perks-advanced-discovery-filters","since":null},
+  "Builder":{"state":"idle","ticket":"just finished: stripe-webhook idempotency (7229c2d)","since":null},
+  "Tester":{"state":"idle","ticket":"private-beta feature correct; verified after clean-tree rebuild","since":null},
   "UserSimulator":{"state":"idle","ticket":"filed P3 time-datetime-attr","since":null} } }
