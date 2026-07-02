@@ -39,7 +39,12 @@ export default function MomentGlow({ tone = "go" }: { tone?: "go" }) {
       aria-hidden="true"
       className="moment-glow"
       style={{ ["--moment-glow-color" as string]: color }}
-      initial={reducedMotion ? false : { opacity: 0, scale: 0.96 }}
+      // `initial` is unconditional so the server render (where `useReducedMotion()`
+      // is always null) and the first client render agree — branching it on
+      // reduced-motion made React log a hydration mismatch on the ended-event room
+      // for reduced-motion members. Reduced-motion still gets NO animation: the
+      // `duration: 0` transition snaps straight to the static wash with no frames.
+      initial={{ opacity: 0, scale: 0.96 }}
       animate={animation}
       transition={reducedMotion ? { duration: 0 } : { duration: 1.1, ease: "easeOut", times: [0, 0.35, 1] }}
     />
