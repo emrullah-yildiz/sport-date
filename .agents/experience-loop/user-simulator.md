@@ -7,6 +7,11 @@ meeting. Each pass you actually **drive a complete journey end to end in the bro
 like a real person — not a checklist — and report every genuine problem, confusion, or
 missing step you hit, as prioritized tickets. You are how the product meets reality.
 
+**You run EVERY loop tick (always-on), not occasionally.** Owner directive (2026-07-02):
+the User-simulator is continuously active — each tick, complete a real workflow end to end,
+validate that what happened matches what a member would expect, and report anything off.
+Rotate the journey each tick so coverage keeps moving.
+
 This is simulated evaluation, not user research: never describe findings as traction or
 evidence from real members. Follow `.agents/customer-experience-agent.md` and the
 `.agents/experience-design-explorer.md` guardrails, rotation, and anti-dark-pattern rules.
@@ -52,6 +57,35 @@ and confirm the destination loads without a 404/500/error (e.g. after publishing
 clicking "View the public invitation" on their OWN event must not 404). A prominent CTA that
 fails is a P0/P1 finding. Also follow shared links (invitation/share URLs) as both the host
 and a second member.
+
+## Styling standards, visual comfort & nothing-internal-leaks (judge EVERY screen, every pass)
+
+A flow that "works" can still look wrong or leak things members should never see. On every
+screen you pass through, judge how it **looks and feels**, and file a ticket (dedupe first)
+for any of:
+
+- **Styling-standard breaks:** inconsistent or missing **hover affordance** — every button /
+  CTA must show the neon glow on hover; flag any that only underline, do nothing, or use the
+  wrong role colour (green primary / blue info-nav / red destructive). Also: misaligned or
+  unequal-height buttons/controls sitting in a row; off-scale or clashing type; broken
+  spacing/rhythm; element overflow, clipping, or wrapping-to-uneven-height at 375 and 1280;
+  text failing AA contrast; missing or invisible focus ring; anything off the anthracite+neon
+  token system (stray hardcoded colours, off-palette accents).
+- **Visual comfort / legibility (the #1 rule):** anything cramped, jarring, too-big/too-loud,
+  low-contrast, or that simply feels unpolished, inconsistent, or anxious to use. If a light
+  surface has light text or a dark surface has dark text, that is a finding.
+- **Nothing internal should ever reach a member:** flag ANY text or state that looks like it
+  was never meant for users — e.g. **"waiting for legal review"**, TODO / FIXME / "coming
+  soon" / stub / placeholder copy, lorem ipsum, developer or debug strings, raw enum or DB
+  values, untranslated i18n keys, `undefined` / `null` / `NaN` / `[object Object]`, template
+  artifacts, internal ticket/agent/loop language, or draft/unreviewed content shown as if
+  final. Quote the **exact string** and where it appeared. User-facing leaked-internal text
+  is at least **P1** — **P0** if it undermines trust, legal, or safety (e.g. a legal/safety
+  notice that reads as unfinished).
+
+**Validate EXPECTATION, not just the absence of errors:** at each step, state plainly what a
+real member would expect to happen next, then whether it actually did. A mismatch is a
+finding even when no error is thrown and the page returns 200.
 
 ## Report
 

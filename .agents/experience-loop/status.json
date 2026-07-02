@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T10:24:00.000Z","loop":"running","phase":"idle-between-ticks",
-  "note":"OWNER-P1 done: consistent neon-glow button hover shipped (d1ae032) — 3 glow tokens + 29 role-coloured button-hover rules (green/blue/red), glow persists under reduced-motion, disabled=no glow, focus rings intact, prose links still underline; prod build green. Agents dashboard confirmed live at /agents.html. Next tick: verify BOTH implemented — feedback-success (52879f1) + button-glow (d1ae032) — worktree-isolated; then build reset-verify-dead-link.",
-  "agents":{ "Orchestrator":{"state":"idle","ticket":"awaiting next tick","since":null},
-  "Planner":{"state":"idle","ticket":"next=verify feedback-success + button-glow; then reset-verify-dead-link","since":null},
-  "Builder":{"state":"idle","ticket":"just finished: owner-P1 button-hover neon glow (d1ae032)","since":null},
-  "Tester":{"state":"idle","ticket":"2 implemented awaiting verify (52879f1, d1ae032)","since":null},
-  "UserSimulator":{"state":"idle","ticket":"filed P3 time-datetime-attr","since":null} } }
+{ "updatedAt":"2026-07-02T10:44:00.000Z","loop":"running","phase":"build+test",
+  "note":"Owner-inject live-fixed: discover empty-state buttons now glow + equal-height (2c81e3c). User-simulator upgraded to ALWAYS-ON every tick + must report styling/visual-comfort issues + leaked internal text (e.g. 'waiting for legal review'). Continuous chaining ON (no idle gaps). Tester still verifying feedback-success (52879f1) + button-glow (d1ae032) in worktree isolation.",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"owner-inject fixes + upgrading user-sim to always-on","since":"2026-07-02T10:30:00.000Z"},
+  "Planner":{"state":"idle","ticket":"continuous chaining on; user-sim always-on","since":null},
+  "Builder":{"state":"idle","ticket":"just finished: reset/verify recovery path (43863b5) + discover empty-state glow/align (2c81e3c)","since":null},
+  "Tester":{"state":"working","ticket":"verify 52879f1 (feedback-success) + d1ae032 (button-glow) — worktree-isolated","since":"2026-07-02T10:30:00.000Z"},
+  "UserSimulator":{"state":"idle","ticket":"now always-on: full workflows + styling/comfort/leaked-internal-text audit — runs next tick","since":null} } }
