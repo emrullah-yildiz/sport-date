@@ -1,13 +1,13 @@
 # CX-20260701-brand-asset-swap-mechanism
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3` — (Reach 5 × Impact 2 × Confidence 4) / Effort 2 = 20. Invisible-to-members refactor / polish; no member-facing change now, but it de-risks the eventual brand decision. No safety/privacy/auth dimension.
 - Customer journey: (internal foundation — enables a future brand change without member-facing churn)
 - Surface: `web`
 - Environment and viewport/device: all widths (no visual change expected)
 - Found by: Experience & Design Explorer (owner growth-intake pass, 2026-07-01) — the buildable *mechanism* for the owner brand decision
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-owner-decision-brand-name-and-logo` (`blocked-owner` — the decision this prepares for; **do not rename** until that lands), `CX-20260701-shareable-branded-motivational-card` (should consume this module)
 
 ## Customer outcome
@@ -74,3 +74,5 @@ partially-renamed app (a real trust papercut). Emotional: none now. No auth/priv
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner growth-intake pass); status `ready`.
+- 2026-07-02 - Experience Build Agent picked up; status `in-progress`. Found the rename-to-Rally pass (commit 83e0a36) already centralized name/wordmark/tagline/colors into `lib/brand.tsx` and wired navs/footer/layout metadata/landing/share-card to it. Remaining DoD work: document the favicon (`app/icon.svg`) as the single manual asset that mirrors the brand mark, and add a non-tautological test proving (a) components consume the brand module and (b) the favicon stays in sync with the brand tokens so drift is caught.
+- 2026-07-02 - Implemented (commit `2e5dec4`). **What was centralized:** the last scattered copies of the brand *mark geometry*. Extracted the rally-arc glyph paths (arc, return, dot, stroke width) into a single exported `RALLY_GLYPH_PATHS` constant in `src/lib/brand.tsx`; both the in-app `<RallyGlyph/>` and the shareable motivational card (`lib/motivational-card.ts`) now draw from it instead of hand-copied path strings. Name/tagline/title/colors were already centralized there and consumed by navs, footer, layout metadata, landing, auth email, error chrome, and the share card. **Single documented swap point:** `src/lib/brand.tsx` carries a "HOW TO SWAP THE BRAND" block naming every knob — name/tagline (`BRAND_NAME`/`BRAND_TAGLINE`), colors (`BRAND_ACCENT`/`BRAND_TEXT`/`BRAND_BG`, kept in sync with globals.css tokens), and mark geometry (`RALLY_GLYPH_PATHS`). **To swap:** edit those constants; everything member-facing updates. The ONE remaining manual asset is `src/app/icon.svg` (favicon/app icon) — Next serves it as a raw file so it can't import the module; it hand-mirrors the mark and now carries a comment pointing back at the source of truth. **Appearance unchanged:** no rename, no logo change, no DOM/class change; the extracted glyph paths are byte-identical to the originals (test renders `<RallyGlyph/>` and asserts the exact paths). **Tests:** added `src/lib/brand.test.tsx` (16 assertions) — a non-tautology proving consumers stay in sync: it renders `<RallyGlyph/>`/`<Wordmark/>` and reads `app/icon.svg` from disk, asserting the favicon still uses `BRAND_ACCENT`/`BRAND_BG` and the exact `RALLY_GLYPH_PATHS`; a mark/color change that forgets the favicon fails CI. Existing motivational-card test still asserts the card consumes `BRAND_NAME`/`BRAND_ACCENT`. **Checks (apps/web):** typecheck ✓, lint ✓ (0 errors), test ✓ (675 pass incl. ethical-guardrails 54), production build ✓ (icon.svg serves static). No migration. Status → `implemented` (Explorer to retest).

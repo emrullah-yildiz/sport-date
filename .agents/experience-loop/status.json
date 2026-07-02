@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T23:10:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"event-create form structure VERIFIED+archived (8e0335e — one form/one publish, sections partition all fields, privacy/auth intact). Host-side past-event reflection SHIPPED (aff5f8a — private, honest, derived from host's own reflection; ethical-guardrails green). User-sim found + orchestrator FIXED DIRECTLY a hydration mismatch on /events/new (adf2ee5 — datetime min now client-only via useSyncExternalStore). Chaining: BUILD brand-asset-swap-mechanism; TEST hosting-past-events-no-reflection aff5f8a (worktree-isolated); USE user-sim (report-only, rotate).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T23:10:00.000Z"},
-  "Planner":{"state":"idle","ticket":"polish queue ~18; no new tickets; fix-directly mode","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260701-brand-asset-swap-mechanism","since":"2026-07-02T23:10:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify aff5f8a (hosting past-events reflection) — worktree-isolated","since":"2026-07-02T23:10:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"report-only: next member journey + audit","since":"2026-07-02T23:10:00.000Z"} } }
+{ "updatedAt":"2026-07-02T23:35:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Host past-event reflection VERIFIED+archived (aff5f8a). Brand-mark swap mechanism SHIPPED (2e5dec4 — single documented swap point, appearance unchanged, 675 tests, guardrails green). User-sim caught + orchestrator FIXED DIRECTLY two issues: host acknowledgement claimed attendance on empty events (a7d34c4 — now turnout-agnostic + honesty test) and MomentGlow hydration mismatch under reduced-motion (a2605c3 — initial made unconditional). Chaining: BUILD event-detail-approximate-location-no-spatial-cue; TEST brand-mark 2e5dec4 (worktree-isolated); USE user-sim (report-only, re-verify both fixes live).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T23:35:00.000Z"},
+  "Planner":{"state":"idle","ticket":"polish queue ~17; no new tickets; fix-directly mode","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260701-event-detail-approximate-location-no-spatial-cue","since":"2026-07-02T23:35:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 2e5dec4 (brand-mark swap mechanism) — worktree-isolated","since":"2026-07-02T23:35:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"report-only: rotate journey + re-verify host-acknowledgement + MomentGlow fixes","since":"2026-07-02T23:35:00.000Z"} } }
