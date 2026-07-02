@@ -121,7 +121,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         <p className="discover-area-note">
           <span>
             You&apos;re seeing events within <strong>{requestedRadiusKm} km</strong> of{" "}
-            {geoCentre.source === "device" ? "your approximate current area" : <>near <strong>{area.memberArea}</strong></>}.
+            {geoCentre.source === "device" ? "your approximate current area" : <strong>{area.memberArea}</strong>}.
           </span>
           <Link href="/discover" className="discover-broaden">Back to my area</Link>
         </p>

@@ -36,7 +36,7 @@ export function buildSecurityHeaders(nodeEnv: string): Header[] {
     { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
     {
       key: "Permissions-Policy",
-      value: "camera=(), geolocation=(), microphone=(), payment=(), usb=()",
+      value: "camera=(), geolocation=(self), microphone=(), payment=(), usb=()",
     },
   ];
 
