@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T06:46:00.000Z","loop":"running","phase":"idle-between-ticks",
-  "note":"Tick done: built event-detail facts hierarchy (72f3d97, implemented); Tester verified + archived 6 tickets. Next build: migrate-hardcoded-colors-moderation-remainder.",
+{ "updatedAt":"2026-07-02T06:58:00.000Z","loop":"running","phase":"idle-between-ticks",
+  "note":"Tick done: moderation color-token migration + dead-CSS removal implemented (4e6082a); User-sim ran seeker discover→room→chat journey (all works), filed 1 P3 (time-datetime-attr). Next: Tester pass on the 2 implemented (event-detail-facts 72f3d97, moderation 4e6082a), then build profile-photos-upload-label @375 overflow.",
   "agents":{ "Orchestrator":{"state":"idle","ticket":"awaiting next tick","since":null},
-  "Planner":{"state":"idle","ticket":"next=migrate-hardcoded-colors-moderation-remainder","since":null},
-  "Builder":{"state":"idle","ticket":"just finished: event-detail facts hierarchy (72f3d97)","since":null},
-  "Tester":{"state":"idle","ticket":"verified+archived 6 tickets","since":null},
-  "UserSimulator":{"state":"idle","ticket":null,"since":null} } }
+  "Planner":{"state":"idle","ticket":"next=Tester pass on 2 implemented; then profile-photos-upload-label @375","since":null},
+  "Builder":{"state":"idle","ticket":"just finished: moderation color-token migration (4e6082a)","since":null},
+  "Tester":{"state":"idle","ticket":"verified+archived 6 earlier","since":null},
+  "UserSimulator":{"state":"idle","ticket":"filed CX-20260702-event-time-datetime-attr-not-iso (P3)","since":null} } }
