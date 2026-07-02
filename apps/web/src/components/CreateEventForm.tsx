@@ -1,7 +1,7 @@
 "use client";
 
 import type { ExperienceLevel } from "@sport-date/domain";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import {
   datetimeLocalMin,
@@ -37,9 +37,17 @@ export default function CreateEventForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
 
-  // `min` is fixed for the life of this mount: it only needs to stop a clearly
-  // past time from being picked; the server stays the authoritative check.
-  const startMin = useMemo(() => datetimeLocalMin(), []);
+  // `min` only exists to stop a clearly-past time from being picked; the server
+  // stays the authoritative check. `datetimeLocalMin()` reads the wall clock, so
+  // evaluating it during SSR and again at hydration can yield a different minute
+  // (or timezone) and makes React log a hydration-mismatch on every host visit.
+  // Resolve it as a client-only value: the server snapshot is empty (no floor),
+  // so server and first client render agree, then the browser fills in the floor.
+  const startMin = useSyncExternalStore(
+    () => () => {},
+    () => datetimeLocalMin(),
+    () => "",
+  );
 
   const invalidFields = useMemo(() => {
     const set = new Set<EventFieldName>();
