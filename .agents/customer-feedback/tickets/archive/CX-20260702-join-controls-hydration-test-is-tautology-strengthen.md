@@ -1,6 +1,6 @@
 # CX-20260702-join-controls-hydration-test-is-tautology-strengthen
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3` — (Reach 2 × Impact 2 × Confidence 5) / Effort 2 = 10. Test-quality/regression-safety only; no member-facing impact. The reduced-motion hydration bug itself is fixed and verified (`ada3e8d`); this hardens the guard so a future reintroduction is actually caught.
 - Customer journey: n/a (engineering test coverage)
