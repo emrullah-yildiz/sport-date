@@ -1,6 +1,6 @@
 # CX-20260702-photo-reorder-500-check-constraint
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1 high` — a shipped feature (photo reorder) 500s for any member with 2+ photos, now that storage is live. Found only after the Blob store was connected (the live path never ran before).
 - Customer journey: profile / photos
@@ -32,4 +32,4 @@ A member can reorder their photos and it persists, with no server error.
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by the Tester after live photo-upload verification exposed the reorder path; status `ready`.
-- 2026-07-02 - Builder took ticket `in-progress`; rewrote `reorderProfilePhotos` to a single set-based `UPDATE ... FROM unnest(ids, positions)` inside a transaction. A non-deferrable `UNIQUE(user_id, position)` index still 500'd mid-permutation (checked per-row), so added ADDITIVE migration `028_profile_photos_position_deferrable.sql` making that uniqueness `DEFERRABLE INITIALLY DEFERRED` (guarantee unchanged, checked at COMMIT). Reorder no longer touches `is_primary` (that is `setPrimaryProfilePhoto`'s job; re-deriving it would trip the one-primary partial index). MIGRATION ADDED — orchestrator must migrate prod before pushing. Live verified on dev: reorder of 3 photos → 200 + persisted order, positions unique/in-range, primary preserved, foreign id → 400. Checks: typecheck/lint/test/build all pass; migration applied clean on dev.
+- 2026-07-02 - Builder took ticket `in-progress`; rewrote `reorderProfilePhotos` to a single set-based `UPDATE ... FROM unnest(ids, positions)` inside a transaction. A non-deferrable `UNIQUE(user_id, position)` index still 500'd mid-permutation (checked per-row), so added ADDITIVE migration `028_profile_photos_position_deferrable.sql` making that uniqueness `DEFERRABLE INITIALLY DEFERRED` (guarantee unchanged, checked at COMMIT). Reorder no longer touches `is_primary` (that is `setPrimaryProfilePhoto`'s job; re-deriving it would trip the one-primary partial index). MIGRATION ADDED — orchestrator must migrate prod before pushing. Live verified on dev: reorder of 3 photos → 200 + persisted order, positions unique/in-range, primary preserved, foreign id → 400. Checks: typecheck/lint/test/build all pass; migration applied clean on dev. Committed `96aa377` (NOT pushed — MIGRATION ADDED; orchestrator applies db/028 to prod first, then pushes). Status → `implemented` for independent retest.
