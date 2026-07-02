@@ -1,6 +1,6 @@
 # CX-20260702-cancelled-request-cannot-re-request-permanent-lockout
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 4 × Impact 4 × Confidence 5) / Effort 2 = 40. Directly contradicts the reassuring cancel copy the product just fixed, and quietly locks a willing member out of an open event. Core commit-loop reversibility failure; cheap to fix.
 - Customer journey: commit — request a place → pending → cancel → change my mind → re-request
@@ -92,3 +92,4 @@ reversibility/expectation failure in the core commit loop.
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim (commit-journey re-verify pass); status `ready`.
+- 2026-07-02 - Implemented by build agent (commit b5cdddd). Server `createEventJoinRequest` now reopens the member's OWN cancelled row to pending via `ON CONFLICT ... DO UPDATE ... WHERE join_requests.status = 'cancelled'` (was `DO NOTHING`), scoped so accepted/declined/pending rows are untouched; every join guard stays in the INSERT SELECT (published+future, capacity, host-exclusion, mutual block, age/skill/language), and the reliability cool-down still returns before the upsert so an active late-cancel pause is never bypassed; RETURNING yields the row's real id for a subsequent cancel. UI `JoinRequestControls` cancelled branch replaced the terminal dead-end with a calm "Request a place again" affordance (join form returns, focus lands on the note field, "skip counts stay private" kept). No schema change. Added `join-requests.test.ts` (on-time cancel -> reopen to pending; guards still block closed/full/blocked; active cool-down never bypassed vs. expired pause proceeds). Checks (apps/web): typecheck pass, lint 0 errors, test 546 passed, build pass. Status -> `implemented` for independent Explorer retest.

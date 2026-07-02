@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T12:12:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"Cancel/leave resilience shipped (6425f5b, implemented): calm JSON errors, never raw 500, shared abort/timeout helper — button can never hang. share-invitation glow verified+archived (every-button-glows standard closed). Chaining next tick: BUILD cancelled-request-permanent-lockout P1 (allow re-request after on-time self-cancel; ON CONFLICT DO NOTHING + dead-end UI); TEST cancel-500 resilience (6425f5b, worktree-isolated); USE always-on user-sim.",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T12:12:00.000Z"},
-  "Planner":{"state":"idle","ticket":"next build=cancelled-request-permanent-lockout (P1)","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260702-cancelled-request-cannot-re-request-permanent-lockout","since":"2026-07-02T12:12:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 6425f5b (cancel/leave resilience) — worktree-isolated","since":"2026-07-02T12:12:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T12:12:00.000Z"} } }
+{ "updatedAt":"2026-07-02T12:44:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Permanent-lockout fixed (b5cdddd, implemented) — cancelled request re-requestable, guards+cooldown preserved. cancel/leave resilience (6425f5b) + share-invitation glow verified+archived. User-sim Account&Trust pass: 0 errors, sign-out clears session, hover-glow correct; filed P2 web-sessions-device-hint + P3 photo-upload-375-overflow. Chaining next tick: BUILD join-request-cancel-buttons-no-hover-glow (close the every-button-glows standard further); TEST lockout fix (b5cdddd, worktree-isolated); USE always-on user-sim.",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T12:44:00.000Z"},
+  "Planner":{"state":"idle","ticket":"next build=join-request-cancel-buttons-no-hover-glow (owner glow standard)","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-join-request-cancel-buttons-no-hover-glow","since":"2026-07-02T12:44:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify b5cdddd (re-request after cancel) — worktree-isolated","since":"2026-07-02T12:44:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T12:44:00.000Z"} } }
