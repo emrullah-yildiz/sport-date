@@ -1,6 +1,6 @@
 # CX-20260701-event-create-form-no-step-progress-friction
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. Every host meets this; moderate friction; the entry point and publish success are already solved, so this is the remaining "creation is easy" gap. P2 medium.
 - Customer journey: intent → commitment (hosting / event creation)
@@ -67,3 +67,4 @@ A long undifferentiated form raises perceived effort and abandonment for first-t
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criteria 1 and 6); status `ready`.
+- 2026-07-02 - Implemented by Experience Build Agent; status `implemented`. Kept the single form with one Publish at the end (no wizard, no clicks added, no data loss) and added a calm sense of structure/progress: (1) a top progress rail (`nav`, `aria-label="Event details progress"`) naming and linking the three ordered sections — The invitation / The rhythm / Where you'll meet — so the host sees the shape before scrolling; (2) a quiet "Section N of 3" indicator plus an `aria-labelledby` heading landmark on each `<section>` for keyboard/SR orientation; (3) on a blocked submit the rail quietly flags which sections need attention (informative, never a blocker) beside the existing field-tied summary, so recovery is oriented and entered data is preserved. Defaults, inline help, timezone capture, datetime behaviour, and the public/private location separation are unchanged; no field became newly required; no gamification/motion. Section metadata is the single source of truth in `event-create-recovery.ts`. Anthracite+neon tokens only in globals.css; mobile 375px stacks the rail to one column; 44px targets; visible focus via global fallback. Files: `apps/web/src/components/CreateEventForm.tsx`, `apps/web/src/lib/event-create-recovery.ts`, `apps/web/src/lib/event-create-recovery.test.ts`, `apps/web/src/app/globals.css`. Test: added `form sections (structure + progress orientation)` suite in `event-create-recovery.test.ts` (partition-of-EVENT_FIELD_ORDER, public-before-private order, "Section N of M" label, field→section mapping, attention-flagging in section order). Checks: typecheck / lint (0 errors) / test (661 passed) / production build — all pass. Commit `8e0335e`, pushed to origin/main. Ready for independent Explorer retest.

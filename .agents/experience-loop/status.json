@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T22:20:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"event-room past-tense VERIFIED+archived (9cb2801). feedback headline reframe implemented (388a9a5 — welcomes ideas/praise/problems). User-sim HOST create→publish→success pass ALL PASS both viewports (CTAs work, own-event no-404, precise-location firewall holds, focus rings, no leak); no findings. Chaining: BUILD event-create-form-no-step-progress (P2); TEST feedback-headline 388a9a5 (worktree-isolated); USE user-sim (report-only, rotate).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T22:20:00.000Z"},
-  "Planner":{"state":"idle","ticket":"polish queue; no new tickets; fix-directly mode","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260701-event-create-form-no-step-progress-friction","since":"2026-07-02T22:20:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 388a9a5 (feedback headline reframe) — worktree-isolated","since":"2026-07-02T22:20:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"report-only: next member journey + audit","since":"2026-07-02T22:20:00.000Z"} } }
+{ "updatedAt":"2026-07-02T22:52:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"feedback headline reframe VERIFIED+archived (388a9a5, live-confirmed). event-create form structure implemented (8e0335e — progress rail + section landmarks, single form/one publish). User-sim feedback-submit pass all matched (a11y confirmation live). Chaining: BUILD hosting-past-events-no-reflection (P2); TEST event-create-step 8e0335e (worktree-isolated); USE user-sim (report-only, rotate).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T22:52:00.000Z"},
+  "Planner":{"state":"idle","ticket":"polish queue ~19; no new tickets; fix-directly mode","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260701-hosting-past-events-no-reflection-or-outcome","since":"2026-07-02T22:52:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 8e0335e (event-create form structure) — worktree-isolated","since":"2026-07-02T22:52:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"report-only: next member journey + audit","since":"2026-07-02T22:52:00.000Z"} } }
