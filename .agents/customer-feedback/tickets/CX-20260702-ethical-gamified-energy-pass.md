@@ -1,6 +1,6 @@
 # CX-20260702-ethical-gamified-energy-pass
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 3) / Effort 3 = 12. Delivers the owner-requested "gamified, energetic" feel, but rides on top of the token + type + IA work and carries the highest guardrail risk, so it sits at the bottom of the P2 band and ships LAST in the cluster. Reach is broad (momentum cues appear across coordination + reflection), impact is real but softer than the structural fixes, confidence moderate because the humane/non-casino line requires care.
 - Customer journey: cross-cutting — commitment, arrival, activity, reflection (celebrating real meetings)
@@ -76,3 +76,5 @@ Practical/emotional: done right, the app feels alive and rewards real meetings, 
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh); guardrails in `docs/design-refresh-2026.md` §4. Ships last in the cluster. Status `ready`.
+- 2026-07-02 - experience-build-agent (Claude Opus 4.8) took ownership; status `in-progress`.
+- 2026-07-02 - Implemented (commit 0c00391). Added `MomentGlow` (brief, aria-hidden, reduced-motion-safe green neon confirmation on real ended-event afterglow + own confirmed movement), enriched private `MovementArc` with an honest retrospective "your movement" reflection from real completed-event counts (no invented numbers), and wired the glow into `PostEventAfterglow`. Hard guardrails restated in AC and enforced by a new source-scanning tripwire test (`ethical-energy-guardrails.test.tsx`) that fails the build if any banned mechanic re-enters. AA-safe (green `--accent` only, behind text, no layout shift). Migration: none. Checks: typecheck PASS, lint PASS (only a pre-existing unrelated warning in gitignored qa/full-flows.mjs), test PASS (439 passed / 12 skipped), production build PASS. Dev-server interactive login unavailable (auth DB 503 in this env); verified routes compile with no 500 and rendered surfaces asserted via renderToStaticMarkup in the new test. Status `implemented` — ready for independent retest.
