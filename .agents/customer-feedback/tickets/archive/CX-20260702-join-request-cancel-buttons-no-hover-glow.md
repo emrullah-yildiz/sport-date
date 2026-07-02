@@ -1,6 +1,6 @@
 # CX-20260702-join-request-cancel-buttons-no-hover-glow
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3` — (Reach 4 × Impact 2 × Confidence 5) / Effort 1 = 40, capped P3 as pure hover-affordance polish. A coverage gap left by the (verified) systemic glow work on the highest-intent buttons in the app.
 - Customer journey: commit — request a place / cancel request / cancel my place
@@ -62,3 +62,5 @@ impact. Purely presentational.
 
 - 2026-07-02 - Filed by user-sim (commit-journey live pass); status `ready`.
 - 2026-07-02 - Implemented (build). `apps/web/src/app/globals.css`: added hover glow + focus ring directly on the join-controls commit buttons via `.join-request-box button` and `.join-state button` (unscoped so it can't drift). These cover every commit CTA: Request a place, Cancel request, Cancel my place, Request a place again. Hover now `box-shadow: var(--glow-accent)` (GREEN role colour for both positive and calm/neutral cancel — cancel is not styled destructive), plus `transition` for box-shadow/transform. Added `:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px }` on the buttons themselves (previously only the confirmation `strong` had a ring). Disabled → `box-shadow: none` (`:disabled` and `:disabled:hover`). Reduced-motion: the glow persists; only the `translateY(-2px)` lift is gated behind `@media (prefers-reduced-motion: no-preference)`. Shared tokens only, no hardcoded hex; decorative box-shadow only so AA/layout unaffected at 375/1280. Reconciled with b5cdddd (which added "Request a place again" assuming `.join-state button` already glowed — it did not; now it does). Checks (apps/web): typecheck pass, lint 0 errors, test 546 passed, build pass. Commit `7f1e301`.
+
+- 2026-07-02 - VERIFIED (Tester, independent, worktree-isolated at clean HEAD incl. 7f1e301). Base rule `.join-request-box button,.join-state button` had NO box-shadow (glow genuinely new); hover `:hover:not(:disabled){ box-shadow: var(--glow-accent) }` GREEN + `:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }`; disabled + disabled:hover reset box-shadow:none; translateY lift only inside `@media (prefers-reduced-motion:no-preference)` so glow persists under reduced-motion. All 4 commit CTAs covered (Request a place, Cancel my place, Cancel request, Request a place again — all unclassed <button> in .join-request-box/.join-state). Tokens only, no hex, AA/layout unaffected, green acceptable for positive+neutral. Checks the Tester ran itself: typecheck PASS, lint 0 errors, test 546 passed/12 skipped, prod build PASS. Orchestrator applied `verified` in main tree and archived. Closes the app-wide every-button-glows standard on the commit controls.
