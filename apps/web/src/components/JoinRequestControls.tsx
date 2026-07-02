@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import { cancelJoinRequest } from "@/lib/cancel-join-request";
 import { declinedJoinRequestMessage, joinRequestConfirmationMessage } from "@/lib/join-request-policy";
 
 type Status = DiscoveryRequest["status"];
@@ -112,28 +113,31 @@ export default function JoinRequestControls({
     if (!requestId) return;
     setSubmitting(true);
     setError("");
-    try {
-      const response = await fetch(`/api/events/${eventId}/requests/${requestId}`, { method: "DELETE" });
-      const result = (await response.json()) as { error?: string; status?: Status };
-      if (!response.ok) throw new Error(result.error || "Cancellation failed.");
-      const nextStatus = result.status ?? "cancelled";
-      const wasAccepted = status === "accepted";
-      setStatus(nextStatus);
-      setAnnouncement(joinRequestConfirmationMessage(nextStatus));
-      focusOnResolveRef.current = true;
-      // Only cancelling an accepted place changes server-rendered content (the
-      // exact meeting-point section must disappear), so re-sync the RSC tree in
-      // that case. router.refresh() preserves this component's local state and
-      // browser scroll; re-assert focus afterwards so the async merge can't
-      // strand a keyboard / screen-reader member on <body>.
-      if (wasAccepted) {
-        router.refresh();
-        requestAnimationFrame(() => confirmationRef.current?.focus());
-      }
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Cancellation failed.");
-    } finally {
+    // The shared helper owns the client-side timeout/abort so a hung or slow
+    // request can never leave this button stuck on "Cancelling…"; it always
+    // resolves, so `submitting` is reliably cleared below.
+    const result = await cancelJoinRequest(eventId, requestId);
+    if (!result.ok) {
+      // Re-enable the control and surface the calm, recoverable message. The
+      // member's request/place is untouched — never a dead end.
+      setError(result.message);
       setSubmitting(false);
+      return;
+    }
+    const nextStatus = (result.status as Status) ?? "cancelled";
+    const wasAccepted = status === "accepted";
+    setStatus(nextStatus);
+    setAnnouncement(joinRequestConfirmationMessage(nextStatus));
+    focusOnResolveRef.current = true;
+    setSubmitting(false);
+    // Only cancelling an accepted place changes server-rendered content (the
+    // exact meeting-point section must disappear), so re-sync the RSC tree in
+    // that case. router.refresh() preserves this component's local state and
+    // browser scroll; re-assert focus afterwards so the async merge can't
+    // strand a keyboard / screen-reader member on <body>.
+    if (wasAccepted) {
+      router.refresh();
+      requestAnimationFrame(() => confirmationRef.current?.focus());
     }
   }
 
@@ -174,7 +178,7 @@ export default function JoinRequestControls({
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel my place"}
           </button>
-          {error ? <p role="alert">{error}</p> : null}
+          {error ? <p className="error-message" role="alert">{error}</p> : null}
         </motion.div>
       );
     }
@@ -186,7 +190,7 @@ export default function JoinRequestControls({
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel request"}
           </button>
-          {error ? <p role="alert">{error}</p> : null}
+          {error ? <p className="error-message" role="alert">{error}</p> : null}
         </motion.div>
       );
     }

@@ -11,6 +11,11 @@ vi.mock("@/lib/join-requests", () => ({
   cancelEventJoinRequest: vi.fn(),
 }));
 
+class TestDatabaseNotConfiguredError extends Error {}
+vi.mock("@/lib/db", () => ({
+  DatabaseNotConfiguredError: TestDatabaseNotConfiguredError,
+}));
+
 let DELETE: typeof import("./route").DELETE;
 let isTrustedBrowserMutation: typeof import("@/lib/request-security").isTrustedBrowserMutation;
 let getCurrentUser: typeof import("@/lib/session").getCurrentUser;
@@ -22,6 +27,21 @@ beforeAll(async () => {
   ({ getCurrentUser } = await import("@/lib/session"));
   ({ cancelEventJoinRequest } = await import("@/lib/join-requests"));
 }, 60000);
+
+function deleteRequest() {
+  return DELETE(
+    new Request("https://sportdate.example/api/events/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/requests/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", {
+      method: "DELETE",
+      headers: { Origin: "https://sportdate.example" },
+    }),
+    {
+      params: Promise.resolve({
+        eventId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        requestId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+      }),
+    },
+  );
+}
 
 describe("browser join request cancellation route", () => {
   it("cancels an accepted place for the authenticated requester", async () => {
@@ -123,5 +143,41 @@ describe("browser join request cancellation route", () => {
 
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({ error: "Cross-site request rejected." });
+  });
+
+  it("returns a readable JSON error (never a raw empty 500) when the data layer throws", async () => {
+    // The class of bug that stranded members on "Cancelling…": the DELETE 500'd
+    // with an empty body when the underlying UPDATE hit missing columns, so the
+    // client had no JSON error to read. The route must now catch any throw and
+    // return a calm, readable JSON body — not an empty 500.
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(isTrustedBrowserMutation).mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: "11111111-1111-4111-8111-111111111111" } as never);
+    vi.mocked(cancelEventJoinRequest).mockRejectedValue(new Error('column "exit_reason" does not exist'));
+
+    const response = await deleteRequest();
+
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(typeof body.error).toBe("string");
+    expect(body.error.length).toBeGreaterThan(0);
+    // The readable body must not leak the underlying error / internals to the member.
+    expect(body.error).not.toContain("exit_reason");
+    consoleError.mockRestore();
+  });
+
+  it("returns a calm 503 (not an empty 500) when the database is not configured", async () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(isTrustedBrowserMutation).mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: "11111111-1111-4111-8111-111111111111" } as never);
+    vi.mocked(cancelEventJoinRequest).mockRejectedValue(new TestDatabaseNotConfiguredError("no db"));
+
+    const response = await deleteRequest();
+
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(typeof body.error).toBe("string");
+    expect(body.error.length).toBeGreaterThan(0);
+    consoleError.mockRestore();
   });
 });

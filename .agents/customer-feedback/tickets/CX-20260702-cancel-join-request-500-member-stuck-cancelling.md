@@ -1,6 +1,6 @@
 # CX-20260702-cancel-join-request-500-member-stuck-cancelling
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — (Reach 5 × Impact 4 × Confidence 5) / Effort 2 = 50. Core commit-loop action (cancel a pending request / leave an accepted place) is completely broken on the live QA environment and the button hangs forever; owner-reported-style breakage.
 - Customer journey: commit — request a place → pending → cancel/unjoin (and the accepted-place graceful exit, same code path)
@@ -87,4 +87,8 @@ Separately: this is an authorization/data-integrity-adjacent reliability failure
 
 - 2026-07-02 - Filed by user-sim (commit-journey live pass); status `ready`.
 
+- 2026-07-02 - build (experience build agent): status `in-progress`, implementation owner. Scope = route/UI resilience per orchestrator note (acute DB cause already fixed via applied migration 029). Hardening the DELETE route (no raw empty 500) and both cancel/leave UI surfaces (no indefinite "Cancelling…"; client-side timeout/abort + recoverable "your place is still yours" alert).
+
 - 2026-07-02 - orchestrator: acute cause resolved — migration `029_join_request_exit_reasons.sql` has now been applied to BOTH prod (earlier this session) and the DEV database (`NEON_DATABASE_URL`), so `cancelEventJoinRequest` no longer 500s on the missing `exit_reason`/`exit_note` columns; a live re-test of cancel/leave should now pass and will be re-verified by the next User-simulator pass. **Remaining scope for this P1 = route/UI RESILIENCE:** the DELETE route should never return a raw empty-body 500 and the "Cancelling…" button must never hang forever — on any failure, return a calm JSON error and have the UI re-enable the control + show a recoverable message ("your place is still yours"). Prioritized as the next build.
+
+- 2026-07-02 - user-sim RE-VERIFY: **PASS on the acute cancel path.** Logged in as a pooled seeker, opened a compatible published future event with a pending request, clicked **Cancel request**. Result: `DELETE /api/events/{id}/requests/{id}` returned **HTTP 200** with body `{"success":true,"status":"cancelled"}` (was 500/empty). The panel resolved to the calm closed state "Request cancelled. This invitation is closed for your account.", the button did NOT hang on "Cancelling…", no 5xx, no console errors. Migration 029 fix confirmed working on dev. Also verified in source that the resilience scope is implemented: `cancelRequest` in `JoinRequestControls.tsx` routes through `cancelJoinRequest()` (shared helper with client-side timeout/abort) and on failure re-enables the control + shows `result.message` instead of hanging (lines 112–142). Recommend marking the acute-cause portion `verified`; keep open only for the outstanding route-test acceptance criterion (DB-error → readable JSON, not empty 500).

@@ -3,6 +3,8 @@
 import { MAX_GRACEFUL_EXIT_NOTE_LENGTH, exitReasonIsSafety, type GracefulExitReason } from "@sport-date/domain";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { cancelJoinRequest } from "@/lib/cancel-join-request";
+
 // Member-facing labels for the optional, PRIVATE reason. Calm and non-judgemental —
 // no reason implies fault, and "prefer not to say" is a first-class choice.
 const REASON_LABELS: Record<GracefulExitReason, string> = {
@@ -70,24 +72,21 @@ export default function RoomLeaveControl({
   async function confirmLeave() {
     setPhase("leaving");
     setMessage("");
-    try {
-      const response = await fetch(`/api/events/${eventId}/requests/${requestId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        // Optional private reason. The seat is removed regardless of what is sent;
-        // this only records the member's own note, never shown to anyone else.
-        body: JSON.stringify({
-          reason,
-          note: reason === "prefer_not_to_say" || reason === "unspecified" ? "" : note,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Could not leave the event.");
-      setPhase("done");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not leave the event.");
+    // The shared helper owns the client-side timeout/abort, so a hung or slow
+    // request can never strand this button on "Leaving…"; it always resolves.
+    const result = await cancelJoinRequest(eventId, requestId, {
+      // Optional private reason. The seat is removed regardless of what is sent;
+      // this only records the member's own note, never shown to anyone else.
+      exit: { reason, note: reason === "prefer_not_to_say" || reason === "unspecified" ? "" : note },
+    });
+    if (!result.ok) {
+      // Re-enable the control (phase leaves "leaving") and show the calm,
+      // recoverable message — the member's place is untouched.
+      setMessage(result.message);
       setPhase("error");
+      return;
     }
+    setPhase("done");
   }
 
   // Calm acknowledgement after a successful exit. Reassures the member their choice
@@ -186,7 +185,7 @@ export default function RoomLeaveControl({
 
           {phase === "error" && message ? (
             <p className="room-leave-error" role="alert">
-              {message} Your place is still yours — nothing changed. You can try again or step back for now.
+              {message} You can try again or step back for now.
             </p>
           ) : null}
         </div>
