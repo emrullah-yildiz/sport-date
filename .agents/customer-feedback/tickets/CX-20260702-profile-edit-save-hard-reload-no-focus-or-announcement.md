@@ -1,6 +1,6 @@
 # CX-20260702-profile-edit-save-hard-reload-no-focus-or-announcement
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Customer journey: Account & trust — edit my profile (bio, languages, seeking, sports, prompts) and save
 - Surface: `web`
@@ -102,3 +102,4 @@ emotionally loaded than committing to meet a stranger, but it is the same accept
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim; status `ready`.
+- 2026-07-02 - Implemented (build agent), commit `8a0532a`, status `implemented`. Removed `window.location.reload()` from the save success path in `apps/web/src/components/EditProfileForm.tsx`. On a successful PATCH the form now resolves in place: it sets a persistent, focusable `role="status"` / `aria-live="polite"` confirmation ("Profile updated.") and calls `router.refresh()` (from `next/navigation`) so the server-rendered profile sections (intro/bio, languages, sports, prompts, seeking) re-sync without a hard navigation, preserving local state and scroll. A callback ref (`focusOnConfirmRef` + `attachConfirmation`, mirroring the verified JoinRequestControls / host accept-decline fixes) moves focus to the confirmation the moment it mounts, so keyboard / screen-reader focus lands on it and is never dropped to `<body>`. Errors keep their own `role="alert"` inline message and re-enable the Save button; the editor stays usable, no data loss. Success is instant (no motion) so reduced-motion parity is automatic. Extracted a presentational `EditProfileConfirmation` and added `apps/web/src/components/EditProfileForm.test.tsx` (asserts the confirmation is a polite live region and a keyboard focus target; source tripwires that `window.location.reload()` stays gone, `router.refresh()` is used, and the error path keeps `role="alert"` + re-enables the button). Added `.edit-profile-status` calm/positive style in `globals.css` (existing `--line`/lime tokens, visible focus via global fallback). Checks (apps/web): typecheck pass, lint 0 errors, test 582 passed / 12 skipped, production build pass. No migration.
