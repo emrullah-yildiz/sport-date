@@ -1,6 +1,6 @@
 # CX-20260702-feedback-history-page-value-capitalized-distorts-member-text
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 2 × Confidence 4) / Effort 1 = 24. One-line CSS scoping fix; keeps a member's own words faithful.
 - Customer journey: reflection / feedback ("What you've shared" history)
@@ -71,3 +71,4 @@ Low. The member's own words are quietly rewritten, which erodes the sense that t
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by User-simulator (feedback journey pass); status `ready`.
+- 2026-07-02 - Implemented (Builder). What was distorting the text: `.feedback-ticket dd` (globals.css ~1177) and `.feedback-ticket > header span` (~1171) each carried `text-transform: capitalize`. The `dd` cell renders the member's own free-text Page value (`ticket.currentPath`), so capitalize rewrote their words — `/discover` → `/Discover` (case-meaningful path), `Event room` → `Event Room` — and also title-cased the calm sentence-case labels ("Small friction" → "Small Friction"). Faithful-rendering fix (display-only; no stored-data / validation change): removed `text-transform: capitalize` from both rules. Member Page text now echoes verbatim; the Surface/Impact/Status/Category values keep the human casing they already receive from `displayLabel()` (which maps each enum to a proper label, never a raw snake_case token — so no CSS-capitalized enum leak). The `<dt>` chrome column labels keep their own `text-transform: uppercase` — styling on the chrome, not on member content. Test: added 4 regression assertions in `FeedbackWorkspace.test.tsx` — the `dd` and header-span CSS rules contain no capitalize/uppercase/lowercase transform, the Page cell outputs `{ticket.currentPath}` verbatim, and the `<dt>` chrome retains its uppercase. Checks: typecheck ✓, lint ✓ (0 errors; 2 pre-existing unrelated warnings), test ✓ (716 passed incl. ethical-energy-guardrails), production build ✓. No overflow at 375/1280; AA unchanged. Commit `57f04c9`, pushed to origin/main.
