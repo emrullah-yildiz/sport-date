@@ -1,13 +1,13 @@
 # CX-20260701-private-beta-term-unexplained-no-tooltip
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 5 × Impact 3 × Confidence 4) / Effort 2 = 30. Every new visitor meets the term; cheap to fix; low safety weight. P2 medium.
 - Customer journey: discovery → intent (first contact / signup decision)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths
 - Found by: Experience & Design Explorer — owner design-acceptance intake (2026-07-01), criterion 2
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260630-landing-hero-reduced-motion-hydration-error` (quotes the hero string only), `CX-20260701-profile-hero-off-scale-headline-demotes-member-name` (uses the "private beta profile" eyebrow)
 
 ## Customer outcome
@@ -66,3 +66,5 @@ An unexplained gate-keeping term at the very first decision point erodes trust a
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 2); status `ready`.
+- 2026-07-02 - Picked up by experience-build-agent; status `in-progress`. Building a reusable accessible disclosure (`BetaTermExplainer`) surfaced at landing hero microcopy, login switch CTA, and profile eyebrow.
+- 2026-07-02 - Implemented (status `implemented`, commit 3338ff8). Built a reusable accessible **disclosure** (`apps/web/src/components/BetaTermExplainer.tsx`): a real focusable `<button>` with `aria-expanded` + `aria-controls`, and (when open) `aria-describedby` pointing at a `role="group"` note. NOT hover-only — keyboard + SR reach it identically; dismissible via Esc (returns focus to trigger), outside-click, and a "Got it" Close control; 44px trigger target; `prefers-reduced-motion` disables the open animation. Wired next to the term at all three visible surfaces: landing hero microcopy (`apps/web/src/app/landing/page.tsx`), login switch CTA (`apps/web/src/components/LoginForm.tsx`), profile eyebrow (`apps/web/src/app/profile/page.tsx`). (Signup's "private beta" is a non-visible `<meta>` description, so no on-page explainer applies there.) Copy states only true facts — adults-only Europe-first early preview, features still in build/"preview", free during preview, access is **open (no invite required)** — no unproven safety/verification/identity claims. Styling uses semantic tokens only (`apps/web/src/app/globals.css`): `--surface-raised` panel, `--text`/`--text-muted` copy, `--accent-2` info glyph with `--bg` text, `--focus` 3px ring, `--line` hairlines. AA/AAA per `docs/design-refresh-2026.md` §1 — `--text` on `--surface-raised` = 10.54 (AAA); `--bg` text on `--accent-2` fill = 7.74 (AAA); focus ring = green accent. No overflow at 375/1280px (panel `max-width: min(320px, calc(100vw - 32px))`, flips to right-anchored ≤480px). Tests added: `apps/web/src/components/BetaTermExplainer.test.tsx` (trigger disclosure contract, collapsed-until-open, reusable custom label, panel content/dismiss, and an honesty guard asserting open-access + no invite-only/verification claims). Checks (apps/web): typecheck PASS, lint PASS (pre-existing warnings only), test PASS (499 passed, incl. new file), prod build PASS. Pushed to origin/main. Ready for independent retest.
