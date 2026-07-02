@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { DatabaseNotConfiguredError } from "@/lib/db";
+import { cancelFailureResponse } from "@/lib/cancel-response";
 import { cancelEventJoinRequest } from "@/lib/join-requests";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -36,14 +36,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ e
     if (!await cancelEventJoinRequest(eventId, requestId, requester.id, exit)) return NextResponse.json({ error: "Request cannot be cancelled." }, { status: 409 });
     return NextResponse.json({ success: true, status: "cancelled" });
   } catch (error) {
-    // Distinguish a not-yet-connected database (a transient, retryable condition)
-    // from an unexpected failure, but never leak details to the member. The log
-    // is server-side only and deliberately carries no event/request/user IDs.
-    if (error instanceof DatabaseNotConfiguredError) {
-      console.error("Cancel join request failed: database not configured");
-      return NextResponse.json({ error: "We couldn't reach the service just now. Your place is unchanged — please try again." }, { status: 503 });
-    }
-    console.error("Cancel join request failed:", error instanceof Error ? error.message : "unknown error");
-    return NextResponse.json({ error: "We couldn't complete that just now. Your place is unchanged — please try again." }, { status: 500 });
+    // Calm, readable JSON on any throw — the shared contract both surfaces use, so
+    // web and mobile can never drift apart. Details are logged server-side only.
+    return cancelFailureResponse(error);
   }
 }
