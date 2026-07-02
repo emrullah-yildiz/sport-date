@@ -12,6 +12,7 @@ import PostEventAfterglow from "@/components/PostEventAfterglow";
 import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
+import ShareEventLink from "@/components/ShareEventLink";
 import { BRAND_NAME } from "@/lib/brand";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
@@ -51,6 +52,17 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
     viewerIsFirstTimer: room.viewerIsFirstTimer,
     viewerRequestStatus: room.viewerRequest?.status,
   });
+  // The host lands here right after publishing. Before anyone has an accepted place
+  // the people panel would otherwise read as a cold "0 people joining" over an empty
+  // box — so give the host a warm, honest empty state (no fabricated traction) with a
+  // calm next step: share the approximate-only public invitation or manage the event.
+  const hostAwaitingFirstPlace = room.isHost && room.participants.length === 0;
+  const publicInvitationPath = `/discover/events/${room.id}`;
+  // An accepted, non-host attendee who is currently the only participant (just
+  // themselves, alongside the host) gets a calm "you're the first" note rather than an
+  // absence — never the "0 people joining" contradiction with their own presence.
+  const viewerIsSoleAcceptedGuest =
+    !room.isHost && room.viewerRequest?.status === "accepted" && room.participants.length === 1;
   const startsAtShort = new Intl.DateTimeFormat("en-GB", {
     weekday: "long",
     day: "numeric",
@@ -143,8 +155,32 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         </article>
         <article className="room-people" id="room-people">
           <p className="panel-label">Who has a place</p>
-          <h2>{room.participants.length} {room.participants.length === 1 ? "person" : "people"} joining</h2>
+          <h2>
+            {hostAwaitingFirstPlace
+              ? "No one has a place yet"
+              : `${room.participants.length} ${room.participants.length === 1 ? "person" : "people"} joining`}
+          </h2>
+          {hostAwaitingFirstPlace ? (
+            <div className="room-people-empty">
+              <p className="room-people-empty-lede">
+                Your event is live and people can find it in discovery right now. Requests to
+                join a brand-new invitation usually take a little time to arrive — this is where
+                accepted members will appear as they join.
+              </p>
+              <p className="room-people-empty-hint">Want to help it along? Share the invitation — it only ever reveals the approximate area, never the exact meeting point.</p>
+              <ShareEventLink path={publicInvitationPath} />
+              <div className="room-people-empty-actions">
+                <Link href={publicInvitationPath} className="room-people-empty-primary">
+                  View the public invitation <span aria-hidden="true">→</span>
+                </Link>
+                <Link href="/hosting">Manage your events</Link>
+              </div>
+            </div>
+          ) : (
           <div>
+            {viewerIsSoleAcceptedGuest ? (
+              <p className="room-people-first-note">You&apos;re the first to join — others will appear here as the host accepts more requests.</p>
+            ) : null}
             {!room.isHost ? (
               <span>
                 <strong>{room.host.firstName}</strong>
@@ -172,6 +208,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
               </span>
             ))}
           </div>
+          )}
         </article>
       </section>
       <section className="room-rhythm">

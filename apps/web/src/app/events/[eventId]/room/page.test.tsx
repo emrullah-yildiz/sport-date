@@ -147,6 +147,51 @@ describe("First-event preparation card", () => {
   });
 });
 
+describe("Zero-participants coordination room empty state", () => {
+  it("gives a host with no accepted participants a warm empty state, not a bare zero", async () => {
+    const html = await render({ isHost: true, viewerRequest: null, participants: [] });
+    // Warm, honest heading instead of "0 people joining" over a blank box.
+    expect(html).toContain("No one has a place yet");
+    expect(html).not.toContain("0 people joining");
+    // Acknowledges the event is live and reassures that requests take a little time.
+    expect(html).toContain("Your event is live");
+    expect(html).toContain("usually take a little time");
+    // One clear next action: share the approximate-only public invitation, plus calm
+    // links to the public invitation and to managing the event.
+    expect(html).toContain("Copy invitation link");
+    expect(html).toContain('href="/discover/events/11111111-1111-4111-8111-111111111111"');
+    expect(html).toContain('href="/hosting"');
+    // Honest — no fabricated traction, counts, "people near you", or scarcity/streak pressure.
+    const lower = html.toLowerCase();
+    for (const forbidden of ["people near you", "others near you", "spots left", "hurry", "streak", "popularity", "trending"]) {
+      expect(lower).not.toContain(forbidden);
+    }
+  });
+
+  it("keeps the normal people list once the host has an accepted participant", async () => {
+    const html = await render({
+      isHost: true,
+      viewerRequest: null,
+      participants: [{ userId: "p-1", firstName: "Mara", skillLevel: "intermediate", seenLatestUpdate: null, criticalUpdateIntent: null }],
+    });
+    expect(html).toContain("1 person joining");
+    expect(html).not.toContain("No one has a place yet");
+    expect(html).toContain("Mara");
+  });
+
+  it("shows an accepted sole guest a calm 'you're the first' note, not a contradiction", async () => {
+    const html = await render({
+      isHost: false,
+      viewerRequest: { id: "req-1", status: "accepted" },
+      participants: [{ userId: user.id, firstName: "Ana", skillLevel: "intermediate", seenLatestUpdate: null, criticalUpdateIntent: null }],
+    });
+    expect(html).toContain("You&#x27;re the first to join");
+    expect(html).not.toContain("0 people joining");
+    // The host is still listed for this accepted guest.
+    expect(html).toContain("Radu");
+  });
+});
+
 describe("Post-event warm afterglow moment", () => {
   it("does not show before the event has ended", async () => {
     const html = await render({ hasEnded: false });

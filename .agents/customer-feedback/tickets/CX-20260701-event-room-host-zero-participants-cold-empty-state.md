@@ -1,13 +1,13 @@
 # CX-20260701-event-room-host-zero-participants-cold-empty-state
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 4 × Impact 3 × Confidence 4) / Effort 1.5 = 32. Not safety/privacy/a11y, so bucketed P2 despite the score: it is a warmth/convenience empty-state gap at an emotionally raw moment (a host who just published, waiting alone).
 - Customer journey: coordination (hosting → open coordination room → wait for the first request/place)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev localhost:3000, all widths; `/events/[id]/room` as the HOST before anyone has an accepted place
 - Found by: Experience & Design Explorer — event room × completeness-of-states / empty-states (2026-07-01)
-- Implementation owner: unassigned
+- Implementation owner: Experience Build Agent
 - Related tickets: `CX-20260701-empty-states-lack-warmth-and-next-step` (implemented; explicitly scoped discover/hosting/profile empties — NOT the coordination room, so this is a distinct uncovered surface), `CX-20260701-event-room-no-loading-state-blank-during-fetch` (loading, not empty), `CX-20260701-hosting-hub-hides-pending-join-requests` (the /hosting list, not the room's people panel)
 
 ## Customer outcome
@@ -71,3 +71,4 @@ The coordination room is where a host lands right after the generous act of publ
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (event room × completeness-of-states / empty-states). Zero-participant host people-panel observed live as a cold "0 people joining" + empty container; source-confirmed no empty branch exists. Status `ready`.
+- 2026-07-02 - Picked up by Experience Build Agent; status `in-progress`. Implementing a warm zero-participants empty state in the room's "Who has a place" panel (host: acknowledge live + reassure + share invitation/view public invitation/manage next steps; accepted-solo non-host: "you're the first" calm copy, no "0 people joining" contradiction). Reusing ShareEventLink + host-event-view paths; no schema change.
