@@ -1,6 +1,6 @@
 # CX-20260703-safety-route-error-boundary-missing
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P2` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12 → P2. Not an accessibility regression, so the P1 floor does not apply; but it degrades a **safety** surface on failure, so it is held above a routine P3. Files: new `apps/web/src/app/safety/error.tsx` (and, secondarily, `apps/web/src/app/moderation/error.tsx`), mirroring the existing `apps/web/src/app/hosting/error.tsx`.
 - Customer journey: any moment a member opens the Safety center (`/safety`) to read guidance or track/appeal a report
@@ -74,3 +74,4 @@ Deleted generic line "The original customer can complete or safely leave the jou
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; added scoped `safety/error.tsx` (keeps PrimaryNav + full `SafetyGuidelines` incl. emergency-services reminder reachable, calm alert card, `unstable_retry()` "Try again", no `error` internals rendered) and `moderation/error.tsx` (covers `/moderation` and nested `reports/[reportId]`, calm staff retry) mirroring `hosting/error.tsx`; added `safety/error.test.tsx` (renderToStaticMarkup) asserting emergency line + guidance + retry present and no message/digest/SQL/column leak. Checks: typecheck OK; lint 0 errors/0 new warnings (2 pre-existing in qa/full-flows.mjs + member-profile.test.ts); tests 749 passed/12 skipped; prod build compiled (`/safety`, `/moderation`, `/moderation/reports/[reportId]` in route graph). No live throw forced (no dev server this pass). Status `implemented`.
