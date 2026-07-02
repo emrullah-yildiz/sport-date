@@ -1,6 +1,6 @@
 # CX-20260703-profile-empty-cta-opens-collapsed-editor
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Customer journey: New/incomplete member completes their profile from the empty-state prompts (`/profile`)
 - Surface: `web`
@@ -72,3 +72,4 @@ Smallest fix: ensure that reaching the editor via a CTA opens it and reaches the
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; new `ProfileEmptyAction` client component upgrades each empty-state CTA to open the `<details id="edit-profile">` and move focus to its named field (intro→`#edit-profile-bio`, language→`#edit-profile-languages`, sport→`#edit-profile-sports` add button, prompt→`#edit-profile-prompts` add button), keeping the `#<field>` fragment as a no-JS fallback; already-open editor just focuses; scroll gated on prefers-reduced-motion (instant). Added `ProfileEmptyAction.test.tsx` tripwire. Checks: typecheck pass; lint 0 errors (2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts, not mine); test 761 passed/12 skipped; production build pass. Not driven on a live dev server this pass. status `implemented`.

@@ -7,6 +7,7 @@ import EmailVerificationControls from "@/components/EmailVerificationControls";
 import PrivacyControls from "@/components/PrivacyControls";
 import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
+import ProfileEmptyAction from "@/components/ProfileEmptyAction";
 import MilestoneMoment from "@/components/MilestoneMoment";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
@@ -137,7 +138,7 @@ export default async function ProfilePage() {
             : (
               <div className="profile-empty-block">
                 <p className="profile-empty">No intro yet. A sentence or two about why you play helps people say yes.</p>
-                <Link href="#edit-profile" className="profile-empty-action">Write a short intro <span aria-hidden="true">→</span></Link>
+                <ProfileEmptyAction target="edit-profile-bio">Write a short intro <span aria-hidden="true">→</span></ProfileEmptyAction>
               </div>
             )}
         </article>
@@ -159,7 +160,7 @@ export default async function ProfilePage() {
             <div className="profile-empty-block">
               <h2>Languages</h2>
               <p className="profile-empty">No languages listed yet. Adding the languages you&rsquo;re comfortable in helps people who share one find you — and lets more events match you.</p>
-              <Link href="#edit-profile" className="profile-empty-action">Add a language <span aria-hidden="true">→</span></Link>
+              <ProfileEmptyAction target="edit-profile-languages">Add a language <span aria-hidden="true">→</span></ProfileEmptyAction>
             </div>
           )}
         </article>
@@ -182,7 +183,7 @@ export default async function ProfilePage() {
           ) : (
             <div className="profile-empty-block">
               <p className="profile-empty">No sports listed yet. Add at least one so compatible events can find you and show up in discovery.</p>
-              <Link href="#edit-profile" className="profile-empty-action">Add a sport <span aria-hidden="true">→</span></Link>
+              <ProfileEmptyAction target="edit-profile-sports">Add a sport <span aria-hidden="true">→</span></ProfileEmptyAction>
             </div>
           )}
         </article>
@@ -199,7 +200,7 @@ export default async function ProfilePage() {
           ) : (
             <div className="profile-empty-block">
               <p className="profile-empty">No prompts answered yet. Optional one-liners like &ldquo;A perfect Saturday game is…&rdquo; give people a real sense of you — you can add up to three.</p>
-              <Link href="#edit-profile" className="profile-empty-action">Answer a prompt <span aria-hidden="true">→</span></Link>
+              <ProfileEmptyAction target="edit-profile-prompts">Answer a prompt <span aria-hidden="true">→</span></ProfileEmptyAction>
             </div>
           )}
         </article>
