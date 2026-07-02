@@ -1,6 +1,6 @@
 # CX-20260701-hosting-past-events-no-reflection-or-outcome
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 3 × Confidence 3) / Effort 3 = 9. Closes the reflection phase of the host journey on the hub; data is already fetched, so effort is moderate and the win is dignity/closure rather than a blocked task.
 - Customer journey: reflection (graceful exit → reflection)
@@ -64,3 +64,4 @@ Practical: the host journey has no closure step on the hub, so reflection (and a
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (`/hosting × completeness-of-states`); status `ready`.
+- 2026-07-02 - Implemented (build agent). Past hosted cards on `/hosting` now close the host's arc with a PRIVATE, honest outcome: a warm "You made this happen — people showed up because you made the plan real" acknowledgement, plus either a calm optional "How did it go?" reflect link (→ the room's existing `#event-reflection-title` form) when no reflection is recorded, or a quiet mirror of the host's OWN recorded outcome once it is. Humane/no-metrics: derived only from the host's own `event.reflection` (already fetched by `getMemberEventSummaries` — NO MIGRATION, no new query, no fabricated count); no streak/score/rank/badge/leaderboard/popularity/comparison; no participant identity or attendance surfaced; left-early / did-not-attend / would-not-host-again all read without blame; an acknowledgement, not a nag. Primitives/patterns reused: mirrors the member-side afterglow/MovementArc host voice; pure copy derivation `summarizeHostReflection` sits alongside `summarizeHostCoordination` in `lib/events.ts`; on-brand anthracite+neon tokens (`.hosting-outcome`), AA, 44px reflect target, visible focus, overflow-safe 375/1280. Static server render — NO new client energy surface, so the `ethical-energy-guardrails` tripwire is untouched and GREEN. Tests: added `summarizeHostReflection` cases (honest/derived/no-fabricated-count, non-punitive, no banned mechanic, no participant data) — full web suite 665 pass + guardrail tripwire green; typecheck, lint (0 errors), and production `build` all pass. Commit `aff5f8a` (pushed to origin/main — no migration).
