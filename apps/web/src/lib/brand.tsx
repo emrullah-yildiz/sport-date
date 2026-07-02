@@ -10,6 +10,26 @@
 // green accent (`--accent`, #3BEA7E) beside a bold "Rally" wordmark in the
 // primary text color (`--text`) on the anthracite theme. It is static by
 // construction, so it is inherently reduced-motion safe.
+//
+// ─── HOW TO SWAP THE BRAND ────────────────────────────────────────────────
+// To rebrand (name, wordmark, colors), edit ONLY this file:
+//   1. Name / tagline  → `BRAND_NAME`, `BRAND_TAGLINE` (updates every nav,
+//      title/metadata, hero, footer, auth email, error chrome, and the
+//      shareable card, which all import from here).
+//   2. Colors          → `BRAND_ACCENT` / `BRAND_TEXT` / `BRAND_BG` (keep in
+//      sync with the design tokens in `globals.css`; the sole token owner is
+//      the builder editing globals.css).
+//   3. Mark geometry   → `RALLY_GLYPH_PATHS` below (the arc/return/dot). Both
+//      the in-app `<RallyGlyph />` and the wordmark render from these paths.
+//
+// The ONE remaining manual asset is the static favicon / app icon at
+// `apps/web/src/app/icon.svg`. Next.js serves it as a raw file, so it cannot
+// import from this module — it hand-mirrors the same glyph paths and colors.
+// When you change the mark or accent here, update `icon.svg` to match. This is
+// intentionally guarded: `brand.test.tsx` asserts `icon.svg` still uses
+// `BRAND_ACCENT`/`BRAND_BG` and the exact `RALLY_GLYPH_PATHS`, so a mark change
+// that forgets the favicon fails CI rather than shipping a mismatched icon.
+// ──────────────────────────────────────────────────────────────────────────
 
 import type { CSSProperties } from "react";
 
@@ -36,6 +56,22 @@ export function brandTitle(pageLabel: string): string {
 export const BRAND_ACCENT = "#3BEA7E" as const; // neon green (--accent)
 export const BRAND_TEXT = "#F1F5F3" as const; // off-white primary text (--text)
 export const BRAND_BG = "#20262B" as const; // anthracite background (--bg)
+
+/**
+ * The rally-arc glyph geometry — the single source of truth for the mark's
+ * shape (a 32×32 viewBox). Both `<RallyGlyph />` and the static favicon at
+ * `app/icon.svg` draw these exact paths; `brand.test.tsx` asserts the favicon
+ * still matches, so the mark can't drift out of sync. Change the mark here.
+ */
+export const RALLY_GLYPH_PATHS = {
+  /** Upward rally arc: momentum / an exchange rising and returning. */
+  arc: "M5 24 C 11 8, 21 8, 27 20",
+  /** Return stroke: the arc coming back — a rally is two-sided. */
+  returnArc: "M27 20 C 24 26, 19 27, 14 25",
+  /** The meeting point — the solid neon dot at the arc's apex-lead. */
+  dot: { cx: 27, cy: 10, r: 3.4 },
+  strokeWidth: 3.5,
+} as const;
 
 /**
  * The rally-arc glyph — a compact upward "rally exchange" arc with a leading
@@ -73,23 +109,28 @@ export function RallyGlyph({
     >
       {/* Upward rally arc: momentum / an exchange rising and returning. */}
       <path
-        d="M5 24 C 11 8, 21 8, 27 20"
+        d={RALLY_GLYPH_PATHS.arc}
         stroke={color}
-        strokeWidth={3.5}
+        strokeWidth={RALLY_GLYPH_PATHS.strokeWidth}
         strokeLinecap="round"
         fill="none"
       />
       {/* Return stroke: the arc coming back — a rally is two-sided. */}
       <path
-        d="M27 20 C 24 26, 19 27, 14 25"
+        d={RALLY_GLYPH_PATHS.returnArc}
         stroke={color}
-        strokeWidth={3.5}
+        strokeWidth={RALLY_GLYPH_PATHS.strokeWidth}
         strokeLinecap="round"
         fill="none"
         opacity={0.55}
       />
       {/* The meeting point — a solid neon dot at the arc's apex-lead. */}
-      <circle cx="27" cy="10" r="3.4" fill={color} />
+      <circle
+        cx={RALLY_GLYPH_PATHS.dot.cx}
+        cy={RALLY_GLYPH_PATHS.dot.cy}
+        r={RALLY_GLYPH_PATHS.dot.r}
+        fill={color}
+      />
     </svg>
   );
 }

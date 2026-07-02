@@ -18,7 +18,7 @@
 // Brand name/colors come from the centralized brand module so a future rename or
 // palette change updates the card automatically (no logo hard-coded only here).
 
-import { BRAND_NAME, BRAND_ACCENT, BRAND_TEXT, BRAND_BG } from "@/lib/brand";
+import { BRAND_NAME, BRAND_ACCENT, BRAND_TEXT, BRAND_BG, RALLY_GLYPH_PATHS } from "@/lib/brand";
 
 /** Instagram Story canvas — 9:16 portrait. */
 export const CARD_WIDTH = 1080 as const;
@@ -188,9 +188,9 @@ export function buildCardSvg(data: MotivationalCardData): string {
   const glyphX = CARD_WIDTH / 2 - glyphSize / 2;
   const glyphY = CARD_HEIGHT - 300;
   const glyph = `<g transform="translate(${glyphX} ${glyphY}) scale(${glyphSize / 32})">
-    <path d="M5 24 C 11 8, 21 8, 27 20" stroke="${BRAND_ACCENT}" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-    <path d="M27 20 C 24 26, 19 27, 14 25" stroke="${BRAND_ACCENT}" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
-    <circle cx="27" cy="10" r="3.4" fill="${BRAND_ACCENT}"/>
+    <path d="${RALLY_GLYPH_PATHS.arc}" stroke="${BRAND_ACCENT}" stroke-width="${RALLY_GLYPH_PATHS.strokeWidth}" stroke-linecap="round" fill="none"/>
+    <path d="${RALLY_GLYPH_PATHS.returnArc}" stroke="${BRAND_ACCENT}" stroke-width="${RALLY_GLYPH_PATHS.strokeWidth}" stroke-linecap="round" fill="none" opacity="0.55"/>
+    <circle cx="${RALLY_GLYPH_PATHS.dot.cx}" cy="${RALLY_GLYPH_PATHS.dot.cy}" r="${RALLY_GLYPH_PATHS.dot.r}" fill="${BRAND_ACCENT}"/>
   </g>`;
 
   const wordmark = `<text x="${CARD_WIDTH / 2}" y="${CARD_HEIGHT - 176}" text-anchor="middle" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="-1" fill="${BRAND_TEXT}">${escapeXml(BRAND_NAME)}</text>`;
