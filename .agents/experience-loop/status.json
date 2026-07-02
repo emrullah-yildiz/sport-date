@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T10:44:00.000Z","loop":"running","phase":"build+test",
-  "note":"Owner-inject live-fixed: discover empty-state buttons now glow + equal-height (2c81e3c). User-simulator upgraded to ALWAYS-ON every tick + must report styling/visual-comfort issues + leaked internal text (e.g. 'waiting for legal review'). Continuous chaining ON (no idle gaps). Tester still verifying feedback-success (52879f1) + button-glow (d1ae032) in worktree isolation.",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"owner-inject fixes + upgrading user-sim to always-on","since":"2026-07-02T10:30:00.000Z"},
-  "Planner":{"state":"idle","ticket":"continuous chaining on; user-sim always-on","since":null},
-  "Builder":{"state":"idle","ticket":"just finished: reset/verify recovery path (43863b5) + discover empty-state glow/align (2c81e3c)","since":null},
-  "Tester":{"state":"working","ticket":"verify 52879f1 (feedback-success) + d1ae032 (button-glow) — worktree-isolated","since":"2026-07-02T10:30:00.000Z"},
-  "UserSimulator":{"state":"idle","ticket":"now always-on: full workflows + styling/comfort/leaked-internal-text audit — runs next tick","since":null} } }
+{ "updatedAt":"2026-07-02T10:52:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Continuous chaining ON. Verified+archived button-glow (d1ae032) + feedback-success (52879f1). Now chaining next tick: BUILD graceful-exit-no-show; TEST reset-verify-dead-link (43863b5, worktree-isolated); USE always-on User-simulator (full workflow + styling/comfort/leaked-internal-text audit).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T10:52:00.000Z"},
+  "Planner":{"state":"idle","ticket":"groomed; next build=graceful-exit-no-show","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260701-graceful-exit-no-show-non-punitive-handling","since":"2026-07-02T10:52:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 43863b5 (reset/verify recovery) — worktree-isolated","since":"2026-07-02T10:52:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: full member workflow + styling/comfort/leaked-internal-text audit","since":"2026-07-02T10:52:00.000Z"} } }
