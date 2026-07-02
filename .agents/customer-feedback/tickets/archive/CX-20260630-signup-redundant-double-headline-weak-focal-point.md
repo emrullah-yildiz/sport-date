@@ -1,6 +1,6 @@
 # CX-20260630-signup-redundant-double-headline-weak-focal-point
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — Reach 5 (every new member sees this on all 5 signup steps) × Impact 2 (mild "where do I look / what is this screen" friction and a slightly unfinished feel at the highest-stakes commitment moment; not blocking) × Confidence 4 (directly observed at 1440 / 1024 / 375 and confirmed in `SignUpForm.tsx` + `globals.css`) / Effort 2 (header markup + a few CSS rules; copy decision on whether to keep both lines). Math: (5×2×4)/2 = 20. Not safety/privacy/auth/accessibility-gated, so it stays in the polish bucket. Components: `apps/web/src/components/SignUpForm.tsx` (`.signup-header` h1 + `.step-indicator` + progress bar), each `apps/web/src/components/steps/SignUpStep*.tsx` (the per-step `<h2>`), `apps/web/src/app/globals.css` (`.signup-header`, `.signup-step h2`, `.signup-container` centering).
 - Customer journey: Signing up — a cautious first-time member moves through the 5-step wizard (Step 1 "Let's get started" through Step 5 review) deciding whether this product feels real and worth a profile.
