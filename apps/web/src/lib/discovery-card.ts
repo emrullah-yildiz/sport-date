@@ -18,18 +18,44 @@ export type DiscoveryCardFacts = Readonly<{
   startsAt: string;
 }>;
 
-export type DiscoveryDateParts = Readonly<{ day: string; time: string }>;
+export type DiscoveryDateParts = Readonly<{
+  day: string;
+  time: string;
+  /**
+   * A valid ISO-8601 machine-readable value for the event's start INSTANT, for the
+   * `<time datetime>` attribute (CX-20260702). This is the true UTC instant (`Z`
+   * form, e.g. "2026-07-05T16:00:00.000Z"), so assistive tech / calendar tooling get
+   * an unambiguous, parseable time — independent of the human-visible text, which
+   * still renders in the event's own `timeZone`. Empty string when `startsAt` is not
+   * a parseable instant (so the attribute is never a bogus non-ISO string).
+   */
+  machineDateTime: string;
+}>;
 
 /**
  * Split the event start into a scannable two-line date/time: a short calendar day
  * ("Sun 5 Jul") and the clock time ("19:00"), both rendered in the event's own
  * timezone so the "when" is unambiguous. Emphasised as the primary scan fact.
+ *
+ * Also derives `machineDateTime`, a valid ISO-8601 value for the `<time datetime>`
+ * attribute. `startsAt` arrives either as an ISO string OR — from the Postgres
+ * driver — as a JS `Date` whose default `toString()` is a localized, non-ISO,
+ * server-timezone-leaking value ("Sun Jul 05 2026 19:00:00 GMT+0300 (…)"), which is
+ * NOT a valid HTML `datetime`. Normalising through `new Date(...).toISOString()`
+ * yields the correct instant in `Z` form regardless of the input shape, matching the
+ * RSC payload and the room-chat `<time>` — while the visible text above is untouched.
  */
 export function formatDiscoveryDate(startsAt: string, timeZone: string): DiscoveryDateParts {
   const date = new Date(startsAt);
+  // Defensive: an unparseable start would make Intl.format throw and toISOString
+  // reject. In practice startsAt is always a valid instant, but guarding keeps a bad
+  // value from crashing the feed and keeps the machine attribute honestly empty
+  // rather than a bogus non-ISO string.
+  if (Number.isNaN(date.getTime())) return { day: "", time: "", machineDateTime: "" };
   const day = new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone }).format(date);
   const time = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone }).format(date);
-  return { day, time };
+  const machineDateTime = date.toISOString();
+  return { day, time, machineDateTime };
 }
 
 /**

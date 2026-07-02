@@ -22,6 +22,48 @@ describe("formatDiscoveryDate", () => {
     expect(berlin.time).toBe("01:30");
     expect(london.time).toBe("00:30");
   });
+
+  // CX-20260702: the `<time datetime>` attribute must be a valid, timezone-unambiguous
+  // ISO-8601 value for the event's start INSTANT (not a localized Date.toString()),
+  // so assistive tech and calendar tooling can parse it. The human-visible day/time
+  // above stays in the event's own zone and is unchanged.
+  describe("machineDateTime (the <time datetime> attribute value)", () => {
+    it("emits a valid ISO-8601 value for the start instant, parseable by new Date()", () => {
+      const parts = formatDiscoveryDate("2026-07-05T16:00:00.000Z", "Europe/Bucharest");
+      // A real, machine-readable instant — not the server's localized Date.toString().
+      expect(parts.machineDateTime).toBe("2026-07-05T16:00:00.000Z");
+      const parsed = new Date(parts.machineDateTime);
+      expect(Number.isNaN(parsed.getTime())).toBe(false);
+      // Round-trips to the exact same instant, regardless of display timezone.
+      expect(parsed.getTime()).toBe(Date.parse("2026-07-05T16:00:00.000Z"));
+      // ISO shape, and no leaked server timezone label like "Eastern European Summer Time".
+      expect(parts.machineDateTime).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/);
+    });
+
+    it("normalizes a non-ISO Date.toString() input (the Postgres driver's Date) to the correct ISO instant", () => {
+      // The bug source: the DB driver hands the render a JS Date whose toString() is a
+      // localized, non-ISO, server-timezone-leaking string. Feeding that same textual
+      // form through the helper must still yield the correct machine-readable instant.
+      const instant = "2026-07-05T16:00:00.000Z";
+      const nonIso = new Date(instant).toString(); // e.g. "Sun Jul 05 2026 19:00:00 GMT+0300 (…)"
+      expect(nonIso).not.toMatch(/^\d{4}-\d{2}-\d{2}T/); // confirm the input is the broken shape
+      const parts = formatDiscoveryDate(nonIso, "Europe/Bucharest");
+      expect(new Date(parts.machineDateTime).getTime()).toBe(Date.parse(instant));
+      expect(parts.machineDateTime).not.toContain("GMT");
+    });
+
+    it("keeps the visible day/time text unchanged while adding the machine value", () => {
+      const parts = formatDiscoveryDate("2026-07-05T16:00:00.000Z", "Europe/Bucharest");
+      // 16:00Z is 19:00 in Bucharest (EEST, UTC+3) — the human-visible text is unchanged.
+      expect(parts.day).toBe("Sun 5 Jul");
+      expect(parts.time).toBe("19:00");
+    });
+
+    it("yields an empty attribute (never a bogus non-ISO string) for an unparseable start", () => {
+      const parts = formatDiscoveryDate("not-a-date", "Europe/Bucharest");
+      expect(parts.machineDateTime).toBe("");
+    });
+  });
 });
 
 describe("formatDiscoveryArea", () => {

@@ -213,7 +213,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
               <article className="discovery-card" key={event.id}>
                 <div className="discovery-card-scan">
                   <p className="discovery-identity"><span className="discovery-sport">{event.sport}</span><span className="discovery-area">{area}</span></p>
-                  <p className="discovery-when"><time dateTime={event.startsAt}><span className="discovery-when-day">{when.day}</span><span className="discovery-when-time">{when.time}</span></time><span className={`discovery-availability${availability.isFull ? " is-full" : ""}`}>{availability.label}</span></p>
+                  <p className="discovery-when"><time dateTime={when.machineDateTime}><span className="discovery-when-day">{when.day}</span><span className="discovery-when-time">{when.time}</span></time><span className={`discovery-availability${availability.isFull ? " is-full" : ""}`}>{availability.label}</span></p>
                 </div>
                 <div className="discovery-card-body">
                   <h3>{event.title}</h3>
