@@ -2,12 +2,21 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
+import { applyAdvancedFilters, ALL_RADIUS_OPTIONS_KM, resolveAdvancedFilters, SCHEDULE_WINDOWS } from "@/lib/discovery-advanced-filters";
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPTIONS_KM, resolveDiscoveryCentre } from "@/lib/discovery-geo";
+import { isPlus } from "@/lib/entitlements";
 import PrimaryNav from "@/components/PrimaryNav";
 import SiteFooter from "@/components/SiteFooter";
 import UseMyLocationControl from "@/components/UseMyLocationControl";
 import { getDiscoverableEvents, type DiscoveryEvent, type DiscoveryFilters } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
+
+const SCHEDULE_LABELS: Record<(typeof SCHEDULE_WINDOWS)[number], string> = {
+  morning: "Mornings (5am–12pm)",
+  afternoon: "Afternoons (12–5pm)",
+  evening: "Evenings (5–11pm)",
+  weekend: "Weekends only",
+};
 
 export const metadata = { title: "Discover events" };
 
@@ -33,7 +42,22 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   // exact-city label constraint from the DB query and filter by distance in-process
   // (an event we cannot geocode falls back to a same-city label match, so the radius
   // is purely additive and never hides an event the old behaviour would have shown).
-  const requestedRadiusKm = parseRadiusKm(text(parameters.radius, 3));
+  // Plus perk gate (CX-20260701-plus-perks-advanced-discovery-filters). ONE
+  // entitlement check decides whether the advanced convenience filters (finer
+  // radius bands, schedule/time-of-day, multi-language) apply. `resolveAdvancedFilters`
+  // fails closed: a free / expired / unconfirmable member gets NO advanced facets, so
+  // their discovery is exactly the baseline (all free filters, all eligible events,
+  // nothing silently excluded). Safety/core discovery is never routed through here.
+  const plus = isPlus(user);
+  const advanced = resolveAdvancedFilters(plus, {
+    radius: text(parameters.radius, 3),
+    schedule: text(parameters.schedule, 12),
+    languages: parameters.languages,
+  });
+  // The free radius set is 5/25/100; a Plus member may additionally pick a finer band.
+  // A free member's radius is parsed only against the free set, so a finer band typed
+  // into the URL by a non-Plus member is ignored (fails closed to their area default).
+  const requestedRadiusKm = advanced.radiusKm ?? parseRadiusKm(text(parameters.radius, 3));
   const deviceCoordinates = coarsenCoordinates(text(parameters.lat, 12), text(parameters.lng, 12));
   const geoCentre = requestedRadiusKm ? resolveDiscoveryCentre({ deviceCoordinates, profileArea: user.location }) : null;
   const radiusActive = Boolean(requestedRadiusKm && geoCentre);
@@ -49,18 +73,27 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   };
   const fetched = await getDiscoverableEvents(user, filters);
   const centreCity = requestedCity || area.memberArea;
-  const events: DiscoveryEvent[] =
+  const withinRadius: DiscoveryEvent[] =
     radiusActive && geoCentre ? filterEventsWithinRadius(fetched, geoCentre.coordinates, requestedRadiusKm!, centreCity) : fetched;
-  const hasNarrowingFilters = Boolean(filters.city || filters.sport || filters.language);
+  // Advanced schedule + multi-language facets are applied in-process AFTER the
+  // eligibility query and the radius filter. `advanced` is already fail-closed to
+  // inactive for a free member, so this is a no-op for them. It only NARROWS at the
+  // member's own request — never bypasses any eligibility/safety gate.
+  const events: DiscoveryEvent[] = applyAdvancedFilters(withinRadius, advanced);
+  const hasNarrowingFilters = Boolean(filters.city || filters.sport || filters.language || advanced.anyActive);
   // When a radius returns nothing, offer to widen to the next-larger option, or to
   // search everywhere if already at the widest. Preserves the current query params.
-  const nextRadiusKm = radiusActive ? RADIUS_OPTIONS_KM.find((km) => km > requestedRadiusKm!) : undefined;
+  // Widen to the next-larger band in the set the member is actually offered (Plus
+  // members' finer bands are included so "widen" still moves up one real step).
+  const radiusLadder = plus ? ALL_RADIUS_OPTIONS_KM : (RADIUS_OPTIONS_KM as readonly number[]);
+  const nextRadiusKm = radiusActive ? radiusLadder.find((km) => km > requestedRadiusKm!) : undefined;
   const widenRadiusHref = (() => {
     const next = new URLSearchParams();
-    for (const key of ["sport", "language", "days", "city", "lat", "lng"]) {
+    for (const key of ["sport", "language", "days", "city", "lat", "lng", "schedule"]) {
       const value = text(parameters[key], 40);
       if (value) next.set(key, value);
     }
+    for (const language of advanced.languages) next.append("languages", language);
     if (nextRadiusKm) {
       next.set("radius", String(nextRadiusKm));
       return `/discover?${next.toString()}`;
@@ -112,14 +145,29 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any in your profile" title="Defaults to any sport in your profile" /></label>
         <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible" title="Defaults to any compatible language" /></label>
         <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>
-        <label>Distance<select name="radius" defaultValue={requestedRadiusKm ? String(requestedRadiusKm) : ""} title="Filter by how far you'll travel. 'My area' keeps the profile-area default; 'Search everywhere' is on the note above.">
+        <label>Distance<select name="radius" defaultValue={requestedRadiusKm ? String(requestedRadiusKm) : ""} title={plus ? "Filter by how far you'll travel, with finer Plus distance bands." : "Filter by how far you'll travel. 'My area' keeps the profile-area default; 'Search everywhere' is on the note above."}>
           <option value="">My area</option>
-          {RADIUS_OPTIONS_KM.map((km) => <option key={km} value={String(km)}>{`Within ${km} km`}</option>)}
+          {(plus ? ALL_RADIUS_OPTIONS_KM : (RADIUS_OPTIONS_KM as readonly number[])).map((km) => <option key={km} value={String(km)}>{`Within ${km} km`}</option>)}
         </select></label>
+        {plus ? (
+          <label>Schedule<select name="schedule" defaultValue={advanced.schedule ?? ""} title="Plus: narrow to a time of day or weekends only.">
+            <option value="">Any time</option>
+            {SCHEDULE_WINDOWS.map((window) => <option key={window} value={window}>{SCHEDULE_LABELS[window]}</option>)}
+          </select></label>
+        ) : null}
+        {plus ? (
+          <label>More languages<input name="languages" defaultValue={advanced.languages.join(", ")} placeholder="e.g. English, Romanian" title="Plus: accept events in any of these languages (comma-separated). You still only see events you're eligible for." /></label>
+        ) : null}
         {parameters.lat && parameters.lng ? <input type="hidden" name="lat" value={text(parameters.lat, 12)} /> : null}
         {parameters.lat && parameters.lng ? <input type="hidden" name="lng" value={text(parameters.lng, 12)} /> : null}
         <button type="submit">Find my events</button>
       </form>
+      {plus ? null : (
+        <p className="discover-plus-note">
+          Rally Plus adds finer distance bands, a schedule filter, and multi-language discovery. Your discovery here is already complete without it — these are just extra ways to narrow the search.{" "}
+          <Link href="/profile" className="discover-plus-link">See what Plus adds</Link>
+        </p>
+      )}
       <UseMyLocationControl defaultRadiusKm={RADIUS_OPTIONS_KM[1]} />
 
       <section className="discovery-results" aria-live="polite">

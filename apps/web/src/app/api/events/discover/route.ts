@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { resolveDiscoveryArea } from "@/lib/discovery-card";
+import { applyAdvancedFilters, resolveAdvancedFilters } from "@/lib/discovery-advanced-filters";
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, resolveDiscoveryCentre } from "@/lib/discovery-geo";
+import { isPlus } from "@/lib/entitlements";
 import { getDiscoverableEvents, type DiscoveryFilters } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
@@ -23,7 +25,17 @@ export async function GET(request: Request) {
   // client-coarsened device position (`lat`/`lng`, used for this request only, never
   // stored) or the member's profile area geocoded offline; matching is by real distance
   // on coarsened coordinates only, never a precise member or venue point.
-  const requestedRadiusKm = parseRadiusKm(parameters.get("radius"));
+  // Plus perk gate (CX-20260701-plus-perks-advanced-discovery-filters), mirroring the
+  // /discover page rule exactly so web + mobile stay in sync. ONE entitlement check;
+  // fails closed to FREE (no advanced facets) for a free / expired / unconfirmable
+  // member, so baseline discovery is untouched.
+  const plus = isPlus(user);
+  const advanced = resolveAdvancedFilters(plus, {
+    radius: parameters.get("radius"),
+    schedule: parameters.get("schedule"),
+    languages: parameters.getAll("languages"),
+  });
+  const requestedRadiusKm = advanced.radiusKm ?? parseRadiusKm(parameters.get("radius"));
   const deviceCoordinates = coarsenCoordinates(parameters.get("lat"), parameters.get("lng"));
   const geoCentre = requestedRadiusKm ? resolveDiscoveryCentre({ deviceCoordinates, profileArea: user.location }) : null;
   const radiusActive = Boolean(requestedRadiusKm && geoCentre);
@@ -35,15 +47,22 @@ export async function GET(request: Request) {
     withinDays,
   };
   const fetched = await getDiscoverableEvents(user, filters);
-  const events =
+  const withinRadius =
     radiusActive && geoCentre
       ? filterEventsWithinRadius(fetched, geoCentre.coordinates, requestedRadiusKm!, requestedCity || area.memberArea)
       : fetched;
+  // Apply the advanced schedule + multi-language facets in-process; no-op for a free
+  // member (advanced already fail-closed to inactive). Additive narrowing only.
+  const events = applyAdvancedFilters(withinRadius, advanced);
   return NextResponse.json(
     {
       events,
       filters,
       nearMe: { active: area.isNearMeDefault, area: area.memberArea },
+      // Honestly report the Plus tier and which advanced facets applied (never a
+      // coordinate). A free member sees plus:false and no advanced facets.
+      plus,
+      advanced: { schedule: advanced.schedule, languages: advanced.languages },
       // Only ever report the coarse radius and centre SOURCE — never a coordinate — so
       // the response cannot leak a member's position.
       radius: radiusActive ? { km: requestedRadiusKm, centreSource: geoCentre!.source } : null,
