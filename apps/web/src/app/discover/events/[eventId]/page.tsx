@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import PrimaryNav from "@/components/PrimaryNav";
 import JoinRequestControls from "@/components/JoinRequestControls";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
+import { describeDiscoveryAvailability, formatDiscoveryDate } from "@/lib/discovery-card";
 import { getAcceptedEventLocation, getDiscoverableEvent } from "@/lib/events";
 import { getMemberReliabilityStanding } from "@/lib/join-requests";
 import { getCurrentUser } from "@/lib/session";
@@ -21,12 +22,16 @@ export default async function DiscoveryEventPage({ params }: { params: Promise<{
   // The member's OWN private reliability standing (warning or active cool-down).
   // Only ever shown to the member themselves — never to hosts or other members.
   const standing = event.viewerIsHost ? null : await getMemberReliabilityStanding(user.id);
-  const start = new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeStyle: "short", timeZone: event.timeZone }).format(new Date(event.startsAt));
+  // Reuse the SAME pure helpers the verified feed card uses so the two scan-critical
+  // facts — when it is, and whether a place remains — cannot drift in wording or
+  // privacy posture between the feed and this shared-invitation landing.
+  const when = formatDiscoveryDate(event.startsAt, event.timeZone);
+  const availability = describeDiscoveryAvailability(event.placesRemaining);
 
   return (
     <main className="event-detail-page">
       <PrimaryNav firstName={user.firstName} current="discover" />
-      <header className="event-detail-hero"><div><p className="eyebrow">{event.sport} · {event.areaLabel}</p><h1>{event.title}</h1><p>{event.description}</p></div><div className="event-detail-facts"><strong>{start}</strong><span>{event.durationMinutes} minutes</span><span>{event.placesRemaining} of {event.capacity} places remain</span><span>{event.language} · {event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span><span>Hosted by {event.hostFirstName}</span></div></header>
+      <header className="event-detail-hero"><div><p className="eyebrow">{event.sport} · {event.areaLabel}</p><h1>{event.title}</h1><p>{event.description}</p></div><div className="event-detail-facts"><p className="event-detail-when"><time dateTime={event.startsAt}><span className="event-detail-when-day">{when.day}</span><span className="event-detail-when-time">{when.time}</span></time></p><p className={`event-detail-availability${availability.isFull ? " is-full" : ""}`}>{availability.label}</p><dl className="event-detail-meta"><div><dt>Duration</dt><dd>{event.durationMinutes} minutes</dd></div><div><dt>Language &amp; level</dt><dd>{event.language} · {event.experienceLevels.join(" / ")}</dd></div><div><dt>Ages</dt><dd>{event.minimumAge}–{event.maximumAge}</dd></div><div><dt>Host</dt><dd>{event.hostFirstName}</dd></div></dl></div></header>
       <section className="event-detail-grid"><article><p className="panel-label">Before acceptance</p><h2>{event.areaLabel}, {event.city}</h2><p>This is deliberately approximate. The exact venue is not included in this page or its data.</p></article>{event.viewerIsHost ? (
         <div className="event-detail-manage">
           <strong>This is your event.</strong>
