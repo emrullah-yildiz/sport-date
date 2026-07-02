@@ -350,9 +350,12 @@ a.logo:hover { color: var(--text); }
    (Was: :nth-child(2) solid lime fill + :nth-child(3) surface-raised fill,
    which pulled the eye to the loud middle card and out of numeric order.) */
 .step-card { display: grid; gap: 12px; padding: 30px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
-.step-number { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: .1em; color: var(--accent); }
 .step-card h3 { margin: 6px 0 0; font-size: var(--fs-h3); }
 .step-card p { margin: 0; color: var(--muted); font-size: var(--fs-small); line-height: 1.6; }
+/* The number is a <p class="step-number">, so it must out-specify `.step-card p`
+   above (0,0,1,1) or it renders as muted body copy. Scoping as `.step-card
+   p.step-number` (0,0,2,1) makes the green ordering-cue actually paint. */
+.step-card p.step-number { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: .1em; color: var(--accent); }
 
 /* ---- Sports variety ---- */
 .sports-section { background: var(--surface); color: var(--text); border-radius: var(--radius-lg); border: 1px solid var(--line); }
