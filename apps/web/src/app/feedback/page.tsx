@@ -15,10 +15,10 @@ export default async function FeedbackPage() {
       <PrimaryNav firstName={user.firstName} />
       <header className="feedback-header">
         <p className="eyebrow">Help shape the experience</p>
-        <h1>Tell us where the rhythm broke.</h1>
+        <h1>Tell us how the rhythm feels.</h1>
         <p>
-          Share what you were trying to do and what happened instead. Your feedback is private to the team
-          and helps us make the next visit clearer.
+          Share an idea, a kind word, or something that didn&apos;t work. Anything that shapes the experience
+          belongs here. Your note is private to the team and helps us make the next visit clearer.
         </p>
       </header>
       <FeedbackWorkspace />

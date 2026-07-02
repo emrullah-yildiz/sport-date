@@ -233,7 +233,7 @@ export default function FeedbackWorkspace() {
       <section className="feedback-form-panel" aria-labelledby="feedback-form-title">
         <div>
           <p className="panel-label">New feedback</p>
-          <h2 id="feedback-form-title">What happened?</h2>
+          <h2 id="feedback-form-title">What&apos;s on your mind?</h2>
           <p>Plain language is perfect. A short, specific example is more useful than a polished report.</p>
         </div>
 
@@ -268,11 +268,11 @@ export default function FeedbackWorkspace() {
 
           <label>
             Short summary
-            <input value={values.summary} onChange={(event) => update("summary", event.target.value)} minLength={10} maxLength={160} placeholder="I could not cancel my request" required />
+            <input value={values.summary} onChange={(event) => update("summary", event.target.value)} minLength={10} maxLength={160} placeholder="An idea, a kind word, or what didn't work" required />
           </label>
           <label>
-            What were you trying to do?
-            <textarea value={values.details} onChange={(event) => update("details", event.target.value)} minLength={20} maxLength={4000} rows={4} placeholder="Describe the steps you took, without including anyone's private information." required />
+            Tell us more
+            <textarea value={values.details} onChange={(event) => update("details", event.target.value)} minLength={20} maxLength={4000} rows={4} placeholder="Share your idea, note, or what happened — without including anyone's private information." required />
           </label>
           <label>
             Page or screen

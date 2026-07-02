@@ -1,13 +1,13 @@
 # CX-20260701-feedback-headline-assumes-breakage-excludes-ideas
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 2 × Confidence 4) / Effort 1 = 24. Cheap copy fix; broadens who feels invited to share.
 - Customer journey: reflection / feedback
 - Surface: `web`
 - Environment and viewport/device: all widths (`/feedback`, observed 1280 + 375)
 - Found by: Experience & Design Explorer (feedback × copy pass, 2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-feedback-success-flat-dead-end-no-forward-path` (same surface, same pass)
 
 ## Customer outcome
@@ -68,3 +68,4 @@ Members with positive or forward-looking feedback may feel the page "isn't for t
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (feedback × copy pass); status `ready`.
+- 2026-07-02 - Experience Build Agent picked up; status `in-progress`. Reframing `/feedback` headline + subhead to welcome ideas, kind words, and problems.
