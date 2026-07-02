@@ -1,6 +1,6 @@
 # CX-20260701-humane-milestone-moments
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 3) / Effort 3 = 12. Warm motivation tied to real participation; genuinely nice, not urgent. Guardrails below are binding — any variant that manipulates is a bug, not a feature.
 - Customer journey: reflection → re-engagement (celebrating real showing-up between events)
@@ -93,3 +93,4 @@ describes. No auth/privacy risk if milestones stay private and derive only from 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner growth-intake pass); status `ready`.
+- 2026-07-02 - Implemented by Experience Build Agent; status `implemented` (commit `b51d25a`, pushed to origin/main). **Milestones marked:** first game, third game, first time hosting — a warm, host-toned, PRIVATE acknowledgement on the member's own profile (below the Movement Arc). **How it stays humane/no-metrics:** a new pure `detectMilestone` (packages/domain) computes the moment ONLY from the member's already-earned attended/hosted counts (the same qualified-attendance data behind the Movement Arc) — no new tracked behavior, no rewarding app opens/time-in-app; zero streak/score/rank/points/level/badge/leaderboard/popularity/comparison; never frames anything as something to lose and never nags toward a "next" target; renders nothing when no real milestone is crossed (no dead-end). **Private/honest:** shown only on the member's own profile, says nothing to/about anyone else; copy states only the real number reached (never inflated). **Opt-out:** clear control turns future moments off (remembered locally, like the pre-arrival brief) while leaving earned progress untouched. **Primitives reused:** MomentGlow (decorative one-shot glow, aria-hidden, static under reduced-motion) + opt-in ShareMotivationalCard (never required). **Migration:** none — derived from existing data, no schema change. **Tests:** new `packages/domain/src/milestone.test.ts` (honest realCount, fractional/negative/NaN => no moment, no banned mechanic in copy, single calm moment, progression math untouched) + MilestoneMoment added to the ethical-energy-guardrails tripwire energy surface with private/honest/non-pressuring/reduced-motion assertions — **tripwire green (54 tests)**. **Checks:** typecheck, lint (only pre-existing warnings), domain tests (213), web tests (641), production build — all pass.
