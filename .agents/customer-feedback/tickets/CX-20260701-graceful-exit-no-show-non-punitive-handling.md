@@ -1,6 +1,6 @@
 # CX-20260701-graceful-exit-no-show-non-punitive-handling
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. Important dignity/safety path, but less frequent than the core-loop P0s; sequence after them.
 - Customer journey: graceful exit / no-show / recovery
@@ -69,3 +69,23 @@ members will hesitate to protect themselves — a direct safety and dignity harm
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by product/growth strategist (journey analysis); status `ready`.
+- 2026-07-02 - Implemented (Builder). Reworked `RoomLeaveControl` from a bare `window.confirm` into a calm,
+  non-punitive in-page exit flow: explicit reassurance that leaving any time (including to stay safe) is fine;
+  an OPTIONAL, PRIVATE reason + short note that is never shown to the host/peers and never a public score/count
+  ("prefer not to say" / no-explanation are first-class defaults); a prominent always-free one-step path to the
+  in-room report/block controls when the reason is "I didn't feel safe" (that exit is also marked safety-path so
+  it can never count toward reliability); a calm success acknowledgement with a real next step (find another event
+  / back to profile) — no dead end; and error/recovery states that keep the member's place intact. No public
+  no-show/skip counts or reliability scores exposed. A11y: 44px targets, visible focus, focus moves to confirm
+  panel and to the `role=status` acknowledgement, keyboard + SR naming, hover-glow only (reduced-motion safe),
+  no overflow at 375/1280. Files: `apps/web/src/components/RoomLeaveControl.tsx`,
+  `apps/web/src/app/events/[eventId]/room/page.tsx`, `apps/web/src/app/globals.css` (tokens only; removed a stray
+  hardcoded hex; danger/accent hover glows), `apps/web/src/app/api/events/[eventId]/requests/[requestId]/route.ts`
+  (+`route.test.ts`), `apps/web/src/lib/join-requests.ts`, `packages/domain/src/graceful-exit.ts` (+test) and
+  `index.ts`, migration `apps/web/db/029_join_request_exit_reasons.sql` (additive, nullable `exit_reason`/`exit_note`).
+  Tests: new domain graceful-exit suite + route reason-passthrough/malformed-body cases. Checks (apps/web):
+  typecheck PASS, lint PASS (0 errors), test PASS (532 web + 170 domain), **production build PASS**. WCAG AA per
+  design-refresh-2026 §1 (danger `--danger` on `--bg`, accent-info links). Commit `d922397` (LOCAL ONLY — new
+  migration; not pushed). MIGRATION ADDED: `029_join_request_exit_reasons.sql` (deploy-ordering hazard: apply to
+  production before/with this code; columns are write-only on the member's own cancel path, never read by a
+  broadly-rendered path).
