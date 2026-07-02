@@ -1,12 +1,12 @@
 # CX-20260701-discover-geo-radius-and-use-my-location
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 4 × Impact 3 × Confidence 3) / Effort 6 = 6. The profile-area default already lets a member find events "around me" without typing a city; a true distance radius and opt-in device location are a valuable next step, not the core unmet promise.
 - Customer journey: discovery
 - Surface: `web` (matching logic shared with mobile)
 - Found by: Follow-up split from `CX-20260701-discover-no-location-around-me-search` (Experience Build Agent, 2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-discover-no-location-around-me-search`
 
 ## Customer outcome
@@ -49,3 +49,11 @@ That is a migration + geocoding dependency + a consented geolocation flow — to
 ## Handoff and retest log
 
 - 2026-07-01 - Split from `CX-20260701-discover-no-location-around-me-search` after shipping the profile-area default; status `ready`.
+- 2026-07-02 - Experience Build Agent picked up; status `in-progress`.
+- 2026-07-02 - Implemented (commit `112e665`, pushed to origin/main). Added an opt-in distance radius ("Within 5/25/100 km") and an opt-in "Use my current location" to `/discover`, on top of the existing "My area" default and "Search everywhere".
+  - Privacy decision (chose the MORE-private option): NO precise member coordinate is ever stored — the search centre is derived at query time from the existing free-text profile area via a tiny OFFLINE Europe-first gazetteer (no external geocoder, no network leak = no owner-escalation dependency), or from an opt-in device position that is coarsened ON-DEVICE before it leaves the browser and is used for that one search only, never stored. Every coordinate (event approximate coord, gazetteer centre, device fix) is rounded to a ~10km (0.1°) grid so it cannot be trilaterated to a point. Only approximate areas are shown; the precise venue is never joined. The API reports only the coarse km + centre source, never a coordinate. Radius is purely additive (uncoded events fall back to same-city label match, never hidden).
+  - Files: `apps/web/src/lib/discovery-geo.ts` (+ `.test.ts`, 34 pure-logic cases), `apps/web/src/components/UseMyLocationControl.tsx`, `apps/web/src/app/discover/page.tsx`, `apps/web/src/app/api/events/discover/route.ts` (shared rule, mobile-ready), `apps/web/src/lib/events.ts` (selects approximate public coord), `apps/web/src/app/globals.css`, `docs/architecture/discovery-geo-radius.md`.
+  - Migration: NONE needed. Events already carry nullable `public_approximate_latitude/longitude`; members intentionally get no coordinate column.
+  - Tests added: geo coarsening/privacy boundary, haversine distance, radius match (incl. coarsening boundary + blank-input never-(0,0)), gazetteer, end-to-end `filterEventsWithinRadius`.
+  - Checks: typecheck PASS, lint 0 errors, unit tests 505 pass, prod build PASS. AA verified (green-fill buttons carry `--bg` text 9.65 AAA; consent/status `--text-muted`/`--text` on `--bg` 7.13/13.90 AAA), 44px targets, keyboard + SR labels, no overflow at 375/1280.
+  - Ready for independent retest by the Explorer.
