@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { declinedJoinRequestMessage, hostDecisionConfirmationMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, joinRequestStateHeadline, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
+import { declinedJoinRequestMessage, hostDecisionConfirmationMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, joinRequestStateHeadline, showsFullJoinState, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
 
 describe("join request policy copy", () => {
   it("marks the third skip as a quiet decline", () => {
@@ -81,6 +81,24 @@ describe("join request policy copy", () => {
     const unknown = joinRequestStateHeadline("archived");
     expect(unknown).toBe("You have a request.");
     expect(unknown).not.toContain("archived");
+  });
+
+  it("shows the honest full state INSTEAD of the request form only for a full event with no request of one's own", () => {
+    // CX-20260703: a fully booked event must not invite a new request the server
+    // capacity guard will 409. The full state replaces the open form ONLY when the
+    // event has no places AND the viewer holds no request row (status === null).
+    expect(showsFullJoinState(true, null)).toBe(true);
+    // A member who already holds ANY request/place keeps their own state — the full
+    // state never hides or overrides it, so the gate is false for every non-null.
+    for (const status of ["pending", "accepted", "declined", "cancelled"] as const) {
+      expect(showsFullJoinState(true, status)).toBe(false);
+    }
+    // A not-full event always keeps the open form for a member with no request, and
+    // of course never changes an existing state either.
+    expect(showsFullJoinState(false, null)).toBe(false);
+    for (const status of ["pending", "accepted", "declined", "cancelled"] as const) {
+      expect(showsFullJoinState(false, status)).toBe(false);
+    }
   });
 
   it("summarizes pending-first host request review", () => {

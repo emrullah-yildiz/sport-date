@@ -109,6 +109,19 @@ export function hostDecisionConfirmationMessage(
   }
 }
 
+// Full-event join gating (CX-20260703-full-event-join-form-invites-doomed-request).
+// A fully booked event must NOT show the open request form to a member with no
+// existing request — the server capacity guard would 409 the submission, a
+// dead-ended "why did you let me do that" failure. This is the SINGLE source of
+// that decision, shared by the join panel: show the honest "full" state ONLY when
+// the event has no places left AND the viewer holds no request row of their own
+// (status === null). A member who already has a pending/accepted/declined/cancelled
+// row keeps their own state — the fully booked state never hides or overrides an
+// existing request; it only replaces the pre-request open form.
+export function showsFullJoinState(isFull: boolean, status: JoinRequestStatus | null): boolean {
+  return isFull && status === null;
+}
+
 export function declinedJoinRequestMessage(skipCount: number): string {
   return skipCount >= 3
     ? "This request was quietly closed after the host used all three skips for this event."

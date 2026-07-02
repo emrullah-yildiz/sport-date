@@ -2,11 +2,12 @@
 
 import type { DiscoveryRequest } from "@/lib/events";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
-import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline } from "@/lib/join-request-policy";
+import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline, showsFullJoinState } from "@/lib/join-request-policy";
 
 type Status = DiscoveryRequest["status"];
 
@@ -30,10 +31,18 @@ export default function JoinRequestControls({
   eventId,
   request,
   reliability,
+  isFull = false,
 }: {
   eventId: string;
   request: DiscoveryRequest | null;
   reliability?: ReliabilityNotice;
+  // The event has no places left (derived from the SAME availability helper the
+  // hero "Fully booked" badge uses, so the two can't drift). Threaded in so a
+  // capacity-full event replaces the open request form with an honest "full"
+  // state instead of inviting a submission the server would 409
+  // (CX-20260703-full-event-join-form-invites-doomed-request). Members who already
+  // hold a request/place keep their own state — see showsFullJoinState.
+  isFull?: boolean;
 }) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
@@ -190,7 +199,32 @@ export default function JoinRequestControls({
     }
   }
 
+  // A calm, real next step shared by the full-event states: back to discovery to
+  // find a game with room. A plain informational link (never a coral alarm or a
+  // scarcity nudge), 44px target and visible focus handled in CSS.
+  const browseOtherGames = (
+    <Link href="/discover" className="join-full-browse">Browse other games <span aria-hidden="true">→</span></Link>
+  );
+
   function panel() {
+    // Fully booked + no request of one's own: the event has no place to ask for, so
+    // show an honest "full" state with a calm next step INSTEAD of the open request
+    // form the server capacity guard would 409
+    // (CX-20260703-full-event-join-form-invites-doomed-request). Placed before the
+    // reliability-pause branch: when the event is full the real, permanent blocker
+    // is capacity, so "requests are paused for a short while" (which implies you
+    // could ask once it lifts) would be the less honest thing to say. Members who
+    // already hold a request/place fall through to their own state below — this only
+    // replaces the pre-request form (status === null), never an existing request.
+    if (showsFullJoinState(isFull, status)) {
+      return (
+        <Panel key="full" className="join-state closed">
+          <strong tabIndex={-1} ref={attachConfirmation}>This game is full.</strong>
+          <p>Every place is taken, so there isn&apos;t an open spot to request right now. Places sometimes open up if someone cancels — and there are other games looking for players.</p>
+          {browseOtherGames}
+        </Panel>
+      );
+    }
     // Reliability cool-down: the ONLY consequence of the fair reliability rule is
     // a temporary pause on requesting NEW places. It is shown only to this member,
     // explains itself calmly, and states exactly when it lifts. It never appears
@@ -242,23 +276,36 @@ export default function JoinRequestControls({
       // Reversible by design (CX-20260702): cancelling is low-stakes, so this is
       // never a dead end. The join form returns on request, matching the pending
       // promise that you can "cancel quietly at any time". Skip counts stay private.
+      // BUT if the game filled up since the member cancelled, re-requesting would be
+      // doomed (the server 409s a full event), so we don't offer that button — we
+      // say so honestly and point to other games instead
+      // (CX-20260703-full-event-join-form-invites-doomed-request).
       return (
         <Panel key="cancelled" className="join-state closed">
           <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("cancelled")}</strong>
-          <p>No pressure either way. If you change your mind, you can ask again while this game still has room. Skip counts stay private.</p>
-          <button
-            type="button"
-            onClick={() => {
-              // Return to the join form. Re-requesting reopens the member's own
-              // cancelled row server-side, honouring every join guard and any
-              // active reliability pause.
-              setError("");
-              setStatus(null);
-              focusOnResolveRef.current = true;
-            }}
-          >
-            Request a place again
-          </button>
+          {isFull ? (
+            <>
+              <p>This game has since filled up, so there isn&apos;t an open place to ask for right now. No pressure — there are other games looking for players. Skip counts stay private.</p>
+              {browseOtherGames}
+            </>
+          ) : (
+            <>
+              <p>No pressure either way. If you change your mind, you can ask again while this game still has room. Skip counts stay private.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  // Return to the join form. Re-requesting reopens the member's own
+                  // cancelled row server-side, honouring every join guard and any
+                  // active reliability pause.
+                  setError("");
+                  setStatus(null);
+                  focusOnResolveRef.current = true;
+                }}
+              >
+                Request a place again
+              </button>
+            </>
+          )}
         </Panel>
       );
     }

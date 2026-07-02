@@ -1,6 +1,6 @@
 # CX-20260703-full-event-join-form-invites-doomed-request
 
-- Status: `ready`
+- Status: `implemented`
 - Priority: `P2` — RICE (4 reach × 1.0 impact × 0.9 confidence) / 0.5 effort = 7.2. Functional expectation gap; small, contained fix.
 - Severity: `medium`
 - Customer journey: Viewing a public event invitation that is already at capacity and deciding whether to ask for a place.
@@ -79,3 +79,4 @@ Practical: the member wastes effort composing an introduction for a request that
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; threaded `isFull` (from the existing `describeDiscoveryAvailability` availability used by the hero badge) into `JoinRequestControls`, added a pure `showsFullJoinState(isFull, status)` gate in `join-request-policy.ts`, and rendered an honest "This game is full." state with a calm "Browse other games" link (→ /discover) INSTEAD of the open request form when the event is full and the viewer has no request (status === null). Pending/accepted/declined states are unchanged; the cancelled state withholds the doomed "Request a place again" button on a now-full event and shows an honest "filled up" message + browse link instead. Server 409 capacity guard left intact for the fill-during-session race. Checks: typecheck clean; lint 0 errors (2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts, not mine); tests 741 passed / 12 skipped (added full-state gating cases in join-request-policy.test.ts + component render cases in JoinRequestControls.test.tsx); production build succeeded. Status `implemented`.

@@ -49,6 +49,10 @@ function serverHtml(request: Parameters<typeof JoinRequestControls>[0]["request"
   return renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={request} />);
 }
 
+function serverHtmlFull(request: Parameters<typeof JoinRequestControls>[0]["request"]) {
+  return renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={request} isFull />);
+}
+
 afterEach(() => {
   reducedMotionMock.mockReturnValue(false);
 });
@@ -130,6 +134,48 @@ describe("JoinRequestControls server render (hydration parity)", () => {
     expect(html).not.toMatch(/style="[^"]*opacity/i);
     expect(html).not.toMatch(/style="[^"]*transform/i);
     expect(html).toContain("Request a place");
+  });
+
+  // CX-20260703-full-event-join-form-invites-doomed-request: a fully booked event
+  // must replace the open request form with an honest "full" state, not invite a
+  // submission the server capacity guard would 409. These pin the gating end-to-end
+  // through the actual component render (the pure decision is unit-tested in
+  // join-request-policy.test.ts).
+  it("renders the honest full state — not the request form — for a full event with no request", () => {
+    const html = serverHtmlFull(null);
+    expect(html).toContain("This game is full.");
+    // A real, calm next step, not a dead-ended submit.
+    expect(html).toContain("Browse other games");
+    expect(html).toContain('href="/discover"');
+    // The doomed open form is gone: no textarea, no "Request a place" submit.
+    expect(html).not.toContain("Request a place");
+    expect(html).not.toContain("<textarea");
+    // Still hydration-safe (no framer-motion inline style on the server pass).
+    expect(html).not.toMatch(/style="[^"]*transform/i);
+    expect(html).not.toMatch(/style="[^"]*opacity/i);
+  });
+
+  it("keeps a member's existing pending state on a now-full event (full never overrides an existing request)", () => {
+    const html = serverHtmlFull({ id: "req-1", status: "pending", skipCount: 0 });
+    // Their own state is preserved verbatim — not replaced by the full state.
+    expect(html).toContain("Your request is with the host.");
+    expect(html).not.toContain("This game is full.");
+  });
+
+  it("does not offer a doomed re-request from the cancelled state when the game has since filled up", () => {
+    const html = serverHtmlFull({ id: "req-1", status: "cancelled", skipCount: 0 });
+    // The cancelled headline is preserved, but the "ask again" button (which would
+    // 409 on a full event) is withheld in favour of an honest message + next step.
+    expect(html).toContain("Request cancelled.");
+    expect(html).not.toContain("Request a place again");
+    expect(html).toContain("filled up");
+    expect(html).toContain("Browse other games");
+  });
+
+  it("still offers the re-request affordance from cancelled when the game has room (unchanged not-full behaviour)", () => {
+    const html = serverHtml({ id: "req-1", status: "cancelled", skipCount: 0 });
+    expect(html).toContain("Request a place again");
+    expect(html).not.toContain("filled up");
   });
 
   it("server render is byte-identical across motion settings (the gate makes SSR motion-independent)", () => {
