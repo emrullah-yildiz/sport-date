@@ -1,6 +1,6 @@
 # CX-20260702-room-safety-options-summary-no-focus-ring-or-hover
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — (Reach 3 × Impact 4 × Confidence 5) / Effort 1 = 60 → P1. Per policy, an accessibility regression is never below P1, and this is on a **safety** control (the Report/Block disclosure inside the meeting room), so it stays P1 rather than being bucketed down like the non-safety discover-filter focus gap. One-line CSS fix, very high confidence. Components: `apps/web/src/app/globals.css` (`.safety-controls summary`), used by `apps/web/src/components/ReportSafetyControls.tsx`.
 - Customer journey: coordinate & arrive (accepted-participant meeting room) → report/block a member
@@ -67,3 +67,4 @@ Accessibility (WCAG 2.4.7 Focus Visible and 1.4.11 Non-text Contrast) on a **saf
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by the User-simulator experience loop during the accepted-participant meeting-room + chat pass (accepted member seeker-B on a real host-A event, live + source-confirmed). Status `ready`.
+- 2026-07-02 - Implemented (build agent). Selector `.safety-controls summary` in `apps/web/src/app/globals.css`. Added `:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px }` (the standard Rally neon ring, clearly visible on the coral-tinted dark panel, WCAG 2.4.7/1.4.11), plus a calm on-brand hover `:hover { color: #ff8a85; box-shadow: var(--glow-danger) }` matching the room's other --warn/danger-role controls (coral role preserved, not swapped to green); added `border-radius: 8px` to the summary so ring/glow follow rounded corners with no layout shift (outline/offset only, verified at 375 & 1280). `<details>` disclosure behavior unchanged; no new motion so reduced-motion unaffected. Shared global rule covers every render site (event room, public event detail, host request rows). Checks (apps/web): typecheck pass, lint 0 errors (2 pre-existing warnings in unrelated files), 570 unit tests pass, production build pass. Commit `8dcf81c`, pushed to origin/main. Status `implemented` — handed back for independent retest.
