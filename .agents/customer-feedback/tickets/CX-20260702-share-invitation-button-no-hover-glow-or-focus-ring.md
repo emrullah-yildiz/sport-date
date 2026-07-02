@@ -1,6 +1,6 @@
 # CX-20260702-share-invitation-button-no-hover-glow-or-focus-ring
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P2` — a single, prominent host CTA on the "It's live" success panel violates the owner's app-wide "every button glows on hover, always" mandate (CX-20260702-button-hover-inconsistent-no-neon-glow), and additionally has NO visible focus ring — a keyboard/accessibility gap on the exact button a host reaches to share their new event. Low reach (host, post-publish, hover/keyboard only) keeps it below P1, but it is a clear, checkable break in a standard the owner just had fixed.
 - Customer journey: Host — create + publish an event → success ("It's live") panel → Copy invitation link
@@ -63,3 +63,4 @@ Cosmetic-plus-accessibility: the button still works (copies the approximate-only
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim (host journey pass); status `ready`.
+- 2026-07-02 - Implemented (build agent). Moved the hover glow + `:focus-visible` ring onto the `.share-event-button` class itself (unscoped) in `apps/web/src/app/globals.css`, replacing the previously `.room-people-empty`-scoped-only rule, so BOTH render sites now share one source of truth and cannot drift apart: the `.host-published` "It's live" success panel (`events/[eventId]/page.tsx`) and the `.room-people-empty` event-room empty state (`events/[eventId]/room/page.tsx`) — the only two `ShareEventLink`/`.share-event-button` render sites (grep-confirmed). Hover uses shared `box-shadow: var(--glow-accent)`; focus uses `outline: 3px solid var(--focus); outline-offset: 2px`, matching the app's other CTAs. Glow-only (no transform) so reduced-motion parity is preserved; disabled state shows no glow; kept the room instance's blue-tinted hover background. Tokens only, no hardcoded hex, AA unaffected (decorative box-shadow). Note: used `--glow-accent` (green primary CTA) per implementation directive rather than the ticket's originally-suggested `--glow-info` (blue). Checks (apps/web): typecheck pass, lint pass (pre-existing warnings only), unit tests 532 pass / 12 skip, production build pass. Commit `a9159ad`, pushed to origin/main. Ready for independent retest.
