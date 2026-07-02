@@ -1,6 +1,6 @@
 # CX-20260630-research-bucharest-hero-visual-overflows-container
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 2 × Impact 2 × Confidence 5) / Effort 3 = ~7 → P3. Cosmetic per-element decorative overflow on the `noindex`, non-launch-critical Bucharest research microsite; the page shell's `overflow-x: clip` already prevents any page-level horizontal scroll, so no member ever sees a scrollbar. No data/safety/a11y/authorization dimension. Held at P3.
 - Customer journey: Reading the Bucharest research invitation page (`/research/bucharest`).
