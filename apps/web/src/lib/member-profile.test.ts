@@ -21,7 +21,7 @@ vi.mock("@/lib/db", () => ({ getDatabase: () => fakeSql }));
 const listProfilePhotos = vi.fn((_userId: string): Promise<unknown[]> => Promise.resolve([]));
 vi.mock("@/lib/photos", () => ({ listProfilePhotos: (userId: string) => listProfilePhotos(userId) }));
 
-import { getViewableMemberProfile } from "./member-profile";
+import { getViewableMemberProfile, memberProfileRelationshipLabel } from "./member-profile";
 
 function reset(rows: unknown[]) {
   capturedQueries.length = 0;
@@ -41,6 +41,7 @@ const ROW = {
   seeking: "friendship",
   prompts: [{ prompt: "A perfect Saturday game is…", answer: "Doubles, then coffee." }],
   sports: [{ name: "Tennis", skillLevel: "intermediate", frequency: "weekly" }],
+  shares_accepted_event: true,
 };
 
 afterEach(() => {
@@ -123,5 +124,35 @@ describe("getViewableMemberProfile authorization boundary", () => {
     reset([{ ...ROW, prompts: null }]);
     const result = await getViewableMemberProfile("7", "42");
     expect(result!.prompts).toEqual([]);
+  });
+
+  it("derives the relationship honestly: shared seats vs a still-pending request", async () => {
+    reset([{ ...ROW, shares_accepted_event: true }]);
+    expect((await getViewableMemberProfile("7", "42"))!.relationship).toBe("shared-event");
+
+    // The ONLY link is a host->requester request the host has not accepted yet — the
+    // two do NOT share an event, so the discriminant must reflect that.
+    reset([{ ...ROW, shares_accepted_event: false }]);
+    expect((await getViewableMemberProfile("7", "42"))!.relationship).toBe("pending-request");
+
+    // The "share an event" signal is derived only from ACCEPTED links (accepted
+    // request, viewer's accepted seat, or accepted co-participation) — distinct from
+    // the broader pending/accepted gate that merely authorises the read.
+    const query = capturedQueries.join("\n");
+    expect(query).toMatch(/shares_accepted_event/);
+    expect(query).toMatch(/status = 'accepted'/);
+  });
+});
+
+describe("memberProfileRelationshipLabel", () => {
+  it("only claims a shared event when one actually exists", () => {
+    expect(memberProfileRelationshipLabel("shared-event")).toBe(
+      "You can see this because you share an event",
+    );
+    // A pending requester does not yet share an event with the host — the copy must
+    // describe the request, not overstate the relationship.
+    const pending = memberProfileRelationshipLabel("pending-request");
+    expect(pending).toBe("You can see this because they asked to join one of your events");
+    expect(pending).not.toContain("share an event");
   });
 });

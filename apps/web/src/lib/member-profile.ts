@@ -28,7 +28,24 @@ export type ViewableMemberProfile = Readonly<{
   // the ids here after the same block check has already passed for this pairing, so
   // a blocked viewer never even receives a photo id to request.
   photos: readonly ProfilePhoto[];
+  // WHY the viewer is allowed to see this profile, so the UI can explain it honestly.
+  // "shared-event" = they hold accepted seats together (or the viewer is an accepted
+  // participant in the target's event). "pending-request" = the ONLY link is a
+  // host→requester join_request still awaiting the host's decision — the two do NOT
+  // yet share an event, so the copy must not claim they do.
+  relationship: MemberProfileRelationship;
 }>;
+
+export type MemberProfileRelationship = "shared-event" | "pending-request";
+
+// Pure, honest label for why this profile is visible. Kept as a separate exported
+// function (not inlined in the page) so the wording is unit-testable and stays in
+// lockstep with the relationship discriminant the query derives.
+export function memberProfileRelationshipLabel(relationship: MemberProfileRelationship): string {
+  return relationship === "shared-event"
+    ? "You can see this because you share an event"
+    : "You can see this because they asked to join one of your events";
+}
 
 type ViewableProfileRow = {
   id: string | number;
@@ -45,6 +62,7 @@ type ViewableProfileRow = {
     skillLevel: SessionUser["sports"][number]["skillLevel"];
     frequency: SessionUser["sports"][number]["frequency"];
   }>;
+  shares_accepted_event: boolean;
 };
 
 // Ids are bigint in this schema, so a target id must be all-digits to be a real
@@ -94,7 +112,35 @@ export async function getViewableMemberProfile(
           ) ORDER BY user_sports.created_at
         ) FILTER (WHERE user_sports.id IS NOT NULL),
         '[]'::jsonb
-      ) AS sports
+      ) AS sports,
+      -- TRUE when the pair actually share an event: an ACCEPTED host→requester
+      -- request (relationship 1, accepted), the viewer holding an accepted seat in
+      -- the target's event (2), or accepted co-participation (3). FALSE means the
+      -- only qualifying link is a still-pending request, so the copy must say
+      -- "asked to join", not "you share an event".
+      (
+        EXISTS (
+          SELECT 1 FROM events
+          JOIN join_requests ON join_requests.event_id = events.id
+          WHERE events.host_user_id = ${viewerId}
+            AND join_requests.requester_user_id = target.id
+            AND join_requests.status = 'accepted'
+        )
+        OR EXISTS (
+          SELECT 1 FROM events
+          JOIN event_participants ON event_participants.event_id = events.id
+          WHERE events.host_user_id = target.id
+            AND event_participants.user_id = ${viewerId}
+        )
+        OR EXISTS (
+          SELECT 1
+          FROM event_participants AS viewer_seat
+          JOIN event_participants AS target_seat
+            ON target_seat.event_id = viewer_seat.event_id
+          WHERE viewer_seat.user_id = ${viewerId}
+            AND target_seat.user_id = target.id
+        )
+      ) AS shares_accepted_event
     FROM users AS target
     LEFT JOIN user_sports ON user_sports.user_id = target.id
     WHERE target.id = ${targetId}
@@ -159,5 +205,6 @@ export async function getViewableMemberProfile(
     sports: row.sports,
     prompts: Array.isArray(row.prompts) ? row.prompts : [],
     photos,
+    relationship: row.shares_accepted_event ? "shared-event" : "pending-request",
   };
 }
