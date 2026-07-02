@@ -107,7 +107,7 @@ export default async function LandingPage() {
               </>
             ) : (
               <>
-                <Link href="/login" className="nav-signin">Sign in</Link>
+                <Link href="/login" className="nav-signin nav-signin--guest">Sign in</Link>
                 <Link href="/signup" className="btn btn--accent">Create a profile</Link>
               </>
             )}

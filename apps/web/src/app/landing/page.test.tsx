@@ -42,6 +42,19 @@ describe("LandingPage auth-awareness", () => {
     expect(html).not.toContain("Signed in as");
   });
 
+  it("marks the signed-out Sign in link so it stays reachable on mobile", async () => {
+    // Tripwire for CX-20260703-landing-mobile-hides-sign-in-returning-user-stuck.
+    // The signed-out "Sign in" affordance carries the .nav-signin--guest modifier
+    // that the ≤700px media query keeps visible (while the signed-in greeting,
+    // which shares .nav-signin, may still collapse). Losing this class would
+    // re-hide the only route back to /login for a returning member on a phone.
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    expect(html).toMatch(/class="nav-signin nav-signin--guest"[^>]*href="\/login"|href="\/login"[^>]*class="nav-signin nav-signin--guest"/);
+  });
+
   it("offers a signed-in path into the app when a session exists", async () => {
     mocks.getCurrentUser.mockResolvedValue(member);
 

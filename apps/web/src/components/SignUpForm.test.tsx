@@ -49,3 +49,21 @@ describe("SignUpForm header hierarchy — one dominant per-step focal point", ()
     expect(html).toMatch(/class="step-indicator"/);
   });
 });
+
+/**
+ * Tripwire for CX-20260703-landing-mobile-hides-sign-in-returning-user-stuck.
+ *
+ * The signup form used to be a one-way street: it offered no path back to
+ * /login, so a returning member who reached signup (the only visible CTA on
+ * mobile) was stranded. It must now carry a reciprocal cross-link to sign-in,
+ * mirroring the login form's "New here? Create a profile" link.
+ */
+describe("SignUpForm reciprocal sign-in cross-link", () => {
+  it("renders a link back to /login so a returning member can reach sign-in", () => {
+    const html = markup();
+    // The reciprocal route must resolve to the real /login page…
+    expect(html).toContain('href="/login"');
+    // …and be framed as a sign-in path for someone who already has a profile.
+    expect(html).toMatch(/Already have a profile\?/);
+  });
+});

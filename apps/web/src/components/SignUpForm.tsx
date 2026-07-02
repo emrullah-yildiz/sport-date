@@ -2,6 +2,7 @@
 
 import { dateOfBirthError, validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { useState } from "react";
 
 import { BRAND_NAME } from "@/lib/brand";
@@ -120,6 +121,13 @@ export default function SignUpForm() {
             </button>
           )}
         </div>
+
+        {/* Reciprocal path back to sign-in — mirrors the login form's
+            "New here? Create a profile" cross-link so a returning member who
+            lands on signup is never stranded without a route to /login. */}
+        <p className="auth-switch">
+          Already have a profile? <Link href="/login">Sign in</Link>
+        </p>
       </motion.div>
     </div>
   );

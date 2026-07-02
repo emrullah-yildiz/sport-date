@@ -1,6 +1,6 @@
 # CX-20260703-landing-mobile-hides-sign-in-returning-user-stuck
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — RICE (10 × 2.5 × 0.9) / 0.5 = 45. Reach 10 (every returning member who opens the marketing home on a phone — the default first tap for a returning user), Impact 2.5 (a blocked core journey: the only way back into an existing account is hidden, leaving type-the-URL-yourself as the sole workaround), Confidence 0.9 (confirmed in CSS + both page/component sources), Effort 0.5 (add/unhide one Sign-in affordance + a reciprocal link on signup — CSS + markup only). Not safety/privacy/auth-gated (it is discoverability of a login entry point, not the login itself), so it sits below P0.
 - Customer journey: Returning — a member who already has a profile opens `/landing` on a phone and tries to sign back in.
@@ -81,3 +81,4 @@ A returning member on mobile is pushed toward creating a *second* account or is 
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; gave the signed-out "Sign in" link a `.nav-signin--guest` modifier that the ≤700px media query keeps visible (the shared `.nav-signin` greeting still collapses), made `.nav-signin` a 44px inline-flex target (global `a[href]:focus-visible` supplies the ring; `--text` on the dark navbar is AAA contrast), and shrank the mobile CTA button padding (`.landing-nav-actions .btn` → 44px min-height / `0 15px`) so the restored link doesn't crowd or overflow the 375px header; added a reciprocal "Already have a profile? Sign in" → `/login` link to `SignUpForm` mirroring the login cross-link. Tests: landing + SignUpForm tripwires added. Checks: typecheck PASS, lint 0 errors (2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts, not mine), test 755 passed/12 skipped, production build PASS. Responsive result is source-reasoned (no live dev server this pass). Status `implemented`.
