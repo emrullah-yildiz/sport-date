@@ -94,11 +94,22 @@ export function VerificationCardBody({
           </>
         ) : (
           <>
-            <Link className="btn-primary" href="/login">Sign in</Link>
+            {/* Primary recovery action on every dead-end verify state: a precise deep
+                link to the exact resend control (the Account security panel on
+                /profile), not a generic "Sign in". Resending is auth-gated, so we say
+                so plainly below rather than pretend it is one tap for a signed-out
+                member — no dark pattern, no account-existence leak. */}
+            <Link className="btn-primary" href="/profile#account-security">Get a new verification link</Link>
+            <Link className="btn-secondary" href="/login">Sign in</Link>
             <Link className="btn-secondary" href="/signup">Create account</Link>
           </>
         )}
       </div>
+      {!isLoading && !isSuccess ? (
+        <p className="auth-flow-hint">
+          Resending happens under Account security, so you may be asked to sign in first.
+        </p>
+      ) : null}
     </div>
   );
 }

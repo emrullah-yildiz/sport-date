@@ -71,6 +71,19 @@ describe("EmailVerificationConfirmCard pending + synchronous states", () => {
       "Email verification confirms inbox access only. It does not verify identity, age, location accuracy, or in-person safety.",
     );
   });
+
+  it("offers a precise deep link to the resend control on dead-end states, with Sign in / Create account kept as secondary", () => {
+    for (const html of [render(""), render("not-a-valid-token")]) {
+      // Primary recovery action: the exact account-security control, not a generic Sign in.
+      expect(html).toMatch(/class="btn-primary"[^>]*href="\/profile#account-security"|href="\/profile#account-security"[^>]*class="btn-primary"/);
+      expect(html).toContain("Get a new verification link");
+      // Secondary options remain available.
+      expect(html).toMatch(/href="\/login"/);
+      expect(html).toMatch(/href="\/signup"/);
+      // Honest, non-dark-pattern note that resending is auth-gated.
+      expect(html).toContain("you may be asked to sign in first");
+    }
+  });
 });
 
 describe("VerificationCardBody announces the resolved async outcomes", () => {

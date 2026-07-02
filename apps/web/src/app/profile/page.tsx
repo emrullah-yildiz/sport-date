@@ -162,7 +162,7 @@ export default async function ProfilePage() {
             </div>
           )}
         </article>
-        <article className="profile-panel">
+        <article className="profile-panel" id="account-security">
           <p className="panel-label">Account</p>
           <h2>Contact &amp; sign-in</h2>
           <p>{user.email}</p>

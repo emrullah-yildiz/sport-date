@@ -18,11 +18,24 @@ type ForgotPasswordPanelProps = {
    */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Initial open state for the uncontrolled panel. Used by the reset-password
+   * dead-end states, where requesting a fresh link is the next step, so the form
+   * starts expanded but stays collapsible (a proper disclosure, not stuck open).
+   */
+  defaultOpen?: boolean;
+  /** Optional label override for the disclosure toggle. */
+  triggerLabel?: string;
 };
 
-export default function ForgotPasswordPanel({ open: openProp, onOpenChange }: ForgotPasswordPanelProps = {}) {
+export default function ForgotPasswordPanel({
+  open: openProp,
+  onOpenChange,
+  defaultOpen = false,
+  triggerLabel = "Forgot your password?",
+}: ForgotPasswordPanelProps = {}) {
   const [email, setEmail] = useState("");
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -76,7 +89,7 @@ export default function ForgotPasswordPanel({ open: openProp, onOpenChange }: Fo
         aria-expanded={open}
         aria-controls="forgot-password-panel"
       >
-        Forgot your password?
+        {triggerLabel}
       </button>
       {open ? (
         <div id="forgot-password-panel" className="auth-support-card">

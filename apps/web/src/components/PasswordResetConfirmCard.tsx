@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import ForgotPasswordPanel from "./ForgotPasswordPanel";
 import { isBrowserPasswordResetToken, validatePasswordResetDraft } from "@/lib/auth-flow";
 
 async function readJson(response: Response) {
@@ -26,6 +27,13 @@ export default function PasswordResetConfirmCard({ token }: Props) {
   const [completed, setCompleted] = useState(false);
 
   const tokenValid = useMemo(() => isBrowserPasswordResetToken(token), [token]);
+
+  // A dead-end reset link: no token, a malformed token, or a valid-format token the
+  // server rejected on submit (invalid/expired/already used). In every case the thing
+  // the member actually needs next is a fresh link, so we offer the request form right
+  // here (open) instead of only telling them to go find it. `completed` is the one
+  // non-dead-end where no recovery action is needed.
+  const deadEnd = !completed && (!token || !tokenValid || Boolean(error));
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -83,13 +91,13 @@ export default function PasswordResetConfirmCard({ token }: Props) {
 
       {!token ? (
         <p className="error-message" role="alert">
-          This reset link is missing its secure token. Open the full link from your email or start the recovery flow again.
+          This reset link is missing its secure token. Open the full link from your email, or request a fresh one below.
         </p>
       ) : null}
 
       {token && !tokenValid ? (
         <p className="error-message" role="alert">
-          This reset link is invalid. Request a fresh recovery link from the sign-in page.
+          This reset link is invalid. Request a fresh recovery link below.
         </p>
       ) : null}
 
@@ -122,9 +130,18 @@ export default function PasswordResetConfirmCard({ token }: Props) {
       {message ? <p className="auth-support-message" role="status">{message}</p> : null}
       {error ? <p className="error-message" role="alert">{error}</p> : null}
 
+      {deadEnd ? (
+        // Primary recovery action: request a fresh reset link inline. Reuses the same
+        // request form + endpoint as the login "Forgot your password?" panel, so the
+        // anti-enumeration response ("if an account exists…") is identical here — no
+        // way to tell whether the email is registered. Kept open by default because on
+        // a dead-end link this IS the next step.
+        <ForgotPasswordPanel defaultOpen triggerLabel="Send me a new reset link" />
+      ) : null}
+
       <div className="auth-flow-actions">
-        <Link className="btn-secondary" href="/login">Back to sign in</Link>
         {completed ? <Link className="btn-primary" href="/login">Sign in with new password</Link> : null}
+        <Link className="btn-secondary" href="/login">Back to sign in</Link>
       </div>
     </div>
   );
