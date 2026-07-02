@@ -1,6 +1,6 @@
 # CX-20260702-join-controls-reduced-motion-hydration-mismatch
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3` — (Reach 3 × Impact 2 × Confidence 4) / Effort 2 = 12. Console-level React hydration warning on the event detail page under reduced-motion; no visible break, but it degrades reliability of client hydration on a core page.
 - Customer journey: discover & decide → commit (event detail / join controls)
@@ -60,3 +60,4 @@ brittle hydration on a core commit-loop page. No safety/privacy/data impact.
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim (commit-journey live pass); status `ready`.
+- 2026-07-02 - build - Implemented (commit `ada3e8d`). Root cause: `JoinRequestControls` wrapped every join panel in a framer-motion `motion.div` on every render pass; `motion.*` serializes its resolved inline style differently on the server (emits `transform:none`) than the client's first (pre-mount) render (no `transform`), so under reduced-motion the `.join-request-box` server/client style strings diverged — a mismatch React "won't patch up". Fix approach: gate the motion wrapper behind a `mounted` flag via `useSyncExternalStore` (server snapshot `false`, client snapshot `true`), rendered through a local `Panel` component. Before mount (the SSR pass and the first client paint) every panel is a plain `<div>` with NO motion props and NO motion-injected inline `opacity`/`transform`; after mount the `motion.div` swaps in. Why server+client now agree: both the SSR HTML and the first client render take the `mounted === false` branch, so they emit byte-identical plain markup in every motion setting — there is no `transform`/`opacity` diff to mismatch. `AnimatePresence initial={false}` means the first mounted panel does not animate its entrance, so hydration is visually unchanged; only later in-place resolutions (request → pending/accepted/cancelled) get the calm fade/rise, and reduced-motion users still get the instant motion-free swap (parity preserved, no visual regression). Test: added `JoinRequestControls.test.tsx` — a `renderToStaticMarkup` (server-pass) tripwire asserting the join form and a resolved panel emit no motion inline `transform`/`opacity` style. Checks: typecheck green, lint 0 errors, vitest 570 passed / 12 skipped, `next build` compiled + all 56 pages generated. No migration. Handing back for independent reduced-motion retest.

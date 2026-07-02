@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T14:04:00.000Z","loop":"running","phase":"build+use",
-  "note":"P0 login/signup re-verified FIXED live (200/201). web-sessions device-hints/bulk-signout VERIFIED+archived (891ec8d). photo-375 fix 536fdf4 failed the live retest (min-width:auto beat width:100%) → orchestrator re-fixed with min-width:0 on label+input (implemented, awaiting live re-measure). Chaining next tick: BUILD join-controls-reduced-motion-hydration-mismatch (P3, SSR/framer-motion); USE always-on user-sim (LIVE re-measure photo-375 at 375 + rotate journey). No source-Tester this tick — photo-375 needs a LIVE measure (source/build passed last time yet the fix failed).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T14:04:00.000Z"},
-  "Planner":{"state":"idle","ticket":"next build=join-controls-reduced-motion-hydration; photo-375 re-fixed pending live measure","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260702-join-controls-reduced-motion-hydration-mismatch","since":"2026-07-02T14:04:00.000Z"},
-  "Tester":{"state":"idle","ticket":"photo-375 verification is a LIVE measure (user-sim), not source","since":null},
-  "UserSimulator":{"state":"working","ticket":"always-on: LIVE re-measure photo-375 @375 + rotate journey + audit","since":"2026-07-02T14:04:00.000Z"} } }
+{ "updatedAt":"2026-07-02T14:36:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"photo-375 re-fix VERIFIED live + archived. join-controls reduced-motion hydration fixed (ada3e8d, implemented — mount-gated motion). User-sim filed P2 hosting-card-manage-cta-no-hover-glow. Chaining next tick: BUILD hosting-card-manage-cta glow (close another glow gap); TEST join-controls-hydration (ada3e8d, worktree-isolated); USE always-on user-sim.",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T14:36:00.000Z"},
+  "Planner":{"state":"idle","ticket":"next build=hosting-card-manage-cta-no-hover-glow (P2)","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-hosting-card-manage-cta-no-hover-glow","since":"2026-07-02T14:36:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify ada3e8d (join-controls reduced-motion hydration) — worktree-isolated","since":"2026-07-02T14:36:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: next member journey + styling/comfort/leaked-internal audit","since":"2026-07-02T14:36:00.000Z"} } }
