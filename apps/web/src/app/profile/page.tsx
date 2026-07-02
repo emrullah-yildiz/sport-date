@@ -118,6 +118,7 @@ export default async function ProfilePage() {
           <p className="profile-actions-secondary-label" id="profile-actions-secondary-label">Safety &amp; support</p>
           <ul aria-labelledby="profile-actions-secondary-label">
             <li><Link href="/safety" className="profile-action-secondary" aria-label="Safety center">Safety center</Link></li>
+            <li><Link href="/safety#guidelines" className="profile-action-secondary" aria-label="Safety guidelines — how to meet safely">Safety guidelines</Link></li>
             <li><Link href="/feedback" className="profile-action-secondary" aria-label="Share feedback">Share feedback</Link></li>
           </ul>
         </nav>

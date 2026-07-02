@@ -26,11 +26,24 @@ export default async function SafetyCenterPage() {
         <h1>Your reports, without the black box.</h1>
         <p>Track reports you submitted. Internal notes, another member&apos;s information, and protected evidence are never shown here.</p>
       </header>
+
+      <aside className="safety-guidance-pointer" aria-labelledby="safety-guidance-pointer-title">
+        <p className="eyebrow">Meeting someone soon?</p>
+        <h2 id="safety-guidance-pointer-title">Here&apos;s how to keep it safe.</h2>
+        <p>The Safety center is for both halves of safety: knowing what to expect before you meet, and resolving harm if something goes wrong. If you came here to prepare rather than report, start with the guidance.</p>
+        <p className="safety-guidance-pointer-actions">
+          <Link href="#guidelines" className="safety-guidance-link">Read how to meet safely</Link>
+          <span>Need to report or block? Those controls live on the event, request, or authorized event room.</span>
+        </p>
+      </aside>
+
       <section className="safety-case-list" aria-label="Submitted safety reports">
         {cases.length === 0 ? (
           <article className="safety-case-empty">
-            <h2>No submitted reports</h2>
-            <p>Reporting remains available from an event, request, or authorized event room.</p>
+            <h2>No submitted reports yet</h2>
+            <p>Nothing to track here — that&apos;s a good sign. This space fills in only when you file a report, so you can follow its status and any decision.</p>
+            <p>Reporting stays available from an event, request, or authorized event room. If you&apos;re here to prepare for a meeting instead, read <Link href="#guidelines">how to meet safely</Link>.</p>
+            <p className="safety-case-empty-note">If anyone is in immediate danger, contact local emergency services first.</p>
           </article>
         ) : cases.map((safetyCase) => (
             <article className="safety-case" key={safetyCase.id}>

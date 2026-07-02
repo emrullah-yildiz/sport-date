@@ -1,13 +1,13 @@
 # CX-20260701-safety-center-report-tracker-only-no-proactive-guidance-link
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 4 × Confidence 4) / Effort 2 = 32. Trust surface, but the guidance content already exists and no safety path is broken, so not P1. Never below P1 would apply if a safety action were unreachable — it is not (report/block/leave remain reachable from events/rooms).
 - Customer journey: trust check → arrival (before a first meeting) → reflection (after a concern)
 - Surface: `web` (mobile parity)
 - Environment and viewport/device: dev server localhost:3000, all widths; signed-in member
 - Found by: Experience & Design Explorer — safety/trust surface × information & copy
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260701-profile-action-strip-flat-no-hierarchy` (verified — added the profile "Safety, legal & support" strip that links to /safety, /trust, /privacy; that strip does NOT surface /safety-guidelines), `CX-20260701-pre-arrival-safety-micro-brief` (verified — puts a per-event safety brief in the accepted event room; this ticket is the standing, always-available guidance surface, complementary not duplicate), `CX-20260701-in-app-page-headers-off-scale-headline-systemic` (uses /safety only as a typography example, unrelated content)
 
 ## Customer outcome
@@ -76,3 +76,4 @@ Safety is the product's core promise, and the moment a member most needs *guidan
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (safety/trust surface × information & copy). Live-observed on a signed-in session: `/safety` links only to /discover + /profile, empty state is report-only, and the existing `/safety-guidelines` guidance is not linked from the safety hub or the profile safety strip. Status `ready`.
+- 2026-07-02 - Picked up by Experience Build Agent (Claude Opus 4.8). Status `in-progress`. Note: the IA consolidation has already moved the proactive guidance onto `/safety#guidelines` (progressive-disclosure section on the same page; `/safety-guidelines` now permanent-redirects there), so the fix is to surface that existing on-page section from the top of the safety hub + reframe the empty state to point to it, and add a "Safety guidelines" link to the profile "Safety & support" strip.
