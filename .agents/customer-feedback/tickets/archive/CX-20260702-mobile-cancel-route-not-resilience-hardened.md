@@ -1,6 +1,6 @@
 # CX-20260702-mobile-cancel-route-not-resilience-hardened
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12. Parity/hardening follow-up: the web cancel/leave DELETE route was hardened (calm JSON error, never raw empty-500) in `CX-20260702-cancel-join-request-500-member-stuck-cancelling` (verified), but the mobile route using the same `cancelEventJoinRequest` was out of that ticket's scope. No known live failure today (029 is applied to prod+dev), so this is defensive parity, not an active break.
 - Customer journey: commit — cancel/leave (mobile surface)
