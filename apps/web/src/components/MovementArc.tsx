@@ -2,7 +2,29 @@ import Link from "next/link";
 
 import { MOVEMENT_STAGES } from "@sport-date/domain";
 
+import MomentGlow from "@/components/MomentGlow";
 import type { MemberMovementProgress } from "@/lib/progress";
+
+/**
+ * A warm, HONEST, retrospective reflection built only from real completed events
+ * the member privately confirmed they attended (never invented, never a target).
+ * It celebrates real meetings that already happened — memory, not a score to
+ * chase. Empty state stays encouraging without pressure.
+ */
+function movementReflection(progress: MemberMovementProgress): string {
+  const { attendedMoves, hostedMoves, joinedMoves } = progress;
+  if (attendedMoves === 0) {
+    return "No shared games yet — your first real meeting is the only thing that starts this.";
+  }
+  const games = attendedMoves === 1 ? "1 real game" : `${attendedMoves} real games`;
+  if (hostedMoves > 0 && joinedMoves > 0) {
+    return `You've shared ${games} — some you hosted, some you joined. Each one actually happened.`;
+  }
+  if (hostedMoves > 0) {
+    return `You've hosted and shared ${games}. Real people showed up because you made the plan real.`;
+  }
+  return `You've shown up for ${games}. That is time you spent moving with real people.`;
+}
 
 /**
  * MovementArc — a member's private, calm progression. This is a FAST, fully
@@ -29,10 +51,12 @@ export default function MovementArc({ progress }: { progress: MemberMovementProg
 
   return (
     <section className="movement-arc" aria-labelledby="movement-arc-title">
+      {progress.attendedMoves > 0 ? <MomentGlow tone="go" /> : null}
       <header>
         <div>
           <p className="panel-label">Your Movement Arc</p>
           <h2 id="movement-arc-title">{progress.currentStage.label}</h2>
+          <p className="movement-reflection">{movementReflection(progress)}</p>
         </div>
         <div className="movement-count">
           <strong>{progress.attendedMoves}</strong>

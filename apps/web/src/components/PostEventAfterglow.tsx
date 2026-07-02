@@ -3,10 +3,14 @@
 // offers a calm, clearly-optional forward path (reflect below, discover another
 // event, host one). Deliberately anti-manipulative: no streaks, no scores, no
 // popularity/attractiveness metric, no counters-as-pressure, no fake urgency or
-// guilt. It is a static server component — no client JS, so it works with no-JS
-// and needs no reduced-motion fallback beyond the CSS entrance (which is disabled
-// under prefers-reduced-motion).
+// guilt. It is a static server component — no client JS for the content, so it
+// works with no-JS and needs no reduced-motion fallback beyond the CSS entrance
+// (which is disabled under prefers-reduced-motion). The only client touch is a
+// brief, decorative neon MomentGlow celebrating that a real meeting happened;
+// it is aria-hidden, non-blocking, and has a static reduced-motion fallback.
 import Link from "next/link";
+
+import MomentGlow from "@/components/MomentGlow";
 
 const REFLECTION_ANCHOR = "event-reflection-title";
 
@@ -24,6 +28,7 @@ export default function PostEventAfterglow({
 
   return (
     <section className="post-event-afterglow" aria-labelledby="afterglow-title">
+      <MomentGlow tone="go" />
       <div className="post-event-afterglow-copy">
         <p className="panel-label">A warm ending</p>
         <h2 id="afterglow-title">{heading}</h2>

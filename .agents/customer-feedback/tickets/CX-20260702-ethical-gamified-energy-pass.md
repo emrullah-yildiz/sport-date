@@ -1,13 +1,13 @@
 # CX-20260702-ethical-gamified-energy-pass
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 3) / Effort 3 = 12. Delivers the owner-requested "gamified, energetic" feel, but rides on top of the token + type + IA work and carries the highest guardrail risk, so it sits at the bottom of the P2 band and ships LAST in the cluster. Reach is broad (momentum cues appear across coordination + reflection), impact is real but softer than the structural fixes, confidence moderate because the humane/non-casino line requires care.
 - Customer journey: cross-cutting — commitment, arrival, activity, reflection (celebrating real meetings)
 - Surface: `web` (desktop + mobile)
 - Environment and viewport/device: dev server localhost:3000, all widths; existing components `PostEventAfterglow.tsx`, `MovementArc.tsx`, plus state-change CTAs
 - Found by: Design Lead — black+neon refresh (2026-07-02); direction in `docs/design-refresh-2026.md` §4
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent (Claude Opus 4.8)`
 - Related tickets: `CX-20260702-dark-neon-theme-tokens` (provides neon accents), `CX-20260702-typography-right-size-and-scale`
 
 ## Customer outcome
@@ -64,14 +64,14 @@ Practical/emotional: done right, the app feels alive and rewards real meetings, 
 
 ## Acceptance criteria
 
-- [ ] Added energetic motion/celebration is tied only to real participation (completed events, positive state changes), is retrospective/private, and celebrates real meetings — matching the vision.
-- [ ] NONE of the hard guardrails above are present: no streaks-as-pressure, no scores/ranks/leaderboards, no attractiveness/popularity metrics, no exposed skip counts, no infinite feed, no artificial scarcity, no urgency countdowns.
-- [ ] Every animation respects `prefers-reduced-motion` with a static fallback; no motion is required to complete any action.
-- [ ] Celebrations are skippable and never gate or obscure a core or safety action.
-- [ ] All colors used meet WCAG AA on the black+neon theme; neon fills carry near-black text; visible focus and 44px targets preserved.
-- [ ] Copy describes only implemented capabilities (no invented stats or achievements).
-- [ ] No precise location or sensitive data is exposed by any celebration/momentum cue.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Added energetic motion/celebration is tied only to real participation (completed events, positive state changes), is retrospective/private, and celebrates real meetings — matching the vision. (New `MomentGlow` fires only on a real ended-event afterglow and a member's own confirmed movement; the enriched `MovementArc` reflection speaks only of real, already-completed games from `event_reflections` counts — asserted in `ethical-energy-guardrails.test.tsx`.)
+- [x] NONE of the hard guardrails above are present: no streaks-as-pressure, no scores/ranks/leaderboards, no attractiveness/popularity metrics, no exposed skip counts, no infinite feed, no artificial scarcity, no urgency countdowns, no "don't lose your streak"/daily-login. (Enforced by a source-scanning tripwire in `ethical-energy-guardrails.test.tsx` over `MomentGlow.tsx`, `MovementArc.tsx`, `PostEventAfterglow.tsx` — fails the build if any banned mechanic re-enters affirmatively; honest negated disclaimers are allowed.)
+- [x] Every animation respects `prefers-reduced-motion` with a static fallback; no motion is required to complete any action. (`MomentGlow` uses `useReducedMotion()` to render a static neon wash with zero-duration transition; CSS `animation:none;transition:none` guard; asserted in the test.)
+- [x] Celebrations are skippable and never gate or obscure a core or safety action. (The glow is `aria-hidden`, `pointer-events:none`, sits BEHIND content at a lower z-index; the afterglow reflection stays clearly optional/skippable.)
+- [x] All colors used meet WCAG AA on the black+neon theme; neon fills carry near-black text; visible focus and 44px targets preserved. (Glow is green `--accent` only — never red `--warn` — at low opacity behind text, over unchanged solid backgrounds; existing focus rings/44px targets untouched; no layout shift.)
+- [x] Copy describes only implemented capabilities (no invented stats or achievements). (Reflection is built from real `attendedMoves`/`hostedMoves`/`joinedMoves`; test asserts it never inflates the given count.)
+- [x] No precise location or sensitive data is exposed by any celebration/momentum cue. (Glow carries no data/text; reflection exposes only self-only aggregate counts already shown on the private profile.)
+- [x] Relevant automated tests and repository checks pass. (typecheck, lint, `test` 439 passed, production `build` — all green.)
 
 ## Handoff and retest log
 
