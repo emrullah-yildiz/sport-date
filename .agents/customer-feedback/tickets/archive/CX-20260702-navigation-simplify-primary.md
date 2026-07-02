@@ -1,6 +1,6 @@
 # CX-20260702-navigation-simplify-primary
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P2` — (Reach 4 × Impact 3 × Confidence 4) / Effort 3 = 16. Fewer, clearer primary destinations directly addresses "hard to navigate," but depends on the IA consolidation landing first (so the nav has the right set to point at), so it sits at P2 just behind that ticket. Broad reach, real clarity impact, moderate effort.
 - Customer journey: cross-cutting — every authenticated surface's navigation
@@ -49,17 +49,18 @@ Practical/emotional: a stable, minimal nav lowers cognitive load and makes the a
 
 ## Acceptance criteria
 
-- [ ] Primary member nav exposes at most four destinations: Discover, Host, Safety, Account menu — consistent across every authenticated surface.
-- [ ] Feedback and Legal & trust are reachable from the account menu and/or footer, not the primary bar.
-- [ ] `/moderation` never appears in member nav (staff-only).
-- [ ] The current page/section is indicated for orientation; detail links use progressive disclosure rather than crowding the top level.
-- [ ] Keyboard operation, screen-reader naming, visible focus (`--focus` on the black+neon theme), and 44px targets are correct; reduced-motion unaffected.
-- [ ] No horizontal overflow at 1280 or 375; nav collapses cleanly on mobile.
-- [ ] No precise location or sensitive data exposed.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Primary member nav exposes at most four destinations: Discover, Host, Safety, Account menu — consistent across every authenticated surface. (Shared `PrimaryNav.tsx`: DESTINATIONS = Discover/Host/Safety + AccountMenu; imported by all 11 authed surfaces — discover, discover-event, events/new, event-detail, room, feedback, hosting +loading/error, profile, safety.)
+- [x] Feedback and Legal & trust are reachable from the account menu and/or footer, not the primary bar. (AccountMenu has "Send feedback" → `/feedback`; legal in SiteFooter; neither in the top bar.)
+- [x] `/moderation` never appears in member nav (staff-only). (Not in PrimaryNav; live 404 for members.)
+- [x] The current page/section is indicated for orientation; detail links use progressive disclosure rather than crowding the top level. (`aria-current="page"` on the matching destination; logo → /discover.)
+- [x] Keyboard operation, screen-reader naming, visible focus (`--focus` on the black+neon theme), and 44px targets are correct; reduced-motion unaffected. (nav landmark aria-label="Primary", logo aria-label, blue `--accent-info` links, static markup.)
+- [x] No horizontal overflow at 1280 or 375; nav collapses cleanly on mobile. (flex-wrap + 560px media query per build live-check.)
+- [x] No precise location or sensitive data exposed.
+- [x] Relevant automated tests and repository checks pass. (typecheck ✓, lint ✓, test 400/12-skip incl. updated AccountMenu.test ✓, prod build ✓.)
 
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by Design Lead (black+neon refresh). Depends on `CX-20260702-ia-consolidate-guideline-and-legal-pages` landing first. Status `ready`.
 - 2026-07-02 - Picked up by experience-build-agent; set `in-progress`. Standardizing authenticated primary nav to a shared component (Discover, Host, Safety + AccountMenu).
+- 2026-07-02 - test - **VERIFIED** (independent retest, one step). Repo checks all pass. Source-confirmed the single shared `apps/web/src/components/PrimaryNav.tsx` (destinations = Discover/Host/Safety + AccountMenu, logo → /discover with aria-label, `aria-current="page"` per section) is imported by all 11 authenticated surfaces (grep) — no per-page `.profile-nav` drift. AccountMenu carries "Send feedback" → /feedback (progressive disclosure); legal in SiteFooter; `/moderation` not in nav and 404 for members (live). Status `implemented` → `verified`.
 - 2026-07-02 - Implemented (commit `89038dd`, pushed). New shared `apps/web/src/components/PrimaryNav.tsx` (nav landmark, logo→/discover, Discover/Host/Safety with aria-current, one page-action slot, AccountMenu) replaces the per-page `.profile-nav` on discover, discover event detail, hosting (+ loading/error), host event detail, create flow, room, profile, safety, feedback. Feedback moved into the AccountMenu (progressive disclosure); legal/trust stays in SiteFooter; `/moderation` staff-only untouched. Blue (`--accent-info`) nav links/active-state, green CTAs. Checks: typecheck/lint/test pass (400 pass/12 skip; AccountMenu.test updated for the new Feedback item), production `npm run build` pass. Verified logged in as pooled host-A: primary nav byte-identical across surfaces, aria-current correct, no legal/feedback in the top bar, no overflow at 375. Migration: none. Ready for independent retest.

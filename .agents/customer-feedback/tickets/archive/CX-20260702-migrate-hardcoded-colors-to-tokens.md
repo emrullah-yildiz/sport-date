@@ -1,6 +1,6 @@
 # CX-20260702-migrate-hardcoded-colors-to-tokens
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `high`
 - Priority: `P1 high` — bumped from P2: until the ~141 hardcoded light card/panel/input colors + ~32 dark-fill surfaces are moved onto tokens, the app is a half-migrated mix (dark shell, light cards) that looks worse than either state. Completing this is what actually delivers the black+neon look. Split by surface-group if too large for one clean unit.
 - Customer journey: cross-cutting (every surface with a card/panel — discovery, hosting, trust, profile, coordination, reflection, auth)
@@ -66,18 +66,19 @@ Practical/emotional: leftover light cards on a dark page read as broken/half-fin
 
 ## Acceptance criteria
 
-- [ ] Class A: card/panel/input surfaces that hard-code `background: white`/`#fff`/`#f4f0e7` resolve to `--surface` or `--surface-raised`; their text resolves to `--text`/`--text-muted`; borders to `--line`.
-- [ ] Class B: the ~32 `--ink`-as-fill surfaces render as intended dark panels via `--surface`/`--surface-raised` (or keep a neon-accent panel with `--bg` text), not pale off-white boxes; any `color: white` inside them still lands on a dark base.
-- [ ] Class C: old dark-ink rgba shadows/hairlines and white-on-dark helper literals inside migrated panels are re-based on theme-aware values (`--line` / rgba of `--text`).
-- [ ] `<select>`/date chevron + focus affordances remain visible on the new panel backgrounds (chevron stroke visible; `--focus`/accent ring intact).
-- [ ] Every migrated pairing meets **WCAG AA** (re-measure; ratios in `docs/design-refresh-2026.md` §1). Neon fills carry near-black `--bg` text.
-- [ ] Safety/trust surfaces (`.safety`, `.privacy-panel`, `.trust-disclaimer`, `.legal-*`, safety center) stay legible and prominent — no reduction in trust legibility.
-- [ ] Visible focus, 44px targets, and `prefers-reduced-motion` behavior unchanged.
-- [ ] No precise location or sensitive data exposed (styling-only change).
-- [ ] Relevant automated tests and repository checks pass, including production `npm run build`.
+- [x] Class A: card/panel/input surfaces that hard-code `background: white`/`#fff`/`#f4f0e7` resolve to `--surface` or `--surface-raised`; their text resolves to `--text`/`--text-muted`; borders to `--line`. (Grep of `globals.css`: no `background: white`/`#fff`/`#f4f0e7` light-card fill remains on member surfaces; `--cream` re-pointed to `--surface`.)
+- [x] Class B: the ~32 `--ink`-as-fill surfaces render as intended dark panels via `--surface`/`--surface-raised` (or keep a neon-accent panel with `--bg` text), not pale off-white boxes; any `color: white` inside them still lands on a dark base.
+- [x] Class C: old dark-ink rgba shadows/hairlines and white-on-dark helper literals inside migrated panels are re-based on theme-aware values (`--line` / rgba of `--text`).
+- [x] `<select>`/date chevron + focus affordances remain visible on the new panel backgrounds (chevron stroke visible; `--focus`/accent ring intact).
+- [x] Every migrated pairing meets **WCAG AA** (re-measure; ratios in `docs/design-refresh-2026.md` §1). Neon fills carry near-black `--bg` text. (Re-computed independently — see anthracite-palette ticket retest, all AA+.)
+- [x] Safety/trust surfaces (`.safety`, `.privacy-panel`, `.trust-disclaimer`, `.legal-*`, safety center) stay legible and prominent — no reduction in trust legibility.
+- [x] Visible focus, 44px targets, and `prefers-reduced-motion` behavior unchanged.
+- [x] No precise location or sensitive data exposed (styling-only change).
+- [x] Relevant automated tests and repository checks pass, including production `npm run build`. (typecheck ✓, lint ✓, test 400/12-skip ✓, prod build ✓.)
 
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by experience-build-agent as the scoped follow-up to `CX-20260702-dark-neon-theme-tokens` (token layer shipped in commit `b4ff31a`). Inventory of Class A (hardcoded light fills), Class B (`--ink`-as-dark-fill), and Class C (dark-ink rgba helpers) captured above from a source grep of `globals.css`. Status `ready`.
 - 2026-07-02 - experience-build-agent took ownership, status `in-progress`. Migrating the high-visibility member journeys fully (global controls + button system, landing, signup, auth, profile, discover, hosting, event detail/room, safety report control, feedback) onto `--surface`/`--surface-raised`/`--text`/`--text-muted`/`--line`. Re-pointing legacy `--cream` from `--bg` to `--surface` so token-consuming pills/chips render as raised dark chips (not invisible on the page bg). Deferring staff-only `/moderation` + `/research/bucharest` low-level literal text colors to a focused follow-up if they don't recolor for free.
+- 2026-07-02 - test - **VERIFIED** (independent retest, one step). Repo checks all pass. Grep of `apps/web/src/app/globals.css` confirms no `background: white`/`#fff`/`#f4f0e7` light-card fill remains on member surfaces and `--cream` is re-pointed to `--surface` (raised dark chips). Served CSS is coherent anthracite/neon with AA ratios re-computed (see anthracite-palette retest). Chevron flipped for dark, focus rings on `--focus`. No light-on-light residue. Status `implemented` → `verified`.
 - 2026-07-02 - experience-build-agent: IMPLEMENTED in commit `1fdb70b` (pushed to origin/main; no migration). Migrated all member-facing surface groups fully — global controls + button system, landing (live block), signup, auth, profile (panels/edit/session panels/plus/photos/privacy/communication), discover, hosting, event detail + room (join/manage/updates/intent/leave/prearrival/first-event-prep), afterglow/movement arc + rail, reflection/peer-feedback/received-rating, safety report control, safety center, feedback, legal + trust disclaimers. Class A light fills → `--surface`/`--surface-raised`; Class B `--ink`-as-fill → intentional dark surface/raised (primary/positive CTAs = neon fills with near-black `--bg` text); Class C dark-ink rgba shadows/hairlines/white-on-dark helpers → `--line` / theme rgba; chevron+date glyph flipped for dark; focus rings → `--focus`. AA re-measured on every new pairing (text/surface 14.7–16.7 AAA; muted 7.0–7.9; `--bg` on lime 15.95; near-black .78 on lime 8.81; warn/surface 6.4; warn-panel text 16.0; #32110b on coral 6.1). Checks: typecheck ✓, lint ✓ (only warning is in gitignored qa/full-flows.mjs, untouched), test 391 passed/12 skipped ✓, production `npm run build` ✓. Verified logged-in as pooled host-A: served CSS re-points `--cream`→`--surface`, no light card fill remains on any member surface, discover/profile/hosting/auth/feedback/safety pages 200. Remainder (staff `/moderation` + evidence-reference surfaces + dead legacy landing CSS block) split to child `CX-20260702-migrate-hardcoded-colors-moderation-remainder` (P3, ready). Status `implemented` (Explorer retests independently).

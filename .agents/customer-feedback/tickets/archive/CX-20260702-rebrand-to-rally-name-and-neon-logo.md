@@ -1,6 +1,6 @@
 # CX-20260702-rebrand-to-rally-name-and-neon-logo
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `high`
 - Priority: `P1 high` — owner delegated the name+logo decision ("You decide", 2026-07-02). Rename the product and ship a modern neon logo, centralized so it's a one-edit change later.
 - Customer journey: brand / trust (cross-cutting)
@@ -35,4 +35,5 @@
 
 - 2026-07-02 - Filed after owner delegated the name/logo decision; decision recorded (name "Rally", neon motion-mark). Status `ready`.
 - 2026-07-02 - experience-build-agent picked up, set `in-progress`, recorded as implementation owner. Implementing single brand module + component and sweeping all member-facing "Sport Date" literals.
+- 2026-07-02 - test - **VERIFIED** (independent retest, one step). Repo checks all pass. Grep of `apps/web/src` for "Sport Date" returns exactly ONE hit — `apps/web/src/lib/brand.tsx` (the brand module doc comment) — no stray member-facing literal remains. Live on `:3000`: metadata `<title>` = "Sign in — Rally" (login) and "Rally — Meet through movement" (landing); `/icon.svg` favicon serves 200 `image/svg+xml` (neon glyph). Name+logo centralized in the single `brand.tsx` module. Status `implemented` → `verified`.
 - 2026-07-02 - Implemented (commit `83e0a36`, pushed to origin/main). Added `apps/web/src/lib/brand.tsx` as the single source of truth (`BRAND_NAME="Rally"`, `BRAND_TITLE`, `BRAND_TAGLINE`, colors, static reduced-motion-safe `RallyGlyph` + `Wordmark` with a glyph-only/decorative variant). Swept every member-facing "Sport Date" literal → Rally across all page navs (discover/discover-event/profile/safety/feedback/hosting/hosting-loading/hosting-error/events-new/event-detail/room/moderation), landing hero+footer wordmark, `layout.tsx` metadata (title default + `%s — Rally` template), auth email content (`auth-email-content.ts`), global-error + moderation 404, legal/guideline/research pages, Plus billing surface + billing API error copy, and misc components. New neon glyph favicon at `apps/web/src/app/icon.svg` (replaces `favicon.ico`). Logo link: visible focus ring, 44px target, accessible name; neon green (#3BEA7E) on anthracite meets AA; static/reduced-motion safe. Updated tests asserting the old name. Grep confirms no stray member-facing "Sport Date" literal remains (only the brand module's own doc comment references the former name). Checks: typecheck PASS, lint PASS (0 errors), test PASS (400), production `npm run build` PASS. Verified on dev :3000 logged in as pooled host-A — landing/discover/profile nav/title read "Rally", favicon serves the neon glyph. No migration. Ready for independent retest. Legal-entity naming intentionally left to owner.
