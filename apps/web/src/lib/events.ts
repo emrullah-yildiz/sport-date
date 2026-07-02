@@ -533,6 +533,70 @@ export function selectHostedEvents(summaries: ReadonlyArray<MemberEventSummary>)
     .map((summary) => ({ ...summary, hostedStatus: summary.hasEnded ? "past" : "upcoming" }));
 }
 
+// Pure copy derivation for the PRIVATE host-side reflection/outcome shown on a PAST
+// hosted card (CX-20260701-hosting-past-events-no-reflection-or-outcome). It closes
+// the host's arc with a warm, honest acknowledgement — "you made this happen" — and
+// either invites a calm optional reflection when none is recorded, or quietly mirrors
+// the host's OWN recorded outcome when one exists.
+//
+// Humane guardrails (the point of the feature):
+//  - Honest + derived: it reflects ONLY the host's own `event.reflection` row (joined
+//    on the viewer's user id). It invents no attendance figure, shows no participant
+//    identity, and carries no count/streak/score/rank/badge/leaderboard/popularity.
+//  - Private: this is the host's own view of their own event; nothing here is shown to
+//    or about any other participant.
+//  - Non-punitive: a `left_early` / `did_not_attend` / "would not host again" outcome
+//    reads with dignity and no blame — hosting is generous however it went.
+//  - Non-pressuring: an acknowledgement, not a nag to host more. When nothing is
+//    recorded it offers (never demands) the same private reflection the room already
+//    owns; skipping it changes nothing.
+export type HostReflectionOutcome = Readonly<{
+  heading: string;
+  body: string;
+  /** True only when the host has recorded their own reflection for this event. */
+  recorded: boolean;
+  /** Present only when unrecorded: the calm, optional invitation label. */
+  reflectPrompt: string | null;
+}>;
+
+export function summarizeHostReflection(reflection: MemberEventSummary["reflection"]): HostReflectionOutcome {
+  const acknowledgement = "You hosted this. People showed up because you made the plan real.";
+
+  if (!reflection) {
+    return {
+      heading: "You made this happen",
+      body: acknowledgement,
+      recorded: false,
+      // Optional and clearly the host's choice — the write path lives in the room.
+      reflectPrompt: "How did it go? Add a private note (optional)",
+    };
+  }
+
+  // The host recorded their own reflection — mirror it quietly and kindly, using only
+  // the host's own words. Attendance is the host's self-report about their OWN
+  // presence, not any participant's.
+  const attendanceNote =
+    reflection.attendance === "attended"
+      ? "You marked this as happened — you were there for it."
+      : reflection.attendance === "left_early"
+        ? "You noted you left this one early. That is completely fine — hosting it still mattered."
+        : "You noted this one didn't come together for you. That happens, and it takes nothing away from making the plan real.";
+
+  const wouldAgainNote =
+    reflection.wouldJoinAgain === "yes"
+      ? " You'd gather this group again."
+      : reflection.wouldJoinAgain === "no"
+        ? " You'd rather not run this exact one again — good to know for next time."
+        : "";
+
+  return {
+    heading: "You made this happen",
+    body: `${acknowledgement} ${attendanceNote}${wouldAgainNote}`,
+    recorded: true,
+    reflectPrompt: null,
+  };
+}
+
 // Pure copy derivation shared by the hosting card and its tests. Turns the host's
 // own aggregate counts into calm, truthful labels — no scarcity/urgency pressure,
 // no other member's identity. `pending` is the count of requests awaiting the

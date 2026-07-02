@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import PrimaryNav from "@/components/PrimaryNav";
 import { BRAND_NAME } from "@/lib/brand";
 import SiteFooter from "@/components/SiteFooter";
-import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, type HostedEvent } from "@/lib/events";
+import { getMemberEventSummaries, selectHostedEvents, summarizeHostCoordination, summarizeHostReflection, type HostedEvent } from "@/lib/events";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata = { title: "Your events" };
@@ -24,6 +24,11 @@ function HostedEventCard({ event }: { event: HostedEvent }) {
   const statusLabel = event.hostedStatus === "upcoming" ? "Upcoming" : "Past";
   const coordination = event.hostCoordination ? summarizeHostCoordination(event.hostCoordination) : null;
   const isUpcoming = event.hostedStatus === "upcoming";
+  // Private host-side closure for a PAST event: a warm "you made this happen"
+  // acknowledgement, plus either the host's own recorded outcome or a calm optional
+  // invitation to reflect. Derived only from the host's own reflection — no counts,
+  // no participant data, no pressure. (See summarizeHostReflection.)
+  const outcome = isUpcoming ? null : summarizeHostReflection(event.reflection);
   return (
     <article className={`hosting-card ${event.hostedStatus}`}>
       <div className="hosting-card-top">
@@ -58,6 +63,21 @@ function HostedEventCard({ event }: { event: HostedEvent }) {
             <dd>{coordination.placesLabel}</dd>
           </div>
         </dl>
+      ) : null}
+      {outcome ? (
+        <div className="hosting-outcome" role="note" aria-label={`Your private reflection on ${event.title}`}>
+          <p className="hosting-outcome-head">{outcome.heading}</p>
+          <p className="hosting-outcome-body">{outcome.body}</p>
+          {outcome.reflectPrompt ? (
+            <Link
+              className="hosting-outcome-reflect"
+              href={`/events/${event.id}/room#event-reflection-title`}
+              aria-label={`How did ${event.title} go? Add a private, optional reflection`}
+            >
+              {outcome.reflectPrompt} <span aria-hidden="true">→</span>
+            </Link>
+          ) : null}
+        </div>
       ) : null}
       <footer>
         <Link href={`/events/${event.id}`} aria-label={`Manage ${event.title}`}>

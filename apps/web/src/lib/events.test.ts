@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, summarizeHostCoordination, type MemberEventSummary } from "./events";
+import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, summarizeHostCoordination, summarizeHostReflection, type MemberEventSummary } from "./events";
 
 // These cases pin the discovery language-preference rule that the SQL clause in
 // `getDiscoverableEvents` mirrors. The bug (CX-20260630): a brand-new member has
@@ -185,5 +185,65 @@ describe("hosting coordination summary copy", () => {
     const full = summarizeHostCoordination({ pendingRequestCount: 0, acceptedCount: 4, capacity: 4 });
     expect(full.placesLabel).toBe("All places filled");
     expect(full.isFull).toBe(true);
+  });
+});
+
+// Pins the PRIVATE host-side reflection/outcome shown on a PAST hosted card
+// (CX-20260701-hosting-past-events-no-reflection-or-outcome). It must be honest
+// (derived only from the host's OWN reflection — never a fabricated count), warm,
+// non-punitive, non-pressuring, and free of any banned engagement mechanic.
+describe("host past-event reflection/outcome copy", () => {
+  // Whole-token scan: none of these manipulative mechanics may appear in the copy.
+  const BANNED = [
+    /\bstreaks?\b/i, /\bscores?\b/i, /\branks?\b/i, /\bleaderboards?\b/i,
+    /\b(points|xp|coins?|gems?)\b/i, /\b(badges?|trophy|trophies|medals?)\b/i,
+    /\b(popularity|attractiveness)\b/i, /\b(better than|compared to)\b/i,
+    /\b(don'?t (?:lose|break)|come back tomorrow|last chance|hurry)\b/i,
+  ];
+  function assertClean(text: string) {
+    for (const pattern of BANNED) expect(pattern.test(text), `banned mechanic ${pattern} in: ${text}`).toBe(false);
+  }
+
+  it("invites a calm, optional reflection with a warm acknowledgement when none is recorded", () => {
+    const outcome = summarizeHostReflection(null);
+    expect(outcome.recorded).toBe(false);
+    expect(outcome.heading).toBe("You made this happen");
+    expect(outcome.body).toContain("People showed up because you made the plan real.");
+    // The reflect affordance is explicitly optional — an invitation, never a nag.
+    expect(outcome.reflectPrompt).toContain("optional");
+    assertClean(`${outcome.heading} ${outcome.body} ${outcome.reflectPrompt}`);
+  });
+
+  it("quietly mirrors the host's OWN recorded attendance without inventing a figure", () => {
+    const outcome = summarizeHostReflection({ attendance: "attended", wouldJoinAgain: "yes" });
+    expect(outcome.recorded).toBe(true);
+    // No reflect prompt once recorded — the loop is closed, no re-nagging.
+    expect(outcome.reflectPrompt).toBeNull();
+    expect(outcome.body).toContain("You marked this as happened");
+    expect(outcome.body).toContain("You'd gather this group again.");
+    // Honest: it invents no attendance count or participant figure.
+    expect(outcome.body).not.toMatch(/\d/);
+    assertClean(`${outcome.heading} ${outcome.body}`);
+  });
+
+  it("reads without blame for a left-early or did-not-attend outcome (non-punitive)", () => {
+    const left = summarizeHostReflection({ attendance: "left_early", wouldJoinAgain: "prefer_not_to_say" });
+    expect(left.body).toContain("left this one early");
+    expect(left.body).toContain("hosting it still mattered");
+
+    const missed = summarizeHostReflection({ attendance: "did_not_attend", wouldJoinAgain: "no" });
+    expect(missed.body).toContain("didn't come together for you");
+    // "Would not host again" is framed as useful, never as failure.
+    expect(missed.body).toContain("good to know for next time");
+    for (const o of [left, missed]) assertClean(`${o.heading} ${o.body}`);
+  });
+
+  it("exposes only the host's own reflection — no participant identity or attendance", () => {
+    // The function's only input is the host's own reflection shape; there is no
+    // channel for another member's data. This pins that contract at the type level
+    // and asserts the copy never references others.
+    const outcome = summarizeHostReflection({ attendance: "attended", wouldJoinAgain: "prefer_not_to_say" });
+    expect(outcome.body.toLowerCase()).not.toContain("they");
+    expect(outcome.body.toLowerCase()).not.toContain("attended");
   });
 });
