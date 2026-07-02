@@ -1,6 +1,6 @@
 # CX-20260630-event-detail-approximate-location-no-spatial-cue
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P2 medium` — Reach 5 (every member evaluating any event before requesting sees this "Before acceptance" location panel) × Impact 3 (the trust-check + travel decision rests entirely on a place *name* the member may not know; a visible-but-approximate spatial cue is exactly what the vision and design signature call for, and what comparable event/movement apps provide; without it a cautious member can't judge distance or feasibility and the "deliberately approximate" claim is told, not shown) × Confidence 4 (directly observed; the panel is text-only with no map/zone; this is a design improvement with one strong privacy constraint to respect) / Effort 4 (introduce an approximate-area visual — a static blurred/circled neighborhood zone — that NEVER plots or implies the exact venue, plus tiles/asset cost; must be progressive-enhancement and accessible). Math: (5×3×4)/4 = 15 → P2. Not a safety regression (the existing text disclosure already honors the precise-location guardrail); this raises the trust + spatial experience. Components: `apps/web/src/app/discover/events/[eventId]/page.tsx` (the "Before acceptance" `<article>`), `apps/web/src/app/globals.css` (`.event-detail-grid`), event data (`areaLabel`, `city` — must remain coarse; do NOT add precise coordinates to this pre-acceptance surface).
 
