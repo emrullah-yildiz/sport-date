@@ -1,13 +1,13 @@
 # CX-20260702-web-sessions-indistinguishable-no-device-hint-or-bulk-signout
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 3 × Impact 4 × Confidence 4) / Effort 3 = 16 → P2. Reach 3: members who sign in from more than one browser/computer (shared laptop, work + home, a public machine) and later open Account security to tidy up — a real subset, especially the safety-conscious. Impact 4: this is a trust/security surface; when a member suspects a session on a device they no longer control, they cannot tell WHICH row is that device, so they either end the wrong one or, to be safe, must end everything one row at a time — friction at exactly the "I feel unsafe / I lost my laptop" moment. Confidence 4: observed live (17 identical rows) and confirmed in source that the `sessions` table stores no distinguishing attribute. Effort 3: needs a schema/column addition (coarse device/browser hint captured at sign-in) plus a bulk "sign out all other browsers" action — more than a CSS change. Not a hard safety floor (ending sessions already works), so P2 not P1.
 - Customer journey: account & trust — reviewing and ending my signed-in browsers from Account security
 - Surface: `web` (desktop + mobile; same `WebSessionControls` panel)
 - Environment and viewport/device: `/profile` → "Account security · Signed-in browsers", dev server localhost:3000, Chromium at 1280. Signed in as a pooled synthetic adult. Observed 2026-07-02.
 - Found by: user-simulator (account & trust journey pass)
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260630-session-management-web-session-not-listed` (archived — delivered the list-and-revoke panel this ticket builds on; that ticket's scope was surfacing + single-session revoke, NOT distinguishing sessions or a bulk control), `CX-20260701-remember-me-optional-persistent-login` (archived — longer-lived sessions make the "which browser is this?" problem more likely, since revocable long sessions should be listed here). No open ticket covers session identifiability or bulk sign-out.
 
 ## Customer outcome
@@ -69,3 +69,4 @@ Practical: a member who needs to lock out a device they no longer control cannot
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-simulator (account & trust journey pass); status `ready`. Live: many active browser rows indistinguishable beyond timestamp, one "This device" badge, working per-row revoke, no bulk control. Source-confirmed the `sessions` table stores no device/agent/location attribute and no bulk-revoke endpoint exists. Builds on the archived list-and-revoke ticket; self-contained (schema hint + bulk endpoint + UI). Live retest of the new hint + bulk action owed after implementation.
+- 2026-07-02 - Picked up by experience-build-agent; status `in-progress`.

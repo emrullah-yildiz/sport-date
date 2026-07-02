@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashSessionToken, verifyPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { deriveDeviceLabel } from "@/lib/device-label";
 import { browserAuthRateLimitRules, enforceRateLimit, normalizeRateLimitKeyPart } from "@/lib/rate-limit";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { AUTH_COOKIE_NAME, setSessionCookie } from "@/lib/session";
@@ -53,6 +54,11 @@ export async function POST(request: Request) {
     // shared/public computer is never silently kept signed in.
     const remember = (body as Record<string, unknown>)?.rememberMe === true;
     const session = createSession({ remember });
+    // Coarse, honest "Browser on OS" hint (e.g. "Chrome on Windows") derived
+    // from the User-Agent so the member can recognise this browser in the
+    // "Signed-in browsers" panel. We store ONLY this derived family label — not
+    // the raw UA, IP, or any location. null when the UA is missing/unrecognised.
+    const deviceLabel = deriveDeviceLabel(request.headers.get("user-agent"));
     const previousToken = (await cookies()).get(AUTH_COOKIE_NAME)?.value;
     const previousTokenHash = previousToken ? hashSessionToken(previousToken) : "";
     await sql.transaction((transaction) => [
@@ -61,8 +67,8 @@ export async function POST(request: Request) {
         WHERE ${previousTokenHash} <> '' AND token_hash = ${previousTokenHash}
       `,
       transaction`
-        INSERT INTO sessions (id, user_id, token_hash, expires_at)
-        VALUES (${session.id}::uuid, ${user.id}, ${session.tokenHash}, ${session.expiresAt.toISOString()}::timestamptz)
+        INSERT INTO sessions (id, user_id, token_hash, expires_at, device_label, last_active_at)
+        VALUES (${session.id}::uuid, ${user.id}, ${session.tokenHash}, ${session.expiresAt.toISOString()}::timestamptz, ${deviceLabel}, NOW())
       `,
     ]);
 

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 import { createSession, hashPassword } from "@/lib/auth";
 import { DatabaseNotConfiguredError, getDatabase } from "@/lib/db";
+import { deriveDeviceLabel } from "@/lib/device-label";
 import { browserRegistrationRateLimitRules, enforceRateLimit, normalizeRateLimitKeyPart } from "@/lib/rate-limit";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { setSessionCookie } from "@/lib/session";
@@ -31,6 +32,9 @@ export async function POST(request: Request) {
     const input = validation.data;
     const passwordHash = await hashPassword(input.password);
     const session = createSession();
+    // Coarse, honest "Browser on OS" hint (see login route / device-label.ts):
+    // derived family label only, never the raw UA / IP / location.
+    const deviceLabel = deriveDeviceLabel(request.headers.get("user-agent"));
     const sql = getDatabase();
     const sportsJson = JSON.stringify(input.sports.map((sport) => ({
       name: sport.name,
@@ -57,8 +61,8 @@ export async function POST(request: Request) {
         CROSS JOIN jsonb_to_recordset(${sportsJson}::jsonb)
           AS selected(name TEXT, skill_level TEXT, frequency TEXT)
       ), new_session AS (
-        INSERT INTO sessions (id, user_id, token_hash, expires_at)
-        SELECT ${session.id}::uuid, new_user.id, ${session.tokenHash}, ${session.expiresAt.toISOString()}::timestamptz
+        INSERT INTO sessions (id, user_id, token_hash, expires_at, device_label, last_active_at)
+        SELECT ${session.id}::uuid, new_user.id, ${session.tokenHash}, ${session.expiresAt.toISOString()}::timestamptz, ${deviceLabel}, NOW()
         FROM new_user
       )
       SELECT id, email FROM new_user
