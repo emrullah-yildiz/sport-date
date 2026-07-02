@@ -1,6 +1,6 @@
 # CX-20260702-feedback-history-page-value-capitalized-distorts-member-text
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 2 × Confidence 4) / Effort 1 = 24. One-line CSS scoping fix; keeps a member's own words faithful.
 - Customer journey: reflection / feedback ("What you've shared" history)
