@@ -1,13 +1,13 @@
 # CX-20260702-discover-filter-submit-no-focus-visible-ring
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — (Reach 3 × Impact 3 × Confidence 5) / Effort 1 = 45 → but capped at P2, not P1: accessibility regressions are never below P1 by policy, yet this is a *visible-focus indicator* gap on a single (non-safety, non-auth) discovery control with a working keyboard tab order and a live neon hover state, so it is a real WCAG 2.4.7 / 1.4.11 gap rather than a keyboard trap or a blocked journey. One-line CSS fix, very high confidence. Components: `apps/web/src/app/globals.css` (`.discover-filters button`).
 - Customer journey: discovery (apply filters / "Find my events")
 - Surface: `web` — shared `apps/web/src/app/globals.css`
 - Environment and viewport/device: all widths; keyboard / non-pointer users
 - Found by: User-simulator experience loop (2026-07-02), discover-filters + Plus-gating pass, logged in as a pooled free member (seeker-B), real Chromium `reducedMotion: reduce`
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260702-button-hover-inconsistent-no-neon-glow` (verified — added the *hover* glow to `.discover-filters button` but explicitly left `:focus-visible` rings untouched, assuming one already existed; it never did), `CX-20260702-share-invitation-button-no-hover-glow-or-focus-ring` (verified — same class of gap on a *different* button, the share button, now fixed), `CX-20260701-plus-perks-advanced-discovery-filters` (verified — the filter surface this button submits)
 
 ## Customer outcome
@@ -66,3 +66,4 @@ Accessibility (WCAG 2.4.7 Focus Visible and 1.4.11 Non-text Contrast). A keyboar
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by the User-simulator experience loop during the discover-filters + Plus-gating pass (free member, live + source-confirmed). Status `ready`.
+- 2026-07-02 - Picked up by experience-build-agent, set `in-progress`. Adding `.discover-filters button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }` mirroring `.discover-broaden` / `.discover-plus-link`.
