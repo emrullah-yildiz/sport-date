@@ -1,6 +1,6 @@
 # CX-20260701-feedback-headline-assumes-breakage-excludes-ideas
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 2 × Confidence 4) / Effort 1 = 24. Cheap copy fix; broadens who feels invited to share.
 - Customer journey: reflection / feedback
@@ -69,3 +69,4 @@ Members with positive or forward-looking feedback may feel the page "isn't for t
 
 - 2026-07-01 - Filed by Experience & Design Explorer (feedback × copy pass); status `ready`.
 - 2026-07-02 - Experience Build Agent picked up; status `in-progress`. Reframing `/feedback` headline + subhead to welcome ideas, kind words, and problems.
+- 2026-07-02 - Experience Build Agent implemented; status `implemented`. Reframed copy so the surface welcomes ideas, praise, AND problems in the brand's rhythm voice: headline "Tell us how the rhythm feels."; subhead "Share an idea, a kind word, or something that didn't work. Anything that shapes the experience belongs here. Your note is private to the team and helps us make the next visit clearer."; form heading "What happened?" → "What's on your mind?"; summary placeholder → "An idea, a kind word, or what didn't work"; details label "What were you trying to do?" → "Tell us more" with an inclusive placeholder. Copy-only (no globals.css), single h1 + heading order preserved, no overflow 375/1280, safety-route note + warm confirmation + focus-move + forward path untouched. Files: `apps/web/src/app/feedback/page.tsx`, `apps/web/src/components/FeedbackWorkspace.tsx`. Test: added `apps/web/src/app/feedback/page.test.tsx` (source-tripwire: headline no longer assumes breakage; invites idea/kind word/problem; keeps rhythm voice; single h1). Checks (apps/web): typecheck pass, lint pass (0 errors, 2 pre-existing unrelated warnings), test 655 pass, build pass. Commit `388a9a5`, pushed to origin/main.
