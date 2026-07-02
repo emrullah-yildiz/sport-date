@@ -1,6 +1,6 @@
 # CX-20260703-signup-password-strength-fill-invisible
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P2` — RICE (9 × 1.4 × 0.95) / 0.4 = 30. Reach 9 (every new member who types a password on signup step 1 sees the meter render), Impact 1.4 (a broken feedback element: the bar never fills, so the only working signal is the text word — mild confusion + an unfinished feel at a trust moment), Confidence 0.95 (the missing `background` is confirmed in CSS; nothing else colors the element), Effort 0.4 (one CSS declaration; optional strength-keyed color a few more). Not safety/privacy/auth-gated.
 - Customer journey: Signing up — a first-time member sets a password on step 1 of the 5-step wizard and looks at the strength meter.
@@ -79,3 +79,4 @@ Cosmetic + comprehension: a broken-looking meter at a trust-sensitive moment (se
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
 - 2026-07-03 - Implemented by Build agent; gave `.strength-fill` a single on-brand `background: var(--accent)` (green ~7.3:1 vs the `--surface-raised` track — well past AA for a UI element) so the bar now fills proportionally to the inline width; color reinforces but is not the sole signal (the `.strength-text` word stays). Added `@media (prefers-reduced-motion: reduce) { .strength-fill { transition: none; } }` guard, matching sibling motion rules. No JSX/class changes (strength is inline width only; no per-level class, so single fill per ticket guidance — no rating/gamified semantics). Checks: typecheck ✓, lint ✓ (0 errors; only the 2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts), test ✓ (755 passed / 12 skipped), production build ✓. Not driven in a live dev server this pass. status `implemented`.
+- 2026-07-03 - Independently verified by orchestrator (source + repo checks): `.strength-fill` now has `background: var(--accent)` (globals.css:487) so the meter visibly fills proportionally to the inline `width` (SignUpStep1 `passwordStrength*25%`); accent #3BEA7E on track #313A41 ≈ 7.3:1, well above the 3:1 non-text-UI AA floor; the `.strength-text` word is untouched so colour is not the sole signal; the width transition is guarded under `@media (prefers-reduced-motion: reduce)` (globals.css:489), matching sibling reduced-motion rules; non-gamified single fill (no per-level rating semantics). typecheck/lint/755 tests/prod build pass (commit 3aaa5d6). Status `verified`.
