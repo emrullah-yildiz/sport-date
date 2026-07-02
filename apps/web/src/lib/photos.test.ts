@@ -18,15 +18,17 @@ let deleteProfilePhotoBlob: typeof import("@/lib/photo-storage").deleteProfilePh
 function mockSql(results: unknown[][]) {
   let index = 0;
   const calls: string[] = [];
-  const sql = (strings: TemplateStringsArray) => {
+  const args: unknown[][] = [];
+  const sql = (strings: TemplateStringsArray, ...values: unknown[]) => {
     calls.push(strings.join("?"));
+    args.push(values);
     const result = results[index] ?? [];
     index += 1;
     return Promise.resolve(result);
   };
   (sql as unknown as { transaction: unknown }).transaction = (queries: unknown) =>
     Promise.resolve(Array.isArray(queries) ? queries : []);
-  return { sql, calls };
+  return { sql, calls, args };
 }
 
 beforeAll(async () => {
@@ -104,6 +106,40 @@ describe("reorderProfilePhotos", () => {
     vi.mocked(getDatabase).mockReturnValue(sql as never);
     const result = await reorderProfilePhotos("42", ["b", "a"]);
     expect(result.ok).toBe(true);
+  });
+
+  it("reorders 2+ photos in one collision-free set-based statement (CX-20260702)", async () => {
+    // Reproduces the old 500: the previous implementation ran a phase-1
+    // `SET position = position + 6`, which violates CHECK (position < 6) → 23514.
+    // The fix must NOT emit any offset bump and must apply the ordering in a
+    // single UPDATE ... FROM unnest(...) so no row transiently collides or goes
+    // out of range.
+    const { sql, calls, args } = mockSql([[
+      { id: "a", alt: "", position: 0, is_primary: true, created_at: "t" },
+      { id: "b", alt: "", position: 1, is_primary: false, created_at: "t" },
+      { id: "c", alt: "", position: 2, is_primary: false, created_at: "t" },
+    ]]);
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    const result = await reorderProfilePhotos("42", ["c", "a", "b"]);
+    expect(result.ok).toBe(true);
+
+    // The reorder issues exactly one write after the initial SELECT.
+    const writes = calls.slice(1);
+    expect(writes).toHaveLength(1);
+    const [reorderSql, reorderArgs] = [writes[0], args[1]];
+    // No transient constraint-violating offset bump anywhere.
+    expect(reorderSql).not.toContain("position + ");
+    // Single set-based mapping keyed off the pre-update snapshot.
+    expect(reorderSql).toContain("unnest");
+    expect(reorderSql).toContain("SET position = v.pos");
+    // Reorder touches only positions — is_primary is owned by setPrimaryProfilePhoto,
+    // so re-deriving it here would trip the one-primary-per-user partial unique index.
+    expect(reorderSql).not.toContain("is_primary");
+    // The new order is bound as an id array + a 0..n-1 position array, scoped to
+    // the member — so only the member's own rows are touched and every position
+    // lands in [0, count): no CHECK (position < 6) violation is possible.
+    expect(reorderArgs).toEqual([["c", "a", "b"], [0, 1, 2], "42"]);
   });
 });
 

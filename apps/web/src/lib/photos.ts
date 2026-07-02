@@ -150,14 +150,32 @@ export async function reorderProfilePhotos(
   if (!resolution.valid) return { ok: false, error: resolution.error };
 
   const sql = getDatabase();
-  // Two-phase to avoid tripping the (user_id, position) unique index mid-update:
-  // offset all positions high, then set the final positions.
+  // Apply the whole new ordering in ONE set-based statement inside a transaction.
+  // Each row's final position is computed from the pre-update snapshot via
+  // unnest(ids, positions), and the (user_id, position) uniqueness is now a
+  // DEFERRABLE INITIALLY DEFERRED constraint (migration 028), so it is checked
+  // once at COMMIT rather than per row — the mid-permutation state where two rows
+  // briefly share a slot is allowed as long as the final positions are unique.
+  //
+  // This replaces the old two-phase hack that bumped every position by +6 to dodge
+  // a non-deferrable unique index; +6 violated the CHECK (position < 6) and 500'd
+  // for anyone with 2+ photos (CX-20260702). The order is already validated as an
+  // exact permutation of the member's own ids above, so only their rows match and
+  // every final position lands in [0, count).
+  //
+  // Reorder ONLY changes positions — it does not touch is_primary. Which photo is
+  // primary is an independent choice owned by setPrimaryProfilePhoto; re-deriving
+  // it here would transiently leave two rows primary and trip the one-primary
+  // partial unique index (which is not deferrable).
+  const ids = [...resolution.order];
+  const positions = resolution.order.map((_photoId, index) => index);
   await sql.transaction([
-    sql`UPDATE profile_photos SET position = position + ${MAX_PROFILE_PHOTOS} WHERE user_id = ${userId}`,
-    ...resolution.order.map(
-      (photoId, index) =>
-        sql`UPDATE profile_photos SET position = ${index} WHERE id = ${photoId}::uuid AND user_id = ${userId}`,
-    ),
+    sql`
+      UPDATE profile_photos AS p
+      SET position = v.pos
+      FROM unnest(${ids}::uuid[], ${positions}::int[]) AS v(id, pos)
+      WHERE p.id = v.id AND p.user_id = ${userId}
+    `,
   ]);
   return { ok: true };
 }
