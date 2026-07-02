@@ -7,6 +7,8 @@ let getWebSessions: typeof import("./web-sessions").getWebSessions;
 let revokeWebSession: typeof import("./web-sessions").revokeWebSession;
 let revokeOtherWebSessions: typeof import("./web-sessions").revokeOtherWebSessions;
 let touchWebSessionLastActive: typeof import("./web-sessions").touchWebSessionLastActive;
+let MAX_WEB_SESSIONS_PER_USER: typeof import("./web-sessions").MAX_WEB_SESSIONS_PER_USER;
+let WEB_SESSION_LIST_LIMIT: typeof import("./web-sessions").WEB_SESSION_LIST_LIMIT;
 let hashSessionToken: typeof import("./auth").hashSessionToken;
 let getDatabase: typeof import("@/lib/db").getDatabase;
 
@@ -22,7 +24,7 @@ function mockSql(result: unknown[]) {
 }
 
 beforeAll(async () => {
-  ({ getWebSessions, revokeWebSession, revokeOtherWebSessions, touchWebSessionLastActive } = await import("./web-sessions"));
+  ({ getWebSessions, revokeWebSession, revokeOtherWebSessions, touchWebSessionLastActive, MAX_WEB_SESSIONS_PER_USER, WEB_SESSION_LIST_LIMIT } = await import("./web-sessions"));
   ({ hashSessionToken } = await import("./auth"));
   ({ getDatabase } = await import("@/lib/db"));
 }, 40000);
@@ -61,6 +63,11 @@ describe("getWebSessions", () => {
     expect(calls[0].values).toContain(hashSessionToken("auth-token-value"));
     // The raw cookie token itself is never put into the query.
     expect(calls[0].values).not.toContain("auth-token-value");
+    // The listing limit is the derived constant (>= the cap), interpolated as a
+    // value — NOT a hardcoded 50 baked into the SQL text — so it can never drift
+    // below the cap and silently omit a retained session.
+    expect(calls[0].text).toContain("LIMIT ?");
+    expect(calls[0].values).toContain(WEB_SESSION_LIST_LIMIT);
   });
 
   it("flags no row as current when no cookie token is supplied", async () => {
@@ -70,6 +77,20 @@ describe("getWebSessions", () => {
     await getWebSessions("42");
 
     expect(calls[0].values).toContain("");
+  });
+});
+
+describe("web-session cap / listing-limit invariants", () => {
+  it("keeps the listing limit >= the cap so no retained session is ever silently omitted", () => {
+    // The cap bounds how many active rows a member can have; the listing limit must
+    // be able to show ALL of them. If this ever fails, sessions past the limit would
+    // become invisible/unrevocable — the exact bug this fix removes.
+    expect(WEB_SESSION_LIST_LIMIT).toBeGreaterThanOrEqual(MAX_WEB_SESSIONS_PER_USER);
+  });
+
+  it("uses a conservative, generous cap (bounded growth, minimal surprise sign-outs)", () => {
+    expect(MAX_WEB_SESSIONS_PER_USER).toBeGreaterThanOrEqual(10);
+    expect(MAX_WEB_SESSIONS_PER_USER).toBeLessThanOrEqual(30);
   });
 });
 

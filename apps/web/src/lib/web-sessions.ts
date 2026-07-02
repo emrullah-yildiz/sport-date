@@ -3,6 +3,27 @@ import "server-only";
 import { hashSessionToken } from "@/lib/auth";
 import { getDatabase } from "@/lib/db";
 
+/**
+ * Maximum concurrent ACTIVE web/browser sessions kept per member. Enforced on
+ * sign-in (see the login route): the newest N sessions — including the one just
+ * created — are retained and the oldest active rows beyond N are evicted, so the
+ * `sessions` table cannot grow without bound. This is the single source of truth
+ * for the cap; the login route imports it so the cap and the listing limit below
+ * can never drift apart. Mobile app sessions live in a separate table and are
+ * unaffected by this cap.
+ */
+export const MAX_WEB_SESSIONS_PER_USER = 20;
+
+/**
+ * How many active sessions the "Signed-in browsers" panel lists. Derived from the
+ * cap so it is ALWAYS >= the number of rows the cap can leave behind — guaranteeing
+ * every retained session is individually visible and revocable and NOTHING is ever
+ * silently omitted. (The old fixed LIMIT 50 could silently hide sessions past the
+ * 50th on an uncapped account; capping at 20 makes 50 comfortably sufficient, but we
+ * keep it tied to the cap so raising the cap can never re-introduce silent hiding.)
+ */
+export const WEB_SESSION_LIST_LIMIT = Math.max(50, MAX_WEB_SESSIONS_PER_USER + 5);
+
 export type WebSession = Readonly<{
   id: string;
   createdAt: string;
@@ -47,7 +68,7 @@ export async function getWebSessions(userId: string, currentToken?: string): Pro
     FROM sessions
     WHERE user_id = ${userId} AND expires_at > NOW()
     ORDER BY (token_hash = NULLIF(${currentHash}, '')) DESC NULLS LAST, created_at DESC
-    LIMIT 50
+    LIMIT ${WEB_SESSION_LIST_LIMIT}
   ` as unknown as WebSessionRow[];
   return rows.map((row) => ({
     id: row.id,

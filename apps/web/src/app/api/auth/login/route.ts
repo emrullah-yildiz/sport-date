@@ -8,6 +8,7 @@ import { deriveDeviceLabel } from "@/lib/device-label";
 import { browserAuthRateLimitRules, enforceRateLimit, normalizeRateLimitKeyPart } from "@/lib/rate-limit";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { AUTH_COOKIE_NAME, setSessionCookie } from "@/lib/session";
+import { MAX_WEB_SESSIONS_PER_USER } from "@/lib/web-sessions";
 
 export const runtime = "nodejs";
 
@@ -69,6 +70,35 @@ export async function POST(request: Request) {
       transaction`
         INSERT INTO sessions (id, user_id, token_hash, expires_at, device_label, last_active_at)
         VALUES (${session.id}::uuid, ${user.id}, ${session.tokenHash}, ${session.expiresAt.toISOString()}::timestamptz, ${deviceLabel}, NOW())
+      `,
+      // Bound the number of concurrent web/browser sessions per member. Without a
+      // cap, every new browser sign-in left a permanent `sessions` row (login only
+      // clears the SAME-cookie row above), so an active account accumulated rows
+      // without limit — and the "Signed-in browsers" panel silently hid everything
+      // past its display limit, so those sessions could not be individually seen or
+      // revoked. We keep the newest MAX_WEB_SESSIONS_PER_USER active rows and evict
+      // the OLDEST active ones beyond that. This bounds growth AND keeps every
+      // remaining session visible/revocable (the panel's display limit is >= the
+      // cap, so nothing is ever silently omitted). We NEVER evict the session just
+      // created here — it is excluded by id, so the current browser is always kept
+      // signed in — and we only touch ACTIVE (not-yet-expired) rows, leaving expired
+      // residue to session-cleanup. The cap is deliberately generous so a member is
+      // very unlikely to hit it; if they do, only their truly-oldest device is signed
+      // out and can simply sign in again. This scopes to WEB `sessions` only; mobile
+      // devices live in the separate `mobile_sessions` table and are unaffected.
+      transaction`
+        DELETE FROM sessions
+        WHERE user_id = ${user.id}
+          AND id <> ${session.id}::uuid
+          AND expires_at > NOW()
+          AND id IN (
+            SELECT id FROM sessions
+            WHERE user_id = ${user.id}
+              AND id <> ${session.id}::uuid
+              AND expires_at > NOW()
+            ORDER BY created_at DESC
+            OFFSET ${MAX_WEB_SESSIONS_PER_USER - 1}
+          )
       `,
     ]);
 
