@@ -43,7 +43,7 @@
 
 .eyebrow { margin: 0 0 20px; color: #53665a; font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
 .hero h1 { max-width: 720px; margin: 0; font-size: clamp(58px, 7vw, 102px); line-height: .88; letter-spacing: -.078em; overflow-wrap: anywhere; }
-.hero h1 em { color: var(--research-coral); font-family: Georgia, serif; font-weight: 400; }
+.hero h1 em { color: var(--research-coral); font-family: var(--font-display); font-style: italic; font-weight: 400; }
 .lede { max-width: 620px; margin: 34px 0; color: #56635b; font-size: clamp(17px, 2vw, 21px); line-height: 1.55; }
 .primaryAction { display: inline-flex; align-items: center; gap: 34px; min-height: 58px; padding: 0 22px; border-radius: 99px; background: var(--research-ink); color: white; font-size: 13px; font-weight: 850; }
 .primaryAction span { color: var(--research-lime); font-size: 20px; }
@@ -73,7 +73,7 @@
 .formatCard dl { margin: auto 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.formatCard dl > div { padding-top: 14px; border-top: 1px solid rgba(23, 36, 29, .3); }.formatCard dt { margin-bottom: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; }.formatCard dd { margin: 0; font-size: 12px; font-weight: 750; }
 
 .belief { min-height: 640px; padding: 100px max(24px, calc((100vw - 1240px) / 2)); display: grid; align-content: center; background: var(--research-coral); }
-.belief p { margin: 0; font-size: clamp(46px, 7vw, 100px); line-height: .94; letter-spacing: -.07em; }.beliefLead { max-width: 900px; }.beliefTurn { max-width: 1050px; margin: 26px 0 0 auto !important; font-family: Georgia, serif; font-style: italic; text-align: right; }
+.belief p { margin: 0; font-size: clamp(46px, 7vw, 100px); line-height: .94; letter-spacing: -.07em; }.beliefLead { max-width: 900px; }.beliefTurn { max-width: 1050px; margin: 26px 0 0 auto !important; font-family: var(--font-display); font-style: italic; text-align: right; }
 
 .principles { padding: 120px max(24px, calc((100vw - 1240px) / 2)); }
 .principles > header { max-width: 900px; }.principles > div { margin-top: 75px; border-top: 1px solid rgba(23, 36, 29, .22); }
