@@ -1,6 +1,6 @@
 # CX-20260702-event-approx-coord-not-recoarsened-on-write-or-response
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3` — (Reach 3 × Impact 4 × Confidence 4) / Effort 2 = 24 → P3. Defense-in-depth / latent privacy hardening, NOT a live leak: the risky column is always written `null` today and matching re-coarsens defensively, so nothing precise ships now. Filed so the safeguard exists before the column is ever populated.
 - Customer journey: discovery (location privacy posture)
