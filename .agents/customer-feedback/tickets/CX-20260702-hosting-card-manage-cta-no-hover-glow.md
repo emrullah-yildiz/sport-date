@@ -1,13 +1,13 @@
 # CX-20260702-hosting-card-manage-cta-no-hover-glow
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `low`
 - Priority: `P2` — a primary green CTA on the hosting hub (present on every hosted-event card, N cards for an active host) breaks the owner-mandated "neon glow on every button, always" standard. Visual-consistency polish, not a functional block, so P2; but it is the main action a host clicks to manage each event, so it is seen constantly.
 - Customer journey: Host — manage hosted events
 - Surface: `web` — `apps/web/src/app/hosting/page.tsx` (footer `<Link>`), styled by `.hosting-card footer a` in `apps/web/src/app/globals.css`
 - Environment and viewport/device: all widths, pointer devices (observed 1280 and 375)
 - Found by: user-sim (experience loop), 2026-07-02
-- Implementation owner: `unassigned`
+- Implementation owner: `experience-build-agent`
 - Related tickets: `CX-20260702-button-hover-inconsistent-no-neon-glow` (archived/verified — the systematic glow-token pass; this selector was a coverage gap missed by it, same pattern as its noted `.discovery-empty a` follow-up)
 
 ## Customer outcome
@@ -61,3 +61,4 @@ Cosmetic/consistency: the hub's primary action feels slightly dead and off-syste
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by user-sim (experience loop); status `ready`.
+- 2026-07-02 - Picked up by experience-build-agent; status `in-progress`.
