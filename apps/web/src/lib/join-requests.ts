@@ -5,9 +5,12 @@ import crypto from "node:crypto";
 import {
   applyLateCancellation,
   describeReliabilityStanding,
+  exitReasonIsSafety,
   isNewJoinPaused,
+  normalizeGracefulExit,
   restoreReliabilityAfterCleanAttendance,
   type CancellationContext,
+  type GracefulExitInput,
   type ReliabilityNotice,
   type ReliabilityState,
 } from "@sport-date/domain";
@@ -118,11 +121,21 @@ export async function createEventJoinRequest(
   return rows.length > 0 ? { requestId, status: "pending" as const } : null;
 }
 
-export async function cancelEventJoinRequest(eventId: string, requestId: string, requesterId: string) {
+export async function cancelEventJoinRequest(
+  eventId: string,
+  requestId: string,
+  requesterId: string,
+  // Optional, PRIVATE graceful-exit reason. Never shown to hosts/peers, never a
+  // public score. Best-effort: it is normalized (never rejected) so an optional
+  // field can never block a member from leaving to protect themselves.
+  exit?: GracefulExitInput | null,
+) {
   const sql = getDatabase();
+  const { reason, note } = normalizeGracefulExit(exit);
   // Capture the pre-cancel status and hours-until-start in the same statement that
-  // cancels, so the reliability signal reflects the real state. NOTE: safety-path
-  // exits (report/block) cancel seats inside safety-actions.ts and never reach this
+  // cancels, so the reliability signal reflects the real state. The private exit
+  // reason/note are recorded on the member's own row only. NOTE: safety-path exits
+  // (report/block) cancel seats inside safety-actions.ts and never reach this
   // function, so a safety-motivated exit can never count here. Host-cancelled
   // events also do not route through here.
   const rows = (await sql`
@@ -131,7 +144,8 @@ export async function cancelEventJoinRequest(eventId: string, requestId: string,
       WHERE event_id = ${eventId}::uuid AND user_id = ${requesterId}
     )
     UPDATE join_requests
-    SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
+    SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW(),
+        exit_reason = ${reason}, exit_note = ${note === "" ? null : note}
     FROM events
     WHERE join_requests.id = ${requestId}::uuid AND join_requests.event_id = ${eventId}::uuid
       AND join_requests.event_id = events.id
@@ -145,11 +159,13 @@ export async function cancelEventJoinRequest(eventId: string, requestId: string,
   if (rows.length === 0) return false;
 
   // A cancellation only counts as a reliability signal when it was an ACCEPTED
-  // place cancelled close to the start. The domain layer owns the exact rule.
+  // place cancelled close to the start. The domain layer owns the exact rule. A
+  // member who noted they felt unsafe is treated as a safety exit here so it can
+  // NEVER count toward reliability, matching the report/block safety path.
   const context: CancellationContext = {
     wasAccepted: Boolean(rows[0].was_accepted),
     hoursUntilStart: Number(rows[0].hours_until_start),
-    viaSafetyPath: false,
+    viaSafetyPath: exitReasonIsSafety(reason),
   };
   const now = new Date();
   const currentRows = (await sql`

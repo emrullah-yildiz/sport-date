@@ -13,6 +13,17 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ e
   const { eventId, requestId } = await params;
   if (!UUID_PATTERN.test(eventId) || !UUID_PATTERN.test(requestId)) return NextResponse.json({ error: "Request not found." }, { status: 404 });
 
-  if (!await cancelEventJoinRequest(eventId, requestId, requester.id)) return NextResponse.json({ error: "Request cannot be cancelled." }, { status: 409 });
+  // The optional, PRIVATE graceful-exit reason. Parsed best-effort: a missing or
+  // malformed body must never stop a member from leaving, so any failure falls back
+  // to an unspecified exit. The reason is normalized in the data layer.
+  let exit: { reason?: unknown; note?: unknown } | null = null;
+  try {
+    const body = await request.json();
+    if (body && typeof body === "object") exit = { reason: (body as Record<string, unknown>).reason, note: (body as Record<string, unknown>).note };
+  } catch {
+    exit = null;
+  }
+
+  if (!await cancelEventJoinRequest(eventId, requestId, requester.id, exit)) return NextResponse.json({ error: "Request cannot be cancelled." }, { status: 409 });
   return NextResponse.json({ success: true, status: "cancelled" });
 }

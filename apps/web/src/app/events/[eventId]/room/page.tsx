@@ -232,7 +232,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         </div>
       </section>
       {canUseChat ? <EventRoomChat eventId={room.id} timeZone={room.timeZone} /> : null}
-      {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} /></div> : null}
+      {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} safetyControlsId="room-people" /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
       {room.hasEnded ? <PeerFeedbackPanel eventId={room.id} targets={peerFeedbackTargets} /> : null}
