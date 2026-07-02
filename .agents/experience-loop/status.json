@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-02T16:52:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"room safety-options VERIFIED+archived (8dcf81c). Global :focus-visible fallback implemented (49c9605). User-sim landing pass filed P1 signed-out-safety-guidance-gated-to-login (safety guidance bounces signed-out visitors to login — trust/safety-legibility gap) + P2 beta-explainer-panel-invalid-nesting-hydration-error (block elements in <p>). Chaining: BUILD signed-out-safety-guidance (P1 — make guidance publicly readable); TEST global-focus-visible 49c9605 (worktree-isolated, prod build confirms rule compiles); USE user-sim (fresh-load live focus re-check + rotate).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T16:52:00.000Z"},
-  "Planner":{"state":"idle","ticket":"P1 signed-out safety-guidance gating jumped to front","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260702-signed-out-safety-guidance-link-gated-to-login","since":"2026-07-02T16:52:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 49c9605 (global :focus-visible fallback) — worktree-isolated","since":"2026-07-02T16:52:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"always-on: fresh-load global-focus live re-check + next journey","since":"2026-07-02T16:52:00.000Z"} } }
+{ "updatedAt":"2026-07-02T17:28:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Global :focus-visible fallback VERIFIED+archived (49c9605 — compiles into prod CSS, no double-rings; closes the keyboard-focus-ring class). P1 signed-out safety-guidance implemented (be297ef). Chaining: BUILD beta-explainer-panel-invalid-nesting (P2 — 4 React DOM errors on landing); TEST signed-out-safety-guidance be297ef (worktree-isolated); USE user-sim (live-verify signed-out guidance readable + no member data + rotate).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-02T17:28:00.000Z"},
+  "Planner":{"state":"idle","ticket":"next build=beta-explainer-nesting (P2 landing DOM errors)","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-beta-explainer-panel-invalid-nesting-hydration-error","since":"2026-07-02T17:28:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify be297ef (signed-out safety-guidance public, no member leak) — worktree-isolated","since":"2026-07-02T17:28:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"always-on: live-verify signed-out safety guidance + next journey","since":"2026-07-02T17:28:00.000Z"} } }
