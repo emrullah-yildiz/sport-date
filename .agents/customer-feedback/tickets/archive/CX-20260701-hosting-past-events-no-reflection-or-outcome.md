@@ -1,6 +1,6 @@
 # CX-20260701-hosting-past-events-no-reflection-or-outcome
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 3 × Impact 3 × Confidence 3) / Effort 3 = 9. Closes the reflection phase of the host journey on the hub; data is already fetched, so effort is moderate and the win is dignity/closure rather than a blocked task.
 - Customer journey: reflection (graceful exit → reflection)
