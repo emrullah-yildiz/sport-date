@@ -20,6 +20,11 @@ export type DiscoveryEvent = Readonly<{
   minimumAge: number; maximumAge: number; experienceLevels: string[]; hostUserId: string; hostFirstName: string;
   areaLabel: string; city: string; countryCode: string; acceptedCount: number;
   placesRemaining: number; request: DiscoveryRequest | null;
+  // Approximate PUBLIC coordinate only (stored coarse column, or null when unset).
+  // Never a precise venue — that lives in event_private_locations and is not joined
+  // here. Used solely to power the distance/radius filter, and coarsened again before
+  // any comparison (CX-20260701-discover-geo-radius-and-use-my-location).
+  approximateLatitude: number | null; approximateLongitude: number | null;
 }>;
 
 // A single event's PUBLIC invitation as seen on the direct `/discover/events/{id}`
@@ -46,6 +51,7 @@ type DiscoveryEventRow = {
   time_zone: string; duration_minutes: number; capacity: number; language: string;
   minimum_age: number; maximum_age: number; experience_levels: string[];
   host_user_id: string | number; host_first_name: string; public_area_label: string; public_city: string; public_country_code: string;
+  public_approximate_latitude: number | null; public_approximate_longitude: number | null;
   accepted_count: number; request_id: string | null; request_status: DiscoveryRequest["status"] | null;
   request_skip_count: number | null;
 };
@@ -158,6 +164,7 @@ export async function getDiscoverableEvents(
       events.minimum_age, events.maximum_age, events.experience_levels,
       events.host_user_id, host.first_name AS host_first_name,
       events.public_area_label, events.public_city, events.public_country_code,
+      events.public_approximate_latitude, events.public_approximate_longitude,
       (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
       member_request.id AS request_id, member_request.status AS request_status,
       member_request.skip_count AS request_skip_count
@@ -209,6 +216,7 @@ export async function getDiscoverableEvents(
     hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
     city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
+    approximateLatitude: row.public_approximate_latitude, approximateLongitude: row.public_approximate_longitude,
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
   }));
 }
@@ -244,6 +252,7 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
       events.minimum_age, events.maximum_age, events.experience_levels,
       events.host_user_id, host.first_name AS host_first_name,
       events.public_area_label, events.public_city, events.public_country_code,
+      events.public_approximate_latitude, events.public_approximate_longitude,
       (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
       member_request.id AS request_id, member_request.status AS request_status,
       member_request.skip_count AS request_skip_count
@@ -272,6 +281,7 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
     hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
     city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
+    approximateLatitude: row.public_approximate_latitude, approximateLongitude: row.public_approximate_longitude,
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
     viewerIsHost: String(row.host_user_id) === String(user.id),
   };
