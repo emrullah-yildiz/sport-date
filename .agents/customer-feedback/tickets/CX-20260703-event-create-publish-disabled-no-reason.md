@@ -1,6 +1,6 @@
 # CX-20260703-event-create-publish-disabled-no-reason
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Customer journey: Host creates and publishes an event (`/events/new`)
 - Surface: `web`
@@ -70,3 +70,4 @@ A host who narrows the audience (a legitimate action) can be blocked from publis
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent. Replaced the silent `experienceLevels.length === 0` Publish disable with the form's own recovery idiom: added `experienceLevelsIssue()` + `EXPERIENCE_LEVELS_REQUIRED_MESSAGE` to `event-create-recovery.ts` (single source of truth), so an empty selection now (a) shows a live inline reason ("Pick at least one experience level to publish.") in `#experienceLevels-error` the moment the set empties and clears on re-select, (b) is programmatically tied to the fieldset via `aria-describedby` + `aria-invalid` with a persistent `#experienceLevels-hint` requirement cue and `role="status"` announcement, and (c) flows through the on-submit summary + progress-rail like every other required field (button now enabled; `reportEmptyRequired` catches empty levels client-side). Added a coral `fieldset[aria-invalid]` cue. Checks: typecheck pass; lint 0 errors/0 new warnings (2 pre-existing in qa/full-flows.mjs + member-profile.test.ts); tests 765 passed/12 skipped (added 3 `experienceLevelsIssue` cases + copy assert); prod build compiled successfully. Status `implemented`.

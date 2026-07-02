@@ -5,6 +5,8 @@ import {
   EVENT_FIELD_ORDER,
   EVENT_FORM_SECTION_COUNT,
   EVENT_FORM_SECTIONS,
+  EXPERIENCE_LEVELS_REQUIRED_MESSAGE,
+  experienceLevelsIssue,
   fieldForServerMessage,
   isPastLocalDateTime,
   issuesFromServerErrors,
@@ -126,6 +128,29 @@ describe("copy + field order", () => {
     expect(requiredFieldsHeadline(0)).toBe("");
     expect(requiredFieldsHeadline(1)).toMatch(/^One required detail/);
     expect(requiredFieldsHeadline(3)).toMatch(/^3 required details/);
+  });
+
+  it("gives a calm, directive reason for an empty experience-level selection", () => {
+    expect(EXPERIENCE_LEVELS_REQUIRED_MESSAGE).toMatch(/at least one experience level/i);
+    expect(EXPERIENCE_LEVELS_REQUIRED_MESSAGE).toMatch(/publish/i);
+  });
+});
+
+describe("experienceLevelsIssue", () => {
+  it("flags an empty selection as a field-tied experience-level issue", () => {
+    const issue = experienceLevelsIssue(0);
+    expect(issue).toEqual({ field: "experienceLevels", message: EXPERIENCE_LEVELS_REQUIRED_MESSAGE });
+  });
+
+  it("clears (returns null) the moment at least one level is selected", () => {
+    expect(experienceLevelsIssue(1)).toBeNull();
+    expect(experienceLevelsIssue(3)).toBeNull();
+  });
+
+  it("ties its issue to a field the recovery summary can order and focus", () => {
+    // Must be a known field in canonical page order so the summary link and
+    // first-focus land on the fieldset rather than a form-wide dead end.
+    expect(EVENT_FIELD_ORDER).toContain(experienceLevelsIssue(0)!.field);
   });
 
   it("keeps the split location fields in the canonical order (public before private)", () => {

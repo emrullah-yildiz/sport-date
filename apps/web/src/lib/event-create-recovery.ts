@@ -225,6 +225,31 @@ export function requiredFieldsHeadline(count: number): string {
   return `${count} required details still need your attention:`;
 }
 
+/**
+ * Calm host-voice reason shown when the experience-level selection is empty.
+ *
+ * The experience-level pills are React state, not a native `required` input, so
+ * the browser's validity check can never flag an empty set. That let a host
+ * uncheck every level and hit a silently-disabled Publish with no reason
+ * (CX-20260703-event-create-publish-disabled-no-reason). This message is the
+ * single source of truth for both the live inline hint next to the fieldset and
+ * the on-submit recovery summary, so the two can never drift.
+ */
+export const EXPERIENCE_LEVELS_REQUIRED_MESSAGE =
+  "Pick at least one experience level to publish.";
+
+/**
+ * The experience-level requirement expressed as an `EventFieldIssue`, or `null`
+ * when at least one level is selected. `count` is the number of currently
+ * selected levels. Kept DOM-free here so the component can reuse it for both the
+ * real-time inline hint and the submit-time recovery flow, and so the rule can
+ * be unit-tested deterministically without a live submit round-trip.
+ */
+export function experienceLevelsIssue(count: number): EventFieldIssue | null {
+  if (count > 0) return null;
+  return { field: "experienceLevels", message: EXPERIENCE_LEVELS_REQUIRED_MESSAGE };
+}
+
 // datetime-local values are wall-clock, minute-precision, with no timezone
 // suffix: "YYYY-MM-DDTHH:mm". `min` must be written the same way, in the host's
 // local time, or the browser compares against a UTC-shifted instant.

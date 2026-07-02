@@ -7,6 +7,7 @@ import {
   datetimeLocalMin,
   EVENT_FIELD_ORDER,
   eventFieldLabel,
+  experienceLevelsIssue,
   isPastLocalDateTime,
   issuesFromServerErrors,
   PAST_START_TIME_MESSAGE,
@@ -101,38 +102,48 @@ export default function CreateEventForm() {
   function reportEmptyRequired(): boolean {
     const form = formRef.current;
     if (!form) return false;
+    // Collect every currently-blocked field, in page order, as its own issue so
+    // the host sees the full list rather than the native one-bubble-at-a-time.
+    const emptyIssues: EventFieldIssue[] = [];
+    let kind: SummaryKind = "empty-required";
     if (form.checkValidity()) {
       // Still guard the client-side past-time rule even when everything is
       // "filled" — the native `min` catches most, this catches an edited value.
       const startInput = form.elements.namedItem("startsAt");
       const startValue = startInput instanceof HTMLInputElement ? startInput.value : "";
       if (isPastLocalDateTime(startValue)) {
-        const pastIssues: EventFieldIssue[] = [{ field: "startsAt", message: PAST_START_TIME_MESSAGE }];
-        setIssues(pastIssues);
-        setSummaryKind("server");
-        focusFirstIssue(pastIssues);
-        return true;
+        emptyIssues.push({ field: "startsAt", message: PAST_START_TIME_MESSAGE });
+        kind = "server";
       }
-      return false;
-    }
-    // Collect every currently-invalid field, in page order, as its own issue so
-    // the host sees the full list rather than the native one-bubble-at-a-time.
-    const emptyIssues: EventFieldIssue[] = [];
-    for (const field of EVENT_FIELD_ORDER) {
-      const element = form.elements.namedItem(field);
-      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
-        if (!element.checkValidity()) {
-          const past = field === "startsAt" && isPastLocalDateTime(element.value);
-          emptyIssues.push({
-            field,
-            message: past ? PAST_START_TIME_MESSAGE : `${eventFieldLabel(field)} is required.`,
-          });
+      // Experience levels sit after startsAt in page order, so append here.
+      const levelIssue = experienceLevelsIssue(experienceLevels.length);
+      if (levelIssue) emptyIssues.push(levelIssue);
+    } else {
+      for (const field of EVENT_FIELD_ORDER) {
+        // Experience levels are React-state checkboxes with no native `required`,
+        // so the browser can't flag an empty set — check it explicitly, in its
+        // canonical page position, so it joins the same recovery summary as
+        // every other required detail instead of a silent, unexplained disable.
+        if (field === "experienceLevels") {
+          const levelIssue = experienceLevelsIssue(experienceLevels.length);
+          if (levelIssue) emptyIssues.push(levelIssue);
+          continue;
+        }
+        const element = form.elements.namedItem(field);
+        if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
+          if (!element.checkValidity()) {
+            const past = field === "startsAt" && isPastLocalDateTime(element.value);
+            emptyIssues.push({
+              field,
+              message: past ? PAST_START_TIME_MESSAGE : `${eventFieldLabel(field)} is required.`,
+            });
+          }
         }
       }
     }
     if (emptyIssues.length === 0) return false;
     setIssues(emptyIssues);
-    setSummaryKind("empty-required");
+    setSummaryKind(kind);
     focusFirstIssue(emptyIssues);
     return true;
   }
@@ -194,6 +205,13 @@ export default function CreateEventForm() {
 
   const summaryHeadline =
     summaryKind === "empty-required" ? REQUIRED_FIELDS_SUMMARY_MESSAGE : "Please fix the following to publish:";
+
+  // The reason Publish is blocked when no experience level is chosen — shown the
+  // moment the selection empties (not only after a submit round-trip), and
+  // cleared the moment a level is re-checked. Prefers a submit/server message for
+  // the field if one exists so the inline text never contradicts the summary.
+  const experienceLevelsError =
+    fieldMessage("experienceLevels") ?? experienceLevelsIssue(experienceLevels.length)?.message;
 
   return (
     <form className="event-form" onSubmit={submit} noValidate ref={formRef}>
@@ -257,7 +275,7 @@ export default function CreateEventForm() {
         <h2 id="section-rhythm-heading">Make the commitment easy to understand.</h2>
         <div className="event-field-grid"><label htmlFor="startsAt">Starts at<input {...fieldProps("startsAt")} type="datetime-local" min={startMin} required /><span className="field-format-hint">Date order follows your browser&apos;s region.</span>{fieldMessage("startsAt") ? <span id="startsAt-error" className="field-error">{fieldMessage("startsAt")}</span> : null}</label><label htmlFor="durationMinutes">Duration in minutes<input {...fieldProps("durationMinutes")} type="number" min="15" max="480" defaultValue="90" required />{fieldMessage("durationMinutes") ? <span id="durationMinutes-error" className="field-error">{fieldMessage("durationMinutes")}</span> : null}</label><label htmlFor="capacity">Total places<input {...fieldProps("capacity")} type="number" min="2" max="20" defaultValue="4" required />{fieldMessage("capacity") ? <span id="capacity-error" className="field-error">{fieldMessage("capacity")}</span> : null}</label><label htmlFor="language">Event language<input {...fieldProps("language")} maxLength={35} placeholder="English" required />{fieldMessage("language") ? <span id="language-error" className="field-error">{fieldMessage("language")}</span> : null}</label></div>
         <p className="field-help">The event time zone is captured from your device when you publish.</p>
-        <fieldset><legend>Experience levels welcome</legend><div className="choice-row">{levels.map((level) => <label className="choice-pill" key={level.value}><input type="checkbox" checked={experienceLevels.includes(level.value)} onChange={() => toggleLevel(level.value)} />{level.label}</label>)}</div>{fieldMessage("experienceLevels") ? <span id="experienceLevels-error" className="field-error">{fieldMessage("experienceLevels")}</span> : null}</fieldset>
+        <fieldset aria-invalid={experienceLevelsError ? true : undefined} aria-describedby={experienceLevelsError ? "experienceLevels-hint experienceLevels-error" : "experienceLevels-hint"}><legend>Experience levels welcome</legend><p id="experienceLevels-hint" className="field-help">Pick at least one — welcome as many levels as you like.</p><div className="choice-row">{levels.map((level) => <label className="choice-pill" key={level.value}><input type="checkbox" checked={experienceLevels.includes(level.value)} onChange={() => toggleLevel(level.value)} />{level.label}</label>)}</div>{experienceLevelsError ? <span id="experienceLevels-error" className="field-error" role="status">{experienceLevelsError}</span> : null}</fieldset>
         <div className="event-field-grid"><label htmlFor="minimumAge">Minimum age<input {...fieldProps("minimumAge")} type="number" min="18" max="100" defaultValue="24" required />{fieldMessage("minimumAge") ? <span id="minimumAge-error" className="field-error">{fieldMessage("minimumAge")}</span> : null}</label><label htmlFor="maximumAge">Maximum age<input {...fieldProps("maximumAge")} type="number" min="18" max="100" defaultValue="38" required />{fieldMessage("maximumAge") ? <span id="maximumAge-error" className="field-error">{fieldMessage("maximumAge")}</span> : null}</label></div>
       </section>
 
@@ -275,7 +293,7 @@ export default function CreateEventForm() {
             : "We couldn't publish yet — see the highlighted problems above."}
         </p>
       ) : null}
-      <button className="event-publish" type="submit" disabled={submitting || experienceLevels.length === 0}>{submitting ? "Publishing…" : "Publish the invitation"}</button>
+      <button className="event-publish" type="submit" disabled={submitting} aria-describedby={experienceLevelsError ? "experienceLevels-error" : undefined}>{submitting ? "Publishing…" : "Publish the invitation"}</button>
       <p className="event-form-note">Publishing makes only the approximate event details discoverable. Exact meeting details remain private.</p>
     </form>
   );
