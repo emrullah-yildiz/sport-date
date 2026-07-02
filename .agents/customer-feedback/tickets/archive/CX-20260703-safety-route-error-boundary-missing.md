@@ -1,6 +1,6 @@
 # CX-20260703-safety-route-error-boundary-missing
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `high`
 - Priority: `P2` — (Reach 2 × Impact 3 × Confidence 4) / Effort 2 = 12 → P2. Not an accessibility regression, so the P1 floor does not apply; but it degrades a **safety** surface on failure, so it is held above a routine P3. Files: new `apps/web/src/app/safety/error.tsx` (and, secondarily, `apps/web/src/app/moderation/error.tsx`), mirroring the existing `apps/web/src/app/hosting/error.tsx`.
 - Customer journey: any moment a member opens the Safety center (`/safety`) to read guidance or track/appeal a report
@@ -75,3 +75,4 @@ Deleted generic line "The original customer can complete or safely leave the jou
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
 - 2026-07-03 - Implemented by Build agent; added scoped `safety/error.tsx` (keeps PrimaryNav + full `SafetyGuidelines` incl. emergency-services reminder reachable, calm alert card, `unstable_retry()` "Try again", no `error` internals rendered) and `moderation/error.tsx` (covers `/moderation` and nested `reports/[reportId]`, calm staff retry) mirroring `hosting/error.tsx`; added `safety/error.test.tsx` (renderToStaticMarkup) asserting emergency line + guidance + retry present and no message/digest/SQL/column leak. Checks: typecheck OK; lint 0 errors/0 new warnings (2 pre-existing in qa/full-flows.mjs + member-profile.test.ts); tests 749 passed/12 skipped; prod build compiled (`/safety`, `/moderation`, `/moderation/reports/[reportId]` in route graph). No live throw forced (no dev server this pass). Status `implemented`.
+- 2026-07-03 - Independently verified by orchestrator (source + repo checks): scoped `apps/web/src/app/safety/error.tsx` and `apps/web/src/app/moderation/error.tsx` added as `"use client"` route-segment boundaries mirroring `hosting/error.tsx`; a data-fetch throw now degrades IN-SEGMENT (root chrome/nav survive) instead of the whole-app global fallback. `/safety` keeps the full static `SafetyGuidelines` (emergency-services card + meet-safely guidance, no data needed) reachable plus a calm role="alert" card and a `unstable_retry()` "Try again"; `/moderation` boundary covers the queue + `reports/[reportId]`. Neither boundary renders `error`/message/stack/digest to the DOM (grep clean; leak-proof test injects a column-name error + digest and asserts none appears). typecheck/lint/749 tests/prod build pass, all three routes in the graph (commit 166324d). Status `verified`.
