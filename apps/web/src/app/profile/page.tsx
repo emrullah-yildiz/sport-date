@@ -7,6 +7,7 @@ import EmailVerificationControls from "@/components/EmailVerificationControls";
 import PrivacyControls from "@/components/PrivacyControls";
 import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
+import MilestoneMoment from "@/components/MilestoneMoment";
 import MovementArc from "@/components/MovementArc";
 import MobileSessionControls from "@/components/MobileSessionControls";
 import PlusBilling from "@/components/PlusBilling";
@@ -206,6 +207,10 @@ export default async function ProfilePage() {
       <ProfilePhotos firstName={user.firstName} />
       <PlusBilling billingConfigured={billingConfigured} isPlus={memberIsPlus} />
       <MovementArc progress={movementProgress} />
+      <MilestoneMoment
+        counts={{ attendedMoves: movementProgress.attendedMoves, hostedMoves: movementProgress.hostedMoves }}
+        firstName={user.firstName}
+      />
       <ReceivedRatingSummary aggregate={receivedRating} />
       <CommunicationPreferences preferences={communicationPreferences} />
       <WebSessionControls />

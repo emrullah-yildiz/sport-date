@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
+import MilestoneMoment from "./MilestoneMoment";
 import MomentGlow from "./MomentGlow";
 import MovementArc from "./MovementArc";
 import PostEventAfterglow from "./PostEventAfterglow";
@@ -30,6 +31,7 @@ const ENERGY_SURFACE_FILES = [
   "MomentGlow.tsx",
   "MovementArc.tsx",
   "PostEventAfterglow.tsx",
+  "MilestoneMoment.tsx",
 ] as const;
 
 // Words/mechanics that would signal a manipulative, casino-like energy layer.
@@ -187,5 +189,83 @@ describe("MomentGlow render", () => {
     expect(html).toContain("moment-glow");
     expect(html).toContain('aria-hidden="true"');
     expect(html).not.toMatch(/role=/);
+  });
+});
+
+describe("MilestoneMoment — humane, private, honest, non-pressuring", () => {
+  it("acknowledges a REAL crossed milestone with warm host copy (first game)", () => {
+    const html = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 1, hostedMoves: 0 }} firstName="Ana" />,
+    );
+    // The moment reflects the real first game, in host voice.
+    expect(html).toContain("your first game");
+    expect(html.toLowerCase()).toContain("showed up");
+    // Private framing, not a scoreboard.
+    expect(html).toContain("private to you");
+    // Decorative celebration is present but does not gate anything.
+    expect(html).toContain("moment-glow");
+    // A clear opt-out control exists.
+    expect(html.toLowerCase()).toContain("turn milestone moments off");
+  });
+
+  it("acknowledges first hosting as its own real, dignified moment", () => {
+    const html = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 1, hostedMoves: 1 }} />,
+    );
+    expect(html.toLowerCase()).toContain("hosted your first game");
+  });
+
+  it("renders NOTHING when there is no real milestone (no dead-end, no nag)", () => {
+    const html = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 0, hostedMoves: 0 }} />,
+    );
+    expect(html).toBe("");
+    // And at a non-milestone count (2 games), still no moment is manufactured.
+    const between = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 2, hostedMoves: 0 }} />,
+    );
+    expect(between).toBe("");
+  });
+
+  it("carries no banned scoreboard / pressure language in the rendered moment", () => {
+    const html = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 3, hostedMoves: 0 }} />,
+    ).toLowerCase();
+    for (const banned of [
+      "streak",
+      "score",
+      "rank",
+      "leaderboard",
+      "points",
+      "badge",
+      "level up",
+      "don't lose",
+      "keep your",
+      "come back tomorrow",
+      "better than",
+      "compared to",
+    ]) {
+      expect(html).not.toContain(banned);
+    }
+  });
+
+  it("is honest about which real number it reflects — never inflates the count", () => {
+    // At exactly the third game, the copy speaks of the third game (real=3) and
+    // never a larger, invented figure.
+    const html = renderToStaticMarkup(
+      <MilestoneMoment counts={{ attendedMoves: 3, hostedMoves: 0 }} />,
+    ).toLowerCase();
+    expect(html).toContain("third game");
+    expect(html).not.toContain("fourth");
+    expect(html).not.toContain("fifth");
+  });
+
+  it("reduced-motion safety rides on MomentGlow's static fallback (no bespoke motion)", () => {
+    const code = source("MilestoneMoment.tsx");
+    // The only celebratory motion is the shared MomentGlow (which itself honours
+    // prefers-reduced-motion with a static wash) — this component adds no raw
+    // framer-motion animation of its own that could bypass that.
+    expect(code).toContain("MomentGlow");
+    expect(code).not.toMatch(/from "framer-motion"/);
   });
 });

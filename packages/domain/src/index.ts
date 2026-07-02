@@ -5,6 +5,7 @@ export * from "./feedback";
 export * from "./graceful-exit";
 export * from "./image-metadata";
 export * from "./join-request";
+export * from "./milestone";
 export * from "./peer-feedback";
 export * from "./profile-photo";
 export * from "./progress";
