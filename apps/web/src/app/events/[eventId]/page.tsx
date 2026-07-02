@@ -59,7 +59,11 @@ function renderRequestCard(eventId: string, request: HostJoinRequest) {
   return (
     <article className={`host-request ${request.status}`} key={request.id}>
       <div>
-        <strong>{request.requester.firstName}, {request.requester.age}</strong>
+        <strong>
+          <Link href={`/discover/members/${request.requesterId}`} className="host-request-profile-link" aria-label={`View ${request.requester.firstName}'s profile`}>
+            {request.requester.firstName}, {request.requester.age}
+          </Link>
+        </strong>
         <span>{request.requester.skillLevel} · {request.requester.languages.join(", ")}</span>
       </div>
       {request.requester.bio ? <p>{request.requester.bio}</p> : null}

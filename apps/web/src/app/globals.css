@@ -974,3 +974,18 @@ a.logo:hover { color: var(--text); }
 .profile-photos-upload-label input[type="file"]:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .profile-photos-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
 @media (max-width: 700px) { .profile-photos { padding: 22px 18px; }.profile-photos-series { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } }
+/* Relationship-gated member profile links (host request cards + event room people).
+   Info-blue link on the member's name; visible focus ring; inherits the surrounding
+   44px-target rows, so no extra sizing needed. */
+.host-request-profile-link,
+.room-person-profile-link { color: var(--accent-info); text-decoration: underline; text-underline-offset: 3px; font-weight: inherit; }
+.host-request-profile-link:hover,
+.room-person-profile-link:hover { text-decoration-thickness: 2px; }
+.host-request-profile-link:focus-visible,
+.room-person-profile-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+/* Calm safety note at the foot of another member's profile. Muted body + info link. */
+.member-profile-safety { max-width: 1120px; margin: 30px auto 0; padding: 24px 30px; border-radius: 25px; background: var(--surface); border: 1px solid var(--line); }
+.member-profile-safety p { margin: 0 0 12px; color: var(--text-muted); line-height: 1.55; }
+.member-profile-safety a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent-info); text-decoration: underline; text-underline-offset: 3px; font-weight: 800; }
+.member-profile-safety a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+@media (max-width: 700px) { .member-profile-safety { margin-inline: 20px; padding: 20px; } }

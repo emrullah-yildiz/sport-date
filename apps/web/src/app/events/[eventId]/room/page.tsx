@@ -183,14 +183,26 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
             ) : null}
             {!room.isHost ? (
               <span>
-                <strong>{room.host.firstName}</strong>
+                <strong>
+                  <Link href={`/discover/members/${room.host.userId}`} className="room-person-profile-link" aria-label={`View ${room.host.firstName}'s profile`}>
+                    {room.host.firstName}
+                  </Link>
+                </strong>
                 <small>host</small>
                 <ReportSafetyControls eventId={room.id} subjectUserId={room.host.userId} subjectName={room.host.firstName} />
               </span>
             ) : null}
             {room.participants.map((participant, index) => (
               <span key={`${participant.firstName}-${index}`}>
-                <strong>{participant.firstName}</strong>
+                <strong>
+                  {participant.userId !== user.id ? (
+                    <Link href={`/discover/members/${participant.userId}`} className="room-person-profile-link" aria-label={`View ${participant.firstName}'s profile`}>
+                      {participant.firstName}
+                    </Link>
+                  ) : (
+                    participant.firstName
+                  )}
+                </strong>
                 <small>
                   {room.isHost && room.latestCriticalUpdateId
                     ? participant.criticalUpdateIntent === "still_in"

@@ -1,6 +1,7 @@
 # CX-20260701-member-profile-not-viewable-by-others
 
-- Status: `ready`
+- Status: `in-progress`
+- Implementation owner: `experience-build-agent`
 - Severity: `medium`
 - Priority: `P2` — (Reach 4 × Impact 4 × Confidence 3) / Effort 3 = 16. The rich profile already exists but is self-view only; making it viewable to the right people (safely) is the enabler for both the trust check and peer feedback. P2 medium.
 - Customer journey: trust check (deciding whether to meet someone)
@@ -52,3 +53,4 @@ The trust check is the safety heart of the product ("who am I about to meet?"). 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (owner design-acceptance intake, criterion 7); status `ready`.
+- 2026-07-02 - experience-build-agent took ownership; status `in-progress`. Implementing a conservative, relationship-gated member-to-member profile view: a server helper `getViewableMemberProfile(viewerId, targetId)` that returns the privacy-safe profile only when a qualifying relationship exists (host↔requester of one of the host's events; accepted-participant↔host/accepted co-participant of a shared event) AND no block exists in either direction — otherwise null → 404 (never 403, never unauthenticated, no public index). Route `/discover/members/[memberId]` reuses the verified humane presentation (extracted into a shared component) showing only privacy-safe fields (intro, sports, languages, seeking, prompts, block-gated photos) — no contact, no location. Links added from the host join-request cards and the event room people panel.
