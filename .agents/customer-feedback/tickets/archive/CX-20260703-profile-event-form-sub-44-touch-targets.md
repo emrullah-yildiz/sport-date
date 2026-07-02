@@ -1,6 +1,6 @@
 # CX-20260703-profile-event-form-sub-44-touch-targets
 
-- Status: `ready`
+- Status: `verified`
 - Severity: `low`
 - Customer journey: Host edits experience levels while creating an event (`/events/new`); member edits sports/prompts on their profile (`/profile`)
 - Surface: `web` (most acute on touch/mobile)
@@ -68,3 +68,4 @@ Small controls raise mis-tap rate on phones, most affecting members with limited
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Directly fixed + verified by orchestrator (trivial systemic CSS): bumped the two sub-44px control groups to the 44px minimum — `.choice-pill` (event-create experience-level pills; was ~37px from `padding:10px 13px` + 17px input) now has `min-height:44px` (already `display:flex; align-items:center`, so content stays centered), and `.add-sport,.remove-sport` (profile-edit add/remove sport & prompt buttons) `min-height:42px → 44px`. No other rule changed; sibling controls in the same file already met 44–48px. Production build passes (CSS-only, no unit-test surface). Status `verified`.
