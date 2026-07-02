@@ -236,3 +236,75 @@ describe("Post-event warm afterglow moment", () => {
     }
   });
 });
+
+describe("Ended room reads as a retrospective, not an upcoming event (CX-20260701)", () => {
+  it("keeps future-tense framing before the event ends", async () => {
+    const html = await render({ hasEnded: false });
+    // Hero, venue and people panels all speak of an upcoming meeting.
+    expect(html).toContain("coordination room");
+    expect(html).not.toContain("This event has finished");
+    expect(html).toContain("Where you are meeting");
+    expect(html).toContain("Who has a place");
+    // The pre-event "A calm arrival" rhythm guidance is present.
+    expect(html).toContain("A calm arrival");
+    expect(html).toContain("Before you go");
+    expect(html).toContain("When you arrive");
+  });
+
+  it("shows a clear 'finished' cue in the hero once the event has ended", async () => {
+    const html = await render({ hasEnded: true });
+    expect(html).toContain("This event has finished");
+    expect(html).toContain("after the game");
+    expect(html).not.toContain("coordination room");
+  });
+
+  it("reframes the venue panel to past tense once ended", async () => {
+    const html = await render({ hasEnded: true });
+    expect(html).toContain("Where you met");
+    expect(html).not.toContain("Where you are meeting");
+    // The venue itself is still shown (authorization unchanged for an accepted viewer).
+    expect(html).toContain("Herastrau public courts");
+  });
+
+  it("reframes the people panel to past tense once ended", async () => {
+    const html = await render({
+      hasEnded: true,
+      participants: [{ userId: "p-1", firstName: "Mara", skillLevel: "intermediate", seenLatestUpdate: null, criticalUpdateIntent: null }],
+    });
+    expect(html).toContain("Who had a place");
+    expect(html).not.toContain("Who has a place");
+    expect(html).toContain("1 person had a place");
+    expect(html).not.toContain("1 person joining");
+  });
+
+  it("does not show the pre-event 'A calm arrival' before-you-go guidance once ended", async () => {
+    const html = await render({ hasEnded: true });
+    expect(html).not.toContain("A calm arrival");
+    expect(html).not.toContain("Before you go");
+    expect(html).not.toContain("When you arrive");
+  });
+
+  it("does not present an ended host with no attendees as 'awaiting a first place', and stays non-punitive", async () => {
+    const html = await render({ hasEnded: true, isHost: true, viewerRequest: null, participants: [] });
+    // No future-tense "live / awaiting requests" empty state after the event.
+    expect(html).not.toContain("No one has a place yet");
+    expect(html).not.toContain("Your event is live");
+    expect(html).toContain("No one joined this time");
+    // Calm, non-punitive: no blame or pressure language.
+    const lower = html.toLowerCase();
+    for (const forbidden of ["failed", "no-show", "nobody wanted", "streak", "score"]) {
+      expect(lower).not.toContain(forbidden);
+    }
+  });
+
+  it("does not show the 'you're the first to join' future note to a sole guest once ended", async () => {
+    const html = await render({
+      hasEnded: true,
+      isHost: false,
+      viewerRequest: { id: "req-1", status: "accepted" },
+      participants: [{ userId: user.id, firstName: "Ana", skillLevel: "intermediate", seenLatestUpdate: null, criticalUpdateIntent: null }],
+    });
+    expect(html).not.toContain("You&#x27;re the first to join");
+    expect(html).toContain("1 person had a place");
+  });
+});

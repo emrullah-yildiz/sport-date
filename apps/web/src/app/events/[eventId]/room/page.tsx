@@ -85,9 +85,15 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
         }
       />
       <header className="room-hero">
-        <p className="eyebrow">{room.sport} · coordination room</p>
+        <p className="eyebrow">
+          {room.sport} · {room.hasEnded ? "after the game" : "coordination room"}
+        </p>
         <h1>{room.title}</h1>
-        <p>{startsAt}</p>
+        {room.hasEnded ? (
+          <p className="room-hero-ended">This event has finished. {startsAt}.</p>
+        ) : (
+          <p>{startsAt}</p>
+        )}
       </header>
       {showPreArrivalBrief ? (
         <div id="prearrival-brief">
@@ -149,19 +155,23 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       ) : null}
       <section className="room-grid">
         <article className="room-meeting">
-          <p className="panel-label">Where you are meeting</p>
+          <p className="panel-label">{room.hasEnded ? "Where you met" : "Where you are meeting"}</p>
           <h2>{room.venueName}</h2>
           <p>{room.address}</p>
           {room.instructions ? <blockquote>{room.instructions}</blockquote> : null}
         </article>
         <article className="room-people" id="room-people">
-          <p className="panel-label">Who has a place</p>
+          <p className="panel-label">{room.hasEnded ? "Who had a place" : "Who has a place"}</p>
           <h2>
             {hostAwaitingFirstPlace
-              ? "No one has a place yet"
-              : `${room.participants.length} ${room.participants.length === 1 ? "person" : "people"} joining`}
+              ? room.hasEnded
+                ? "No one joined this time"
+                : "No one has a place yet"
+              : room.hasEnded
+                ? `${room.participants.length} ${room.participants.length === 1 ? "person" : "people"} had a place`
+                : `${room.participants.length} ${room.participants.length === 1 ? "person" : "people"} joining`}
           </h2>
-          {hostAwaitingFirstPlace ? (
+          {hostAwaitingFirstPlace && !room.hasEnded ? (
             <div className="room-people-empty">
               <p className="room-people-empty-lede">
                 Your event is live and people can find it in discovery right now. Requests to
@@ -179,7 +189,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
             </div>
           ) : (
           <div>
-            {viewerIsSoleAcceptedGuest ? (
+            {viewerIsSoleAcceptedGuest && !room.hasEnded ? (
               <p className="room-people-first-note">You&apos;re the first to join — others will appear here as the host accepts more requests.</p>
             ) : null}
             {!room.isHost ? (
@@ -224,14 +234,16 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
           )}
         </article>
       </section>
-      <section className="room-rhythm">
-        <p className="panel-label">A calm arrival</p>
-        <div>
-          <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Use the room chat below to sort the practical details — keep coordination inside {BRAND_NAME}.</p></article>
-          <article><span>02</span><h3>When you arrive</h3><p>Meet in the stated public venue. You can leave at any time if the situation feels different from the invitation.</p></article>
-          <article><span>03</span><h3>If plans change</h3><p>Post in the room chat or cancel your place so the host has an accurate group. Every message can be reported, and blocking still hides you both ways.</p></article>
-        </div>
-      </section>
+      {room.hasEnded ? null : (
+        <section className="room-rhythm">
+          <p className="panel-label">A calm arrival</p>
+          <div>
+            <article><span>01</span><h3>Before you go</h3><p>Check the time, equipment, exact address, and latest host updates. Use the room chat below to sort the practical details — keep coordination inside {BRAND_NAME}.</p></article>
+            <article><span>02</span><h3>When you arrive</h3><p>Meet in the stated public venue. You can leave at any time if the situation feels different from the invitation.</p></article>
+            <article><span>03</span><h3>If plans change</h3><p>Post in the room chat or cancel your place so the host has an accurate group. Every message can be reported, and blocking still hides you both ways.</p></article>
+          </div>
+        </section>
+      )}
       {canUseChat ? <EventRoomChat eventId={room.id} timeZone={room.timeZone} /> : null}
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} safetyControlsId="room-people" /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
