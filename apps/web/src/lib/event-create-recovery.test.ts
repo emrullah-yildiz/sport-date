@@ -3,12 +3,17 @@ import { describe, expect, it } from "vitest";
 import {
   datetimeLocalMin,
   EVENT_FIELD_ORDER,
+  EVENT_FORM_SECTION_COUNT,
+  EVENT_FORM_SECTIONS,
   fieldForServerMessage,
   isPastLocalDateTime,
   issuesFromServerErrors,
   PAST_START_TIME_MESSAGE,
   requiredFieldsHeadline,
   REQUIRED_FIELDS_SUMMARY_MESSAGE,
+  sectionForField,
+  sectionProgressLabel,
+  sectionsNeedingAttention,
 } from "./event-create-recovery";
 
 describe("fieldForServerMessage", () => {
@@ -128,5 +133,50 @@ describe("copy + field order", () => {
     const venueIndex = EVENT_FIELD_ORDER.indexOf("venueName");
     expect(cityIndex).toBeGreaterThan(-1);
     expect(venueIndex).toBeGreaterThan(cityIndex);
+  });
+});
+
+describe("form sections (structure + progress orientation)", () => {
+  it("covers every field exactly once, in canonical page order", () => {
+    // The section metadata must partition EVENT_FIELD_ORDER: no field left out
+    // (would appear in no section) and none duplicated (two step homes).
+    const sectioned = EVENT_FORM_SECTIONS.flatMap((section) => [...section.fields]);
+    expect(sectioned).toEqual([...EVENT_FIELD_ORDER]);
+  });
+
+  it("keeps the public location fields before the private ones within the location section", () => {
+    const location = EVENT_FORM_SECTIONS.find((section) => section.id === "location");
+    expect(location).toBeDefined();
+    const fields = location!.fields;
+    expect(fields.indexOf("areaLabel")).toBeLessThan(fields.indexOf("venueName"));
+  });
+
+  it("labels each section 'Section N of M' from a zero-based index", () => {
+    expect(sectionProgressLabel(0)).toBe(`Section 1 of ${EVENT_FORM_SECTION_COUNT}`);
+    expect(sectionProgressLabel(EVENT_FORM_SECTION_COUNT - 1)).toBe(
+      `Section ${EVENT_FORM_SECTION_COUNT} of ${EVENT_FORM_SECTION_COUNT}`,
+    );
+  });
+
+  it("maps a field to its owning section, and null for a form-wide problem", () => {
+    expect(sectionForField("title")?.id).toBe("invitation");
+    expect(sectionForField("capacity")?.id).toBe("rhythm");
+    expect(sectionForField("venueName")?.id).toBe("location");
+    expect(sectionForField(null)).toBeNull();
+  });
+
+  it("flags only the sections with an issue, in section order, and ignores form-wide issues", () => {
+    const flagged = sectionsNeedingAttention([
+      { field: "venueName", message: "Choose a valid venue name." },
+      { field: "title", message: "Event title must contain 1 to 100 characters." },
+      { field: null, message: "Something form-wide." },
+    ]);
+    // invitation (title) comes before location (venue); rhythm untouched; the
+    // form-wide issue does not invent a section.
+    expect(flagged).toEqual(["invitation", "location"]);
+  });
+
+  it("returns no flagged sections when there are no issues", () => {
+    expect(sectionsNeedingAttention([])).toEqual([]);
   });
 });

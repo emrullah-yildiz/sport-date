@@ -49,6 +49,90 @@ export const EVENT_FIELD_ORDER = [
 
 export type EventFieldName = (typeof EVENT_FIELD_ORDER)[number];
 
+/**
+ * The create-event form is one form with one submit, but a first-time host meets
+ * ~18 fields. To give a calm sense of structure and "where am I / what's left"
+ * (CX-20260701-event-create-form-no-step-progress-friction) WITHOUT turning it
+ * into a multi-step wizard (which would add clicks and risk losing entered data),
+ * we group the existing fields into a small number of ordered, self-explanatory
+ * sections. This metadata is the single source of truth so the section headings,
+ * the progress rail, and the per-section validation routing can never drift apart.
+ *
+ * `fields` for the location section is intentionally the union of the public and
+ * private location fields — the DOM still renders the public/private separation
+ * exactly as before; this only groups them under one progress step for the host's
+ * mental model. The public↔private separation and copy are unchanged.
+ */
+export type EventFormSection = Readonly<{
+  /** Stable id used for the section landmark, heading, and progress-rail anchor. */
+  id: string;
+  /** Short label shown in the progress rail (e.g. "The invitation"). */
+  label: string;
+  /** The fields, in DOM order, that belong to this section. */
+  fields: readonly EventFieldName[];
+}>;
+
+export const EVENT_FORM_SECTIONS: readonly EventFormSection[] = [
+  {
+    id: "invitation",
+    label: "The invitation",
+    fields: ["sport", "title", "description"],
+  },
+  {
+    id: "rhythm",
+    label: "The rhythm",
+    fields: [
+      "startsAt",
+      "durationMinutes",
+      "capacity",
+      "language",
+      "experienceLevels",
+      "minimumAge",
+      "maximumAge",
+    ],
+  },
+  {
+    id: "location",
+    label: "Where you'll meet",
+    fields: ["city", "countryCode", "areaLabel", "venueName", "address", "instructions"],
+  },
+] as const;
+
+/** How many ordered sections the host moves through. */
+export const EVENT_FORM_SECTION_COUNT = EVENT_FORM_SECTIONS.length;
+
+/**
+ * Calm "Section N of M" label for a section's own indicator. `index` is
+ * zero-based (the section's position in `EVENT_FORM_SECTIONS`).
+ */
+export function sectionProgressLabel(index: number): string {
+  return `Section ${index + 1} of ${EVENT_FORM_SECTION_COUNT}`;
+}
+
+/** The section a field belongs to, or `null` for a form-wide/unmapped field. */
+export function sectionForField(field: EventFieldName | null): EventFormSection | null {
+  if (field === null) return null;
+  return EVENT_FORM_SECTIONS.find((section) => section.fields.includes(field)) ?? null;
+}
+
+/**
+ * The set of section ids that currently have at least one flagged field, so the
+ * form can quietly mark which sections still need the host's attention. Purely
+ * informative — never a blocker. Order follows `EVENT_FORM_SECTIONS`.
+ */
+export function sectionsNeedingAttention(
+  issues: readonly EventFieldIssue[],
+): readonly string[] {
+  const flagged = new Set<string>();
+  for (const issue of issues) {
+    const section = sectionForField(issue.field);
+    if (section) flagged.add(section.id);
+  }
+  return EVENT_FORM_SECTIONS.filter((section) => flagged.has(section.id)).map(
+    (section) => section.id,
+  );
+}
+
 const FIELD_LABELS: Record<EventFieldName, string> = {
   sport: "Sport",
   title: "Event name",

@@ -12,6 +12,8 @@ import {
   PAST_START_TIME_MESSAGE,
   requiredFieldsHeadline,
   REQUIRED_FIELDS_SUMMARY_MESSAGE,
+  sectionProgressLabel,
+  sectionsNeedingAttention,
   type EventFieldIssue,
   type EventFieldName,
 } from "@/lib/event-create-recovery";
@@ -46,6 +48,13 @@ export default function CreateEventForm() {
     }
     return set;
   }, [issues]);
+
+  // Which sections still have a flagged field, so the progress rail can quietly
+  // point the host at what remains. Informative only — never a submit blocker.
+  const attentionSections = useMemo(
+    () => new Set(sectionsNeedingAttention(issues)),
+    [issues],
+  );
 
   function describedBy(field: EventFieldName): string | undefined {
     return invalidFields.has(field) ? `${field}-error` : undefined;
@@ -208,9 +217,25 @@ export default function CreateEventForm() {
         </div>
       ) : null}
 
-      <section className="event-form-section">
+      <nav className="event-form-progress" aria-label="Event details progress">
+        <p className="event-form-progress-lede">Three calm sections. One publish at the end—your details are kept as you go.</p>
+        <ol className="event-form-progress-rail">
+          <li className={`event-form-progress-step${attentionSections.has("invitation") ? " needs-attention" : ""}`}>
+            <a href="#section-invitation"><span className="event-form-progress-num" aria-hidden="true">1</span><span className="event-form-progress-name">The invitation</span>{attentionSections.has("invitation") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
+          </li>
+          <li className={`event-form-progress-step${attentionSections.has("rhythm") ? " needs-attention" : ""}`}>
+            <a href="#section-rhythm"><span className="event-form-progress-num" aria-hidden="true">2</span><span className="event-form-progress-name">The rhythm</span>{attentionSections.has("rhythm") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
+          </li>
+          <li className={`event-form-progress-step${attentionSections.has("location") ? " needs-attention" : ""}`}>
+            <a href="#section-location"><span className="event-form-progress-num" aria-hidden="true">3</span><span className="event-form-progress-name">Where you&apos;ll meet</span>{attentionSections.has("location") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
+          </li>
+        </ol>
+      </nav>
+
+      <section className="event-form-section" id="section-invitation" aria-labelledby="section-invitation-heading">
+        <p className="event-form-step-indicator">{sectionProgressLabel(0)}</p>
         <p className="panel-label">The invitation</p>
-        <h2>Give people a reason to picture themselves there.</h2>
+        <h2 id="section-invitation-heading">Give people a reason to picture themselves there.</h2>
         <div className="event-field-grid">
           <label htmlFor="sport">Sport<input {...fieldProps("sport")} required maxLength={60} placeholder="Tennis" />{fieldMessage("sport") ? <span id="sport-error" className="field-error">{fieldMessage("sport")}</span> : null}</label>
           <label htmlFor="title">Event name<input {...fieldProps("title")} required maxLength={100} placeholder="An easy evening rally" />{fieldMessage("title") ? <span id="title-error" className="field-error">{fieldMessage("title")}</span> : null}</label>
@@ -218,16 +243,19 @@ export default function CreateEventForm() {
         <label htmlFor="description">Description<textarea {...fieldProps("description")} required minLength={20} maxLength={1000} rows={5} placeholder="Set the pace, mood, and what a newcomer should expect." />{fieldMessage("description") ? <span id="description-error" className="field-error">{fieldMessage("description")}</span> : null}</label>
       </section>
 
-      <section className="event-form-section">
+      <section className="event-form-section" id="section-rhythm" aria-labelledby="section-rhythm-heading">
+        <p className="event-form-step-indicator">{sectionProgressLabel(1)}</p>
         <p className="panel-label">The rhythm</p>
-        <h2>Make the commitment easy to understand.</h2>
+        <h2 id="section-rhythm-heading">Make the commitment easy to understand.</h2>
         <div className="event-field-grid"><label htmlFor="startsAt">Starts at<input {...fieldProps("startsAt")} type="datetime-local" min={startMin} required /><span className="field-format-hint">Date order follows your browser&apos;s region.</span>{fieldMessage("startsAt") ? <span id="startsAt-error" className="field-error">{fieldMessage("startsAt")}</span> : null}</label><label htmlFor="durationMinutes">Duration in minutes<input {...fieldProps("durationMinutes")} type="number" min="15" max="480" defaultValue="90" required />{fieldMessage("durationMinutes") ? <span id="durationMinutes-error" className="field-error">{fieldMessage("durationMinutes")}</span> : null}</label><label htmlFor="capacity">Total places<input {...fieldProps("capacity")} type="number" min="2" max="20" defaultValue="4" required />{fieldMessage("capacity") ? <span id="capacity-error" className="field-error">{fieldMessage("capacity")}</span> : null}</label><label htmlFor="language">Event language<input {...fieldProps("language")} maxLength={35} placeholder="English" required />{fieldMessage("language") ? <span id="language-error" className="field-error">{fieldMessage("language")}</span> : null}</label></div>
         <p className="field-help">The event time zone is captured from your device when you publish.</p>
         <fieldset><legend>Experience levels welcome</legend><div className="choice-row">{levels.map((level) => <label className="choice-pill" key={level.value}><input type="checkbox" checked={experienceLevels.includes(level.value)} onChange={() => toggleLevel(level.value)} />{level.label}</label>)}</div>{fieldMessage("experienceLevels") ? <span id="experienceLevels-error" className="field-error">{fieldMessage("experienceLevels")}</span> : null}</fieldset>
         <div className="event-field-grid"><label htmlFor="minimumAge">Minimum age<input {...fieldProps("minimumAge")} type="number" min="18" max="100" defaultValue="24" required />{fieldMessage("minimumAge") ? <span id="minimumAge-error" className="field-error">{fieldMessage("minimumAge")}</span> : null}</label><label htmlFor="maximumAge">Maximum age<input {...fieldProps("maximumAge")} type="number" min="18" max="100" defaultValue="38" required />{fieldMessage("maximumAge") ? <span id="maximumAge-error" className="field-error">{fieldMessage("maximumAge")}</span> : null}</label></div>
       </section>
 
-      <section className="event-form-section location-separation">
+      <section className="event-form-section location-separation" id="section-location" aria-labelledby="section-location-heading">
+        <p className="event-form-step-indicator location-step-indicator">{sectionProgressLabel(2)}</p>
+        <h2 id="section-location-heading" className="visually-hidden">Where you&apos;ll meet</h2>
         <div className="location-column public-location"><p className="panel-label">Discovery sees</p><h2>An approximate area</h2><p>Enough context to judge the journey. Never the door they should walk through.</p><label htmlFor="city">City<input {...fieldProps("city")} required maxLength={100} />{fieldMessage("city") ? <span id="city-error" className="field-error">{fieldMessage("city")}</span> : null}</label><label htmlFor="countryCode">Country code<input {...fieldProps("countryCode")} required minLength={2} maxLength={2} placeholder="RO" />{fieldMessage("countryCode") ? <span id="countryCode-error" className="field-error">{fieldMessage("countryCode")}</span> : null}</label><label htmlFor="areaLabel">Area or neighborhood<input {...fieldProps("areaLabel")} required maxLength={120} placeholder="Tineretului" />{fieldMessage("areaLabel") ? <span id="areaLabel-error" className="field-error">{fieldMessage("areaLabel")}</span> : null}</label></div>
         <div className="location-column private-location"><p className="panel-label">Accepted people see</p><h2>The precise meeting point</h2><p>Stored separately and revealed only after acceptance.</p><label htmlFor="venueName">Venue name<input {...fieldProps("venueName")} required maxLength={120} placeholder="Court 2" />{fieldMessage("venueName") ? <span id="venueName-error" className="field-error">{fieldMessage("venueName")}</span> : null}</label><label htmlFor="address">Exact address<input {...fieldProps("address")} required maxLength={300} />{fieldMessage("address") ? <span id="address-error" className="field-error">{fieldMessage("address")}</span> : null}</label><label htmlFor="instructions">Arrival instructions<textarea {...fieldProps("instructions")} maxLength={500} rows={3} placeholder="Where to enter, who to ask for, and what to bring." />{fieldMessage("instructions") ? <span id="instructions-error" className="field-error">{fieldMessage("instructions")}</span> : null}</label></div>
       </section>
