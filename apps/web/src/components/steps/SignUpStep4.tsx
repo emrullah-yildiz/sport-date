@@ -17,7 +17,7 @@ export default function SignUpStep4() {
   const setField = useSignUpStore((state) => state.setField);
   return (
     <motion.div className="signup-step">
-      <h2>Tell us about yourself</h2>
+      <h1>Tell us about yourself</h1>
       <div className="form-group">
         <label htmlFor="signup-bio">Bio (optional)</label>
         <textarea id="signup-bio" value={bio} onChange={(event) => setField("bio", event.target.value.slice(0, 200))} placeholder={`What brings you to ${BRAND_NAME}?`} rows={3} />

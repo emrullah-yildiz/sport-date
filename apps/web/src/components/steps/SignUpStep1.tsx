@@ -21,7 +21,7 @@ export default function SignUpStep1() {
 
   return (
     <motion.div className="signup-step">
-      <h2>Let&apos;s get started</h2>
+      <h1>Let&apos;s get started</h1>
       <div className="form-group">
         <label htmlFor="signup-email">Email</label>
         <input id="signup-email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => setField("email", event.target.value)} />

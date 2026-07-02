@@ -11,7 +11,7 @@ export default function SignUpStep2() {
 
   return (
     <motion.div className="signup-step">
-      <h2>Your profile</h2>
+      <h1>Your profile</h1>
       <div className="form-group"><label htmlFor="signup-first-name">First name</label><input id="signup-first-name" autoComplete="given-name" value={firstName} onChange={(event) => setField("firstName", event.target.value)} /></div>
       <div className="form-group"><label htmlFor="signup-last-name">Last name</label><input id="signup-last-name" autoComplete="family-name" value={lastName} onChange={(event) => setField("lastName", event.target.value)} /></div>
       <div className="form-group"><label htmlFor="signup-location">Location (city or region)</label><input id="signup-location" autoComplete="address-level2" value={location} onChange={(event) => setField("location", event.target.value)} placeholder="e.g. Bucharest" /></div>

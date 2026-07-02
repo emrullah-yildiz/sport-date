@@ -44,7 +44,7 @@ export default function SignUpStep3() {
 
   return (
     <motion.div className="signup-step">
-      <h2>What sports do you play?</h2>
+      <h1>What sports do you play?</h1>
       <p>Choose between one and five — physical or mind sports. You can refine skill levels later.</p>
       <div className="sports-grid">
         {sports.map((sport) => {

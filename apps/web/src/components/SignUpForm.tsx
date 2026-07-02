@@ -95,7 +95,7 @@ export default function SignUpForm() {
     <div className="signup-container">
       <motion.div className="signup-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="signup-header">
-          <h1>Join the movement</h1>
+          <p className="signup-brand">Join {BRAND_NAME}</p>
           <p className="step-indicator">Step {step} of {steps.length}</p>
           <div className="progress-bar"><div style={{ width: `${(step / steps.length) * 100}%` }} /></div>
         </div>

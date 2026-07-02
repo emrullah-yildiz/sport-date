@@ -431,17 +431,24 @@ a.logo:hover { color: var(--text); }
 }
 
 /* Sign-up Page */
-.signup-page-main { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; background: linear-gradient(135deg, var(--bg) 0%, #0E1512 100%); }
+/* Anchor the card toward the top so the primary heading is the first thing in
+   view, rather than floating mid-screen with a dead band above it at desktop
+   heights. On short viewports the min-height + auto margins keep it comfortably
+   spaced and scrollable rather than clipped. */
+.signup-page-main { display: flex; align-items: flex-start; justify-content: center; min-height: 100vh; padding: clamp(32px, 7vh, 88px) 24px 48px; background: linear-gradient(135deg, var(--bg) 0%, #0E1512 100%); }
 
 .signup-container { width: 100%; max-width: 500px; }
 
 .signup-card { display: grid; gap: 28px; padding: 48px 36px; border-radius: 32px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-lg); }
 
-.signup-header { display: grid; gap: 16px; }
+/* Quiet, subordinate header row: a small brand eyebrow + step indicator + progress.
+   The dominant per-step heading (`.signup-step h1`) is the single focal point, so
+   nothing here competes with it for the eye. */
+.signup-header { display: grid; gap: 12px; }
 
-.signup-header h1 { margin: 0; font-size: var(--fs-h1); line-height: 1.1; }
+.signup-brand { margin: 0; color: var(--text-muted); font-family: var(--font-display); font-size: var(--fs-small); font-weight: 700; letter-spacing: .04em; }
 
-.step-indicator { margin: 0; color: var(--text-muted); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.step-indicator { margin: 0; color: var(--text-muted); font-size: var(--fs-label); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 
 .progress-bar { height: 4px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
 
@@ -449,7 +456,10 @@ a.logo:hover { color: var(--text); }
 
 .signup-step { display: grid; gap: 22px; }
 
-.signup-step h2 { margin: 0 0 8px; font-size: 24px; letter-spacing: -.02em; }
+/* The step's own question is the single dominant focal point of each step —
+   promoted to the page h1 and sized on the shared in-app headline scale so the
+   eye lands here first, well above the quiet brand/step-indicator row. */
+.signup-step h1 { margin: 0 0 8px; font-size: var(--fs-h1); letter-spacing: -.02em; line-height: 1.1; }
 
 .signup-step > p { margin: 0; color: var(--text-muted); font-size: 14px; }
 
@@ -561,7 +571,9 @@ a.logo:hover { color: var(--text); }
 
 .review-section { border-bottom: 1px solid var(--line); padding-bottom: 16px; }
 
-.review-section h3 { margin: 0 0 8px; font-size: 20px; }
+/* The reviewed member's name is a sub-heading beneath the step's h1 question —
+   kept well below the step heading so it doesn't reintroduce a competing title. */
+.review-section h2 { margin: 0 0 8px; font-size: 20px; }
 
 .review-section .location { margin: 0; font-size: 14px; color: var(--text-muted); font-weight: 600; }
 
