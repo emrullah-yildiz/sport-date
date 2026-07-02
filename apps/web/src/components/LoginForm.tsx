@@ -140,10 +140,10 @@ export default function LoginForm() {
         </button>
       </form>
       <ForgotPasswordPanel open={recoveryOpen} onOpenChange={setRecoveryOpen} />
-      <p className="auth-switch">
+      <div className="auth-switch">
         New here? <Link href="/signup">Create a private beta profile</Link>
         <BetaTermExplainer className="auth-switch-explainer" />
-      </p>
+      </div>
     </div>
   );
 }

@@ -143,10 +143,10 @@ export default async function LandingPage() {
             {user ? (
               <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
             ) : (
-              <p className="microcopy">
+              <div className="microcopy">
                 Private beta · Adults only · Europe first
                 <BetaTermExplainer className="microcopy-explainer" />
-              </p>
+              </div>
             )}
           </div>
 

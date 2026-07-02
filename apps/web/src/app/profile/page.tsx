@@ -84,10 +84,10 @@ export default async function ProfilePage() {
       <PrimaryNav firstName={user.firstName} />
       <section className="profile-hero">
         <div>
-          <p className="eyebrow eyebrow-with-explainer">
+          <div className="eyebrow eyebrow-with-explainer">
             Your private beta profile
             <BetaTermExplainer className="eyebrow-explainer" />
-          </p>
+          </div>
           <h1>{user.firstName} {user.lastName}</h1>
           <p className="profile-hero-meta">
             <span className="profile-hero-fact">{user.location}</span>
