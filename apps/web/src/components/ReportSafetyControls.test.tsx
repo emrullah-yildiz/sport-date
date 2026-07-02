@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
-import ReportSafetyControls from "./ReportSafetyControls";
+import ReportSafetyControls, { blockConfirmationMessage } from "./ReportSafetyControls";
 
 function render() {
   return renderToStaticMarkup(
@@ -32,5 +32,33 @@ describe("ReportSafetyControls submit-result announcement", () => {
   it("exposes the in-flight state programmatically via aria-busy on submit", () => {
     const html = render();
     expect(html).toContain("aria-busy");
+  });
+});
+
+describe("ReportSafetyControls standalone block confirmation", () => {
+  // The block-only quick action previously hard-navigated to /profile on success
+  // with no message set, so a member (especially a screen-reader user) got zero
+  // acknowledgement of an irreversible safety action. Success now routes through the
+  // persistent polite region + focus move via this confirmation, so it is perceivable.
+  it("confirms the block took effect and names what it now prevents", () => {
+    const message = blockConfirmationMessage("Alex");
+    expect(message).toContain("You blocked Alex");
+    expect(message).toContain("requests");
+    expect(message).toContain("places");
+    expect(message).toContain("room");
+    expect(message).toContain("approximate location");
+  });
+
+  it("tells the member where the block can be managed and stays calm, not alarmist", () => {
+    const message = blockConfirmationMessage("Alex");
+    expect(message).toContain("manage blocks");
+    // Calm, factual copy — no manufactured urgency or dark-pattern language.
+    expect(message).not.toMatch(/danger|warning|urgent|alert|permanently lost/i);
+  });
+
+  it("carries no data about the blocked member beyond the name already shown", () => {
+    const message = blockConfirmationMessage("Alex");
+    // Only the display name that this control already renders may appear.
+    expect(message.replace("Alex", "")).not.toMatch(/Alex/);
   });
 });

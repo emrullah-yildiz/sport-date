@@ -1,6 +1,6 @@
 # CX-20260703-safety-block-action-no-success-confirmation
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — (Reach 2 × Impact 3 × Confidence 5) / Effort 2 = 15 → P2. It is a feedback/trust gap on a **safety** control (an irreversible block) with a screen-reader dimension (no announced closure), so it is held at P2 rather than a routine P3, but it is not a hard keyboard/contrast regression so it does not claim the P1 accessibility floor. File: `apps/web/src/components/ReportSafetyControls.tsx` (and the `/profile` landing it navigates to).
 - Customer journey: coordinate & arrive → block another member for distance/safety
@@ -75,3 +75,4 @@ Deleted generic line "Loading, empty, failure, and retry…appropriate to this o
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; standalone `blockOnly` success now routes through the existing persistent polite live region + focus-move (via `confirmRef`/`announce`) instead of a bare `window.location.assign("/profile")` — the redirect was removed so the announced confirmation is genuinely perceived. Added a `blocked` latch (button becomes disabled "Blocked {name}", `aria-busy` while in flight) for full state coverage, and a calm factual confirmation ("You blocked {name}. They can no longer see your requests, places, room, or approximate location. You can manage blocks anytime from your profile.") extracted as exported `blockConfirmationMessage()`. Extended `ReportSafetyControls.test.tsx` (3 new tests on the confirmation copy: names what the block prevents, points to manage-blocks + no alarmist language, no data beyond the shown name). P1 persistent-region machinery preserved; failure path stays assertive. Checks: typecheck OK, lint OK (only pre-existing qa/full-flows.mjs + member-profile.test.ts warnings), test 744 passed/12 skipped, production build compiled successfully. Status `implemented`.

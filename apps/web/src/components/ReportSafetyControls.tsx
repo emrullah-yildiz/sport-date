@@ -10,11 +10,22 @@ const categoryLabels: Record<SafetyReportCategory, string> = {
   unsafe_event: "Unsafe event or location", no_show: "No-show", other: "Something else",
 };
 
+// Calm, factual confirmation for the irreversible standalone block. States plainly
+// what the block now prevents and where to manage it — no alarm, no dark pattern,
+// and no data about the blocked member beyond the name already shown on this control.
+export function blockConfirmationMessage(name: string): string {
+  return `You blocked ${name}. They can no longer see your requests, places, room, or approximate location. You can manage blocks anytime from your profile.`;
+}
+
 export default function ReportSafetyControls({ eventId, subjectUserId, subjectName }: { eventId: string; subjectUserId: string; subjectName: string }) {
   const [category, setCategory] = useState<SafetyReportCategory>("harassment");
   const [details, setDetails] = useState("");
   const [blockUser, setBlockUser] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Latches once the standalone block succeeds so the irreversible quick action
+  // reads as done and cannot be re-fired; the confirmation stays put (no redirect)
+  // so keyboard/screen-reader members actually perceive the announced closure.
+  const [blocked, setBlocked] = useState(false);
   const [message, setMessage] = useState("");
   // Success and failure are separate persistent live regions (mirrors the shipped
   // RoomLeaveControl / EditProfileForm pattern): the containers are always mounted
@@ -53,14 +64,20 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
       const response = await fetch("/api/safety/blocks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ blockedUserId: subjectUserId }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Block failed.");
-      window.location.assign("/profile");
-    } catch (error) { announce(error instanceof Error ? error.message : "Block failed.", "error"); setSubmitting(false); }
+      // Irreversible safety action: don't hard-navigate away with no acknowledgement.
+      // Latch the done state and announce a calm, factual confirmation in place, moving
+      // focus to it (as the no-block report path does) so keyboard/SR users get closure —
+      // consistent with the report+block path, which also surfaces a message on success.
+      setBlocked(true);
+      announce(blockConfirmationMessage(subjectName), "success", true);
+    } catch (error) { announce(error instanceof Error ? error.message : "Block failed.", "error"); }
+    finally { setSubmitting(false); }
   }
 
   return (
     <details className="safety-controls">
       <summary>Safety options for {subjectName}</summary>
-      <div className="safety-quick-action"><p>Blocking immediately removes shared requests, places, room access, and exact-location access. It does not restore anything if later undone.</p><button type="button" onClick={blockOnly} disabled={submitting}>Block {subjectName}</button></div>
+      <div className="safety-quick-action"><p>Blocking immediately removes shared requests, places, room access, and exact-location access. It does not restore anything if later undone.</p><button type="button" onClick={blockOnly} disabled={submitting || blocked} aria-busy={submitting}>{blocked ? `Blocked ${subjectName}` : submitting ? "Blocking…" : `Block ${subjectName}`}</button></div>
       <form onSubmit={report}>
         <label>What happened?<select value={category} onChange={(event) => setCategory(event.target.value as SafetyReportCategory)}>{SAFETY_REPORT_CATEGORIES.map((item) => <option value={item} key={item}>{categoryLabels[item]}</option>)}</select></label>
         <label>Describe what happened<textarea minLength={20} maxLength={2000} required rows={4} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Include what happened, when, and anything the safety team should preserve." /></label>
