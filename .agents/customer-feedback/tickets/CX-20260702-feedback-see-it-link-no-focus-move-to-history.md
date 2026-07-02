@@ -1,6 +1,6 @@
 # CX-20260702-feedback-see-it-link-no-focus-move-to-history
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 2 × Impact 2 × Confidence 4) / Effort 1 = 16. Small a11y-consistency fix on an already-good moment; completes the forward-path work.
 - Customer journey: reflection / feedback (success → history forward path)
@@ -72,3 +72,4 @@ Low, accessibility-only. A keyboard or screen-reader member activating a labelle
 ## Handoff and retest log
 
 - 2026-07-02 - Filed by User-simulator (feedback journey pass); status `ready`.
+- 2026-07-02 - Implemented by Builder (commit `296a505`). Focus now moves to the history landmark on forward-path activation: `FeedbackWorkspace` gives the destination `<h2 id="feedback-history-title">` `tabIndex={-1}` (a valid focus target) held in `historyHeadingRef`, and passes `onSeeHistory={focusHistoryHeading}` to `FeedbackConfirmation`, whose "See it in what you've shared" anchor calls it via `onClick`. `focusHistoryHeading` runs `historyHeadingRef.current?.focus()`, so keyboard/AT lands on the heading (not `<body>`) and the next Tab continues from the history. Focus — not the scroll animation — conveys arrival, so reduced-motion parity holds; the browser still handles the anchor's smooth scroll (honouring prefers-reduced-motion via `globals.css`). Added `scroll-margin-top: 24px` so the heading clears the sticky panel top and a `:focus-visible` ring on `#feedback-history-title` (the global `:focus-visible` fallback also covers it). Focus is moved only on explicit link activation — no effect/render-time focus, so ordinary renders never steal focus. Test: added 4 assertions in `FeedbackWorkspace.test.tsx` (source tripwires, mirroring the verified `EditProfileForm`/confirmation focus tests) covering the onSeeHistory→onClick wiring, the heading being a focus target, `focusHistoryHeading` focusing the ref, and no render-time focus-steal. Checks (`apps/web`): typecheck, lint (0 errors), test (586 passed +4 new), production build — all pass. No migration. Status `implemented` (awaits independent Explorer retest).
