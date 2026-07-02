@@ -1,6 +1,6 @@
 # CX-20260630-research-bucharest-hero-visual-overflows-container
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 2 × Impact 2 × Confidence 5) / Effort 3 = ~7 → P3. Cosmetic per-element decorative overflow on the `noindex`, non-launch-critical Bucharest research microsite; the page shell's `overflow-x: clip` already prevents any page-level horizontal scroll, so no member ever sees a scrollbar. No data/safety/a11y/authorization dimension. Held at P3.
 - Customer journey: Reading the Bucharest research invitation page (`/research/bucharest`).
@@ -66,3 +66,4 @@ Cosmetic only. No data, privacy, safety, or authorization concern; no page horiz
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
+- `2026-07-02` - Implemented (Builder), commit `4bb9dbd`. Cause: the hero's decorative elements bled past `.heroVisual`/`.hero` — the two mini event cards used negative offsets (`.runCard { left: -5% }`, `.padelCard { right: -4% }`), the dashed route line extended `left:-4%; right:-4%` and then `.route { transform: rotate(-18deg) }` swept its ends further out, and at narrow widths the cards' `rotate(±5deg)` poked ~5px past the circle even after zeroing offsets. Fix: `.heroVisual { overflow: hidden }` to clip the decorative frame; anchored both cards just inside the circle (`left/right: 2%`, and `3%` at the 560px breakpoint so the rotated corner stays in); pulled `.route::before` to `left:0; right:0`; trimmed the card box-shadow spread (`0 18px 40px`) and card width (`min(270px,60%)`) so nothing is visibly cut. Cards remain anchored to the radar circle; visual intent unchanged. Verified with Playwright against the production build: `document.documentElement.scrollWidth === clientWidth` (no page horizontal scroll) AND `.hero`/`.heroVisual`/`.route` each `scrollWidth === clientWidth` (0px overflow) at 375, 768, 1280 (also confirmed 390/1024/1440/1920) — previously +5..+34px. Tests: none added — layout containment has no unit seam (CSS-module only); relied on the production build + the runtime width checks. Checks (apps/web): typecheck pass, lint 0 errors, test 699 pass / 12 skipped incl ethical-guardrails green, production build pass (`/research/bucharest` static). No migration. Pushed origin/main. Ready for independent retest.

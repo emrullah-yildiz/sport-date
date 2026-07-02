@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-03T01:05:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"Landing 'How it works' color hierarchy VERIFIED+archived (59add37 — numeral computes green, no per-card fills). Signup single-headline focal point SHIPPED (b4ed7a7 — one h1 = the step question, 'Join the movement' demoted to a subordinate brand eyebrow, card top-anchored, 699 tests, guardrails green); user-sim confirmed live (no redundant double headline). Landing numeral fix re-verified live PASS (rgb(59,234,126) 13px). Chaining: BUILD research-bucharest-hero-visual-overflows-container; TEST signup headline b4ed7a7 (worktree-isolated); USE user-sim (report-only, rotate).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-03T01:05:00.000Z"},
-  "Planner":{"state":"idle","ticket":"polish queue ~12; no new tickets; fix-directly mode","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260630-research-bucharest-hero-visual-overflows-container","since":"2026-07-03T01:05:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify b4ed7a7 (signup single-headline focal point) — worktree-isolated","since":"2026-07-03T01:05:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"report-only: rotate journey + audit","since":"2026-07-03T01:05:00.000Z"} } }
+{ "updatedAt":"2026-07-03T01:35:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Signup single-headline focal point VERIFIED+archived (b4ed7a7). Bucharest research hero overflow SHIPPED (4bb9dbd — clipped .heroVisual, anchored floating cards inside the radar circle, scrollWidth==clientWidth at 375/768/1280, guardrails green). User-sim caught + orchestrator FIXED DIRECTLY a member-profile accuracy bug (6e2dc55 — profile no longer claims 'you share an event' for a still-pending requester; honest relationship discriminant + pure tested label). Chaining: BUILD research-bucharest-georgia-serif-off-system-font; TEST Bucharest hero overflow 4bb9dbd (worktree-isolated); USE user-sim (report-only, re-verify pending-request label live + rotate).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-03T01:35:00.000Z"},
+  "Planner":{"state":"idle","ticket":"polish queue ~10; no new tickets; fix-directly mode","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260630-research-bucharest-georgia-serif-off-system-font","since":"2026-07-03T01:35:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify 4bb9dbd (Bucharest research hero overflow) — worktree-isolated","since":"2026-07-03T01:35:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"report-only: re-verify member-profile pending-request label live + rotate","since":"2026-07-03T01:35:00.000Z"} } }
