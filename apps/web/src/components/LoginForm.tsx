@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import BetaTermExplainer from "./BetaTermExplainer";
 import ForgotPasswordPanel from "./ForgotPasswordPanel";
 import { interpretLoginFailure } from "@/lib/login-recovery";
 
@@ -139,7 +140,10 @@ export default function LoginForm() {
         </button>
       </form>
       <ForgotPasswordPanel open={recoveryOpen} onOpenChange={setRecoveryOpen} />
-      <p className="auth-switch">New here? <Link href="/signup">Create a private beta profile</Link></p>
+      <p className="auth-switch">
+        New here? <Link href="/signup">Create a private beta profile</Link>
+        <BetaTermExplainer className="auth-switch-explainer" />
+      </p>
     </div>
   );
 }

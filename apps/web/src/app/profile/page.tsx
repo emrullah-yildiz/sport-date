@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import BetaTermExplainer from "@/components/BetaTermExplainer";
 import PrimaryNav from "@/components/PrimaryNav";
 import EmailVerificationControls from "@/components/EmailVerificationControls";
 import PrivacyControls from "@/components/PrivacyControls";
@@ -83,7 +84,10 @@ export default async function ProfilePage() {
       <PrimaryNav firstName={user.firstName} />
       <section className="profile-hero">
         <div>
-          <p className="eyebrow">Your private beta profile</p>
+          <p className="eyebrow eyebrow-with-explainer">
+            Your private beta profile
+            <BetaTermExplainer className="eyebrow-explainer" />
+          </p>
           <h1>{user.firstName} {user.lastName}</h1>
           <p className="profile-hero-meta">
             <span className="profile-hero-fact">{user.location}</span>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import BetaTermExplainer from "@/components/BetaTermExplainer";
 import { BRAND_NAME, BRAND_TITLE, Wordmark } from "@/lib/brand";
 import { sportEmoji } from "@/lib/sports";
 import { getCurrentUser } from "@/lib/session";
@@ -139,11 +140,14 @@ export default async function LandingPage() {
                 </>
               )}
             </div>
-            <p className="microcopy">
-              {user
-                ? `You're signed in — pick up where you left off.`
-                : "Private beta · Adults only · Europe first"}
-            </p>
+            {user ? (
+              <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
+            ) : (
+              <p className="microcopy">
+                Private beta · Adults only · Europe first
+                <BetaTermExplainer className="microcopy-explainer" />
+              </p>
+            )}
           </div>
 
           <div className="hero-visual" aria-hidden="true">

@@ -617,6 +617,26 @@ a.logo:hover { color: var(--text); }
 @keyframes account-menu-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .account-menu-panel { animation: none; } }
 @media (max-width: 560px) { .account-menu-trigger-label { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; } .account-menu-trigger { padding: 6px; gap: 0; } }
+/* Reusable accessible term explainer — a focusable disclosure that plainly explains a
+   rare gate-keeping term (e.g. "private beta") in place. Not hover-only: keyboard + SR
+   reach it via aria-expanded/aria-controls; Esc + outside-click + a Close control dismiss
+   it. 44px trigger target, visible focus, token-only colors, reduced-motion safe. */
+.term-explainer { position: relative; display: inline-flex; vertical-align: middle; }
+.term-explainer-trigger { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-size: 13px; font-weight: 800; line-height: 1.2; cursor: pointer; }
+.term-explainer-trigger:hover { border-color: rgba(241,245,243,.3); }
+.term-explainer-icon { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-2); color: var(--bg); font-size: 12px; font-weight: 900; }
+.term-explainer-trigger:focus-visible, .term-explainer-close:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.term-explainer-panel { position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: max-content; max-width: min(320px, calc(100vw - 32px)); display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-raised); box-shadow: var(--shadow); animation: term-explainer-in .14s ease; text-align: left; }
+.term-explainer-points { margin: 0; padding: 0 0 0 18px; display: grid; gap: 8px; color: var(--text); font-size: 14px; font-weight: 500; line-height: 1.45; text-transform: none; letter-spacing: normal; }
+.term-explainer-close { justify-self: start; min-height: 40px; padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--text); font-size: 13px; font-weight: 800; cursor: pointer; }
+.term-explainer-close:hover { background: rgba(241,245,243,.08); }
+@keyframes term-explainer-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .term-explainer-panel { animation: none; } }
+/* Surface adjustments: keep the trigger on its own baseline next to the label so the
+   uppercase/letter-spaced eyebrow and microcopy styling never leak into the panel copy. */
+.microcopy-explainer, .auth-switch-explainer, .eyebrow-explainer { margin-left: 8px; }
+.eyebrow-with-explainer { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+@media (max-width: 480px) { .term-explainer-panel { left: auto; right: 0; } }
 .profile-hero { max-width: 1120px; margin: 54px auto 48px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 40px; }
 .profile-hero h1 { max-width: 780px; margin: 8px 0 0; font-size: var(--fs-h1); }.profile-hero > div > p:last-child { max-width: 620px; margin: 14px 0 0; color: var(--muted); font-size: var(--fs-body); line-height: 1.55; }
 .profile-initials { width: 150px; height: 150px; display: grid; place-items: center; border-radius: 50%; background: var(--lime); color: var(--bg); font-size: 42px; font-weight: 900; }
