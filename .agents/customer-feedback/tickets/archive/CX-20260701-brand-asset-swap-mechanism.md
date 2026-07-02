@@ -1,6 +1,6 @@
 # CX-20260701-brand-asset-swap-mechanism
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3` — (Reach 5 × Impact 2 × Confidence 4) / Effort 2 = 20. Invisible-to-members refactor / polish; no member-facing change now, but it de-risks the eventual brand decision. No safety/privacy/auth dimension.
 - Customer journey: (internal foundation — enables a future brand change without member-facing churn)
