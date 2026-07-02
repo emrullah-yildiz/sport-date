@@ -1064,8 +1064,13 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 .profile-photo-btn-danger:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .profile-photo-confirm { display: inline-flex; gap: 6px; }
 .profile-photos-upload { margin-top: 16px; }
-.profile-photos-upload-label { display: inline-flex; flex-direction: column; gap: 8px; font-weight: 800; }
-.profile-photos-upload-label input[type="file"] { min-height: 44px; padding: 10px; border-radius: 12px; border: 1px dashed var(--muted); background: var(--cream); }
+/* Constrain the upload control so the native file input's intrinsic content
+   width (its button + "No file chosen" / chosen filename text) can never push
+   the page past the phone viewport. The label fills its panel but is capped at
+   100%; the input is a full-width, border-box child that clips rather than
+   overflows, so a long chosen filename cannot re-widen it (CX-20260702). */
+.profile-photos-upload-label { display: flex; flex-direction: column; gap: 8px; font-weight: 800; width: 100%; max-width: 100%; }
+.profile-photos-upload-label input[type="file"] { width: 100%; max-width: 100%; box-sizing: border-box; min-height: 44px; padding: 10px; border-radius: 12px; border: 1px dashed var(--muted); background: var(--cream); overflow: hidden; }
 .profile-photos-upload-label input[type="file"]:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .profile-photos-hint { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
 @media (max-width: 700px) { .profile-photos { padding: 22px 18px; }.profile-photos-series { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); } }
