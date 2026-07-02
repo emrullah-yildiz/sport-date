@@ -1068,6 +1068,13 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 .feedback-confirmation-link--quiet:hover { border-color: var(--text); box-shadow: var(--glow-accent); }
 .feedback-confirmation-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .feedback-history { position: sticky; top: 20px; }
+/* Forward-path arrival target (CX-20260702-feedback-see-it-link-no-focus-move-to-history):
+   activating "See it in what you've shared" moves keyboard/AT focus onto this
+   heading. tabIndex={-1} makes it focusable; scroll-margin-top keeps it clear of
+   the sticky top when scrolled into view; the ring mirrors the confirmation-title
+   so arrival is visible (the global :focus-visible fallback also covers it). */
+#feedback-history-title { scroll-margin-top: 24px; }
+#feedback-history-title:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
 .feedback-history > header { display: flex; align-items: start; justify-content: space-between; gap: 15px; }
 .feedback-history > header > span { display: grid; place-items: center; min-width: 35px; height: 35px; border-radius: 50%; background: var(--lime); color: var(--bg); font-weight: 900; }
 .feedback-history-state { display: grid; gap: 9px; margin: 18px 0 0; padding: 18px; border-radius: 14px; background: var(--surface-raised); color: var(--muted); line-height: 1.5; }

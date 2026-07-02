@@ -86,8 +86,14 @@ function errorFrom(result: unknown, fallback: string) {
 // piece only guarantees the heading is a keyboard/AT focus target.
 export function FeedbackConfirmation({
   headingRef,
+  onSeeHistory,
 }: {
   headingRef?: (node: HTMLElement | null) => void;
+  // Called when the member activates "See it in what you've shared". The
+  // container moves keyboard/AT focus to the history heading so activation lands
+  // where the link promises, not on <body>. Kept as a prop (not baked in) so this
+  // presentational piece stays effect-free and server-renderable.
+  onSeeHistory?: () => void;
 }) {
   return (
     <div className="feedback-confirmation" role="status" aria-live="polite">
@@ -100,7 +106,11 @@ export function FeedbackConfirmation({
         nothing more you need to do.
       </p>
       <div className="feedback-confirmation-actions">
-        <a className="feedback-confirmation-link" href="#feedback-history-title">
+        <a
+          className="feedback-confirmation-link"
+          href="#feedback-history-title"
+          onClick={onSeeHistory}
+        >
           See it in what you&apos;ve shared
         </a>
         <Link className="feedback-confirmation-link feedback-confirmation-link--quiet" href="/profile">
@@ -127,6 +137,12 @@ export default function FeedbackWorkspace() {
   // heading (never leaving a keyboard / screen-reader member on <body>). Ordinary
   // renders leave it false so we never steal focus.
   const focusOnConfirmRef = useRef(false);
+  // The history landmark heading ("What you've shared"). Held in a ref so that
+  // when the member activates the "See it in what you've shared" link we can move
+  // keyboard/AT focus onto it — otherwise the in-page anchor scrolls the heading
+  // into view but drops focus to <body>, so an AT member is read the top of the
+  // document instead of the destination the link names.
+  const historyHeadingRef = useRef<HTMLHeadingElement | null>(null);
 
   // Callback ref: fires when the confirmation heading attaches to the DOM after a
   // successful submit. Focusing here (rather than in an effect) reliably lands
@@ -136,6 +152,17 @@ export default function FeedbackWorkspace() {
       focusOnConfirmRef.current = false;
       node.focus();
     }
+  }
+
+  // Move focus to the history heading when the forward-path link is activated.
+  // The heading carries tabIndex={-1} so it is a valid focus target; focusing it
+  // (not <body>) is what makes arrival keyboard/AT-perceivable, independent of the
+  // scroll animation — so reduced-motion members land correctly too. The browser
+  // still handles the anchor's own scroll (smooth per globals.css, honouring
+  // prefers-reduced-motion). preventScroll isn't set: letting focus scroll is
+  // harmless here and keeps a single, consistent arrival.
+  function focusHistoryHeading() {
+    historyHeadingRef.current?.focus();
   }
 
   async function loadTickets() {
@@ -276,14 +303,14 @@ export default function FeedbackWorkspace() {
             This channel is for product experience. Member-specific or urgent safety concerns belong in the <Link href="/safety">Safety center</Link>. This service is not an emergency responder.
           </p>
           <button type="submit" disabled={submitting}>{submitting ? "Sharing..." : "Share feedback"}</button>
-          {submitted ? <FeedbackConfirmation headingRef={attachConfirmation} /> : null}
+          {submitted ? <FeedbackConfirmation headingRef={attachConfirmation} onSeeHistory={focusHistoryHeading} /> : null}
           {error ? <p className="feedback-message feedback-message--error" role="alert">{error}</p> : null}
         </form>
       </section>
 
       <section className="feedback-history" aria-labelledby="feedback-history-title" aria-busy={loading}>
         <header>
-          <div><p className="panel-label">Your feedback</p><h2 id="feedback-history-title">What you&apos;ve shared</h2></div>
+          <div><p className="panel-label">Your feedback</p><h2 id="feedback-history-title" tabIndex={-1} ref={historyHeadingRef}>What you&apos;ve shared</h2></div>
           {!loading && !loadError ? <span>{tickets.length}</span> : null}
         </header>
         {loading ? <p className="feedback-history-state">Loading your feedback...</p> : null}
