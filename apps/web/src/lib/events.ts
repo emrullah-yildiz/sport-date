@@ -1,6 +1,7 @@
 import "server-only";
 
 import { getDatabase } from "@/lib/db";
+import { coarsenCoordinates } from "@/lib/discovery-geo";
 import { type EventUpdateAttendanceIntent } from "@/lib/event-update-intents";
 import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice, type EventUpdateSeverity } from "@/lib/event-updates";
 
@@ -68,6 +69,26 @@ type HostJoinRequestRow = {
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Project a row's stored approximate PUBLIC coordinate into the response, coarsened to
+ * the area grid so no finer-than-grid precision can ever ship to a client — defence in
+ * depth, independent of what precision the column happens to hold
+ * (CX-20260702-event-approx-coord-not-recoarsened-on-write-or-response). `null` in →
+ * `null` out (unset stays unset); an out-of-range/garbage pair degrades to `null`
+ * rather than leaking a bogus point. The PRECISE venue is a separate field
+ * (`event_private_locations`) and is untouched by this — it is never joined here.
+ */
+export function coarseApproximateForResponse(
+  latitude: number | null,
+  longitude: number | null,
+): { approximateLatitude: number | null; approximateLongitude: number | null } {
+  const coarse = coarsenCoordinates(latitude, longitude);
+  return {
+    approximateLatitude: coarse ? coarse.latitude : null,
+    approximateLongitude: coarse ? coarse.longitude : null,
+  };
+}
 
 /**
  * Discovery language-preference rule.
@@ -216,7 +237,7 @@ export async function getDiscoverableEvents(
     hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
     city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
-    approximateLatitude: row.public_approximate_latitude, approximateLongitude: row.public_approximate_longitude,
+    ...coarseApproximateForResponse(row.public_approximate_latitude, row.public_approximate_longitude),
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
   }));
 }
@@ -281,7 +302,7 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
     hostUserId: String(row.host_user_id), hostFirstName: row.host_first_name, areaLabel: row.public_area_label,
     city: row.public_city, countryCode: row.public_country_code, acceptedCount: row.accepted_count,
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
-    approximateLatitude: row.public_approximate_latitude, approximateLongitude: row.public_approximate_longitude,
+    ...coarseApproximateForResponse(row.public_approximate_latitude, row.public_approximate_longitude),
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
     viewerIsHost: String(row.host_user_id) === String(user.id),
   };

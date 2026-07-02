@@ -99,6 +99,28 @@ function optionalCoordinate(value: unknown, minimum: number, maximum: number): n
   return Number.isFinite(coordinate) && coordinate >= minimum && coordinate <= maximum ? coordinate : undefined;
 }
 
+/**
+ * The approximate PUBLIC coordinate is a discovery/spatial cue only, never a precise
+ * point. It must never be stored or emitted finer than the ~10km (0.1°) area grid the
+ * rest of the geo system enforces (mirrors `COARSE_GRID_DEGREES` /
+ * `coarsenCoordinate` in the web app's `lib/discovery-geo.ts`). We snap it HERE, at the
+ * write boundary, so the value persisted for `public_approximate_latitude/longitude`
+ * can only ever name a coarse cell centre — a precise venue can never leak through the
+ * approximate field even if the caller supplies a precise number
+ * (CX-20260702-event-approx-coord-not-recoarsened-on-write-or-response).
+ *
+ * This deliberately does NOT touch the PRIVATE precise venue coordinate — that is a
+ * separate field revealed only post-acceptance and must keep full precision.
+ */
+export const APPROXIMATE_COORDINATE_GRID_DEGREES = 0.1 as const;
+
+export function coarsenApproximateCoordinate(value: number | null): number | null {
+  if (value === null || !Number.isFinite(value)) return null;
+  const snapped = Math.round(value / APPROXIMATE_COORDINATE_GRID_DEGREES) * APPROXIMATE_COORDINATE_GRID_DEGREES;
+  // Fix floating error to a stable number of decimals so 0.1 cells compare cleanly.
+  return Number(snapped.toFixed(4));
+}
+
 export function validateEventCreation(raw: unknown, now = new Date()): EventCreationValidation {
   if (!raw || typeof raw !== "object") return { valid: false, errors: ["Event details are required."] };
   const input = raw as Record<string, unknown>;
@@ -139,8 +161,13 @@ export function validateEventCreation(raw: unknown, now = new Date()): EventCrea
         city: typeof publicLocation.city === "string" ? publicLocation.city.trim() : "",
         countryCode: typeof publicLocation.countryCode === "string" ? publicLocation.countryCode.trim().toUpperCase() : "",
         areaLabel: typeof publicLocation.areaLabel === "string" ? publicLocation.areaLabel.trim() : "",
-        approximateLatitude: approximateLatitude ?? null,
-        approximateLongitude: approximateLongitude ?? null,
+        // Coarsen the approximate PUBLIC coordinate to the area grid at the write
+        // boundary so a precise value can never be persisted/emitted for the
+        // discovery field. `approximateLatitude`/`approximateLongitude` are still the
+        // validated (in-range, non-`undefined`) values here; `undefined` (out of
+        // range) short-circuits to the error branch above and never reaches storage.
+        approximateLatitude: coarsenApproximateCoordinate(approximateLatitude ?? null),
+        approximateLongitude: coarsenApproximateCoordinate(approximateLongitude ?? null),
       },
       private: {
         venueName: typeof privateLocation.venueName === "string" ? privateLocation.venueName.trim() : "",

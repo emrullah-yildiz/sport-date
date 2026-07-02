@@ -66,6 +66,66 @@ describe("event creation input", () => {
     if (result.valid) expect(result.data.location.public.countryCode).toBe("RO");
   });
 
+  // CX-20260702: the approximate PUBLIC coordinate is a discovery/spatial cue only and
+  // must be persisted no finer than the ~10km (0.1°) area grid. Coarsening happens HERE
+  // at the write boundary, so a precise value can never be stored for the
+  // `public_approximate_latitude/longitude` columns even if a caller supplies one.
+  it("coarsens the approximate PUBLIC coordinate to the area grid on write, never storing a precise value", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      startsAt: source.startsAt.toISOString(),
+      location: {
+        // A precise fix supplied by a future feature / import must snap to the grid.
+        public: { ...source.location.public, approximateLatitude: 44.4361234, approximateLongitude: 26.1027 },
+        private: source.location.private,
+      },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      // Snapped to the ~10km cell centre — no finer-than-grid precision persisted.
+      expect(result.data.location.public.approximateLatitude).toBe(44.4);
+      expect(result.data.location.public.approximateLongitude).toBe(26.1);
+    }
+  });
+
+  it("keeps a null approximate coordinate null (unset stays unset — no behaviour change today)", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      startsAt: source.startsAt.toISOString(),
+      location: {
+        public: { ...source.location.public, approximateLatitude: null, approximateLongitude: null },
+        private: source.location.private,
+      },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.location.public.approximateLatitude).toBeNull();
+      expect(result.data.location.public.approximateLongitude).toBeNull();
+    }
+  });
+
+  it("does NOT coarsen the PRIVATE precise venue coordinate — the post-acceptance exact location keeps full precision", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      startsAt: source.startsAt.toISOString(),
+      location: {
+        public: { ...source.location.public, approximateLatitude: 44.4361234, approximateLongitude: 26.1027 },
+        // The exact venue (revealed only post-acceptance) must be persisted verbatim.
+        private: { ...source.location.private, latitude: 44.4361234, longitude: 26.1027 },
+      },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.location.private.latitude).toBe(44.4361234);
+      expect(result.data.location.private.longitude).toBe(26.1027);
+      // ...while the approximate public field IS coarsened, proving the two are separate.
+      expect(result.data.location.public.approximateLatitude).toBe(44.4);
+    }
+  });
+
   it("rejects invalid coordinates, duplicate levels, and thin descriptions", () => {
     const source = event();
     const result = validateEventCreation({

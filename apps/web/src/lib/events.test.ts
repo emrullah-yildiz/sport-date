@@ -2,7 +2,56 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 
-import { eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, summarizeHostCoordination, summarizeHostReflection, type MemberEventSummary } from "./events";
+import { coarseApproximateForResponse, eventLanguageMatchesMemberPreference, memberSkillMatchesEvent, selectHostedEvents, summarizeHostCoordination, summarizeHostReflection, type MemberEventSummary } from "./events";
+import { coarsenCoordinate } from "./discovery-geo";
+
+// Pins the RESPONSE-side privacy boundary for the event approximate PUBLIC coordinate
+// (CX-20260702-event-approx-coord-not-recoarsened-on-write-or-response). The discovery
+// response mappers (`getDiscoverableEvents`, `getDiscoverableEvent`) map the stored
+// `public_approximate_latitude/longitude` columns through THIS helper, so no
+// finer-than-grid precision can ever ship to a client — regardless of what precision
+// the column happens to hold. Defence in depth: the write path already coarsens on
+// insert/update, but the mapper coarsens again so a pre-existing or manually-populated
+// precise row can never leak either. The PRECISE venue is a separate field and is never
+// projected here.
+describe("discovery response approximate-coordinate coarsening (privacy boundary)", () => {
+  it("coarsens a precise stored coordinate to the area grid before it reaches the response", () => {
+    // A precise value in the column (future feature / import / manual row) must NEVER
+    // ship verbatim — it degrades to a ~10km cell centre.
+    expect(coarseApproximateForResponse(44.4361234, 26.1027)).toEqual({
+      approximateLatitude: 44.4,
+      approximateLongitude: 26.1,
+    });
+  });
+
+  it("never emits finer-than-grid precision for any in-range coordinate", () => {
+    for (const [lat, lng] of [[44.4361234, 26.1027], [46.7712, 23.6236], [51.5074, -0.1278]] as const) {
+      const projected = coarseApproximateForResponse(lat, lng);
+      // The emitted value is already grid-snapped: coarsening it again is a no-op.
+      expect(coarsenCoordinate(projected.approximateLatitude!)).toBe(projected.approximateLatitude);
+      expect(coarsenCoordinate(projected.approximateLongitude!)).toBe(projected.approximateLongitude);
+    }
+  });
+
+  it("leaves the always-null (unset) case unchanged — no behaviour change today", () => {
+    // Every seeded event stores null today; the mapper must keep emitting null, so the
+    // filter's city-geocode fallback and the UI are untouched.
+    expect(coarseApproximateForResponse(null, null)).toEqual({
+      approximateLatitude: null,
+      approximateLongitude: null,
+    });
+  });
+
+  it("degrades an out-of-range / partial pair to null rather than leaking a bogus point", () => {
+    expect(coarseApproximateForResponse(999, 0)).toEqual({ approximateLatitude: null, approximateLongitude: null });
+    expect(coarseApproximateForResponse(44.4, null)).toEqual({ approximateLatitude: null, approximateLongitude: null });
+  });
+
+  it("is idempotent — round-tripping an already-coarse stored value does not drift", () => {
+    const once = coarseApproximateForResponse(44.4361234, 26.1027);
+    expect(coarseApproximateForResponse(once.approximateLatitude, once.approximateLongitude)).toEqual(once);
+  });
+});
 
 // These cases pin the discovery language-preference rule that the SQL clause in
 // `getDiscoverableEvents` mirrors. The bug (CX-20260630): a brand-new member has
