@@ -1,6 +1,6 @@
 # CX-20260701-event-detail-facts-block-flat-hierarchy-unscannable
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 4 × Impact 3 × Confidence 5) / Effort 2 = 30 → P2. Presentational; the same inverted-hierarchy defect the verified feed-card ticket fixed, but on the *detail / shared-invitation* page. Not a safety/privacy/a11y floor, so held at P2.
 - Customer journey: discovery → intent → trust check → commitment (the shared-link landing)
@@ -68,3 +68,4 @@ The shared-invitation page is the moment a member decides to commit to meeting a
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 18); status `ready`. Live-confirmed the flat facts block on `/discover/events/[id]` as pooled seeker-B; deduped against the verified feed-card ticket (feed only) and the systemic off-scale-headline ticket (this page's `<h1>`).
+- 2026-07-02 - Implemented (Builder). Rebuilt the `.event-detail-facts` panel so it leads with a dominant two-line date/time (`--fs-h2`, time in `--accent`) and a calm, prominent availability pill, with duration / language+level / ages / host demoted to a clearly-secondary `<dl>` meta list below a hairline. REUSED the verified feed's pure helpers `formatDiscoveryDate` and `describeDiscoveryAvailability` from `src/lib/discovery-card.ts` so feed and detail can't drift: honest non-scarcity wording ("N places left" / "Last place" / "Fully booked"), no coral/red urgency, no fabricated scarcity; full state uses a calm muted style on `--surface-raised`. Approximate-area-only privacy unchanged (no venue/street). No new motion → reduced-motion parity holds. AA verified (contrast on `--surface` #272E34): accent date/time + pill 8.68, muted meta label 6.42, full pill on raised 5.41, meta values 12.51. No overflow at 1280 or 375px (baseline flex rows wrap; block still reflows to 1fr at ≤750px). Files: `apps/web/src/app/discover/events/[eventId]/page.tsx` (helper reuse + markup), `apps/web/src/app/globals.css` (hierarchy CSS replacing the flat `span` rule). Checks from `apps/web`: typecheck PASS, lint PASS (0 errors; 1 pre-existing warning in untracked `qa/full-flows.mjs`), test 442 PASS, prod `next build` PASS. No migration. Commit `72f3d97`, pushed to origin/main. Handing back for independent retest.

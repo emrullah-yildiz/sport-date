@@ -1,13 +1,7 @@
-{
-  "updatedAt": "2026-07-02T03:08:00.000Z",
-  "loop": "running",
-  "phase": "orchestrate",
-  "note": "Orchestrator heartbeat for the /agents.html dashboard. The orchestrator overwrites this when it launches/finishes a phase agent. agents[name] = { state: 'working'|'idle', ticket, since }.",
-  "agents": {
-    "Orchestrator": { "state": "working", "ticket": "agent dashboard + bookkeeping", "since": "2026-07-02T03:08:00.000Z" },
-    "Planner": { "state": "idle", "ticket": null, "since": null },
-    "Builder": { "state": "idle", "ticket": "just finished: ia-consolidate-guideline-and-legal-pages (89af256)", "since": null },
-    "Tester": { "state": "idle", "ticket": null, "since": null },
-    "UserSimulator": { "state": "idle", "ticket": null, "since": null }
-  }
-}
+{ "updatedAt":"2026-07-02T06:46:00.000Z","loop":"running","phase":"idle-between-ticks",
+  "note":"Tick done: built event-detail facts hierarchy (72f3d97, implemented); Tester verified + archived 6 tickets. Next build: migrate-hardcoded-colors-moderation-remainder.",
+  "agents":{ "Orchestrator":{"state":"idle","ticket":"awaiting next tick","since":null},
+  "Planner":{"state":"idle","ticket":"next=migrate-hardcoded-colors-moderation-remainder","since":null},
+  "Builder":{"state":"idle","ticket":"just finished: event-detail facts hierarchy (72f3d97)","since":null},
+  "Tester":{"state":"idle","ticket":"verified+archived 6 tickets","since":null},
+  "UserSimulator":{"state":"idle","ticket":null,"since":null} } }
