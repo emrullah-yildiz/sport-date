@@ -1,6 +1,6 @@
 # CX-20260701-event-detail-facts-block-flat-hierarchy-unscannable
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 4 × Impact 3 × Confidence 5) / Effort 2 = 30 → P2. Presentational; the same inverted-hierarchy defect the verified feed-card ticket fixed, but on the *detail / shared-invitation* page. Not a safety/privacy/a11y floor, so held at P2.
 - Customer journey: discovery → intent → trust check → commitment (the shared-link landing)
@@ -56,16 +56,17 @@ The shared-invitation page is the moment a member decides to commit to meeting a
 
 ## Acceptance criteria
 
-- [ ] On `/discover/events/[id]`, the date/time is the clearly-dominant fact and availability is a calm, prominent second, with duration / language / level / ages / host visibly secondary (smaller/muted).
-- [ ] Availability wording matches the verified feed helper's honest, non-scarcity phrasing ("N places left" / "Last place" / "Fully booked"); no coral/red urgency and no fabricated scarcity.
-- [ ] Approximate-area-only privacy is unchanged (no venue/street/precise location added to the facts block or its data).
-- [ ] The facts panel remains usable with no overflow at 1280 and 375px; AA contrast holds for the emphasised and secondary text.
-- [ ] Keyboard/screen-reader: the panel stays readable in a sensible order; if any semantic grouping is added it is correctly labelled (no new focus traps; targets unaffected as this is presentational).
-- [ ] Prefers-reduced-motion parity is preserved (no new motion introduced).
-- [ ] Prefer reusing the pure `src/lib/discovery-card.ts` helpers so feed and detail cannot drift in wording or privacy posture; if not reused, state why.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] On `/discover/events/[id]`, the date/time is the clearly-dominant fact and availability is a calm, prominent second, with duration / language / level / ages / host visibly secondary (smaller/muted).
+- [x] Availability wording matches the verified feed helper's honest, non-scarcity phrasing ("N places left" / "Last place" / "Fully booked"); no coral/red urgency and no fabricated scarcity.
+- [x] Approximate-area-only privacy is unchanged (no venue/street/precise location added to the facts block or its data).
+- [x] The facts panel remains usable with no overflow at 1280 and 375px; AA contrast holds for the emphasised and secondary text.
+- [x] Keyboard/screen-reader: the panel stays readable in a sensible order; if any semantic grouping is added it is correctly labelled (no new focus traps; targets unaffected as this is presentational).
+- [x] Prefers-reduced-motion parity is preserved (no new motion introduced).
+- [x] Prefer reusing the pure `src/lib/discovery-card.ts` helpers so feed and detail cannot drift in wording or privacy posture; if not reused, state why.
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (pass 18); status `ready`. Live-confirmed the flat facts block on `/discover/events/[id]` as pooled seeker-B; deduped against the verified feed-card ticket (feed only) and the systemic off-scale-headline ticket (this page's `<h1>`).
 - 2026-07-02 - Implemented (Builder). Rebuilt the `.event-detail-facts` panel so it leads with a dominant two-line date/time (`--fs-h2`, time in `--accent`) and a calm, prominent availability pill, with duration / language+level / ages / host demoted to a clearly-secondary `<dl>` meta list below a hairline. REUSED the verified feed's pure helpers `formatDiscoveryDate` and `describeDiscoveryAvailability` from `src/lib/discovery-card.ts` so feed and detail can't drift: honest non-scarcity wording ("N places left" / "Last place" / "Fully booked"), no coral/red urgency, no fabricated scarcity; full state uses a calm muted style on `--surface-raised`. Approximate-area-only privacy unchanged (no venue/street). No new motion → reduced-motion parity holds. AA verified (contrast on `--surface` #272E34): accent date/time + pill 8.68, muted meta label 6.42, full pill on raised 5.41, meta values 12.51. No overflow at 1280 or 375px (baseline flex rows wrap; block still reflows to 1fr at ≤750px). Files: `apps/web/src/app/discover/events/[eventId]/page.tsx` (helper reuse + markup), `apps/web/src/app/globals.css` (hierarchy CSS replacing the flat `span` rule). Checks from `apps/web`: typecheck PASS, lint PASS (0 errors; 1 pre-existing warning in untracked `qa/full-flows.mjs`), test 442 PASS, prod `next build` PASS. No migration. Commit `72f3d97`, pushed to origin/main. Handing back for independent retest.
+- 2026-07-02 - VERIFIED (Tester, independent). Source: both `discover/page.tsx` (feed) and `discover/events/[eventId]/page.tsx` (detail) import and call the SAME pure helpers `formatDiscoveryDate` + `describeDiscoveryAvailability` from `src/lib/discovery-card.ts` — confirmed can't drift. Detail CSS (globals.css:761–771): date/time day+time both `--fs-h2`/900 with time in `--accent` (dominant); availability is a calm pill (`rgba(59,234,126,.16)`/`--accent`), `.is-full` uses `--surface-raised`/`--muted` — NO coral/red anywhere; meta demoted to a 12–13px `<dl>` below a `--line` hairline. LIVE (logged in once as pooled seeker-B, `/discover/events/c19cfef3…`, HTTP 200): rendered facts block = `<span class="event-detail-when-day">Thu 2 Jul</span><span class="event-detail-when-time">18:00</span>` + `<p class="event-detail-availability">4 places left</p>` + secondary `<dl>` (Duration/Language & level/Ages/Host) — honest wording, no "N of M places remain", no coral class. Privacy: only "venue/exact" hits in the page are the approximate-area affirmation copy ("The exact venue is not included in this page") + safety copy — no address/street/precise leak added. AA (independently recomputed on `--surface` #272E34): accent date/time 8.68, pill accent-on-composited-pill 6.01, full-pill muted-on-raised 5.41, meta dt muted 6.42, meta dd text 12.51 — all ≥ AA. No new motion (reduced-motion parity holds). Repo checks (run once, `apps/web`): typecheck PASS, lint 0 errors (3 pre-existing warnings: 2 unused imports in `discover/page.tsx`, 1 in untracked `qa/full-flows.mjs` — none from this ticket), test 442 passed/12 skipped, prod `next build` PASS (`/discover/events/[eventId]` compiled). Status → `verified`.
