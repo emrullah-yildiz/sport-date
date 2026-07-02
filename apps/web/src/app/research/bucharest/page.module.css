@@ -47,7 +47,10 @@
 .lede { max-width: 620px; margin: 34px 0; color: #56635b; font-size: clamp(17px, 2vw, 21px); line-height: 1.55; }
 .primaryAction { display: inline-flex; align-items: center; gap: 34px; min-height: 58px; padding: 0 22px; border-radius: 99px; background: var(--research-ink); color: white; font-size: 13px; font-weight: 850; }
 .primaryAction span { color: var(--research-lime); font-size: 20px; }
-.honestyLine { margin: 17px 0 0; color: #6d776f; font-size: 10px; font-weight: 700; }
+/* Darker than the old #6d776f (4.09:1) and 12px not 10px: the transparency line is
+   the page's most important honest disclosure, so it must clear AA (now 5.48:1 on
+   paper) and not be the least legible text on the page. */
+.honestyLine { margin: 17px 0 0; color: #5a635b; font-size: 12px; font-weight: 700; }
 
 .heroCopy { min-width: 0; }
 
@@ -70,6 +73,9 @@
 .formatCard.lime { background: var(--research-lime); }.formatCard.coral { background: var(--research-coral); }
 .formatTopline { display: flex; justify-content: space-between; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
 .formatCard h3 { max-width: 510px; margin: 115px 0 15px; font-size: clamp(38px, 4.5vw, 64px); line-height: .92; letter-spacing: -.06em; }.formatCard > p { margin: 0; color: #3f4c43; }
+/* #3f4c43 clears AA on the lime card but is only 3.44:1 on the darker coral card;
+   the ink token restores AA there (6.13:1) while staying on-brand. */
+.formatCard.coral > p { color: var(--research-ink); }
 .formatCard dl { margin: auto 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }.formatCard dl > div { padding-top: 14px; border-top: 1px solid rgba(23, 36, 29, .3); }.formatCard dt { margin-bottom: 6px; font-size: 9px; font-weight: 900; text-transform: uppercase; }.formatCard dd { margin: 0; font-size: 12px; font-weight: 750; }
 
 .belief { min-height: 640px; padding: 100px max(24px, calc((100vw - 1240px) / 2)); display: grid; align-content: center; background: var(--research-coral); }
