@@ -1,7 +1,7 @@
 "use client";
 
 import { SAFETY_REPORT_CATEGORIES, type SafetyReportCategory } from "@sport-date/domain";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const categoryLabels: Record<SafetyReportCategory, string> = {
   harassment: "Harassment", hate: "Hate or discrimination", sexual_misconduct: "Sexual misconduct",
@@ -16,6 +16,21 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
   const [blockUser, setBlockUser] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  // Success and failure are separate persistent live regions (mirrors the shipped
+  // RoomLeaveControl / EditProfileForm pattern): the containers are always mounted
+  // and empty before submit, so a content change is announced — a failed *safety*
+  // report is assertive so it is not queued behind whatever the reader is saying.
+  const [tone, setTone] = useState<"success" | "error">("success");
+  // Moves keyboard/screen-reader focus to the confirmation on a successful report
+  // that stays on this page (no block redirect), so an already-sent report is not
+  // silently re-submitted from the still-editable form.
+  const confirmRef = useRef<HTMLParagraphElement>(null);
+
+  function announce(text: string, nextTone: "success" | "error", focusConfirm = false) {
+    setTone(nextTone);
+    setMessage(text);
+    if (focusConfirm) requestAnimationFrame(() => confirmRef.current?.focus());
+  }
 
   async function report(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setSubmitting(true); setMessage("");
@@ -23,9 +38,12 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
       const response = await fetch("/api/safety/reports", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ eventId, reportedUserId: subjectUserId, category, details, blockUser }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Report failed.");
-      setMessage(result.message); setDetails("");
+      setDetails("");
+      // Block-and-report redirects to /profile; a report with no block stays here,
+      // so move focus to the confirmation for clear closure.
+      announce(result.message, "success", !blockUser);
       if (blockUser) setTimeout(() => window.location.assign("/profile"), 1200);
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Report failed."); }
+    } catch (error) { announce(error instanceof Error ? error.message : "Report failed.", "error"); }
     finally { setSubmitting(false); }
   }
 
@@ -36,7 +54,7 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Block failed.");
       window.location.assign("/profile");
-    } catch (error) { setMessage(error instanceof Error ? error.message : "Block failed."); setSubmitting(false); }
+    } catch (error) { announce(error instanceof Error ? error.message : "Block failed.", "error"); setSubmitting(false); }
   }
 
   return (
@@ -47,10 +65,15 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
         <label>What happened?<select value={category} onChange={(event) => setCategory(event.target.value as SafetyReportCategory)}>{SAFETY_REPORT_CATEGORIES.map((item) => <option value={item} key={item}>{categoryLabels[item]}</option>)}</select></label>
         <label>Describe what happened<textarea minLength={20} maxLength={2000} required rows={4} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="Include what happened, when, and anything the safety team should preserve." /></label>
         <label className="report-block-choice"><input type="checkbox" checked={blockUser} onChange={(event) => setBlockUser(event.target.checked)} />Also block this member immediately</label>
-        <button type="submit" disabled={submitting}>{submitting ? "Recording…" : "Submit safety report"}</button>
+        <button type="submit" disabled={submitting} aria-busy={submitting}>{submitting ? "Recording…" : "Submit safety report"}</button>
       </form>
       <p className="safety-emergency">If anyone is in immediate danger, move somewhere safe and contact local emergency services.</p>
-      {message ? <p className="safety-message" role="status">{message}</p> : null}
+      <div className="safety-message-region" role="status" aria-live="polite">
+        {message && tone === "success" ? <p className="safety-message" ref={confirmRef} tabIndex={-1}>{message}</p> : null}
+      </div>
+      <div className="safety-message-region" role="alert" aria-live="assertive">
+        {message && tone === "error" ? <p className="safety-message safety-message-error">{message}</p> : null}
+      </div>
     </details>
   );
 }

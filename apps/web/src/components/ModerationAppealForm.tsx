@@ -11,6 +11,10 @@ export default function ModerationAppealForm({ appealId, currentStatus }: { appe
   const [outcomeSummary, setOutcomeSummary] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  // Persistent success/failure live regions (mirrors RoomLeaveControl): always
+  // mounted and empty before submit so the result is announced; a failed update
+  // is assertive so it is not lost behind whatever the reader is saying.
+  const [tone, setTone] = useState<"success" | "error">("success");
   const final = status !== "reviewing";
 
   async function updateAppeal(event: React.FormEvent<HTMLFormElement>) {
@@ -25,9 +29,11 @@ export default function ModerationAppealForm({ appealId, currentStatus }: { appe
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Appeal update failed.");
+      setTone("success");
       setMessage(`Appeal moved to ${result.status}.`);
       router.refresh();
     } catch (error) {
+      setTone("error");
       setMessage(error instanceof Error ? error.message : "Appeal update failed.");
     } finally {
       setSubmitting(false);
@@ -44,8 +50,13 @@ export default function ModerationAppealForm({ appealId, currentStatus }: { appe
       {final ? <label>Reporter-safe appeal outcome
         <textarea rows={5} minLength={20} maxLength={2000} required value={outcomeSummary} onChange={(event) => setOutcomeSummary(event.target.value)} />
       </label> : null}
-      <button type="submit" disabled={submitting}>{submitting ? "Recording..." : final ? "Publish appeal outcome" : "Start separate review"}</button>
-      {message ? <p role="status">{message}</p> : null}
+      <button type="submit" disabled={submitting} aria-busy={submitting}>{submitting ? "Recording..." : final ? "Publish appeal outcome" : "Start separate review"}</button>
+      <div className="safety-message-region" role="status" aria-live="polite">
+        {message && tone === "success" ? <p>{message}</p> : null}
+      </div>
+      <div className="safety-message-region" role="alert" aria-live="assertive">
+        {message && tone === "error" ? <p className="safety-message-error">{message}</p> : null}
+      </div>
     </form>
   );
 }

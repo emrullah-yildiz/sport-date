@@ -12,6 +12,10 @@ export default function ModerationCaseForm({ reportId }: { reportId: string }) {
   const [decisionSummary, setDecisionSummary] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
+  // Persistent success/failure live regions (mirrors RoomLeaveControl): always
+  // mounted and empty before submit so the result is announced; a failed update
+  // is assertive so it is not lost behind whatever the reader is saying.
+  const [tone, setTone] = useState<"success" | "error">("success");
   const terminal = status === "actioned" || status === "dismissed";
 
   async function updateCase(event: React.FormEvent<HTMLFormElement>) {
@@ -31,9 +35,11 @@ export default function ModerationCaseForm({ reportId }: { reportId: string }) {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Case update failed.");
+      setTone("success");
       setMessage(`Case moved to ${result.status}.`);
       router.refresh();
     } catch (error) {
+      setTone("error");
       setMessage(error instanceof Error ? error.message : "Case update failed.");
     } finally {
       setSubmitting(false);
@@ -66,8 +72,13 @@ export default function ModerationCaseForm({ reportId }: { reportId: string }) {
         </label>
         <p>A final decision is immediately visible to the reporter and opens a six-month appeal window. Do not expose the subject&apos;s private data or protected evidence.</p>
       </> : null}
-      <button type="submit" disabled={submitting}>{submitting ? "Recording..." : terminal ? "Issue decision notice" : "Update case state"}</button>
-      {message ? <p role="status">{message}</p> : null}
+      <button type="submit" disabled={submitting} aria-busy={submitting}>{submitting ? "Recording..." : terminal ? "Issue decision notice" : "Update case state"}</button>
+      <div className="safety-message-region" role="status" aria-live="polite">
+        {message && tone === "success" ? <p>{message}</p> : null}
+      </div>
+      <div className="safety-message-region" role="alert" aria-live="assertive">
+        {message && tone === "error" ? <p className="safety-message-error">{message}</p> : null}
+      </div>
     </form>
   );
 }
