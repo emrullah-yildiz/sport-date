@@ -13,6 +13,7 @@ import PreArrivalSafetyBrief from "@/components/PreArrivalSafetyBrief";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import RoomLeaveControl from "@/components/RoomLeaveControl";
 import ShareEventLink from "@/components/ShareEventLink";
+import ShareMotivationalCard from "@/components/ShareMotivationalCard";
 import { BRAND_NAME } from "@/lib/brand";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
@@ -234,6 +235,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       {canUseChat ? <EventRoomChat eventId={room.id} timeZone={room.timeZone} /> : null}
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} safetyControlsId="room-people" /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
+      {room.hasEnded ? <ShareMotivationalCard firstName={user.firstName} /> : null}
       {room.hasEnded ? <EventReflectionForm eventId={room.id} reflection={room.reflection} /> : null}
       {room.hasEnded ? <PeerFeedbackPanel eventId={room.id} targets={peerFeedbackTargets} /> : null}
     </main>
