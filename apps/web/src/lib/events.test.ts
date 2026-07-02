@@ -208,10 +208,28 @@ describe("host past-event reflection/outcome copy", () => {
     const outcome = summarizeHostReflection(null);
     expect(outcome.recorded).toBe(false);
     expect(outcome.heading).toBe("You made this happen");
-    expect(outcome.body).toContain("People showed up because you made the plan real.");
+    expect(outcome.body).toContain("You made the plan real.");
     // The reflect affordance is explicitly optional — an invitation, never a nag.
     expect(outcome.reflectPrompt).toContain("optional");
     assertClean(`${outcome.heading} ${outcome.body} ${outcome.reflectPrompt}`);
+  });
+
+  it("never claims attendance in the shared acknowledgement — it renders for empty events too", () => {
+    // The acknowledgement is emitted for EVERY past hosted event, including ones
+    // nobody joined. Claiming turnout ("people showed up") would be a fabricated
+    // attendance figure — false for an empty event and self-contradicting next to a
+    // did-not-attend note. Pin the turnout-agnostic wording across every branch.
+    const cases = [
+      summarizeHostReflection(null),
+      summarizeHostReflection({ attendance: "did_not_attend", wouldJoinAgain: "no" }),
+      summarizeHostReflection({ attendance: "attended", wouldJoinAgain: "yes" }),
+    ];
+    for (const o of cases) {
+      const body = o.body.toLowerCase();
+      expect(body).not.toContain("showed up");
+      expect(body).not.toContain("people");
+      expect(body).not.toContain("turned out");
+    }
   });
 
   it("quietly mirrors the host's OWN recorded attendance without inventing a figure", () => {

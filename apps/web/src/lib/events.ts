@@ -560,7 +560,12 @@ export type HostReflectionOutcome = Readonly<{
 }>;
 
 export function summarizeHostReflection(reflection: MemberEventSummary["reflection"]): HostReflectionOutcome {
-  const acknowledgement = "You hosted this. People showed up because you made the plan real.";
+  // Attendance-agnostic on purpose: this line renders for every past hosted event,
+  // including ones nobody joined. Claiming "people showed up" would be a fabricated
+  // attendance figure — false for an empty event and self-contradicting next to a
+  // `did_not_attend` note — so we credit only the thing that is always true: the host
+  // made the plan real. (Mirrors PostEventAfterglow's honest, turnout-agnostic voice.)
+  const acknowledgement = "You hosted this. You made the plan real.";
 
   if (!reflection) {
     return {
