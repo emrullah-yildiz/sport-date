@@ -1,6 +1,6 @@
 # CX-20260630-landing-how-it-works-steps-misleading-color-hierarchy
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — Reach 4 (every landing visitor reaches the "How it works" section) × Impact 2 (mild comprehension friction + minor "is step 2 special / clickable?" trust wobble; not blocking) × Confidence 4 (directly observed at 1024px, grounded in `globals.css` + the design-system rule that lime = positive action / active selection) / Effort 1 (a few CSS lines). Math: (4×2×4)/1 = 32. Not safety/privacy/auth/accessibility-gated, so it stays in the polish bucket; raise to P2 only if comprehension of the core pitch is judged higher-stakes. Components: `apps/web/src/app/globals.css` (`.step-card:nth-child(2)`, `:nth-child(3)`), `apps/web/src/app/landing/page.tsx` (`steps`/`.steps-grid`).
 - Customer journey: First impression — a cautious first-time visitor reads the landing page "How it works" three-step explainer to understand what the product actually does before signing up.
