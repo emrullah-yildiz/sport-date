@@ -66,3 +66,32 @@ describe("LandingPage auth-awareness", () => {
     expect(loggedIn).not.toContain('href="/landing"');
   });
 });
+
+describe('LandingPage "How it works" ordered sequence', () => {
+  it("renders the three steps as an equal-weight 1 -> 2 -> 3 sequence, each with a number then a heading", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    // Each step card renders its number (ordering cue) before its <h3> title, and
+    // the three cards appear in numeric order — this is the scannable 1->2->3
+    // sequence the "How it works" section exists to tell. No card is singled out
+    // by markup; they share one .step-card treatment (equal visual weight).
+    const stepOne = html.indexOf("STEP 01");
+    const stepTwo = html.indexOf("STEP 02");
+    const stepThree = html.indexOf("STEP 03");
+    expect(stepOne).toBeGreaterThan(-1);
+    expect(stepTwo).toBeGreaterThan(stepOne);
+    expect(stepThree).toBeGreaterThan(stepTwo);
+
+    // Within a card the number precedes the heading, and each step is an <h3>
+    // (ordering carried by the number + heading, not by color alone).
+    expect(html).toMatch(/STEP 01[\s\S]*?<h3>Build your profile<\/h3>/);
+    expect(html).toMatch(/STEP 02[\s\S]*?<h3>Discover activities nearby<\/h3>/);
+    expect(html).toMatch(/STEP 03[\s\S]*?<h3>Request a place &amp; meet<\/h3>/);
+
+    // All three are the same non-interactive .step-card surface (no per-card
+    // "selected/clickable-looking" fill class); exactly three cards render.
+    expect((html.match(/class="step-card"/g) ?? []).length).toBe(3);
+  });
+});
