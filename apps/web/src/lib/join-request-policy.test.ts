@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { declinedJoinRequestMessage, hostDecisionConfirmationMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
+import { declinedJoinRequestMessage, hostDecisionConfirmationMessage, hostSkipButtonLabel, joinRequestConfirmationMessage, joinRequestStateHeadline, summarizeHostDecision, summarizeHostRequestQueue } from "./join-request-policy";
 
 describe("join request policy copy", () => {
   it("marks the third skip as a quiet decline", () => {
@@ -58,6 +58,29 @@ describe("join request policy copy", () => {
       expect(message).not.toMatch(/\d/);
       expect(message).toContain("private");
     }
+  });
+
+  it("gives one shared, humane sentence-case headline per join state so the feed and event page cannot drift", () => {
+    // This is the SINGLE source of the state wording rendered both by the
+    // event-page join panel (JoinRequestControls) and the /discover feed card
+    // footer, replacing the raw `Request: <enum>` leak
+    // (CX-20260703-discover-card-request-status-raw-enum). The strings are the
+    // exact panel headlines, so the two surfaces stay in lockstep by construction.
+    expect(joinRequestStateHeadline("pending")).toBe("Your request is with the host.");
+    expect(joinRequestStateHeadline("accepted")).toBe("You have a place.");
+    expect(joinRequestStateHeadline("declined")).toBe("Not this game.");
+    expect(joinRequestStateHeadline("cancelled")).toBe("Request cancelled.");
+    for (const status of ["pending", "accepted", "declined", "cancelled"] as const) {
+      const copy = joinRequestStateHeadline(status);
+      // Never the raw enum footer leak, and always a complete sentence-case phrase.
+      expect(copy).not.toBe(`Request: ${status}`);
+      expect(copy).toMatch(/^[A-Z].*\.$/);
+    }
+    // An unknown / future status degrades to a calm generic — never a raw token,
+    // never `undefined`.
+    const unknown = joinRequestStateHeadline("archived");
+    expect(unknown).toBe("You have a request.");
+    expect(unknown).not.toContain("archived");
   });
 
   it("summarizes pending-first host request review", () => {

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
-import { declinedJoinRequestMessage, joinRequestConfirmationMessage } from "@/lib/join-request-policy";
+import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline } from "@/lib/join-request-policy";
 
 type Status = DiscoveryRequest["status"];
 
@@ -209,7 +209,7 @@ export default function JoinRequestControls({
     if (status === "accepted") {
       return (
         <Panel key="accepted" className="join-state accepted">
-          <strong tabIndex={-1} ref={attachConfirmation}>You have a place.</strong>
+          <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("accepted")}</strong>
           <p>The exact meeting point is now visible below.</p>
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel my place"}
@@ -221,7 +221,7 @@ export default function JoinRequestControls({
     if (status === "pending") {
       return (
         <Panel key="pending" className="join-state pending">
-          <strong tabIndex={-1} ref={attachConfirmation}>Your request is with the host.</strong>
+          <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("pending")}</strong>
           <p>You can cancel quietly at any time. Skip counts stay private.</p>
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel request"}
@@ -233,7 +233,7 @@ export default function JoinRequestControls({
     if (status === "declined") {
       return (
         <Panel key="declined" className="join-state closed">
-          <strong tabIndex={-1} ref={attachConfirmation}>Not this game.</strong>
+          <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("declined")}</strong>
           <p>{declinedJoinRequestMessage(request?.skipCount ?? 0)}</p>
         </Panel>
       );
@@ -244,7 +244,7 @@ export default function JoinRequestControls({
       // promise that you can "cancel quietly at any time". Skip counts stay private.
       return (
         <Panel key="cancelled" className="join-state closed">
-          <strong tabIndex={-1} ref={attachConfirmation}>Request cancelled.</strong>
+          <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("cancelled")}</strong>
           <p>No pressure either way. If you change your mind, you can ask again while this game still has room. Skip counts stay private.</p>
           <button
             type="button"

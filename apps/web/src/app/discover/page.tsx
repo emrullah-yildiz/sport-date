@@ -5,6 +5,7 @@ import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscover
 import { applyAdvancedFilters, ALL_RADIUS_OPTIONS_KM, resolveAdvancedFilters, SCHEDULE_WINDOWS } from "@/lib/discovery-advanced-filters";
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPTIONS_KM, resolveDiscoveryCentre } from "@/lib/discovery-geo";
 import { isPlus } from "@/lib/entitlements";
+import { joinRequestStateHeadline } from "@/lib/join-request-policy";
 import PrimaryNav from "@/components/PrimaryNav";
 import SiteFooter from "@/components/SiteFooter";
 import UseMyLocationControl from "@/components/UseMyLocationControl";
@@ -220,7 +221,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
                   <p className="discovery-description">{event.description}</p>
                 </div>
                 <div className="discovery-meta"><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div>
-                <footer><span>{event.request ? `Request: ${event.request.status}` : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer>
+                <footer><span>{event.request ? joinRequestStateHeadline(event.request.status) : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer>
               </article>
             );
           })}</div>

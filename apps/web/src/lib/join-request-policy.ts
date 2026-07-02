@@ -42,6 +42,29 @@ export function summarizeHostDecision(
   };
 }
 
+// Member-facing, sentence-case headline for a join-request state. This is the
+// SINGLE source of the humane wording shared by the event-page join panel
+// (JoinRequestControls) and the /discover feed card footer, so the two surfaces
+// can never drift into different phrasing for the same state — and no member ever
+// reads the raw internal status token
+// (CX-20260703-discover-card-request-status-raw-enum). Pure map; an unknown or
+// future status degrades to a calm, honest generic rather than leaking a database
+// word or `undefined`.
+export function joinRequestStateHeadline(status: JoinRequestStatus | string): string {
+  switch (status) {
+    case "pending":
+      return "Your request is with the host.";
+    case "accepted":
+      return "You have a place.";
+    case "declined":
+      return "Not this game.";
+    case "cancelled":
+      return "Request cancelled.";
+    default:
+      return "You have a request.";
+  }
+}
+
 export function hostSkipButtonLabel(skipCount: number): string {
   if (skipCount >= 2) return `Skip and close (${skipCount}/3)`;
   if (skipCount > 0) return `Skip (${skipCount}/3)`;

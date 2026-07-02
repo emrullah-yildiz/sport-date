@@ -1,6 +1,6 @@
 # CX-20260703-discover-card-request-status-raw-enum
 
-- Status: `ready`
+- Status: `implemented`
 - Priority: `P2` — RICE (5 reach × 0.5 impact × 1.0 confidence) / 0.25 effort = 10.0. High score on a tiny, systemic copy fix.
 - Severity: `low`
 - Customer journey: Browsing the discover feed after having already requested / been declined / cancelled a place on an event.
@@ -75,3 +75,4 @@ Practical: minor — the member still understands roughly what it means. Emotion
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; added shared pure helper `joinRequestStateHeadline(status)` in `lib/join-request-policy.ts` returning the exact humane, sentence-case event-page headlines ("Your request is with the host." / "You have a place." / "Not this game." / "Request cancelled."), with a calm generic fallback ("You have a request.") for any unknown/future enum value so no raw token or `undefined` can leak. The `/discover` card footer (`app/discover/page.tsx:224`) now renders that helper instead of `Request: ${status}`, and `JoinRequestControls` sources its four panel headlines from the same helper so feed and event-page copy cannot drift. Added a unit test for the helper (all four states + raw-enum-leak guard + unknown-value fallback); "View request" CTA, 44px target, and focus ring unchanged. Checks: typecheck OK; lint 0 errors / 2 pre-existing warnings (qa/full-flows.mjs, member-profile.test.ts — not mine); test 736 passed / 12 skipped; production build compiled successfully. Status `implemented`.
