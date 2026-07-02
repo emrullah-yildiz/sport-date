@@ -1,13 +1,13 @@
 # CX-20260701-discover-first-run-arrival-lacks-warm-welcome
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2 medium` — (Reach 5 × Impact 3 × Confidence 4) / Effort 3 = 20. /discover is the home a member returns to every visit; the arrival moment sets the emotional tone for the whole session, but the fix is presentational (copy + a small header layout change) so it is not a blocker. Not below P1 only if it were an accessibility/safety regression — it is neither.
 - Customer journey: discovery (first run + every return visit) — the "arrival / delight" moment
 - Surface: `web` (mobile follow-up; same header component)
 - Environment and viewport/device: dev localhost:3000, Chromium reducedMotion:reduce, 1280 + 375
 - Found by: Experience & Design Explorer (growth track: discover/first-run × delight, 2026-07-01)
-- Implementation owner: `unassigned`
+- Implementation owner: `Experience Build Agent`
 - Related tickets: `CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed` (the *cards* were made scannable — verified; this ticket is the *header/arrival framing* above them), `CX-20260701-empty-states-lack-warmth-and-next-step` (the *empty* discover state; this ticket is the *populated* arrival), `CX-20260701-profile-hero-off-scale-headline-demotes-member-name` (same "make the member the hero, not a marketing sentence" principle, applied on /profile — apply the same lesson here), `CX-20260701-heading-subheading-vertical-rhythm-insufficient-spacing` (spacing rhythm generally; this ticket is the header *content + warmth*, not spacing)
 
 ## Customer outcome
@@ -83,3 +83,4 @@ Every session begins here. A warm, personal, located greeting compounds trust an
 ## Handoff and retest log
 
 - 2026-07-01 - Filed by Experience & Design Explorer (growth track: discover/first-run × delight); status `ready`. Live-grounded on pooled Bucharest member; self-contained (member name + area already on the page, no new data/query needed).
+- 2026-07-02 - Experience Build Agent: picked up, status `in-progress`. Plan: replace the static marketing hero with a warm, personal, located greeting ("Welcome back, {firstName}." + honest near-{area}/everywhere subline) built from pure, unit-testable helpers in `discovery-card.ts`; make the results heading human + located while stating the real count; tighten header spacing to bring the first card closer to the fold. No new data/query, no migration.

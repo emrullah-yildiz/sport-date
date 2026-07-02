@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "./discovery-card";
+import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "./discovery-card";
 
 // These pin the scan-critical presentation rules for the /discover card hierarchy
 // (CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed): the "when" is
@@ -83,6 +83,80 @@ describe("resolveDiscoveryArea", () => {
   it("trims whitespace on both the profile area and a typed city", () => {
     expect(resolveDiscoveryArea("  Bucharest  ", "", false).effectiveCity).toBe("Bucharest");
     expect(resolveDiscoveryArea("Bucharest", "  Berlin  ", false).effectiveCity).toBe("Berlin");
+  });
+});
+
+// Pins the warm arrival greeting (CX-20260701-discover-first-run-arrival-lacks-warm-
+// welcome): the /discover header greets the member by their own first name and orients
+// them to their own approximate area, using only already-available data — no marketing
+// billboard, no precise location, no fabricated traction.
+describe("buildDiscoveryGreeting", () => {
+  it("greets the member by first name and names their own approximate area", () => {
+    expect(buildDiscoveryGreeting("Ana", "Bucharest")).toEqual({
+      heading: "Welcome back, Ana.",
+      subheading: "Here's what's happening near Bucharest.",
+    });
+  });
+
+  it("stays warm and name-less when there is no first name, never an empty slot", () => {
+    expect(buildDiscoveryGreeting("", "Bucharest").heading).toBe("Welcome back.");
+    expect(buildDiscoveryGreeting("   ", "Cluj").heading).toBe("Welcome back.");
+  });
+
+  it("does not imply a location it does not have when the member has no profile area", () => {
+    expect(buildDiscoveryGreeting("Ana", "").subheading).toBe("Here's what's happening in the community.");
+  });
+
+  it("reflects a broadened everywhere search honestly rather than a specific area", () => {
+    expect(buildDiscoveryGreeting("Ana", "Bucharest", { searchEverywhere: true }).subheading).toBe(
+      "Here's what's happening across every area.",
+    );
+  });
+
+  it("trims the first name and area", () => {
+    expect(buildDiscoveryGreeting("  Ana  ", "  Bucharest  ")).toEqual({
+      heading: "Welcome back, Ana.",
+      subheading: "Here's what's happening near Bucharest.",
+    });
+  });
+});
+
+// Pins the human, located results heading: it states the REAL count (no fabricated
+// "people near you", scarcity, or popularity metric) but frames it as located rather
+// than a bare "N invitations".
+describe("describeDiscoveryResultsHeading", () => {
+  it("frames the real count as located when centred on the member's own area", () => {
+    expect(
+      describeDiscoveryResultsHeading({ count: 6, memberArea: "Bucharest", isNearMeDefault: true, searchEverywhere: false }),
+    ).toBe("6 invitations near Bucharest");
+  });
+
+  it("uses the singular noun for a single real invitation", () => {
+    expect(
+      describeDiscoveryResultsHeading({ count: 1, memberArea: "Bucharest", isNearMeDefault: true, searchEverywhere: false }),
+    ).toBe("1 invitation near Bucharest");
+  });
+
+  it("says 'everywhere' honestly when the member broadened the search", () => {
+    expect(
+      describeDiscoveryResultsHeading({ count: 12, memberArea: "Bucharest", isNearMeDefault: false, searchEverywhere: true }),
+    ).toBe("12 invitations everywhere");
+  });
+
+  it("falls back to a plain located-neutral count for a typed city or no area", () => {
+    expect(
+      describeDiscoveryResultsHeading({ count: 4, memberArea: "", isNearMeDefault: false, searchEverywhere: false }),
+    ).toBe("4 invitations");
+    // A typed city (not the near-me default, not everywhere) keeps the honest bare count.
+    expect(
+      describeDiscoveryResultsHeading({ count: 4, memberArea: "Bucharest", isNearMeDefault: false, searchEverywhere: false }),
+    ).toBe("4 invitations");
+  });
+
+  it("never emits a negative or fractional count", () => {
+    expect(
+      describeDiscoveryResultsHeading({ count: -3, memberArea: "Bucharest", isNearMeDefault: true, searchEverywhere: false }),
+    ).toBe("0 invitations near Bucharest");
   });
 });
 

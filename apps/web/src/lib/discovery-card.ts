@@ -86,6 +86,66 @@ export function resolveDiscoveryArea(
   return { effectiveCity: "", isNearMeDefault: false, memberArea };
 }
 
+/**
+ * The warm, personal arrival greeting shown at the top of /discover
+ * (CX-20260701-discover-first-run-arrival-lacks-warm-welcome). The single most
+ * repeated moment in the product should read like an honest host greeting — not the
+ * static pre-signup marketing billboard every member saw before joining.
+ *
+ * Built ONLY from the member's own already-available data: their first name and their
+ * stored approximate profile area (the same area used for the near-me feed). No new
+ * data, no query, no precise member/venue location, and — critically — no fabricated
+ * traction, scarcity, streaks, or popularity metrics. When we have no first name we
+ * fall back to a warm, name-less welcome rather than an awkward empty slot.
+ */
+export type DiscoveryGreeting = Readonly<{
+  /** The h1 greeting, e.g. "Welcome back, Ana." — always a complete, human sentence. */
+  heading: string;
+  /** A calm located/orienting sub-line, e.g. "Here's what's happening near Bucharest." */
+  subheading: string;
+}>;
+
+export function buildDiscoveryGreeting(
+  firstName: string,
+  memberArea: string,
+  options: { searchEverywhere?: boolean } = {},
+): DiscoveryGreeting {
+  const name = (firstName ?? "").trim();
+  const area = (memberArea ?? "").trim();
+  const heading = name ? `Welcome back, ${name}.` : "Welcome back.";
+  // Honest orientation: name the member's own area when we have it and we're centred
+  // on it; when broadened to everywhere, or when we have no area, keep it warm and true
+  // without implying a location we don't have.
+  const subheading = options.searchEverywhere
+    ? "Here's what's happening across every area."
+    : area
+      ? `Here's what's happening near ${area}.`
+      : "Here's what's happening in the community.";
+  return { heading, subheading };
+}
+
+/**
+ * A human, located results heading for the populated feed
+ * (CX-20260701-discover-first-run-arrival-lacks-warm-welcome). It states the REAL
+ * count — no fabricated "people near you", scarcity, or popularity metric — but frames
+ * it as "N open near {area}" / "N open everywhere" rather than a bare "N invitations",
+ * so arriving feels located and for-me. The empty state is owned separately (the warm
+ * near-me-aware empty copy in page.tsx); this only shapes the count >= 1 heading.
+ */
+export function describeDiscoveryResultsHeading(input: {
+  count: number;
+  memberArea: string;
+  isNearMeDefault: boolean;
+  searchEverywhere: boolean;
+}): string {
+  const count = Math.max(0, Math.trunc(input.count));
+  const noun = count === 1 ? "invitation" : "invitations";
+  const area = (input.memberArea ?? "").trim();
+  if (input.isNearMeDefault && area) return `${count} ${noun} near ${area}`;
+  if (input.searchEverywhere) return `${count} ${noun} everywhere`;
+  return `${count} ${noun}`;
+}
+
 export type DiscoveryAvailability = Readonly<{
   /** Short, glanceable label, e.g. "3 places left" / "Last place" / "Fully booked". */
   label: string;

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { describeDiscoveryAvailability, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
+import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
 import PrimaryNav from "@/components/PrimaryNav";
 import SiteFooter from "@/components/SiteFooter";
 import { getDiscoverableEvents, type DiscoveryFilters } from "@/lib/events";
@@ -30,6 +30,10 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   const events = await getDiscoverableEvents(user, filters);
   const hasNarrowingFilters = Boolean(filters.city || filters.sport || filters.language);
   const profileMissingSports = user.sports.length === 0;
+  // Warm, personal, located arrival greeting — built only from the member's own first
+  // name and approximate profile area (no new data/query, no precise location, no
+  // fabricated traction). Replaces the static pre-signup marketing hero.
+  const greeting = buildDiscoveryGreeting(user.firstName, area.memberArea, { searchEverywhere });
 
   return (
     <main className="discover-page">
@@ -38,18 +42,22 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         current="discover"
         action={<Link href="/events/new" className="nav-host-cta" aria-label="Host an event — create a new game">Host an event</Link>}
       />
-      <header className="discover-header"><p className="eyebrow">Events that fit your movement</p><h1>Something real to do. Someone new to meet.</h1><p>Only events compatible with your sports, experience, adult age range, and active blocks appear here.</p></header>
+      <header className="discover-header"><h1>{greeting.heading}</h1><p className="discover-greeting-sub">{greeting.subheading}</p></header>
       {area.isNearMeDefault ? (
         <p className="discover-area-note">
-          <span>Showing events near <strong>{area.memberArea}</strong>, your profile area.</span>
+          <span>You&apos;re seeing events that fit your sports and age range near <strong>{area.memberArea}</strong>, your profile area.</span>
           <Link href="/discover?near=all" className="discover-broaden">Search everywhere</Link>
         </p>
       ) : searchEverywhere && !requestedCity ? (
         <p className="discover-area-note">
-          <span>Showing events everywhere.</span>
+          <span>You&apos;re seeing events that fit your sports and age range, everywhere.</span>
           {area.memberArea ? <Link href="/discover" className="discover-broaden">Back to near {area.memberArea}</Link> : null}
         </p>
-      ) : null}
+      ) : (
+        <p className="discover-area-note">
+          <span>You&apos;re seeing events that fit your sports and age range.</span>
+        </p>
+      )}
       <form className="discover-filters" method="get">
         <label>City<input name="city" defaultValue={requestedCity} placeholder={area.memberArea ? `Near ${area.memberArea}` : "Any city"} title="Leave blank to see events near your profile area" /></label>
         <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any in your profile" title="Defaults to any sport in your profile" /></label>
@@ -59,7 +67,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       </form>
 
       <section className="discovery-results" aria-live="polite">
-        <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : `${events.length} ${events.length === 1 ? "invitation" : "invitations"}`}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
+        <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : describeDiscoveryResultsHeading({ count: events.length, memberArea: area.memberArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
         {events.length === 0 ? (
           <div className="discovery-empty">
             {profileMissingSports ? (
