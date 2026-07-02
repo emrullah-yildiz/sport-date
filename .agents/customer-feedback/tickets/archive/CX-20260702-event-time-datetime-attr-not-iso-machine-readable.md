@@ -1,6 +1,6 @@
 # CX-20260702-event-time-datetime-attr-not-iso-machine-readable
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 5 × Impact 2 × Confidence 5) / Effort 1 = 50 → but this is a presentational/semantics defect with no member-visible breakage and no safety/privacy/authorization floor, so it is held at **P3 polish**. It touches the two scan-critical discovery surfaces (feed + detail) that were just rebuilt, and is a one-line normalization, hence high reach/confidence and tiny effort.
 - Customer journey: discovery → intent (the `<time>` element on the feed card and the shared-invitation detail page)
