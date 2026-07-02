@@ -1,6 +1,6 @@
 # CX-20260630-research-bucharest-georgia-serif-off-system-font
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `low`
 - Priority: `P3 polish` — (Reach 2 × Impact 2 × Confidence 5) / Effort 2 = 10 → P3. Cosmetic brand-consistency only, on the `noindex`, non-collecting Bucharest research microsite (not a launch-critical member surface). No data/safety/a11y/authorization dimension (contrast is fine). Held at P3; note this may fold into the owner brand/type decision (`CX-20260701-owner-decision-brand-name-and-logo`) if the accent serif becomes a brand choice — Builder may action the "bring into the Space Grotesk / Inter system" option now without waiting on the owner.
 - Customer journey: Reading the Bucharest research invitation page (`/research/bucharest`).
@@ -63,3 +63,4 @@ Cosmetic / brand-consistency. No data, safety, or accessibility blocker (contras
 ## Handoff and retest log
 
 - `2026-06-30 19:00 EEST` - Filed by Visual QA; status `ready`.
+- `2026-07-02` - Builder: implemented option (b) — brought the accent into the Space Grotesk / Inter system. Replaced the hardcoded `font-family: Georgia, serif` in `apps/web/src/app/research/bucharest/page.module.css` on `.hero h1 em` (line 46, "in motion?") and `.beliefTurn` (line 76, coral belief line) with `var(--font-display)` (Space Grotesk, the loaded brand display face), keeping the italic accent gesture (added explicit `font-style: italic` to `.hero h1 em`; `.beliefTurn` already had it). No new token — `--font-display` already exists at `:root` in `globals.css` and is wired to next/font on `<html>`. Verified the ACTUAL render via Playwright against `next start`: computed `font-family` on both elements = `"Space Grotesk", system-ui, sans-serif`, `font-style: italic` (no Georgia/serif remains; OS-independent loaded webfont). No horizontal overflow at 375/768/1280 — hero-overflow fix 4bb9dbd not regressed. No test added: font-family in a CSS module has no unit-test seam; coverage is the production build + the computed-style check. Checks: typecheck PASS, lint PASS (0 errors), test PASS (701 passed, incl. ethical-guardrails), `npm run build` PASS (`/research/bucharest` static-prerendered). Commit `df0c183`, pushed to origin/main.

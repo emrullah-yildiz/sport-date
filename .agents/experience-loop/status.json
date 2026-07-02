@@ -1,7 +1,7 @@
-{ "updatedAt":"2026-07-03T01:35:00.000Z","loop":"running","phase":"build+test+use",
-  "note":"Signup single-headline focal point VERIFIED+archived (b4ed7a7). Bucharest research hero overflow SHIPPED (4bb9dbd — clipped .heroVisual, anchored floating cards inside the radar circle, scrollWidth==clientWidth at 375/768/1280, guardrails green). User-sim caught + orchestrator FIXED DIRECTLY a member-profile accuracy bug (6e2dc55 — profile no longer claims 'you share an event' for a still-pending requester; honest relationship discriminant + pure tested label). Chaining: BUILD research-bucharest-georgia-serif-off-system-font; TEST Bucharest hero overflow 4bb9dbd (worktree-isolated); USE user-sim (report-only, re-verify pending-request label live + rotate).",
-  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-03T01:35:00.000Z"},
-  "Planner":{"state":"idle","ticket":"polish queue ~10; no new tickets; fix-directly mode","since":null},
-  "Builder":{"state":"working","ticket":"CX-20260630-research-bucharest-georgia-serif-off-system-font","since":"2026-07-03T01:35:00.000Z"},
-  "Tester":{"state":"working","ticket":"verify 4bb9dbd (Bucharest research hero overflow) — worktree-isolated","since":"2026-07-03T01:35:00.000Z"},
-  "UserSimulator":{"state":"working","ticket":"report-only: re-verify member-profile pending-request label live + rotate","since":"2026-07-03T01:35:00.000Z"} } }
+{ "updatedAt":"2026-07-03T02:05:00.000Z","loop":"running","phase":"build+test+use",
+  "note":"Bucharest research hero overflow VERIFIED+archived (4bb9dbd — measured 0px at 375/768/1280). Bucharest georgia-serif -> Space Grotesk SHIPPED (df0c183 — computed-font confirmed, no overflow regression, 701 tests). User-sim confirmed both live + caught 2 AA fails on the research microsite; orchestrator FIXED DIRECTLY (a0b45c0 — coral card detail line ink 6.13:1, honesty line #5a635b 12px 5.48:1). Member-profile pending-request label (6e2dc55) confirmed at test layer (9/9); live browser check deferred (login 429). Chaining: BUILD mobile-cancel-route-not-resilience-hardened (P3); TEST georgia-serif df0c183 (worktree-isolated); USE user-sim (report-only, re-verify AA fixes + profile label live + rotate).",
+  "agents":{ "Orchestrator":{"state":"working","ticket":"chaining next tick (no idle gap)","since":"2026-07-03T02:05:00.000Z"},
+  "Planner":{"state":"idle","ticket":"polish queue ~8 (mostly P3); no new tickets; fix-directly mode","since":null},
+  "Builder":{"state":"working","ticket":"CX-20260702-mobile-cancel-route-not-resilience-hardened","since":"2026-07-03T02:05:00.000Z"},
+  "Tester":{"state":"working","ticket":"verify df0c183 (Bucharest georgia-serif -> Space Grotesk) — worktree-isolated","since":"2026-07-03T02:05:00.000Z"},
+  "UserSimulator":{"state":"working","ticket":"report-only: re-verify AA fixes + member-profile label live + rotate","since":"2026-07-03T02:05:00.000Z"} } }
