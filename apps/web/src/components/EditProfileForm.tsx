@@ -2,7 +2,8 @@
 
 import type { PersonalityPrompt, RegistrationSport, Seeking, SportFrequency, SportSkillLevel } from "@sport-date/domain";
 import { MAX_PERSONALITY_PROMPTS, PERSONALITY_PROMPT_ANSWER_MAX, PERSONALITY_PROMPT_QUESTIONS } from "@sport-date/domain";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 type EditableProfile = {
   firstName: string;
@@ -15,15 +16,57 @@ type EditableProfile = {
   prompts: readonly PersonalityPrompt[];
 };
 
+// The persistent, focusable success confirmation. Extracted so its
+// accessibility contract (polite live region that survives a save + a keyboard
+// focus target so focus lands here, never <body>) is directly server-renderable
+// and unit-tested, mirroring the verified FeedbackConfirmation pattern. The
+// container passes its attachConfirmation callback ref, which moves focus here
+// the moment it mounts after a successful save.
+export function EditProfileConfirmation({
+  message = "Profile updated.",
+  attach,
+}: {
+  message?: string;
+  attach?: (node: HTMLParagraphElement | null) => void;
+}) {
+  return (
+    <p className="edit-profile-status" role="status" aria-live="polite" tabIndex={-1} ref={attach}>
+      {message}
+    </p>
+  );
+}
+
 export default function EditProfileForm({ profile }: { profile: EditableProfile }) {
+  const router = useRouter();
   const [fields, setFields] = useState({
     ...profile,
     languagesText: profile.languages.join(", "),
     sports: profile.sports.map((sport) => ({ ...sport })),
     prompts: profile.prompts.map((prompt) => ({ ...prompt })),
   });
-  const [message, setMessage] = useState("");
+  // Success and failure are separate live regions: a persistent, focusable
+  // role="status" confirmation on save, and a role="alert" for a failed save —
+  // so the confirmation is never overwritten or torn down before assistive tech
+  // reads it (CX-20260702; mirrors the verified JoinRequestControls fix).
+  const [confirmation, setConfirmation] = useState("");
+  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  // A ref (not state) so consuming it never triggers a render: set true only
+  // when a save resolves in this session, so we move focus to the fresh
+  // confirmation heading (never leaving keyboard / screen-reader focus on
+  // <body>, as the old full-document reload did). A plain re-render never
+  // sets it, so we do not steal focus otherwise.
+  const focusOnConfirmRef = useRef(false);
+
+  // Callback ref: fires when the confirmation actually attaches to the DOM.
+  // Focusing here (rather than in an effect) reliably lands focus on the freshly
+  // mounted confirmation the moment it appears after a successful save.
+  function attachConfirmation(node: HTMLParagraphElement | null) {
+    if (node && focusOnConfirmRef.current) {
+      focusOnConfirmRef.current = false;
+      node.focus();
+    }
+  }
 
   const usedPrompts = new Set(fields.prompts.map((prompt) => prompt.prompt));
   const availablePrompts = PERSONALITY_PROMPT_QUESTIONS.filter((prompt) => !usedPrompts.has(prompt));
@@ -55,7 +98,8 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setMessage("");
+    setError("");
+    setConfirmation("");
     try {
       const response = await fetch("/api/account/profile", {
         method: "PATCH",
@@ -69,10 +113,17 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Profile update failed.");
-      setMessage("Profile updated.");
-      window.location.reload();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Profile update failed.");
+      // Resolve in place — no full-document reload. router.refresh() re-fetches
+      // the server-rendered profile (intro/bio, languages, sports, prompts,
+      // seeking) so every rendered section reflects the saved values, while this
+      // component's local state and browser scroll are preserved and the calm
+      // confirmation below survives to be announced.
+      setConfirmation("Profile updated.");
+      focusOnConfirmRef.current = true;
+      setSaving(false);
+      router.refresh();
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Profile update failed.");
       setSaving(false);
     }
   }
@@ -115,7 +166,8 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
           ))}
           <button className="add-sport" type="button" disabled={fields.prompts.length >= MAX_PERSONALITY_PROMPTS || availablePrompts.length === 0} onClick={addPrompt}>Add a prompt</button>
         </fieldset>
-        {message ? <p role="status">{message}</p> : null}
+        {confirmation ? <EditProfileConfirmation message={confirmation} attach={attachConfirmation} /> : null}
+        {error ? <p className="error-message" role="alert">{error}</p> : null}
         <button className="privacy-action" type="submit" disabled={saving}>{saving ? "Saving…" : "Save profile"}</button>
       </form>
     </details>
