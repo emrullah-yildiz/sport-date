@@ -1,6 +1,6 @@
 # CX-20260703-signup-password-strength-fill-invisible
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — RICE (9 × 1.4 × 0.95) / 0.4 = 30. Reach 9 (every new member who types a password on signup step 1 sees the meter render), Impact 1.4 (a broken feedback element: the bar never fills, so the only working signal is the text word — mild confusion + an unfinished feel at a trust moment), Confidence 0.95 (the missing `background` is confirmed in CSS; nothing else colors the element), Effort 0.4 (one CSS declaration; optional strength-keyed color a few more). Not safety/privacy/auth-gated.
 - Customer journey: Signing up — a first-time member sets a password on step 1 of the 5-step wizard and looks at the strength meter.
@@ -78,3 +78,4 @@ Cosmetic + comprehension: a broken-looking meter at a trust-sensitive moment (se
 ## Handoff and retest log
 
 - 2026-07-03 - Filed by Explorer discovery pass; status `ready`.
+- 2026-07-03 - Implemented by Build agent; gave `.strength-fill` a single on-brand `background: var(--accent)` (green ~7.3:1 vs the `--surface-raised` track — well past AA for a UI element) so the bar now fills proportionally to the inline width; color reinforces but is not the sole signal (the `.strength-text` word stays). Added `@media (prefers-reduced-motion: reduce) { .strength-fill { transition: none; } }` guard, matching sibling motion rules. No JSX/class changes (strength is inline width only; no per-level class, so single fill per ticket guidance — no rating/gamified semantics). Checks: typecheck ✓, lint ✓ (0 errors; only the 2 pre-existing warnings in qa/full-flows.mjs + member-profile.test.ts), test ✓ (755 passed / 12 skipped), production build ✓. Not driven in a live dev server this pass. status `implemented`.

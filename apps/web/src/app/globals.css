@@ -480,7 +480,13 @@ a.logo:hover { color: var(--text); }
 
 .strength-bar { height: 4px; background: var(--surface-raised); border-radius: 2px; overflow: hidden; }
 
-.strength-fill { height: 100%; transition: width 300ms ease; }
+/* Visible on-brand fill so the bar actually reads as filled proportionally to
+   strength (width is set inline, 0–100%). --accent on --surface-raised is ~7.3:1,
+   well past AA for a UI element. Color reinforces — it is not the sole signal:
+   the .strength-text word ("Very weak"…"Strong") always carries the meaning. */
+.strength-fill { height: 100%; background: var(--accent); transition: width 300ms ease; }
+
+@media (prefers-reduced-motion: reduce) { .strength-fill { transition: none; } }
 
 .strength-text { margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
 
