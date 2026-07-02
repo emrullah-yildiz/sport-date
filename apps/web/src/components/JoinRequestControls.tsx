@@ -3,12 +3,18 @@
 import type { DiscoveryRequest } from "@/lib/events";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
 import { declinedJoinRequestMessage, joinRequestConfirmationMessage } from "@/lib/join-request-policy";
 
 type Status = DiscoveryRequest["status"];
+
+// A no-op store subscription: `mounted` never changes after the first client
+// render (false → true at hydration), so there is nothing to subscribe to.
+function subscribeNoop() {
+  return () => {};
+}
 
 // Private, member-only reliability standing. Never rendered for hosts or other
 // members — this component is on the member's own discovery view.
@@ -31,6 +37,12 @@ export default function JoinRequestControls({
 }) {
   const router = useRouter();
   const reducedMotion = useReducedMotion();
+  // false on the server and on the first client paint, true only after
+  // hydration. Gating the framer-motion wrapper on this makes the SSR HTML and
+  // the first client render byte-identical (see `Panel` below). Implemented with
+  // useSyncExternalStore — its server snapshot is false and its client snapshot
+  // is true — so the mismatch-free first render needs no setState-in-effect.
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [introduction, setIntroduction] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -74,6 +86,30 @@ export default function JoinRequestControls({
         exit: { opacity: 0, y: -8 },
         transition: { duration: 0.28, ease: "easeOut" as const },
       };
+
+  // Progressive enhancement to avoid a React hydration mismatch
+  // (CX-20260702-join-controls-reduced-motion-hydration-mismatch): a
+  // framer-motion `motion.div` serializes its resolved inline style differently
+  // on the server vs the client (e.g. the server emits `transform:none` that the
+  // client's post-mount render omits), which React "won't patch up". Before
+  // hydration (`mounted === false` — the server pass and the first client paint)
+  // we render each panel as a plain `<div>` with NO motion props and NO inline
+  // opacity/transform, so both passes are byte-identical in every motion
+  // setting. After mount we swap in the `motion.div` so the calm reveal still
+  // plays client-side only on subsequent state changes. AnimatePresence's
+  // `initial={false}` means the first mounted panel does not animate its
+  // entrance, so nothing visibly changes at hydration — only later in-place
+  // resolutions (request → pending/accepted/cancelled) get the gentle swap.
+  function Panel({ className, role, children }: { className: string; role?: string; children: ReactNode }) {
+    if (!mounted) {
+      return <div className={className} role={role}>{children}</div>;
+    }
+    return (
+      <motion.div className={className} role={role} {...panelMotion}>
+        {children}
+      </motion.div>
+    );
+  }
 
   async function createRequest() {
     setSubmitting(true);
@@ -163,43 +199,43 @@ export default function JoinRequestControls({
     if (pausedBody && status === null) {
       const liftLabel = formatLiftTime(pausedLiftsAt);
       return (
-        <motion.div key="paused" className="join-state reliability-paused" role="status" {...panelMotion}>
+        <Panel key="paused" className="join-state reliability-paused" role="status">
           <strong tabIndex={-1} ref={attachConfirmation}>New requests are paused for a short while.</strong>
           <p>{pausedBody}</p>
           {liftLabel ? <p className="reliability-lift">New requests reopen automatically on {liftLabel}.</p> : null}
-        </motion.div>
+        </Panel>
       );
     }
     if (status === "accepted") {
       return (
-        <motion.div key="accepted" className="join-state accepted" {...panelMotion}>
+        <Panel key="accepted" className="join-state accepted">
           <strong tabIndex={-1} ref={attachConfirmation}>You have a place.</strong>
           <p>The exact meeting point is now visible below.</p>
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel my place"}
           </button>
           {error ? <p className="error-message" role="alert">{error}</p> : null}
-        </motion.div>
+        </Panel>
       );
     }
     if (status === "pending") {
       return (
-        <motion.div key="pending" className="join-state pending" {...panelMotion}>
+        <Panel key="pending" className="join-state pending">
           <strong tabIndex={-1} ref={attachConfirmation}>Your request is with the host.</strong>
           <p>You can cancel quietly at any time. Skip counts stay private.</p>
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel request"}
           </button>
           {error ? <p className="error-message" role="alert">{error}</p> : null}
-        </motion.div>
+        </Panel>
       );
     }
     if (status === "declined") {
       return (
-        <motion.div key="declined" className="join-state closed" {...panelMotion}>
+        <Panel key="declined" className="join-state closed">
           <strong tabIndex={-1} ref={attachConfirmation}>Not this game.</strong>
           <p>{declinedJoinRequestMessage(request?.skipCount ?? 0)}</p>
-        </motion.div>
+        </Panel>
       );
     }
     if (status === "cancelled") {
@@ -207,7 +243,7 @@ export default function JoinRequestControls({
       // never a dead end. The join form returns on request, matching the pending
       // promise that you can "cancel quietly at any time". Skip counts stay private.
       return (
-        <motion.div key="cancelled" className="join-state closed" {...panelMotion}>
+        <Panel key="cancelled" className="join-state closed">
           <strong tabIndex={-1} ref={attachConfirmation}>Request cancelled.</strong>
           <p>No pressure either way. If you change your mind, you can ask again while this game still has room. Skip counts stay private.</p>
           <button
@@ -223,11 +259,11 @@ export default function JoinRequestControls({
           >
             Request a place again
           </button>
-        </motion.div>
+        </Panel>
       );
     }
     return (
-      <motion.div key="request" className="join-request-box" {...panelMotion}>
+      <Panel key="request" className="join-request-box">
         {reliability?.tone === "warning" && !pausedBody ? (
           <p className="reliability-warning" role="status">{reliability.body}</p>
         ) : null}
@@ -251,7 +287,7 @@ export default function JoinRequestControls({
           </button>
         </div>
         {error ? <p className="error-message" role="alert">{error}</p> : null}
-      </motion.div>
+      </Panel>
     );
   }
 
