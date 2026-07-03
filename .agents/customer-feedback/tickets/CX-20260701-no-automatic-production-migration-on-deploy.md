@@ -1,6 +1,6 @@
 # CX-20260701-no-automatic-production-migration-on-deploy
 
-- Status: `blocked-owner`
+- Status: `implemented`
 - Severity: `critical`
 - Priority: `P0` — this gap caused a full production outage on 2026-07-01 (every page 500'd with `column users.personality_prompts does not exist`). Root-cause infra fix.
 - Customer journey: (whole product / reliability)
@@ -41,3 +41,4 @@ Interim guardrail (buildable now, no secret): a CI/preflight check that FAILS th
 ## Handoff and retest log
 
 - 2026-07-01 - Filed after the prod outage; `blocked-owner` because the fix needs the owner to provide the production DB credential to the deploy/CI env and choose the approach. The agent-side lessons (prod build in definition-of-done; explorer "Release & deploy safety" lens) were applied immediately in the agent definitions.
+- 2026-07-03 - Owner unblocked: chose **Option 1 (Vercel build-step)** and confirmed the production DB credential is present. Implemented by orchestrator. `apps/web/vercel.json` `buildCommand` now runs `node scripts/deploy-migrate.mjs && next build`; `deploy-migrate.mjs` uses the pure `planDeployMigration({vercelEnv,hasDatabaseUrl})` in `scripts/migrations.mjs` (extracted from the proven `migrate.mjs` logic; `runMigrations()` shared by the CLI and the deploy path). Behaviour: production+DATABASE_URL → run migrations then build (idempotent, no-op when current); production+no DB → **fail closed / block the deploy** so the last good deployment keeps serving; preview/development → skip. Credential = the EXISTING Vercel **Production** `DATABASE_URL` (verified host `ep-round-rain-...pooler`, i.e. prod) — available at build time, never committed; no new secret added. Verified locally: typecheck/lint pass; `scripts/migrations.test.mjs` (4 cases) proves the run/block/skip decision; full suite 769 tests pass; `npx vercel build --prod` ran the exact production build command end-to-end and logged `[deploy-migrate] production database migrated before build — 0 new migration(s) applied (prod already current)` then `next build` compiled — proving the mechanism reaches prod and no-ops. Runbook §2 updated with an "Automatic on every production deploy" subsection. Pending: confirm the first REAL Vercel deploy runs the build-step migrate and promotes healthy, then → `verified`.

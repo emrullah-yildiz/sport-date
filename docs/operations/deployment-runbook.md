@@ -89,6 +89,38 @@ Migrations live in `apps/web/db/NNN_*.sql` and are applied by
 DATABASE_URL="postgres://…(prod)…" npm run db:migrate -w @sport-date/web
 ```
 
+### Automatic on every production deploy (CX-20260701)
+
+Production migrations run **as part of the Vercel build, before `next build`**, so
+a deploy can never serve code that reads a column/table prod hasn't migrated yet
+(the 2026-07-01 outage). This is wired in `apps/web/vercel.json`:
+
+```
+"buildCommand": "node scripts/deploy-migrate.mjs && next build"
+```
+
+- `apps/web/scripts/deploy-migrate.mjs` decides what to do via the pure
+  `planDeployMigration({ vercelEnv, hasDatabaseUrl })` in `scripts/migrations.mjs`
+  (unit-tested in `scripts/migrations.test.mjs`):
+  - **production** with `DATABASE_URL` present → **runs** pending migrations, then
+    builds. Idempotent (`schema_migrations`), so a deploy with no new migration is
+    a no-op.
+  - **production** with **no** reachable `DATABASE_URL` → **fails the build (exit
+    1)**, i.e. the deploy is **blocked** and the last good deployment keeps
+    serving. A migration that throws also blocks the build for the same reason.
+  - **preview / development** → **skips** entirely (never touches a database).
+- **Credential:** reuses the existing Vercel **Production** `DATABASE_URL` env var
+  (available at build time). Never committed; set only in Vercel → Settings → Env
+  Vars → Production. To rotate, see §4.
+- **The Neon HTTP driver (`neon()`) is used**, so the `-pooler` connection string
+  is fine here (no persistent TCP pool); the `schema_migrations` guard makes
+  concurrent builds safe.
+- **Verify a no-op:** a deploy that adds no migration logs
+  `[deploy-migrate] … 0 new migration(s) applied (0 means prod was already
+  current).` A deploy that adds one logs `Applied database migration NNN_*.sql`.
+- The manual command below remains the fallback (e.g. applying a migration out of
+  band, or against a Neon branch).
+
 - The runner creates a `schema_migrations` table and applies each unapplied file
   in lexical order, recording its name — it is **idempotent**; re-running applies
   only new files.
