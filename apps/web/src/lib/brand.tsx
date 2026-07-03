@@ -39,6 +39,13 @@ export const BRAND_NAME = "KeepItUp" as const;
 /** Short brand promise / tagline. */
 export const BRAND_TAGLINE = "Meet through movement" as const;
 
+/**
+ * Member-facing support / contact email (forwards to the owner inbox). Single
+ * source of truth — surfaced in the footer and legal pages, and the intended
+ * from/reply-to once transactional email delivery is enabled.
+ */
+export const SUPPORT_EMAIL = "support@keepitup.social" as const;
+
 /** Default metadata title (name + tagline). */
 export const BRAND_TITLE = `${BRAND_NAME} — ${BRAND_TAGLINE}` as const;
 

@@ -403,6 +403,8 @@ a.logo:hover { color: var(--text); }
 .site-footer-brand { display: grid; gap: 6px; }
 .site-footer-brand .logo { color: var(--text); }
 .site-footer-brand p { margin: 0; font-size: var(--fs-small); }
+.site-footer-contact a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-info); font-weight: 700; }
+.site-footer-contact a:hover { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 .site-footer-legal { display: grid; gap: 10px; }
 .site-footer-legal-label { margin: 0; color: var(--text-muted); font-size: var(--fs-label); font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
 .site-footer-legal ul { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 0; padding: 0; list-style: none; }

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { BRAND_NAME } from "@/lib/brand";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Terms Preview",
@@ -61,6 +61,9 @@ export default function TermsPage() {
       <section className="legal-disclaimer">
         <p>
           Read the current <Link href="/trust">Trust preview</Link>, <Link href="/privacy">Privacy Notice preview</Link>, and the <Link href="/safety#guidelines">safety guidance</Link> alongside this page.
+        </p>
+        <p>
+          Questions about these terms? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
         </p>
       </section>
     </main>

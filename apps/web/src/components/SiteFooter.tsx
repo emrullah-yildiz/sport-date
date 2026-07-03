@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Wordmark } from "@/lib/brand";
+import { SUPPORT_EMAIL, Wordmark } from "@/lib/brand";
 
 /**
  * Shared member-surface footer. This is the single compact home for the
@@ -26,6 +26,9 @@ export default function SiteFooter() {
         <div className="site-footer-brand">
           <Wordmark variant="footer" />
           <p>Meet through movement. Adults only · Europe first.</p>
+          <p className="site-footer-contact">
+            Questions? <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+          </p>
         </div>
         <nav className="site-footer-legal" aria-labelledby="site-footer-legal-label">
           <p className="site-footer-legal-label" id="site-footer-legal-label">Legal &amp; trust</p>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { BRAND_NAME } from "@/lib/brand";
+import { BRAND_NAME, SUPPORT_EMAIL } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Privacy Notice Preview",
@@ -66,6 +66,9 @@ export default function PrivacyPage() {
         </p>
         <p>
           For current product behavior, also read the <Link href="/trust">Trust preview</Link>, <Link href="/terms">Terms preview</Link>, and the <Link href="/safety#guidelines">safety guidance</Link>.
+        </p>
+        <p>
+          Privacy questions or a data-rights request? Email <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
         </p>
       </section>
     </main>
