@@ -51,3 +51,10 @@ Every time/format in it is a **hypothesis**, listed below. Do not treat any as p
 
 - _2026-07-04_ — Cold start; no prunes yet. Shipped batch 02 to generate baseline data.
   Next review target: ~2 weeks after first posts go live.
+- _2026-07-04_ — **Started without video** (owner). Video posts (P1/P2/P4/P6/P8) paused as
+  `awaiting-asset` pending the AI-video tool. Produced + auto-scheduled the two IMAGE posts:
+  P5 comment-to-win (Buffer `6a4846fb9dd66bf2fd48d9db`, 07-04 06:00 Bucharest) and P3 meme
+  (Buffer `6a4847079dd66bf2fd48da44`, 07-04 22:15 Bucharest). Both Instagram, auto-publish.
+  These two are the first live datapoints — measure follows/saves/shares/comments once out.
+  Queue now thin on approved image content → next autopilot cycle should replenish with more
+  no-video formats (carousels, quote cards, photo-mode) for owner approval.
