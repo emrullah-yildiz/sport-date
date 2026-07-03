@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <text x="540" y="200" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="#F1F5F3">Here for whatever</text>
+  <text x="540" y="278" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="#F1F5F3">you're here for.</text>
+  <!-- three equal cards, deliberately same size (no ranking) -->
+  <rect x="60"  y="430" width="300" height="300" rx="28" fill="none" stroke="#3BEA7E" stroke-width="3"/>
+  <rect x="390" y="430" width="300" height="300" rx="28" fill="none" stroke="#3BEA7E" stroke-width="3"/>
+  <rect x="720" y="430" width="300" height="300" rx="28" fill="none" stroke="#3BEA7E" stroke-width="3"/>
+  <text x="210" y="598" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="800" fill="#F1F5F3">A date</text>
+  <text x="540" y="598" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="800" fill="#F1F5F3">A friend</text>
+  <text x="870" y="598" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="800" fill="#F1F5F3">A good game</text>
+  <text x="540" y="850" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" fill="#F1F5F3">You say which. <tspan fill="#3BEA7E">No ranking, no pressure.</tspan></text>
+  <text x="540" y="1020" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#3BEA7E">keepitup.social</text>
+</svg>

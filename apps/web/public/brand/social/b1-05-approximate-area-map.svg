@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <text x="540" y="150" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="800" fill="#F1F5F3">We hide the exact meeting</text>
+  <text x="540" y="222" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="800" fill="#F1F5F3">point <tspan fill="#3BEA7E">on purpose.</tspan></text>
+  <!-- map viewport -->
+  <defs>
+    <clipPath id="v"><rect x="140" y="300" width="800" height="480" rx="28"/></clipPath>
+  </defs>
+  <rect x="140" y="300" width="800" height="480" rx="28" fill="#242B31"/>
+  <g clip-path="url(#v)" stroke="#3A444B" stroke-width="3">
+    <line x1="140" y1="380" x2="940" y2="380"/>
+    <line x1="140" y1="470" x2="940" y2="470"/>
+    <line x1="140" y1="560" x2="940" y2="560"/>
+    <line x1="140" y1="650" x2="940" y2="650"/>
+    <line x1="140" y1="730" x2="940" y2="730"/>
+    <line x1="240" y1="300" x2="240" y2="780"/>
+    <line x1="360" y1="300" x2="360" y2="780"/>
+    <line x1="480" y1="300" x2="480" y2="780"/>
+    <line x1="600" y1="300" x2="600" y2="780"/>
+    <line x1="720" y1="300" x2="720" y2="780"/>
+    <line x1="840" y1="300" x2="840" y2="780"/>
+  </g>
+  <g clip-path="url(#v)">
+    <line x1="140" y1="560" x2="940" y2="560" stroke="#4A555C" stroke-width="7"/>
+    <line x1="480" y1="300" x2="480" y2="780" stroke="#4A555C" stroke-width="7"/>
+    <circle cx="540" cy="540" r="150" fill="#3BEA7E" fill-opacity="0.16" stroke="#3BEA7E" stroke-width="3" stroke-dasharray="10 10"/>
+  </g>
+  <rect x="140" y="300" width="800" height="480" rx="28" fill="none" stroke="#3A444B" stroke-width="3"/>
+  <text x="540" y="855" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#8A9BA0">During discovery you see an approximate area —</text>
+  <text x="540" y="898" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#8A9BA0">never a pin, never someone's address.</text>
+  <text x="540" y="1020" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#3BEA7E">keepitup.social</text>
+</svg>
