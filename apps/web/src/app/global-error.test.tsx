@@ -18,9 +18,9 @@ describe("GlobalErrorFallback", () => {
     expect(html).toMatch(/<body/);
   });
 
-  it("shows the Rally wordmark and calm, honest reassurance copy", () => {
+  it("shows the KeepItUp wordmark and calm, honest reassurance copy", () => {
     const html = render();
-    expect(html).toContain("Rally");
+    expect(html).toContain("KeepItUp");
     expect(html).toContain("Something went wrong on our end");
     expect(html).toContain("Your account is safe");
     // Honest: no false "we've been notified" / manufactured urgency.

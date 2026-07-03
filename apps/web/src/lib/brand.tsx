@@ -1,13 +1,13 @@
 // Single source of truth for the product brand (name + logo/wordmark).
 //
-// The product is named **Rally** (owner-delegated rename from "Sport Date",
+// The product is named **KeepItUp** (owner-delegated rename from "Sport Date",
 // decision recorded in `CX-20260702-rebrand-to-rally-name-and-neon-logo`).
 // Everything member-facing — page navs, metadata titles, the landing hero,
 // auth email copy, error/404 chrome, and the favicon/app icon — reads its name
 // and mark from HERE, so a future rebrand is a single edit.
 //
 // The logo is a static "motion mark": a compact rally-arc glyph in the neon
-// green accent (`--accent`, #3BEA7E) beside a bold "Rally" wordmark in the
+// green accent (`--accent`, #3BEA7E) beside a bold "KeepItUp" wordmark in the
 // primary text color (`--text`) on the anthracite theme. It is static by
 // construction, so it is inherently reduced-motion safe.
 //
@@ -34,7 +34,7 @@
 import type { CSSProperties } from "react";
 
 /** The product name shown to members everywhere. Change this to rename. */
-export const BRAND_NAME = "Rally" as const;
+export const BRAND_NAME = "KeepItUp" as const;
 
 /** Short brand promise / tagline. */
 export const BRAND_TAGLINE = "Meet through movement" as const;
@@ -44,7 +44,7 @@ export const BRAND_TITLE = `${BRAND_NAME} — ${BRAND_TAGLINE}` as const;
 
 /**
  * Compose a page `<title>` from a member-facing page label, e.g.
- * `brandTitle("Discover events")` → "Discover events — Rally".
+ * `brandTitle("Discover events")` → "Discover events — KeepItUp".
  */
 export function brandTitle(pageLabel: string): string {
   return `${pageLabel} — ${BRAND_NAME}`;

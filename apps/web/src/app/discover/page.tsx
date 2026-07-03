@@ -165,7 +165,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       </form>
       {plus ? null : (
         <p className="discover-plus-note">
-          Rally Plus adds finer distance bands, a schedule filter, and multi-language discovery. Your discovery here is already complete without it — these are just extra ways to narrow the search.{" "}
+          KeepItUp Plus adds finer distance bands, a schedule filter, and multi-language discovery. Your discovery here is already complete without it — these are just extra ways to narrow the search.{" "}
           <Link href="/profile" className="discover-plus-link">See what Plus adds</Link>
         </p>
       )}

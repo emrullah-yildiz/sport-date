@@ -53,8 +53,8 @@ describe("EmailVerificationConfirmCard pending + synchronous states", () => {
     expect(html).toMatch(POLITE_LIVE_REGION);
     expect(html).toMatch(/<h1[^>]*>Verification link invalid<\/h1>/);
     // Anti-enumeration: generic format copy, no account/email existence signal.
-    // (renderToStaticMarkup HTML-escapes the apostrophe in "Rally's".)
-    expect(html).toMatch(/does not match Rally(&#x27;|')s expected secure format/);
+    // (renderToStaticMarkup HTML-escapes the apostrophe in "KeepItUp's".)
+    expect(html).toMatch(/does not match KeepItUp(&#x27;|')s expected secure format/);
     expect(html).not.toMatch(/account exists|no account|already registered|not registered/i);
     expect(html).toMatch(/aria-busy="false"/);
   });

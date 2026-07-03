@@ -26,15 +26,15 @@ import {
 
 describe("brand module — the single source of truth", () => {
   it("exports the current (unchanged) brand identity", () => {
-    // The ticket performs NO rename: assert the centralized values are exactly
-    // today's brand so a refactor can't silently alter what members see.
-    expect(BRAND_NAME).toBe("Rally");
+    // Post KeepItUp rename: assert the centralized values are exactly today's
+    // brand so a refactor can't silently alter what members see.
+    expect(BRAND_NAME).toBe("KeepItUp");
     expect(BRAND_TAGLINE).toBe("Meet through movement");
-    expect(BRAND_TITLE).toBe("Rally — Meet through movement");
+    expect(BRAND_TITLE).toBe("KeepItUp — Meet through movement");
   });
 
   it("derives every page title from the one name via brandTitle()", () => {
-    expect(brandTitle("Discover events")).toBe("Discover events — Rally");
+    expect(brandTitle("Discover events")).toBe("Discover events — KeepItUp");
     // Whatever the name is, the composed title ends in it — not a hard-coded string.
     expect(brandTitle("X").endsWith(`— ${BRAND_NAME}`)).toBe(true);
   });

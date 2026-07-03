@@ -4,7 +4,7 @@
      in sync with RALLY_GLYPH_PATHS / BRAND_ACCENT / BRAND_BG / BRAND_NAME in
      src/lib/brand.tsx — the "HOW TO SWAP THE BRAND" note there is the source of
      truth. brand.test.tsx fails if this file drifts. -->
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Rally">
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="KeepItUp">
   <rect width="32" height="32" rx="8" fill="#20262B"/>
   <path d="M5 24 C 11 8, 21 8, 27 20" stroke="#3BEA7E" stroke-width="3.5" stroke-linecap="round" fill="none"/>
   <path d="M27 20 C 24 26, 19 27, 14 25" stroke="#3BEA7E" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>

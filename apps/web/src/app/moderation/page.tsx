@@ -14,7 +14,7 @@ export default async function ModerationQueuePage() {
   return (
     <main className="moderation-page">
       <nav className="profile-nav">
-        <Link href="/landing" className="logo" aria-label="Rally home"><Wordmark decorative /></Link>
+        <Link href="/landing" className="logo" aria-label="KeepItUp home"><Wordmark decorative /></Link>
         <Link href="/profile">Leave staff area</Link>
       </nav>
       <header className="moderation-header">

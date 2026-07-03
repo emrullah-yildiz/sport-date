@@ -32,7 +32,7 @@ describe("auth email content", () => {
     });
 
     expect(draft.kind).toBe("email_verification");
-    expect(draft.subject).toBe("Verify your Rally email");
+    expect(draft.subject).toBe("Verify your KeepItUp email");
     expect(draft.actionUrl).toBe("https://sportdate.example/verify-email?token=sdv_example");
     expect(draft.text).toContain("ignore this email");
     expect(draft.text).not.toContain("identity verification");
@@ -48,7 +48,7 @@ describe("auth email content", () => {
     });
 
     expect(draft.kind).toBe("password_reset");
-    expect(draft.subject).toBe("Reset your Rally password");
+    expect(draft.subject).toBe("Reset your KeepItUp password");
     expect(draft.actionUrl).toBe("https://sportdate.example/reset-password?token=sdp_example");
     expect(draft.text).toContain("Nothing changes unless you complete the reset form");
     expect(draft.html).toContain("Choose a new password");

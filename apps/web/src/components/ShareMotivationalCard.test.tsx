@@ -32,7 +32,7 @@ describe("ShareMotivationalCard — accessible, member-initiated, humane", () =>
     const html = renderToStaticMarkup(<ShareMotivationalCard seed={0} />);
     expect(html).toMatch(/<button[^>]*type="button"/);
     expect(html).toMatch(/class="share-card-button"/);
-    expect(html).toMatch(/aria-label="Create and share a Rally motivational card"/);
+    expect(html).toMatch(/aria-label="Create and share a KeepItUp motivational card"/);
   });
 
   it("exposes a polite live status region for the share result", () => {
