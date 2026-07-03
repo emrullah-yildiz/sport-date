@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="460" viewBox="0 0 1500 460">
+  <rect width="1500" height="460" fill="#20262B"/>
+  <g transform="translate(80,73) scale(9)">
+  <path d="M5 24 C 11 8, 21 8, 27 20" stroke="#3BEA7E" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M27 20 C 24 26, 19 27, 14 25" stroke="#3BEA7E" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <circle cx="27" cy="10" r="3.4" fill="#3BEA7E"/></g>
+  <text x="400" y="298" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="185" font-weight="800" letter-spacing="-6" fill="#F1F5F3">KeepItUp</text>
+</svg>
