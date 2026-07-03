@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <!-- top panel -->
+  <text x="80" y="150" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="4" fill="#3BEA7E">MY THUMB</text>
+  <text x="80" y="270" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#F1F5F3">after 400 swipes</text>
+  <text x="80" y="372" font-family="Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#F1F5F3">and <tspan fill="#3BEA7E">0 dates.</tspan></text>
+  <!-- divider + VS -->
+  <line x1="80" y1="540" x2="1000" y2="540" stroke="#3A444B" stroke-width="3"/>
+  <circle cx="540" cy="540" r="54" fill="#3BEA7E"/>
+  <text x="540" y="556" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="800" fill="#20262B">VS</text>
+  <!-- bottom panel -->
+  <text x="80" y="700" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="4" fill="#3BEA7E">MY LEGS</text>
+  <text x="80" y="820" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" fill="#F1F5F3">after one padel game</text>
+  <text x="80" y="912" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" fill="#F1F5F3">and <tspan fill="#3BEA7E">3 new friends.</tspan></text>
+  <!-- footer -->
+  <text x="80" y="1015" font-family="Arial, Helvetica, sans-serif" font-size="30" font-style="italic" fill="#8A9BA0">one of these is cardio.</text>
+  <text x="1000" y="1015" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#3BEA7E">keepitup.social</text>
+</svg>

@@ -60,6 +60,23 @@ Seeding bias: while the backlog is thin, weight ticks toward the Planner + User-
 to build a rich prioritized backlog; once there's depth, keep all four phases each tick so
 quality and discovery keep pace with delivery.
 
+### 5. Social (autopilot growth track — cadence-gated)
+
+After the four core phases, **once per ~day** (not every tick — social cadence is daily,
+not per-tick), run the social-media growth autopilot:
+
+- Agent: `.claude/agents/social-media-growth.md`; procedure:
+  `docs/marketing/social-autopilot-runbook.md`.
+- What it does each run: schedule any owner-`APPROVED` posts to Buffer → produce their
+  creative (images itself; video via the owner-provisioned AI-video tool,
+  `docs/marketing/ai-video-tool-setup.md`) → replenish drafts when < ~4 await approval →
+  measure/prune once ≥2 weeks of data → log to `docs/marketing/growth-experiments.md`.
+- Owner-only gate: the owner just marks `APPROVED` / `PARK` on posts in
+  `docs/marketing/content-queue/`. The autopilot does the rest. It **never** schedules
+  un-approved content, never runs the giveaway until a real prize + T&C exist, and never
+  spends money / signs up for tools.
+- Skip the social phase on ticks where it already ran today; note it in `LOG.md` when it does.
+
 Growth mode: when no defects or owner items remain, the Explorer shifts from fixing to
 growing — new features, a monetization & pricing proposal (research-backed; final
 pricing/brand/launch stay owner decisions and are filed `blocked-owner`), and

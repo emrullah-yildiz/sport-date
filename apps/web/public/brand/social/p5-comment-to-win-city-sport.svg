@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <!-- eyebrow -->
+  <text x="540" y="170" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" letter-spacing="6" fill="#3BEA7E">HELP US MAP THE MOVEMENT</text>
+  <!-- headline -->
+  <text x="540" y="310" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="800" fill="#F1F5F3">Where should</text>
+  <text x="540" y="404" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="800" fill="#F1F5F3">KeepItUp show up</text>
+  <text x="540" y="498" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="82" font-weight="800" fill="#3BEA7E">first?</text>
+  <!-- instruction -->
+  <text x="540" y="612" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="600" fill="#F1F5F3">Comment your city + sport</text>
+  <!-- down chevron -->
+  <path d="M 512 660 L 540 690 L 568 660" fill="none" stroke="#3BEA7E" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- example pills -->
+  <rect x="160" y="740" width="360" height="92" rx="46" fill="none" stroke="#3BEA7E" stroke-width="3"/>
+  <text x="340" y="798" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" fill="#F1F5F3">Bucharest, padel</text>
+  <rect x="560" y="740" width="360" height="92" rx="46" fill="none" stroke="#3BEA7E" stroke-width="3"/>
+  <text x="740" y="798" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" fill="#F1F5F3">Lisbon, running</text>
+  <!-- footer -->
+  <text x="540" y="950" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" fill="#8A9BA0">Top-voted cities get priority beta invites.</text>
+  <text x="540" y="1020" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="#3BEA7E">keepitup.social</text>
+</svg>
