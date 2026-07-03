@@ -17,15 +17,22 @@ connected scheduler). Extends [social-launch-packet.md](./social-launch-packet.m
 
 ## 2. Pick ONE handle and use it everywhere (consistency = discoverability)
 
-Recommended primary, in preference order (grab the same one on all platforms):
+Brand name is **KeepItUp** (owner decision 2026-07-04). Recommended handle, in
+preference order (grab the same one on all platforms):
 
-1. `@sportdate.app`  2. `@getsportdate`  3. `@sportdate.eu`  4. `@wearesportdate`
+1. `@keepitup`  2. `@keepitup.eu`  3. `@getkeepitup`  4. `@keepitupapp`
 
 - [ ] As you sign up on each platform, take the first of these that's free, then use the
       **same** handle on the others (reserve it even on platforms you won't post to yet).
 - [ ] Note the final chosen handle back here so agents write copy to match:
       **CHOSEN HANDLE: `__________`**
-- Display name on every platform: **Sport Date** (working name — see brand-refresh-proposal.md).
+- Display name on every platform: **KeepItUp**.
+
+### Domain (owner action — costs money)
+Checked 2026-07-04: `keepitup.com`/`.app` are taken. Available: **`keepitup.eu`**
+(recommended — EU-first), `keepitup.co`, `getkeepitup.com`, `trykeepitup.com`,
+`joinkeepitup.com`. Register with Vercel Domains (auto-connects) / Cloudflare / Namecheap,
+then a branded email `hello@keepitup.eu` becomes possible for later opt-in email.
 
 ## 3. Create the accounts (same email, same handle, 2FA on each)
 
@@ -40,8 +47,8 @@ For each: sign up with the brand email, set the handle + display name, paste the
 
 ## 4. Bio (paste-ready; refined from the launch packet)
 
-> Meet through movement. Small local sports meetups for adults who want dating,
-> friendship, or community — without the endless swiping. Private beta in Europe. 🏃🎾🧗
+> KeepItUp — meet through movement. Small local sports meetups for adults who want dating,
+> friendship, or community, without the endless swiping. Private beta in Europe. 🏃🎾🧗
 
 - Link: use the site once a real domain is live; until then, a simple beta/waitlist link.
   (Domain is still an owner decision — the app currently runs on the Vercel URL.)
@@ -49,7 +56,7 @@ For each: sign up with the brand email, set the handle + display name, paste the
 
 ## 5. Profile image + assets
 
-- [ ] Profile picture: the Sport Date mark on the anthracite/neon-lime brand background
+- [ ] Profile picture: the KeepItUp mark on the anthracite/neon-lime brand background
       (see brand-refresh-proposal.md). If none is exported yet, tell me and I'll spec/generate one.
 - [ ] Have a simple, consistent avatar + one banner ready before you post anything.
 
