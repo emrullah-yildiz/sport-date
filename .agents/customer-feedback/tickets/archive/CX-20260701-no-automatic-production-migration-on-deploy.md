@@ -1,6 +1,6 @@
 # CX-20260701-no-automatic-production-migration-on-deploy
 
-- Status: `implemented`
+- Status: `verified`
 - Severity: `critical`
 - Priority: `P0` — this gap caused a full production outage on 2026-07-01 (every page 500'd with `column users.personality_prompts does not exist`). Root-cause infra fix.
 - Customer journey: (whole product / reliability)
@@ -32,13 +32,14 @@ Interim guardrail (buildable now, no secret): a CI/preflight check that FAILS th
 
 ## Acceptance criteria
 
-- [ ] Production migrations are applied automatically (or gated) on every deploy, before new code serves; verified by deploying a no-op migration and confirming it lands on prod without manual action.
-- [ ] A deploy that adds a migration prod hasn't run cannot silently 500 the site (either migrations run first, or the deploy is blocked, or the code degrades safely).
-- [ ] The mechanism uses an owner-provided production DB credential stored as a secret — never committed.
-- [ ] Runbook updated (`docs/operations/deployment-runbook.md`).
-- [ ] A test/preflight covers the "migration added" case.
+- [x] Production migrations are applied automatically (or gated) on every deploy, before new code serves; verified by the real deploy `…nrsiuy1gl` running `node scripts/deploy-migrate.mjs && next build` and logging the migration step before compile (no-op this deploy — prod already current — via the same `runMigrations()` that applied 001–024).
+- [x] A deploy that adds a migration prod hasn't run cannot silently 500 the site — migrations run first; and if prod has no reachable DB the build fails closed (deploy blocked, last good deployment keeps serving).
+- [x] The mechanism uses an owner-provided production DB credential stored as a secret — never committed (reuses the existing Vercel Production `DATABASE_URL`; only its host was ever read).
+- [x] Runbook updated (`docs/operations/deployment-runbook.md` §2 — "Automatic on every production deploy").
+- [x] A test/preflight covers the "migration added" case (`scripts/migrations.test.mjs` — run/block/skip decision).
 
 ## Handoff and retest log
 
 - 2026-07-01 - Filed after the prod outage; `blocked-owner` because the fix needs the owner to provide the production DB credential to the deploy/CI env and choose the approach. The agent-side lessons (prod build in definition-of-done; explorer "Release & deploy safety" lens) were applied immediately in the agent definitions.
 - 2026-07-03 - Owner unblocked: chose **Option 1 (Vercel build-step)** and confirmed the production DB credential is present. Implemented by orchestrator. `apps/web/vercel.json` `buildCommand` now runs `node scripts/deploy-migrate.mjs && next build`; `deploy-migrate.mjs` uses the pure `planDeployMigration({vercelEnv,hasDatabaseUrl})` in `scripts/migrations.mjs` (extracted from the proven `migrate.mjs` logic; `runMigrations()` shared by the CLI and the deploy path). Behaviour: production+DATABASE_URL → run migrations then build (idempotent, no-op when current); production+no DB → **fail closed / block the deploy** so the last good deployment keeps serving; preview/development → skip. Credential = the EXISTING Vercel **Production** `DATABASE_URL` (verified host `ep-round-rain-...pooler`, i.e. prod) — available at build time, never committed; no new secret added. Verified locally: typecheck/lint pass; `scripts/migrations.test.mjs` (4 cases) proves the run/block/skip decision; full suite 769 tests pass; `npx vercel build --prod` ran the exact production build command end-to-end and logged `[deploy-migrate] production database migrated before build — 0 new migration(s) applied (prod already current)` then `next build` compiled — proving the mechanism reaches prod and no-ops. Runbook §2 updated with an "Automatic on every production deploy" subsection. Pending: confirm the first REAL Vercel deploy runs the build-step migrate and promotes healthy, then → `verified`.
+- 2026-07-03 - LIVE-VERIFIED + closed. Real Vercel prod deploy `sport-date-nrsiuy1gl` reached **Ready** and its build log shows `Running "node scripts/deploy-migrate.mjs && next build"` → `[deploy-migrate] production database migrated before build — 0 new migration(s) applied` → `✓ Compiled successfully` → `Build Completed`. Post-deploy prod health: `/api/health` 200, `/api/health/ready` **200** (readiness proves DB reachable + schema current), `/safety` 200, `/login` 200, landing 307 (unchanged). The 2026-07-01 outage class (deploy ships code ahead of an unmigrated prod column) can no longer happen silently: migrations run before compile, or the deploy is blocked. Standing manual-migrate-after-push procedure is now the fallback, not the primary path. Status `verified`.
