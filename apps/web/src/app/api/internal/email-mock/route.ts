@@ -45,7 +45,11 @@ export async function POST(request: Request) {
       env: { ...process.env, EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "gmail" },
     });
     return NextResponse.json({ success: true }, { headers: { "Cache-Control": "no-store" } });
-  } catch {
-    return NextResponse.json({ error: "Mock email delivery failed." }, { status: 502, headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    const reason = error instanceof Error && error.message.includes("authorization")
+      ? "gmail_authorization_failed"
+      : "gmail_delivery_failed";
+    console.error("Authorized email mock failed:", reason);
+    return NextResponse.json({ error: "Mock email delivery failed.", reason }, { status: 502, headers: { "Cache-Control": "no-store" } });
   }
 }
