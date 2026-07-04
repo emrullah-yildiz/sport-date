@@ -17,7 +17,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 // open). Kept here so every surface tells the member the same true story. Each
 // point is a short fact, not a promise.
 export const PRIVATE_BETA_POINTS: readonly string[] = [
-  "This is an early preview for adults (18+), launching in Europe first.",
+  "This is a free early preview for adults (18+); our first events are in Europe.",
   "Features are still being built — some are marked “preview” and may change or arrive later.",
   "It is free to use during the preview.",
   "Access is open: anyone eligible can create a profile — no invite is required.",

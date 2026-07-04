@@ -25,7 +25,7 @@ export default function SiteFooter() {
       <div className="site-footer-shell">
         <div className="site-footer-brand">
           <Wordmark variant="footer" />
-          <p>Meet through movement. Adults only · Europe first.</p>
+          <p>Meet through movement. Adults 18+ · first events in Europe.</p>
           <p className="site-footer-contact">
             Questions? <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
           </p>

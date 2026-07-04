@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   // brand title).
   title: { absolute: BRAND_TITLE },
   description:
-    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults only, Europe first.",
+    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults 18+; first events in Europe.",
   // The marketing home is the indexable entry point (the root 307s here).
   alternates: { canonical: "/landing" },
 };
@@ -74,10 +74,10 @@ const safety = [
       "Blocking and reporting are part of the baseline, with a moderation queue behind them — not an afterthought bolted on later.",
   },
   {
-    badge: "EU",
-    title: "Privacy-first, Europe first",
+    badge: "GDPR",
+    title: "Privacy-first, from day one",
     description:
-      "We launch in one dense European city first, with privacy and safety shaping the product from day one rather than after the fact.",
+      "Everyone gets EU-grade (GDPR) privacy protection from the start. Anyone 18+ can join the free beta; the first events are being seeded in Europe.",
   },
 ];
 
@@ -153,7 +153,7 @@ export default async function LandingPage() {
               <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
             ) : (
               <div className="microcopy">
-                Free beta · open to all adults (18+) · Europe first
+                Free beta · open to adults 18+ · first events in Europe
                 <BetaTermExplainer className="microcopy-explainer" />
               </div>
             )}
@@ -291,8 +291,8 @@ export default async function LandingPage() {
             <p className="eyebrow" style={{ color: "var(--lime)" }}>Open beta</p>
             <h2 id="beta-title" className="section-title">Free for everyone, right now.</h2>
             <p className="section-lede">
-              {BRAND_NAME} is in open beta — no invite, no payment, open to all adults in Europe.
-              We&apos;re building it in the open, and your input steers what comes next.
+              {BRAND_NAME} is in open beta — no invite, no payment, open to any adult (18+).
+              We&apos;re seeding the first events in Europe and building in the open; your input steers what comes next.
             </p>
           </div>
           <div className="hero-cta">
@@ -306,7 +306,7 @@ export default async function LandingPage() {
         <div className="landing-footer-shell">
           <div className="landing-footer-brand">
             <Wordmark variant="footer" />
-            <p>Meet through movement. Adults only · Europe first.</p>
+            <p>Meet through movement. Adults 18+ · first events in Europe.</p>
           </div>
           <nav aria-label="Legal and trust links">
             <Link href="/trust">Trust</Link>

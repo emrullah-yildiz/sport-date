@@ -180,7 +180,7 @@ export default async function PublicEventInvitePage({ params }: { params: Promis
 
         <footer className="public-invite-footer">
           <p>
-            {BRAND_NAME} — meet through movement. Adults only · Europe first ·{" "}
+            {BRAND_NAME} — meet through movement. Adults 18+ · first events in Europe ·{" "}
             <Link href="/trust">Trust</Link> · <Link href="/privacy">Privacy</Link>
           </p>
         </footer>
