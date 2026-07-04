@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { type EventCreationInput, validateEventCreation } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
-import { validateEventPostalCode, validatePinnedEventLocation } from "@/lib/directions";
+import { validateEventPostalCode, validateOptionalPinnedEventLocation } from "@/lib/directions";
 import { classifyEventUpdateSeverity, type EventUpdateField } from "@/lib/event-updates";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -106,7 +106,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
   const postalCode = postal.postalCode;
 
   const event = validation.data;
-  const pin = validatePinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
+  // Optional precise pin (CX-20260704): keep an existing/typed address editable even
+  // when the geocoder is unavailable — reject only a malformed supplied pin.
+  const pin = validateOptionalPinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
   if (!pin.valid) return NextResponse.json({ error: pin.error, errors: [pin.error] }, { status: 400 });
   const sql = getDatabase();
   const currentRows = await sql`
@@ -166,8 +168,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
       SET venue_name = ${event.location.private.venueName},
           address = ${event.location.private.address},
           postal_code = ${postalCode},
-          precise_latitude = ${event.location.private.latitude},
-          precise_longitude = ${event.location.private.longitude},
+          precise_latitude = ${pin.latitude},
+          precise_longitude = ${pin.longitude},
           arrival_instructions = ${event.location.private.instructions ?? null},
           updated_at = NOW()
       WHERE event_id = ${eventId}::uuid

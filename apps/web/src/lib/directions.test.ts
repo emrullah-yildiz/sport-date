@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDirectionsUrl, formatFullAddress, validateEventPostalCode, validatePinnedEventLocation } from "./directions";
+import { buildDirectionsUrl, formatFullAddress, validateEventPostalCode, validateOptionalPinnedEventLocation } from "./directions";
 
 describe("buildDirectionsUrl — keyless Google Maps directions", () => {
   it("prefers precise coordinates when available", () => {
@@ -21,11 +21,24 @@ describe("buildDirectionsUrl — keyless Google Maps directions", () => {
   });
 });
 
-describe("validatePinnedEventLocation", () => {
-  it("requires a valid selected coordinate pair", () => {
-    expect(validatePinnedEventLocation(44.4268, 26.1025)).toEqual({ valid: true, latitude: 44.4268, longitude: 26.1025 });
-    expect(validatePinnedEventLocation(null, null).valid).toBe(false);
-    expect(validatePinnedEventLocation(91, 26).valid).toBe(false);
+describe("validateOptionalPinnedEventLocation — pin captured from autocomplete (CX-20260704)", () => {
+  it("keeps a valid selected coordinate pair", () => {
+    expect(validateOptionalPinnedEventLocation(44.4268, 26.1025)).toEqual({ valid: true, latitude: 44.4268, longitude: 26.1025 });
+    expect(validateOptionalPinnedEventLocation("44.4268", "26.1025")).toEqual({ valid: true, latitude: 44.4268, longitude: 26.1025 });
+  });
+
+  it("allows an absent pin so a geocoder outage / manual entry never blocks creation", () => {
+    expect(validateOptionalPinnedEventLocation(null, null)).toEqual({ valid: true, latitude: null, longitude: null });
+    expect(validateOptionalPinnedEventLocation("", "")).toEqual({ valid: true, latitude: null, longitude: null });
+    expect(validateOptionalPinnedEventLocation(undefined, undefined)).toEqual({ valid: true, latitude: null, longitude: null });
+  });
+
+  it("rejects a supplied but malformed or out-of-range pin instead of storing garbage", () => {
+    expect(validateOptionalPinnedEventLocation(91, 26).valid).toBe(false);
+    expect(validateOptionalPinnedEventLocation(44, 200).valid).toBe(false);
+    expect(validateOptionalPinnedEventLocation("abc", 26).valid).toBe(false);
+    // A half-supplied pair is malformed, not a clean fallback.
+    expect(validateOptionalPinnedEventLocation(44.4268, "").valid).toBe(false);
   });
 });
 

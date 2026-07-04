@@ -47,14 +47,32 @@ export function validateEventPostalCode(raw: unknown): { valid: true; postalCode
   return { valid: true, postalCode };
 }
 
-export function validatePinnedEventLocation(latitude: unknown, longitude: unknown): { valid: true; latitude: number; longitude: number } | { valid: false; error: string } {
-  if (latitude === null || latitude === undefined || latitude === "" || longitude === null || longitude === undefined || longitude === "") {
-    return { valid: false, error: "Choose a suggested address to set its map pin." };
+/**
+ * Validate the OPTIONAL precise map pin captured by address autocomplete
+ * (CX-20260704-event-address-autocomplete-geocode).
+ *
+ * When the host picks a suggestion, accurate lat/lng arrive and are stored so the
+ * post-acceptance "Get directions" link is precise. But the geocoder is a free,
+ * best-effort provider (Photon/Komoot) — if it is unavailable, or the host typed
+ * the address manually, we must NOT block event creation. So absent coordinates
+ * are accepted (both stored as `null`; the directions link then falls back to the
+ * url-encoded full address). Coordinates that ARE supplied must be a finite,
+ * in-range pair — a partial or out-of-range pair is rejected rather than stored as
+ * a garbage pin.
+ */
+export function validateOptionalPinnedEventLocation(latitude: unknown, longitude: unknown): { valid: true; latitude: number | null; longitude: number | null } | { valid: false; error: string } {
+  const latEmpty = latitude === null || latitude === undefined || latitude === "";
+  const lngEmpty = longitude === null || longitude === undefined || longitude === "";
+  // Fallback path: no pin at all → allowed, directions use the typed address.
+  if (latEmpty && lngEmpty) return { valid: true, latitude: null, longitude: null };
+  // A half-supplied pair can't be a real pin (and `Number("")` would coerce to 0).
+  if (latEmpty || lngEmpty) {
+    return { valid: false, error: "That map pin looks invalid. Search and choose an address, or clear it to continue without a pin." };
   }
   const lat = typeof latitude === "number" ? latitude : Number(latitude);
   const lng = typeof longitude === "number" ? longitude : Number(longitude);
   if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lng) || lng < -180 || lng > 180) {
-    return { valid: false, error: "Choose a suggested address to set its map pin." };
+    return { valid: false, error: "That map pin looks invalid. Search and choose an address, or clear it to continue without a pin." };
   }
   return { valid: true, latitude: lat, longitude: lng };
 }

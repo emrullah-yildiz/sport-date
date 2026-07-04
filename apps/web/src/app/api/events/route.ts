@@ -4,7 +4,7 @@ import { validateEventCreation } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getDatabase } from "@/lib/db";
-import { validateEventPostalCode, validatePinnedEventLocation } from "@/lib/directions";
+import { validateEventPostalCode, validateOptionalPinnedEventLocation } from "@/lib/directions";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -39,7 +39,9 @@ export async function POST(request: Request) {
   const postalCode = postal.postalCode;
 
   const event = validation.data;
-  const pin = validatePinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
+  // The precise pin is optional: absent coordinates (geocoder down or a manually
+  // typed address) must not block creation — only a malformed supplied pin does.
+  const pin = validateOptionalPinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
   if (!pin.valid) return NextResponse.json({ error: pin.error, errors: [pin.error] }, { status: 400 });
   const eventId = crypto.randomUUID();
   const experienceLevels = JSON.stringify(event.experienceLevels);
@@ -70,7 +72,7 @@ export async function POST(request: Request) {
       )
       VALUES (
         ${eventId}::uuid, ${event.location.private.venueName}, ${event.location.private.address}, ${postalCode},
-        ${event.location.private.latitude}, ${event.location.private.longitude},
+        ${pin.latitude}, ${pin.longitude},
         ${event.location.private.instructions ?? null}
       )
     `,

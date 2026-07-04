@@ -42,4 +42,14 @@ describe("authenticated location search", () => {
     expect(JSON.stringify(body)).not.toContain("phone");
     expect(vi.mocked(globalThis.fetch).mock.calls[0][0].toString()).toContain("countrycode=RO");
   });
+
+  it("degrades to a 503 (not a crash) when the geocoder is unavailable, so the host falls back to manual entry", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: "member-1" } as never);
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("network down"));
+    const response = await GET(new Request("https://sportdate.example/api/locations/search?q=tennis%20club"));
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body.suggestions).toBeUndefined();
+    expect(body.error).toMatch(/unavailable/i);
+  });
 });

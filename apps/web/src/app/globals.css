@@ -1581,9 +1581,10 @@ button:disabled:hover, button[disabled]:hover {
 .address-autocomplete { position: relative; display: grid; gap: 8px; }
 .address-suggestions { z-index: 5; display: grid; gap: 2px; max-height: 280px; margin: -2px 0 0; padding: 6px; overflow-y: auto; list-style: none; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: 0 18px 40px rgba(0,0,0,.28); }
 .address-suggestions button { display: grid; grid-template-columns: 18px 1fr; gap: 10px; width: 100%; min-height: 48px; padding: 10px 12px; border: 0; border-radius: 10px; background: transparent; color: var(--text); text-align: left; line-height: 1.4; cursor: pointer; }
-.address-suggestions button:hover,.address-suggestions button:focus-visible { background: var(--surface-raised); outline: 2px solid var(--focus); }
+.address-suggestions button:hover,.address-suggestions button:focus-visible,.address-suggestions button.is-active { background: var(--surface-raised); outline: 2px solid var(--focus); }
 .address-suggestions button > span:first-child { color: var(--coral); }
 .address-search-status { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
 .address-search-status.pin-set { color: var(--lime); font-weight: 800; }
 .address-autocomplete small { color: var(--muted); line-height: 1.45; }
 .address-autocomplete small a { color: var(--accent-info); }
+.address-autocomplete small.address-fallback-hint { color: var(--coral); font-weight: 700; }

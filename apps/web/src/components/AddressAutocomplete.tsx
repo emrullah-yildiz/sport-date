@@ -13,6 +13,14 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
   } : null);
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [status, setStatus] = useState("");
+  // Index of the keyboard-highlighted option, or -1 when none is active. Powers
+  // `aria-activedescendant` so arrow keys move a visible highlight without moving
+  // DOM focus off the input (the Uber-style combobox pattern).
+  const [activeIndex, setActiveIndex] = useState(-1);
+  // True once the provider failed for the current query, so we can reassure the
+  // host that they can still type the address by hand and publish (graceful
+  // fallback — a geocoder outage must never block event creation).
+  const [providerUnavailable, setProviderUnavailable] = useState(false);
   const requestNumber = useRef(0);
   const listId = useId();
 
@@ -30,11 +38,15 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
         const result = await response.json() as { suggestions?: LocationSuggestion[]; error?: string };
         if (current !== requestNumber.current) return;
         if (!response.ok) throw new Error(result.error || "Location search failed.");
+        setProviderUnavailable(false);
         setSuggestions(result.suggestions ?? []);
+        setActiveIndex(-1);
         setStatus((result.suggestions?.length ?? 0) ? `${result.suggestions!.length} locations found.` : "No matching locations found. Try including the city or venue name.");
       } catch (caught) {
         if (controller.signal.aborted || current !== requestNumber.current) return;
         setSuggestions([]);
+        setActiveIndex(-1);
+        setProviderUnavailable(true);
         setStatus(caught instanceof Error ? caught.message : "Location search failed.");
       }
     }, 350);
@@ -45,8 +57,29 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
     setSelected(suggestion);
     setQuery(suggestion.address);
     setSuggestions([]);
+    setActiveIndex(-1);
+    setProviderUnavailable(false);
     setStatus(`Pin set at ${suggestion.label}.`);
   }
+
+  function onKeyDown(keyEvent: React.KeyboardEvent<HTMLInputElement>) {
+    if (suggestions.length === 0) return;
+    if (keyEvent.key === "ArrowDown") {
+      keyEvent.preventDefault();
+      setActiveIndex((index) => (index + 1) % suggestions.length);
+    } else if (keyEvent.key === "ArrowUp") {
+      keyEvent.preventDefault();
+      setActiveIndex((index) => (index <= 0 ? suggestions.length - 1 : index - 1));
+    } else if (keyEvent.key === "Enter" && activeIndex >= 0) {
+      keyEvent.preventDefault();
+      choose(suggestions[activeIndex]);
+    } else if (keyEvent.key === "Escape") {
+      setSuggestions([]);
+      setActiveIndex(-1);
+    }
+  }
+
+  const optionId = (index: number) => `${listId}-option-${index}`;
 
   return <div className="address-autocomplete">
     <label htmlFor="address">Arrival address
@@ -54,7 +87,8 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
         id="address"
         name="address"
         value={query}
-        onChange={(event) => { setQuery(event.target.value); setSelected(null); setSuggestions([]); setStatus(""); }}
+        onChange={(event) => { setQuery(event.target.value); setSelected(null); setSuggestions([]); setActiveIndex(-1); setProviderUnavailable(false); setStatus(""); }}
+        onKeyDown={onKeyDown}
         required
         maxLength={300}
         placeholder="Start typing a venue or street address"
@@ -63,6 +97,7 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
         aria-autocomplete="list"
         aria-expanded={suggestions.length > 0}
         aria-controls={listId}
+        aria-activedescendant={activeIndex >= 0 ? optionId(activeIndex) : undefined}
         aria-invalid={Boolean(error) || undefined}
         aria-describedby={`${listId}-status${error ? " address-error" : ""}`}
       />
@@ -71,11 +106,13 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
     <input type="hidden" name="latitude" value={selected?.latitude ?? ""} />
     <input type="hidden" name="longitude" value={selected?.longitude ?? ""} />
     {suggestions.length > 0 ? <ul id={listId} className="address-suggestions" role="listbox">
-      {suggestions.map((suggestion) => <li key={suggestion.id} role="option" aria-selected={false}>
-        <button type="button" onClick={() => choose(suggestion)}><span aria-hidden="true">●</span><span>{suggestion.label}</span></button>
+      {suggestions.map((suggestion, index) => <li key={suggestion.id} id={optionId(index)} role="option" aria-selected={index === activeIndex}>
+        <button type="button" className={index === activeIndex ? "is-active" : undefined} tabIndex={-1} onMouseDown={(mouseEvent) => mouseEvent.preventDefault()} onClick={() => choose(suggestion)}><span aria-hidden="true">●</span><span>{suggestion.label}</span></button>
       </li>)}
     </ul> : null}
     <p id={`${listId}-status`} className={`address-search-status${selected ? " pin-set" : ""}`} role="status" aria-live="polite">{status || "Choose a result to set the exact map pin."}</p>
-    <small>Your search is sent to our <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-based location provider. Your identity is not sent, and the selected pin stays private until acceptance.</small>
+    {providerUnavailable
+      ? <small className="address-fallback-hint">Location search is unavailable right now — you can still type the full address by hand and publish. Accepted guests will get directions to that address; add a pin later by editing the event once search is back.</small>
+      : <small>Your search is sent to our <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-based location provider. Your identity is not sent, and the selected pin stays private until acceptance.</small>}
   </div>;
 }

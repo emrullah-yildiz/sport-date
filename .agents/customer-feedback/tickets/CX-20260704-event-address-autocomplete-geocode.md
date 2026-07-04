@@ -1,6 +1,6 @@
 # CX-20260704-event-address-autocomplete-geocode
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — owner report (2026-07-04): "Get directions" is unreliable because the event address is free-text with no real geocoding. Hosts should pick the address like entering a destination in Uber: type → suggestions → select → pin.
 - Customer journey: host types the meeting address → an autocomplete lists matching real places → host selects one → precise lat/lng is captured → accepted attendees get accurate one-tap directions.
@@ -35,6 +35,10 @@ link.
 - typecheck/lint/test/prod build green; tests cover the suggest→select→coords flow and the
   no-provider fallback.
 - Docs updated (geocoding provider + privacy note).
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
 
 ## Guardrails
 
