@@ -52,6 +52,10 @@
   .fld .lbl{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mut); font-weight:800; margin-bottom:4px; }
   .fld .val{ font-size:14px; color:#c8d3d0; white-space:pre-wrap; }
   ol.slides{ margin:6px 0 0; padding-left:22px; } ol.slides li{ font-size:14px; color:#c8d3d0; margin-bottom:5px; }
+  .shots{ display:flex; gap:10px; overflow-x:auto; padding:4px 2px 12px; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; }
+  .shots .shot{ flex:0 0 auto; scroll-snap-align:start; line-height:0; }
+  .shots img{ height:320px; width:auto; max-width:none; border-radius:16px; border:1px solid var(--line); display:block; background:var(--panel2); }
+  .shots .shot:hover img{ border-color:rgba(59,234,126,.5); }
   .tags{ display:flex; flex-wrap:wrap; gap:6px; } .tag{ font-size:12px; color:var(--blue); background:rgba(67,198,245,.10); border-radius:6px; padding:2px 7px; }
   .actions{ display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
   .abtn{ min-height:44px; flex:1 1 auto; min-width:120px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
@@ -135,6 +139,12 @@
   function renderBody(b){
     b = b || {};
     var html = "";
+    if (Array.isArray(b.assets) && b.assets.length){
+      html += '<div class="fld"><div class="lbl">Post preview — the finished creative (' +
+        b.assets.length + (b.assets.length > 1 ? ' slides · swipe →' : ' image') + ')</div><div class="shots">' +
+        b.assets.map(function(src, i){ return '<a class="shot" href="' + esc(src) + '" target="_blank" rel="noopener"><img loading="lazy" src="' + esc(src) + '" alt="Slide ' + (i + 1) + '"/></a>'; }).join("") +
+        "</div></div>";
+    }
     if (Array.isArray(b.slides) && b.slides.length){
       html += '<div class="fld"><div class="lbl">Slides</div><ol class="slides">' +
         b.slides.map(function(s){ return "<li>" + esc(s) + "</li>"; }).join("") + "</ol></div>";
