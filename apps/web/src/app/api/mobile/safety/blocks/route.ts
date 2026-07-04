@@ -16,8 +16,12 @@ export async function POST(request: Request) {
   if (!session) return NextResponse.json({ error: "Authentication required." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   const targetId = await targetFrom(request);
   if (!targetId || targetId === session.user.id) return NextResponse.json({ error: "Choose a valid member to block." }, { status: 400 });
-  if (!await blockMember(session.user.id, targetId)) return NextResponse.json({ error: "Member not found." }, { status: 404 });
-  return NextResponse.json({ success: true, message: "Member blocked. Shared requests, places, and room access were removed." }, { headers: { "Cache-Control": "no-store" } });
+  const result = await blockMember(session.user.id, targetId);
+  if (!result.blocked) return NextResponse.json({ error: "Member not found." }, { status: 404 });
+  return NextResponse.json(
+    { success: true, message: "Member blocked. Shared requests, places, and room access were removed.", sharedUpcomingEvents: result.sharedUpcomingEvents },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function DELETE(request: Request) {

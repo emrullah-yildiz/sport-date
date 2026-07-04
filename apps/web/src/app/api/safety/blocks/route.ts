@@ -18,8 +18,15 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Authentication required." }, { status: 401 });
   const targetId = await readTarget(request);
   if (!targetId || targetId === user.id) return NextResponse.json({ error: "Choose a valid member to block." }, { status: 400 });
-  if (!await blockMember(user.id, targetId)) return NextResponse.json({ error: "Member not found." }, { status: 404 });
-  return NextResponse.json({ success: true, message: "Member blocked. Shared requests, places, and room access were removed." });
+  const result = await blockMember(user.id, targetId);
+  if (!result.blocked) return NextResponse.json({ error: "Member not found." }, { status: 404 });
+  return NextResponse.json({
+    success: true,
+    message: "Member blocked. Shared requests, places, and room access were removed.",
+    // Upcoming third-party events you're both still in — surfaced so you can leave
+    // in one tap if you'd rather not be there in person together (never forced).
+    sharedUpcomingEvents: result.sharedUpcomingEvents,
+  });
 }
 
 export async function DELETE(request: Request) {

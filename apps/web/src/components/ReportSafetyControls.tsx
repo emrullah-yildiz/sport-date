@@ -3,6 +3,28 @@
 import { SAFETY_REPORT_CATEGORIES, type SafetyReportCategory } from "@sport-date/domain";
 import { useRef, useState } from "react";
 
+import { cancelJoinRequest } from "@/lib/cancel-join-request";
+
+// A third-party event the blocker and the blocked member are both still in. Shape
+// mirrors the API's `sharedUpcomingEvents`; only the blocker's OWN request id is
+// present, so leaving needs no extra lookup and reveals nothing new.
+type SharedUpcomingEvent = {
+  eventId: string;
+  requestId: string;
+  sport: string;
+  title: string;
+  startsAt: string;
+  timeZone: string;
+};
+
+function formatEventWhen(startsAt: string, timeZone: string): string {
+  const date = new Date(startsAt);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone,
+  }).format(date);
+}
+
 const categoryLabels: Record<SafetyReportCategory, string> = {
   harassment: "Harassment", hate: "Hate or discrimination", sexual_misconduct: "Sexual misconduct",
   sexual_intent: "Sexual or inappropriate intent (e.g. a hookup-oriented event)",
@@ -27,6 +49,11 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
   // reads as done and cannot be re-fired; the confirmation stays put (no redirect)
   // so keyboard/screen-reader members actually perceive the announced closure.
   const [blocked, setBlocked] = useState(false);
+  // Upcoming third-party events the two are still both in after the block, plus the
+  // set already left, so the member can leave in one tap — but is never forced out.
+  const [sharedEvents, setSharedEvents] = useState<SharedUpcomingEvent[]>([]);
+  const [leftEventIds, setLeftEventIds] = useState<string[]>([]);
+  const [leavingEventId, setLeavingEventId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   // Success and failure are separate persistent live regions (mirrors the shipped
   // RoomLeaveControl / EditProfileForm pattern): the containers are always mounted
@@ -51,10 +78,14 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Report failed.");
       setDetails("");
-      // Block-and-report redirects to /profile; a report with no block stays here,
-      // so move focus to the confirmation for clear closure.
-      announce(result.message, "success", !blockUser);
-      if (blockUser) setTimeout(() => window.location.assign("/profile"), 1200);
+      const shared: SharedUpcomingEvent[] = blockUser && Array.isArray(result.sharedUpcomingEvents) ? result.sharedUpcomingEvents : [];
+      setSharedEvents(shared);
+      // Block-and-report normally redirects to /profile. But if the block left the
+      // two scheduled into the same third-party event(s), stay here so the member
+      // can see the warning and choose whether to leave — never yanked away mid-decision.
+      const stayForSharedWarning = blockUser && shared.length > 0;
+      announce(result.message, "success", !blockUser || stayForSharedWarning);
+      if (blockUser && !stayForSharedWarning) setTimeout(() => window.location.assign("/profile"), 1200);
     } catch (error) { announce(error instanceof Error ? error.message : "Report failed.", "error"); }
     finally { setSubmitting(false); }
   }
@@ -70,9 +101,23 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
       // focus to it (as the no-block report path does) so keyboard/SR users get closure —
       // consistent with the report+block path, which also surfaces a message on success.
       setBlocked(true);
+      setSharedEvents(Array.isArray(result.sharedUpcomingEvents) ? result.sharedUpcomingEvents : []);
       announce(blockConfirmationMessage(subjectName), "success", true);
     } catch (error) { announce(error instanceof Error ? error.message : "Block failed.", "error"); }
     finally { setSubmitting(false); }
+  }
+
+  // One-tap leave for a still-shared third-party event. Leaving is optional — the
+  // member is warned, never forced out. The exit is recorded as a safety exit so it
+  // never counts toward the reliability signal (protecting themselves is free).
+  async function leaveSharedEvent(shared: SharedUpcomingEvent) {
+    setLeavingEventId(shared.eventId);
+    try {
+      const result = await cancelJoinRequest(shared.eventId, shared.requestId, { exit: { reason: "felt_unsafe" } });
+      if (!result.ok) { announce(result.message, "error"); return; }
+      setLeftEventIds((prev) => (prev.includes(shared.eventId) ? prev : [...prev, shared.eventId]));
+      announce(`You left ${shared.sport} on ${formatEventWhen(shared.startsAt, shared.timeZone)}. You and ${subjectName} are no longer scheduled together for it.`, "success");
+    } finally { setLeavingEventId(null); }
   }
 
   return (
@@ -85,6 +130,36 @@ export default function ReportSafetyControls({ eventId, subjectUserId, subjectNa
         <label className="report-block-choice"><input type="checkbox" checked={blockUser} onChange={(event) => setBlockUser(event.target.checked)} />Also block this member immediately</label>
         <button type="submit" disabled={submitting} aria-busy={submitting}>{submitting ? "Recording…" : "Submit safety report"}</button>
       </form>
+      {sharedEvents.length > 0 ? (
+        <div className="safety-shared-events" role="note" aria-label={`You and ${subjectName} are both still signed up for the same upcoming ${sharedEvents.length === 1 ? "event" : "events"}`}>
+          <strong>You&apos;re both still signed up for the same upcoming {sharedEvents.length === 1 ? "event" : "events"}.</strong>
+          <p>
+            Blocking hides {subjectName} from you online, but it can&apos;t remove either of you from an event someone
+            else is hosting — so you&apos;d still be there in person together. You don&apos;t have to leave, and no one is
+            told if you do. The choice is entirely yours.
+          </p>
+          <ul className="safety-shared-list">
+            {sharedEvents.map((shared) => (
+              <li key={shared.eventId} className="safety-shared-item">
+                <span className="safety-shared-when">{shared.sport} · {formatEventWhen(shared.startsAt, shared.timeZone)}</span>
+                {leftEventIds.includes(shared.eventId) ? (
+                  <span className="safety-shared-left">You left this event</span>
+                ) : (
+                  <button
+                    type="button"
+                    className="safety-shared-leave"
+                    onClick={() => leaveSharedEvent(shared)}
+                    disabled={leavingEventId === shared.eventId}
+                    aria-busy={leavingEventId === shared.eventId}
+                  >
+                    {leavingEventId === shared.eventId ? "Leaving…" : "Leave this event"}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       <p className="safety-emergency">If anyone is in immediate danger, move somewhere safe and contact local emergency services.</p>
       <div className="safety-message-region" role="status" aria-live="polite">
         {message && tone === "success" ? <p className="safety-message" ref={confirmRef} tabIndex={-1}>{message}</p> : null}
