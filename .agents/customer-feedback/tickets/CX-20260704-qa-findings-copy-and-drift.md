@@ -1,6 +1,6 @@
 # CX-20260704-qa-findings-copy-and-drift
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — member-visible defects found by the User-simulator QA pass (2026-07-04). Small, high-confidence fixes.
 - Customer journey: signup + discovery — copy that's off-brand or contradicts current behavior.
@@ -36,3 +36,4 @@
 ## Handoff log
 
 - 2026-07-04 | build | picked up, set `in-progress`, recorded as implementation owner. Fixing all three findings: (1) domain 18+ error "Sport Date"→"KeepItUp" + test; (2) discover area-note + empty-state reworded so a sportless member is never told a profile sport is required (dropped the sport-gate branch entirely — profile sports no longer affect discovery results at all, verified in events.ts, so a "sports refine matches" nudge would itself be inaccurate); (3) signup success + verification-controls copy made delivery-state-aware via `resolveTransactionalEmailProvider()` read at request time (`await connection()` on /signup; /profile already dynamic).
+- 2026-07-04 | build | implemented, set `implemented`. Commit bed4c79 (PUSHED to main, no migration). Files: packages/domain/src/registration.ts (+ registration.test.ts), apps/web/src/app/discover/page.tsx, apps/web/src/components/SignUpForm.tsx, apps/web/src/app/signup/page.tsx, apps/web/src/components/EmailVerificationControls.tsx, apps/web/src/app/profile/page.tsx. Checks: domain test 228 pass; web typecheck clean; web lint 0 errors (2 pre-existing warnings in untouched files); web test 980 pass/12 skip; production build green (/signup is now ƒ dynamic by design). Note for retest: the "delivery live" copy branch is gated on the transactional-email provider resolving to `gmail` at request time — verify prod /signup success screen + /profile account-security show the live wording (email is LIVE via Gmail), and that a non-live env still shows the honest dark-state copy. Also note: NO member-visible "Sport Date" strings remain in domain+web (mobile app.json name + App.tsx emergency line are out of this ticket's domain+web scope — flag separately if the owner wants the native app rebranded too).
