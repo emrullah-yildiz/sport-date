@@ -182,6 +182,27 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
               {photo.moderationStatus === "pending" ? (
                 <span className="profile-photo-pending-tag" role="status">Being checked — only you can see this yet</span>
               ) : null}
+              {pendingDelete === photo.id ? (
+                <div className="profile-photo-delete-confirm" role="group" aria-label={`Remove photo ${index + 1}?`}>
+                  <span>Remove?</span>
+                  <button type="button" className="ppd-yes" onClick={() => remove(photo.id)} aria-label={`Confirm remove photo ${index + 1}`}>
+                    Delete
+                  </button>
+                  <button type="button" className="ppd-no" onClick={() => setPendingDelete(null)} aria-label="Keep photo">
+                    Keep
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="profile-photo-delete"
+                  onClick={() => setPendingDelete(photo.id)}
+                  aria-label={`Remove photo ${index + 1}`}
+                  title="Remove photo"
+                >
+                  ✕
+                </button>
+              )}
               <div className="profile-photo-controls">
                 <button
                   type="button"
@@ -206,25 +227,6 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
                     Make main
                   </button>
                 ) : null}
-                {pendingDelete === photo.id ? (
-                  <span className="profile-photo-confirm">
-                    <button type="button" className="profile-photo-btn profile-photo-btn-danger" onClick={() => remove(photo.id)}>
-                      Confirm remove
-                    </button>
-                    <button type="button" className="profile-photo-btn" onClick={() => setPendingDelete(null)}>
-                      Keep
-                    </button>
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    className="profile-photo-btn"
-                    onClick={() => setPendingDelete(photo.id)}
-                    aria-label={`Remove photo ${index + 1}`}
-                  >
-                    Remove
-                  </button>
-                )}
               </div>
             </li>
           ))}

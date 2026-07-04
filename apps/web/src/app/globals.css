@@ -1351,7 +1351,16 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 .profile-photo-btn-danger { border-color: rgba(255,110,104,.6); color: var(--warn); }
 .profile-photo-btn-danger:hover:not(:disabled) { box-shadow: var(--glow-danger); }
 .profile-photo-btn-danger:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.profile-photo-confirm { display: inline-flex; gap: 6px; }
+/* Small delete affordance in the photo's top-right corner (icon → tap → inline confirm). */
+.profile-photo-delete { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 999px; border: 1px solid rgba(255,255,255,.28); background: rgba(11,15,13,.6); color: #fff; font-size: 13px; line-height: 1; cursor: pointer; }
+.profile-photo-delete:hover { background: rgba(255,110,104,.92); border-color: transparent; }
+.profile-photo-delete:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.profile-photo-delete-confirm { position: absolute; top: 8px; right: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 5px 6px 5px 11px; border-radius: 999px; background: rgba(11,15,13,.85); border: 1px solid rgba(255,255,255,.18); }
+.profile-photo-delete-confirm span { color: #fff; font-size: 12px; font-weight: 700; }
+.profile-photo-delete-confirm button { min-height: 28px; padding: 0 10px; border-radius: 999px; border: 0; font-size: 12px; font-weight: 800; cursor: pointer; }
+.profile-photo-delete-confirm .ppd-yes { background: var(--coral); color: #fff; }
+.profile-photo-delete-confirm .ppd-no { background: rgba(255,255,255,.16); color: #fff; }
+.profile-photo-delete-confirm button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .profile-photos-upload { margin-top: 16px; }
 /* Constrain the upload control so the native file input's intrinsic content
    width (its button + "No file chosen" / chosen filename text) can never push
@@ -1653,7 +1662,7 @@ button:disabled:hover, button[disabled]:hover {
 
 /* Image-safety guideline + held-photo indicator (CX-20260704). */
 .profile-photos-guideline { margin: 6px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
-.profile-photo-pending-tag { position: absolute; top: 10px; right: 10px; max-width: 70%; padding: 4px 10px; border-radius: 999px; background: rgba(67,198,245,.16); color: var(--accent-info); font-size: 10px; font-weight: 900; letter-spacing: .02em; line-height: 1.2; }
+.profile-photo-pending-tag { position: absolute; bottom: 10px; left: 10px; right: 10px; max-width: calc(100% - 20px); padding: 4px 10px; border-radius: 999px; background: rgba(67,198,245,.16); color: var(--accent-info); font-size: 10px; font-weight: 900; letter-spacing: .02em; line-height: 1.2; }
 
 /* Event-create standard reminder: no sexual/hookup events (CX-20260704). */
 .event-form-standard { max-width: 760px; margin: 8px 0 0; padding: 12px 16px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
