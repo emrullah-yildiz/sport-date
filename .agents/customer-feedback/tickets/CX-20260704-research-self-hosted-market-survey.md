@@ -1,6 +1,6 @@
 # CX-20260704-research-self-hosted-market-survey
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner authorized running market surveys (2026-07-04, "do market surveys using support@keepitup.social, pick the environment yourself"). CEO environment decision: **self-hosted in our app** — no third-party account needed, GDPR under our own policy, data in our DB.
 - Customer journey: visitor (from IG bio/posts or landing) → /research → answers anonymously in ~2 min → optional opt-in to deeper questions + follow-up contact → thank-you.
@@ -39,6 +39,7 @@ Implement the research survey from `docs/marketing/member-survey-and-forum-kit.m
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
+- 2026-07-04 | build | implemented in commit c10f152 — **MIGRATION ADDED (`db/031_research_survey.sql`), committed and deliberately NOT pushed** (orchestrator pushes; deploy-time auto-migrate applies it; already applied to the dev DB). Route `/research` (public, anonymous, static-safe) + `POST /api/research` (actions: answers / extend / contact). Kit Part A wording verbatim (test tripwire reads the kit file and asserts intro + every question + options word-for-word). Flow: Survey 1 (Q1–Q6, Q8) → optional Survey 2 (Q10–Q15) extends the same anonymous row at most once → separate contact screen (Q7) with its own consent checkbox; API refuses contact without `consent === true`; `research_contacts` has NO key to `research_responses` (unlinkable by design); no ip/user-agent/user-id columns anywhere. Rate limit: new IP-hashed `researchSurveyRateLimitRules` 20/h + 60/day (verified live: 429 at threshold). Analysis: `scripts/research-aggregates.mjs` (distributions, Q11 means, --free-text/--contacts, directional-WTP reminder). Checks: typecheck ✓ lint ✓ vitest 820 ✓ (25 new) prod build ✓; full flow driven in-browser at 390px against migrated dev DB, rows verified sanitized + unlinked, probe rows cleaned. Unverified: production migration (pending push+deploy), Upstash-backed limiter in prod (dev used in-memory fallback path of the same seam). EU-counsel review of the notice remains the open owner card noted in guardrails.
 
 ## Why (CEO note)
 
