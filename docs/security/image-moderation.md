@@ -36,6 +36,16 @@ rows grandfathered to `approved`). Visibility gate:
   non-approved photo **only to its own owner**. Pending/rejected photos are never shown to anyone
   else.
 
+## Agent review contract (list → view → decide)
+
+The `.claude/agents/photo-moderator.md` agent clears the pending queue through three internal
+endpoints, ALL behind the fail-closed `MODERATION_AGENT_SECRET` bearer (unauthorised → 401; members
+never hold the secret) — CX-20260704-photo-review-agent-access:
+
+1. **List pending** — `GET /api/internal/photo-moderation` → `{ photos: [{ id, memberId, contentType, alt, createdAt }] }`. Ids + minimal metadata only; no image bytes, no member PII beyond the internal member id.
+2. **View the image** — `GET /api/internal/photo-moderation/{photoId}/image` streams the raw bytes (agent-authenticated). This is the ONLY non-owner way to fetch a photo; the public serve route (`/api/photos/{id}`) still gates non-owners on `approved`, so a **pending image is never publicly viewable**. Bytes are streamed straight through, never logged (`Cache-Control: private, no-store`, `X-Robots-Tag: noindex`).
+3. **Decide** — `POST /api/internal/photo-moderation/{photoId}` `{ action: "approve" | "reject" }`: `approve` → visible; `reject` → hidden + blob deleted; uncertain → leave pending and escalate to a human (never approve blind).
+
 ## Human review
 
 A photo held for `review` files a **system** entry in the existing moderation queue

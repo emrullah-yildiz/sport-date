@@ -222,6 +222,54 @@ export async function setPhotoModerationStatus(photoId: string, action: "approve
   return rows.length > 0;
 }
 
+export type PendingModerationPhoto = Readonly<{
+  id: string;
+  memberId: string;
+  contentType: string;
+  alt: string;
+  createdAt: string;
+}>;
+
+/**
+ * The pending photo queue for the internal photo-moderation agent
+ * (CX-20260704-photo-review-agent-access). Minimal metadata only — the photo id
+ * (to view + decide), the internal member id (so a moderator can act on the
+ * owner if needed), content type, alt, and when it was uploaded. No member PII
+ * beyond the internal id, and NO image bytes. Caller (internal route) enforces
+ * the MODERATION_AGENT_SECRET bearer.
+ */
+export async function listPendingPhotosForModeration(limit = 100): Promise<PendingModerationPhoto[]> {
+  const sql = getDatabase();
+  const rows = (await sql`
+    SELECT id, user_id, content_type, alt, created_at
+    FROM profile_photos
+    WHERE moderation_status = 'pending'
+    ORDER BY created_at ASC
+    LIMIT ${Math.min(Math.max(1, limit), 200)}
+  `) as unknown as Array<{ id: string; user_id: string | number; content_type: string; alt: string; created_at: string }>;
+  return rows.map((row) => ({
+    id: String(row.id),
+    memberId: String(row.user_id),
+    contentType: row.content_type,
+    alt: row.alt,
+    createdAt: row.created_at,
+  }));
+}
+
+/**
+ * Resolve a photo's private blob pathname for the internal moderation image view,
+ * regardless of moderation status or owner. Used ONLY by the secret-guarded
+ * internal image route so the agent can look at a pending image before deciding.
+ * Never exposed publicly. Returns null when the photo doesn't exist.
+ */
+export async function getPhotoBlobForModeration(photoId: string): Promise<{ pathname: string; contentType: string } | null> {
+  const sql = getDatabase();
+  const rows = (await sql`
+    SELECT blob_pathname, content_type FROM profile_photos WHERE id = ${photoId}::uuid
+  `) as unknown as Array<{ blob_pathname: string; content_type: string }>;
+  return rows[0] ? { pathname: rows[0].blob_pathname, contentType: rows[0].content_type } : null;
+}
+
 /** Delete a member's photo and its blob. Re-primaries the series if needed. */
 export async function deleteProfilePhoto(userId: string, photoId: string): Promise<boolean> {
   const sql = getDatabase();
