@@ -1,6 +1,6 @@
 # CX-20260704-interactive-sporty-experience-microgames
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner directive (2026-07-04): the site "looks very plain"; wants an interactive, sporty vibe that makes people feel active and successful, with little games (e.g. "how many taps in 5 seconds", a tennis-serve timing game), kept easy + rewarding.
 - Customer journey: a visitor lands → the page feels alive and sporty (not a plain form) → a quick, delightful warm-up micro-game makes them smile and feel capable → they sign up energized; members get satisfying, honest success moments.
@@ -40,3 +40,7 @@ KeepItUp's entire thesis + investor story is **anti-dark-pattern**: "we win when
 ## Process
 
 - Likely no migration. `git pull --rebase` first. Full DoD. **Commit AND PUSH to main.** Don't touch `apps/web/public/*.html` or `docs/marketing/**`. Read apps/web/AGENTS.md + Next docs before app code.
+
+## Handoff log
+
+- 2026-07-04 | agent (build) | implemented + PUSHED, commit `19a3cf6`. Shipped all three parts: (1) landing sporty motion (floating preview card, breathing hero glow, springy hover-lift on chips/step/safety cards — transform/opacity only, gated behind prefers-reduced-motion:no-preference for calm static parity); (2) OPTIONAL warm-up tap micro-game `WarmUpGame` + pure logic `lib/warmup-game.ts` (5s round, live count, warm non-comparative result tiers, single OUTWARD CTA, real <button> keyboard+touch >=44px, outcome announced once via polite live region, springy press + result bloom fall back to static under reduced-motion; mode registry seam so a tennis-serve timing mode can be added next without reshaping the component); (3) honest `ReadinessIndicator` + domain `calculateProfileReadiness` ("You're ready to play" true once >=1 sport = matchable; enrichment optional, never a gate) marking the real moment with the existing decorative MomentGlow. Anti-dark-pattern honored (reviewer can point to: nothing saved/ranked/streaked, no high-score/daily-loop/escalating-levels/variable-reward, game gates nothing, all paths point OUTWARD, success beats only on real actions; tripwire tests scan for banned mechanics). Checks: typecheck/lint clean (only pre-existing warnings), web tests 969 pass/12 skip (13 new), domain 228 pass, production build green. No new dependency (framer-motion already bundled); game is a small landing client island — no meaningful bundle/LCP cost. Unverified: live browser playthrough of the running game (no jsdom in the suite — logic + SSR render are tested). Awaiting independent Explorer retest.
