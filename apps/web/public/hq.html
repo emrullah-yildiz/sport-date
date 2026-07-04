@@ -189,11 +189,11 @@
       <p>A working Expo/React-Native app exists but is dev-only. Publishing to the App Store / Play Store needs EAS builds + Apple ($99/yr) &amp; Google ($25) developer accounts (owner-provisioned) + review/maintenance overhead.</p>
       <div class="rec">My call: <b>stay on mobile web for launch</b>, revisit when traction justifies it. Tracked here so it isn't forgotten.</div>
     </div>
-    <div class="dec">
-      <div class="pri">Blocker · unlocks reminders</div>
+    <div class="dec" style="border-top-color:var(--neon); opacity:.85">
+      <div class="pri" style="color:var(--neon)">✅ LIVE — email sends</div>
       <h3>9 · Gmail transactional delivery</h3>
-      <p>Owner approved Gmail for the private beta. The fail-closed Gmail API adapter now covers verification, password reset, T-2h attendance reminders, and feedback updates. Delivery stays dark until the OAuth client, refresh token, and verified <code>support@keepitup.social</code> sender alias are stored in Vercel.</p>
-      <div class="rec">⚠ <b>Creds + flag ARE set; sending FAILS on the last step.</b> Tested live 2026-07-04: 2 real sends accepted (202) but NEITHER delivered. Cause: <code>support@keepitup.social</code> is not a <b>verified "Send mail as" alias</b> in the <code>ey.myacc@gmail.com</code> account — Google's confirmation email ("Gmail Confirmation - Send Mail as…", today 11:37) is unclicked. <b>Owner fix (1 min): click that confirmation link</b> (or Gmail → Settings → Accounts → Send mail as → confirm), then I re-test. Alt: point <code>GMAIL_SENDER_EMAIL</code> at <code>ey.myacc@gmail.com</code> (no alias needed).</div>
+      <p><b>Working as of 2026-07-04.</b> Live send confirmed (messageId returned, landed in the mailbox). Verification, password reset, T-2h attendance reminders, and feedback updates now send via Gmail as <code>support@keepitup.social</code>.</p>
+      <div class="rec">Fixed 3 issues via a temporary secret-guarded self-test: (1) <code>EMAIL_DELIVERY_PROVIDER</code> held the sender email → set to <code>gmail</code>; (2) refresh-token/client mismatch (<code>unauthorized_client</code>) → owner reminted the token w/ <code>gmail.send</code>; (3) Gmail API disabled in the GCP project → owner enabled it. Diagnostic endpoint removed.</div>
     </div>
     <div class="dec">
       <div class="pri">⚠ Live &amp; fail-safe · needs provider for auto-approve</div>
