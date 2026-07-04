@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <text x="540" y="135" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="800" fill="#F1F5F3">The dating-app ick, <tspan fill="#3BEA7E">cured.</tspan></text>
+  <!-- column headers -->
+  <text x="290" y="270" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="800" letter-spacing="3" fill="#FF6E68">SWIPE APPS</text>
+  <text x="790" y="270" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="800" letter-spacing="3" fill="#3BEA7E">KEEPITUP</text>
+  <line x1="540" y1="230" x2="540" y2="820" stroke="#3A444B" stroke-width="2"/>
+  <!-- rows -->
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="80" y="390" font-size="30" fill="#8A9BA0">Endless small talk</text>
+    <text x="600" y="390" font-size="27" font-weight="700" fill="#F1F5F3">You're already doing</text>
+    <text x="600" y="424" font-size="27" font-weight="700" fill="#F1F5F3">something</text>
+
+    <text x="80" y="510" font-size="30" fill="#8A9BA0">Zero chemistry IRL</text>
+    <text x="600" y="510" font-size="27" font-weight="700" fill="#F1F5F3">Chemistry shows</text>
+    <text x="600" y="544" font-size="27" font-weight="700" fill="#F1F5F3">in motion</text>
+
+    <text x="80" y="630" font-size="30" fill="#8A9BA0">Ghosted at 11pm</text>
+    <text x="600" y="630" font-size="27" font-weight="700" fill="#F1F5F3">You actually met —</text>
+    <text x="600" y="664" font-size="27" font-weight="700" fill="#F1F5F3">on a court</text>
+
+    <text x="80" y="750" font-size="30" fill="#8A9BA0">Is anyone even real?</text>
+    <text x="600" y="750" font-size="27" font-weight="700" fill="#F1F5F3">Real people.</text>
+    <text x="600" y="784" font-size="27" font-weight="700" fill="#F1F5F3">Real games.</text>
+  </g>
+  <text x="540" y="915" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" fill="#3BEA7E">Tag someone who needs to hear this.</text>
+  <text x="540" y="1020" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#8A9BA0">keepitup.social</text>
+</svg>

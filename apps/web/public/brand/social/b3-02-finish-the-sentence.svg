@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <text x="540" y="230" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" letter-spacing="6" fill="#3BEA7E">YOUR TURN</text>
+  <text x="540" y="360" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#8A9BA0">Finish the sentence:</text>
+  <text x="540" y="500" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="800" fill="#F1F5F3">I'd rather</text>
+  <line x1="270" y1="560" x2="810" y2="560" stroke="#3BEA7E" stroke-width="5"/>
+  <text x="540" y="660" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="74" font-weight="800" fill="#F1F5F3">than open a <tspan fill="#8A9BA0">dating app.</tspan></text>
+  <text x="540" y="830" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="40" font-weight="700" fill="#3BEA7E">Comment your answer 👇</text>
+  <text x="540" y="1020" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#8A9BA0">keepitup.social</text>
+</svg>

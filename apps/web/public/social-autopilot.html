@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>KeepItUp // Social Autopilot</title>
+<style>
+  :root{
+    --bg:#181d21; --panel:#20262B; --panel2:#242B31; --line:rgba(59,234,126,.22);
+    --neon:#3BEA7E; --ink:#F1F5F3; --mut:#8A9BA0; --amber:#E8B04B;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  a{ color:var(--neon); }
+  .wrap{ max-width:1080px; margin:0 auto; padding:28px 18px 70px; }
+  header .eyebrow{ font-size:12px; letter-spacing:.28em; color:var(--neon); font-weight:800; text-transform:uppercase; }
+  header h1{ font-size:30px; margin:6px 0 4px; letter-spacing:-.01em; }
+  header .sub{ color:var(--mut); font-size:14px; }
+  .row{ display:flex; flex-wrap:wrap; gap:14px; margin:22px 0; }
+  .agent{ flex:1 1 300px; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px; }
+  .agent .role{ font-size:11px; letter-spacing:.16em; color:var(--mut); text-transform:uppercase; }
+  .agent .name{ font-size:18px; font-weight:800; margin:3px 0 10px; }
+  .led{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; vertical-align:middle;
+    background:var(--neon); box-shadow:0 0 10px 2px rgba(59,234,126,.8); animation:pulse 1.2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.4} }
+  .live{ font-size:12px; letter-spacing:.14em; color:var(--neon); font-weight:700; text-transform:uppercase; }
+  .agent p{ font-size:13px; color:var(--mut); line-height:1.55; margin:8px 0 0; }
+  .stats{ display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 26px; }
+  .pill{ background:var(--panel); border:1px solid var(--line); border-radius:999px; padding:8px 14px; font-size:13px; color:var(--ink); }
+  .pill b{ color:var(--neon); font-weight:800; }
+  .pill.amber b{ color:var(--amber); }
+  h2.sec{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); margin:30px 0 12px; border-bottom:1px solid var(--line); padding-bottom:8px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
+  .post{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
+  .post .thumb{ position:relative; aspect-ratio:1/1; background:var(--panel2); }
+  .post .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .post .car{ position:absolute; top:8px; right:8px; background:rgba(0,0,0,.6); color:var(--ink); font-size:11px; padding:3px 7px; border-radius:8px; }
+  .post .meta{ padding:11px 12px 13px; }
+  .post .when{ font-size:12px; color:var(--neon); font-weight:700; }
+  .post .plat{ font-size:11px; color:var(--mut); letter-spacing:.06em; text-transform:uppercase; }
+  .post .cap{ font-size:12.5px; color:#c8d3d0; line-height:1.45; margin-top:6px;
+    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .tag{ display:inline-block; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; padding:2px 7px; border-radius:6px; margin-top:9px; font-weight:700; }
+  .tag.sch{ background:rgba(59,234,126,.14); color:var(--neon); }
+  .tag.pause{ background:rgba(232,176,75,.14); color:var(--amber); }
+  .paused .thumb{ display:flex; align-items:center; justify-content:center; color:var(--amber); font-size:13px; text-align:center; padding:16px; }
+  .foot{ margin-top:30px; font-size:12px; color:var(--mut); line-height:1.6; }
+  .foot code{ color:#c8d3d0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">KeepItUp · Growth</div>
+    <h1>Social Autopilot</h1>
+    <div class="sub">Owner approves. Agents do the rest — draft, design, schedule, measure. Snapshot generated 2026-07-04.</div>
+  </header>
+
+  <div class="row">
+    <div class="agent">
+      <div class="role">Agent · .claude/agents/social-media-growth.md</div>
+      <div class="name">Social-Media Growth Strategist</div>
+      <div><span class="led"></span><span class="live">Working</span></div>
+      <p>Drafts funny/curious/festive posts, designs the creatives in-brand, auto-schedules approved posts to Buffer, and runs the measure → prune → double-down loop. North-star: net-new followers.</p>
+    </div>
+    <div class="agent">
+      <div class="role">Loop phase · .agents/experience-loop</div>
+      <div class="name">Social Autopilot Phase (daily)</div>
+      <div><span class="led"></span><span class="live">Armed · fires daily</span></div>
+      <p>Cadence-gated 5th phase of the non-stop experience loop: fulfil approvals → make creative → replenish drafts when &lt;4 await approval → measure/prune → status note.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="pill"><b id="n-sched">8</b> scheduled to Instagram</div>
+    <div class="pill">queue window <b>Jul 4 → Jul 7</b></div>
+    <div class="pill">plan cap <b>10</b> · used <b>8</b></div>
+    <div class="pill amber"><b>5</b> video posts paused</div>
+    <div class="pill">channels <b>IG · TikTok · YouTube</b></div>
+  </div>
+
+  <h2 class="sec">▸ Scheduled — auto-publishing to Instagram</h2>
+  <div class="grid" id="scheduled"></div>
+
+  <h2 class="sec">▸ Paused — awaiting the AI-video tool</h2>
+  <div class="grid" id="paused"></div>
+
+  <div class="foot">
+    Live queue mirrored from Buffer (org “My Organization”). Creatives are self-made in the KeepItUp brand system
+    (<code>/brand/social/*.png</code>) — no stock photos. Video posts stay paused until an AI-video tool is provisioned
+    (<code>docs/marketing/ai-video-tool-setup.md</code>); AI video will carry the platform AI-content label.
+    Nothing publishes that the owner hasn’t approved. This is a static status snapshot, not a live control panel.
+  </div>
+</div>
+
+<script>
+const B = "/brand/social/";
+const scheduled = [
+  {code:"P5", plat:"Instagram · comment-to-win", when:"Fri Jul 4, 06:00", img:"p5-comment-to-win-city-sport.png", cap:"Where should KeepItUp show up first? Comment your city + sport — top-voted cities get priority beta invites."},
+  {code:"P3", plat:"Instagram · meme", when:"Fri Jul 4, 22:15", img:"p3-meme-thumb-vs-legs.png", cap:"400 swipes & 0 dates vs one padel game & 3 new friends. One of these is cardio."},
+  {code:"01-04", plat:"Instagram · intents", when:"Sun Jul 5, 09:36", img:"b1-04-three-intents.png", cap:"Here for whatever you're here for — a date, a friend, a good game. No ranking, no pressure."},
+  {code:"01-02", plat:"Instagram · quote", when:"Sun Jul 5, 21:42", img:"b1-02-encourage-quote.png", cap:"Your profile can't show how you encourage someone. You can only see it in motion."},
+  {code:"01-05", plat:"Instagram · privacy", when:"Mon Jul 6, 19:29", img:"b1-05-approximate-area-map.png", cap:"We hide the exact meeting point on purpose. Discovery shows an approximate area — never a pin."},
+  {code:"01-01", plat:"Instagram · moment", when:"Mon Jul 6, 20:16", img:"b1-01-silence-run.png", cap:"A first date where silence is allowed. The activity carries the first encounter."},
+  {code:"01-06", plat:"Instagram · vision", when:"Tue Jul 7, 17:29", img:"b1-06-court-vision.png", cap:"Three people. One tennis court. Local density beats a big map."},
+  {code:"01-03", plat:"Instagram · safety carousel", when:"Tue Jul 7, 19:00", img:"b1-03-safety-1-cover.png", cap:"Before you join a stranger's game — a 5-card pre-game safety checklist.", carousel:5},
+];
+const paused = [
+  {code:"P1", plat:"Instagram Reel", cap:"3 things nobody tells you about meeting at a pickup game (curiosity hook)"},
+  {code:"P2", plat:"TikTok", cap:"“I quit swiping and started showing up” (talking-head)"},
+  {code:"P4", plat:"Instagram Reel", cap:"Best 8 weeks in Europe to meet someone (summer/seasonal)"},
+  {code:"P6", plat:"TikTok", cap:"Tag the runner + tag the flake (reach mechanic)"},
+  {code:"P8", plat:"YouTube Short", cap:"A first date where silence is allowed (belief)"},
+];
+const esc = s => s.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+document.getElementById("scheduled").innerHTML = scheduled.map(p=>`
+  <div class="post">
+    <div class="thumb"><img loading="lazy" src="${B}${p.img}" alt="${esc(p.cap)}">${p.carousel?`<span class="car">▸ ${p.carousel}</span>`:''}</div>
+    <div class="meta">
+      <div class="when">${p.when}</div>
+      <div class="plat">${esc(p.plat)}</div>
+      <div class="cap">${esc(p.cap)}</div>
+      <span class="tag sch">Scheduled</span>
+    </div>
+  </div>`).join("");
+document.getElementById("paused").innerHTML = paused.map(p=>`
+  <div class="post paused">
+    <div class="thumb">🎬 video<br>needs AI-video tool</div>
+    <div class="meta">
+      <div class="plat">${esc(p.plat)}</div>
+      <div class="cap">${esc(p.cap)}</div>
+      <span class="tag pause">Paused</span>
+    </div>
+  </div>`).join("");
+</script>
+</body>
+</html>

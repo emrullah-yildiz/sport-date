@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>KeepItUp // HQ — CEO Command Center</title>
+<style>
+  :root{
+    --bg:#181d21; --panel:#20262B; --panel2:#242B31; --line:rgba(59,234,126,.20);
+    --neon:#3BEA7E; --ink:#F1F5F3; --mut:#8A9BA0; --amber:#E8B04B; --red:#FF6E68; --blue:#43C6F5;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5; }
+  a{ color:var(--neon); text-decoration:none; }
+  .wrap{ max-width:1080px; margin:0 auto; padding:26px 18px 80px; }
+  .top{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--line); padding-bottom:16px; }
+  .brand{ font-size:12px; letter-spacing:.26em; color:var(--neon); font-weight:800; text-transform:uppercase; }
+  .top h1{ font-size:28px; margin:6px 0 0; }
+  .who{ font-size:13px; color:var(--mut); }
+  .who b{ color:var(--ink); }
+  .badge{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; font-weight:800; color:var(--neon); }
+  .badge .led{ display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; background:var(--neon); box-shadow:0 0 9px 2px rgba(59,234,126,.8); animation:pulse 1.3s infinite; }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  h2.sec{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); margin:34px 0 14px; }
+  .note{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--neon); border-radius:12px; padding:18px 20px; }
+  .note p{ margin:0 0 10px; font-size:15px; }
+  .note p:last-child{ margin:0; }
+  .kpis{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:6px; }
+  .kpi{ background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .kpi .v{ font-size:26px; font-weight:800; }
+  .kpi .l{ font-size:12px; color:var(--mut); margin-top:2px; }
+  .kpi .v.g{ color:var(--neon); } .kpi .v.a{ color:var(--amber); }
+  .decisions{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; }
+  .dec{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; border-top:3px solid var(--amber); }
+  .dec.hi{ border-top-color:var(--red); }
+  .dec.low{ border-top-color:var(--blue); }
+  .dec .pri{ font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:800; color:var(--amber); }
+  .dec.hi .pri{ color:var(--red); } .dec.low .pri{ color:var(--blue); }
+  .dec h3{ margin:6px 0 8px; font-size:17px; }
+  .dec p{ margin:0 0 8px; font-size:13.5px; color:#c8d3d0; }
+  .dec .rec{ font-size:13px; color:var(--ink); }
+  .dec .rec b{ color:var(--neon); }
+  .phase{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; }
+  .ph{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .ph .n{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--neon); font-weight:800; }
+  .ph h3{ margin:5px 0 8px; font-size:17px; }
+  .ph p{ margin:0; font-size:13.5px; color:#c8d3d0; }
+  .ph .st{ display:inline-block; margin-top:10px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:7px; }
+  .st.now{ background:rgba(59,234,126,.15); color:var(--neon); }
+  .st.next{ background:rgba(232,176,75,.15); color:var(--amber); }
+  .st.later{ background:rgba(67,198,245,.13); color:var(--blue); }
+  .cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+  .cards img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; border:1px solid var(--line); display:block; }
+  .log{ border:1px solid var(--line); border-radius:14px; background:var(--panel); overflow:hidden; }
+  .log .item{ padding:14px 18px; border-bottom:1px solid var(--line); }
+  .log .item:last-child{ border-bottom:0; }
+  .log .d{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); }
+  .log .t{ font-size:14px; margin-top:4px; }
+  .foot{ margin-top:34px; font-size:12px; color:var(--mut); line-height:1.7; }
+  .btnrow{ margin-top:14px; }
+  .btn{ display:inline-block; border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:13px; font-weight:700; color:var(--neon); margin-right:8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">KeepItUp · HQ</div>
+      <h1>CEO Command Center</h1>
+      <div class="who">Acting CEO: <b>Claude</b> · Owner: <b>Emrullah</b> · you approve + provision; I run strategy &amp; execution.</div>
+    </div>
+    <div class="badge"><span class="led"></span>Agents live · updated 2026-07-04</div>
+  </div>
+
+  <h2 class="sec">▸ CEO briefing</h2>
+  <div class="note">
+    <p><b>Where we are.</b> KeepItUp is pre-launch with a working product (beta), a brand, and — as of today — a
+    <b>live organic-social growth engine</b>: 10 posts designed in-house and auto-scheduling to Instagram, plus an
+    autopilot that keeps producing and measuring. Cost so far: ~€0. Followers/revenue: starting from zero, honestly.</p>
+    <p><b>The path to profit is sequenced, not simultaneous.</b> Revenue needs liquidity first — real people meeting in
+    real places. So we grow an audience (free), convert attention into local beta density, and only then switch on the
+    Plus subscription that's already built (safety always free). Chasing revenue before liquidity would burn trust and cash.</p>
+    <p><b>What I need from you</b> is below as decision cards — each is owner-gated (money, legal, brand, or account
+    access). Everything else, the agents and I execute without asking.</p>
+  </div>
+
+  <h2 class="sec">▸ Scoreboard (honest, cold-start)</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="v g">10</div><div class="l">posts scheduled</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">channels live</div></div>
+    <div class="kpi"><div class="v">0</div><div class="l">followers (day 0)</div></div>
+    <div class="kpi"><div class="v a">5</div><div class="l">video posts blocked</div></div>
+    <div class="kpi"><div class="v">€6.99</div><div class="l">Plus / mo (built, dark)</div></div>
+    <div class="kpi"><div class="v">€0</div><div class="l">spent on marketing</div></div>
+  </div>
+
+  <h2 class="sec">▸ Decisions I need from you (owner-gated)</h2>
+  <div class="decisions">
+    <div class="dec hi">
+      <div class="pri">Blocker · high impact</div>
+      <h3>1 · Provision an AI-video tool</h3>
+      <p>Short-form video is the #1 reach format and 5 approved posts are paused without it. I can't create accounts or hold keys.</p>
+      <div class="rec">My call: <b>approve Revid.ai starter</b> (~€20–30/mo), key into <code>.env.local</code>. Unblocks TikTok/Reels/Shorts growth. See <a href="/../docs">ai-video-tool-setup</a>.</div>
+    </div>
+    <div class="dec">
+      <div class="pri">Blocker · growth</div>
+      <h3>2 · Giveaway prize + T&amp;C</h3>
+      <p>A follow-gated giveaway is our cheapest follower-spike, but I won't run one with a prize we can't deliver.</p>
+      <div class="rec">My call: <b>a €50 local sports-gear voucher</b>. Confirm it's real and I'll write the T&amp;C page and launch it.</div>
+    </div>
+    <div class="dec low">
+      <div class="pri">Owner action · 10 min</div>
+      <h3>3 · IG → Business + connect domain</h3>
+      <p>Switch Instagram to a Business account (unlocks insights + reliable auto-publish) and point <code>keepitup.social</code> at Vercel (brand + email).</p>
+      <div class="rec">My call: <b>do both this week</b>. No cost, compounding benefit.</div>
+    </div>
+    <div class="dec">
+      <div class="pri">Owner action · scale</div>
+      <h3>4 · Buffer plan</h3>
+      <p>Free plan caps at 10 scheduled posts and 3 channels — we're at the cap now. To scale cadence and add X/LinkedIn, we need a paid tier.</p>
+      <div class="rec">My call: <b>upgrade when videos are flowing</b> (not before — no point paying for capacity we can't fill yet).</div>
+    </div>
+    <div class="dec low">
+      <div class="pri">Revenue · hold for now</div>
+      <h3>5 · Monetization go-live</h3>
+      <p>Plus (€6.99/mo) is built in test mode. Going live needs a legal entity, Stripe KYC, VAT/OSS, and live keys — all yours.</p>
+      <div class="rec">My call: <b>don't switch on yet.</b> Stand it up once we have a first active local cohort. I'll signal the moment.</div>
+    </div>
+  </div>
+
+  <h2 class="sec">▸ Strategy to profitability</h2>
+  <div class="phase">
+    <div class="ph">
+      <div class="n">Phase 1</div>
+      <h3>Audience &amp; liquidity</h3>
+      <p>Free organic social → followers → beta signups. Prove which content earns follows. Zero ad spend until organic works.</p>
+      <span class="st now">In progress</span>
+    </div>
+    <div class="ph">
+      <div class="n">Phase 2</div>
+      <h3>Local density</h3>
+      <p>Turn attention into real meetups in one area (owner picks the launch city). Reliable hosts, repeat games, retention.</p>
+      <span class="st next">Next</span>
+    </div>
+    <div class="ph">
+      <div class="n">Phase 3</div>
+      <h3>Monetize Plus</h3>
+      <p>Flip on the €6.99 subscription once there's liquidity. Convenience/richness only — safety &amp; core participation stay free forever.</p>
+      <span class="st later">When ready</span>
+    </div>
+  </div>
+
+  <h2 class="sec">▸ Latest creative (all self-made, in-brand)</h2>
+  <div class="cards" id="cards"></div>
+  <div class="btnrow">
+    <a class="btn" href="/social-autopilot.html">▸ Full social autopilot dashboard →</a>
+  </div>
+
+  <h2 class="sec">▸ CEO report log</h2>
+  <div class="log">
+    <div class="item"><div class="d">2026-07-04 · Growth</div><div class="t">Launched the organic social engine: 10 in-brand posts (memes, quote cards, safety carousel, comparison, comment-drivers, illustrated moments) auto-scheduling to Instagram Jul 4–Jul 8. First real follower data lands this week.</div></div>
+    <div class="item"><div class="d">2026-07-04 · Ops</div><div class="t">Stood up this HQ page + the autopilot dashboard as your reporting surface. Registered the social autopilot as a daily phase of the experience loop.</div></div>
+    <div class="item"><div class="d">2026-07-04 · Ask</div><div class="t">5 decision cards raised above. The two that most limit growth right now: the AI-video tool (#1) and the giveaway prize (#2).</div></div>
+  </div>
+
+  <div class="foot">
+    Guardrails I operate under (yours, unchanged): safety features are never paywalled; no dark patterns, no fake traction;
+    final pricing, brand, and launch geography are your calls; agents never spend money, create Stripe/live keys, accept
+    terms, or create accounts. When I hit one of those or get stuck, it shows up as a decision card here.
+    This is a static status snapshot the agents regenerate — not a live control panel.
+  </div>
+</div>
+<script>
+const B="/brand/social/";
+const imgs=["b3-01-ick-cured.png","p3-meme-thumb-vs-legs.png","b1-02-encourage-quote.png","b1-04-three-intents.png","b1-03-safety-1-cover.png","b1-06-court-vision.png","b1-01-silence-run.png","b3-02-finish-the-sentence.png"];
+document.getElementById("cards").innerHTML=imgs.map(f=>`<img loading="lazy" src="${B}${f}" alt="KeepItUp social creative">`).join("");
+</script>
+</body>
+</html>
