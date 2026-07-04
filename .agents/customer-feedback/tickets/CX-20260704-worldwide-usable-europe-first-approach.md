@@ -1,6 +1,6 @@
 # CX-20260704-worldwide-usable-europe-first-approach
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner directive (2026-07-04). Clarify KeepItUp is usable worldwide; "Europe-first" is our privacy/safety/compliance/community-building APPROACH, not a geographic restriction. Refines the earlier "first events in Europe" copy pass.
 - Customer journey: any visitor/member (incl. non-EU) understands they can use KeepItUp to organize/join sports events anywhere; participation isn't geo-restricted; local availability depends on hosts.
