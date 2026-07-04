@@ -11,6 +11,7 @@ vi.mock("@/lib/attendance-confirmations", () => ({
   cancelAttendanceByToken: mocks.cancelAttendanceByToken,
 }));
 
+import { resetRateLimitStoreForTests } from "@/lib/rate-limit";
 import { POST } from "./route";
 
 const EVENT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
@@ -27,7 +28,10 @@ function post(fields: Record<string, string>, json = true): Request {
   });
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(async () => {
+  vi.clearAllMocks();
+  await resetRateLimitStoreForTests();
+});
 
 describe("POST /api/attendance — tokenized confirm/cancel (no login)", () => {
   it("confirms via a valid token and returns JSON to the enhanced client", async () => {
@@ -59,6 +63,19 @@ describe("POST /api/attendance — tokenized confirm/cancel (no login)", () => {
     const location = response.headers.get("location") ?? "";
     expect(location).toContain(`/e/${EVENT_ID}/confirm`);
     expect(location).toContain("state=confirmed");
+  });
+
+  it("rate-limits repeated actions on the same token and returns 429 with Retry-After (CX-20260704 item 2)", async () => {
+    mocks.confirmAttendanceByToken.mockResolvedValue("confirmed");
+    // The per-token limit is 10/hour; the 11th action in the window is blocked.
+    for (let i = 0; i < 10; i += 1) {
+      expect((await POST(post({ eventId: EVENT_ID, token: TOKEN, action: "confirm" }))).status).toBe(200);
+    }
+    const limited = await POST(post({ eventId: EVENT_ID, token: TOKEN, action: "confirm" }));
+    expect(limited.status).toBe(429);
+    expect(limited.headers.get("Retry-After")).toBeTruthy();
+    // A blocked request never reaches the DB action for that 11th attempt.
+    expect(mocks.confirmAttendanceByToken).toHaveBeenCalledTimes(10);
   });
 
   it("rejects a malformed event id, short token, or bad action without acting", async () => {

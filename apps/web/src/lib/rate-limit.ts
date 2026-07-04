@@ -368,6 +368,21 @@ export function passwordResetRequestRateLimitRules(request: Request, email: stri
   ];
 }
 
+/**
+ * Public attendance confirm/cancel (CX-20260704). The single-purpose token IS the
+ * capability and its entropy already makes enumeration infeasible; this bounds
+ * abuse of the un-authenticated endpoint per IP and per token (referrer/history/log
+ * exposure of the `?t=` token). Generous enough for a legitimate member who taps
+ * confirm then changes their mind and cancels a few times.
+ */
+export function attendanceActionRateLimitRules(request: Request, token: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "attendance-action-ip", limit: 20, windowMs: 60 * 60 * 1000, key: `ip:${ip}` },
+    { name: "attendance-action-token", limit: 10, windowMs: 60 * 60 * 1000, key: `token:${token}` },
+  ];
+}
+
 export function authTokenConfirmRateLimitRules(request: Request, token: string): readonly RateLimitRule[] {
   const ip = getRequestIp(request);
   return [

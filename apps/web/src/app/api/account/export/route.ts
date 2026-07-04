@@ -30,6 +30,11 @@ type AccountExportRow = {
   orientation_self_describe: string | null;
   orientation_consent_at: string | null;
   orientation_visible: boolean;
+  // The member's OWN reliability standing (Art. 15 personal data). Private — never
+  // shown to hosts/peers — but it is the member's own data, so it belongs in their export.
+  late_cancellation_streak: number;
+  late_cancellation_streak_started_at: string | null;
+  reliability_paused_until: string | null;
   sports: Array<{ name: string; skillLevel: string; frequency: string }>;
 };
 
@@ -47,6 +52,8 @@ export async function GET() {
       users.gender, users.gender_self_describe, users.gender_visible,
       users.sexual_orientation, users.orientation_self_describe,
       users.orientation_consent_at, users.orientation_visible,
+      users.late_cancellation_streak, users.late_cancellation_streak_started_at,
+      users.reliability_paused_until,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -114,6 +121,13 @@ export async function GET() {
   const eventReflections = await sql`
     SELECT event_id, attendance, would_join_again, qualified_for_progress, created_at, updated_at
     FROM event_reflections WHERE user_id = ${user.id} ORDER BY created_at
+  `;
+  // The member's OWN T-2h attendance confirm/cancel history (Art. 15). We include
+  // the status and timestamps but deliberately NOT the token hash — it is an
+  // internal single-purpose credential, not member data, and must stay non-exportable.
+  const attendanceConfirmations = await sql`
+    SELECT event_id, status, reminded_at, responded_at, created_at
+    FROM event_attendance_confirmations WHERE member_id = ${user.id} ORDER BY created_at
   `;
   // The member's OWN private peer signals (the ones they gave). We deliberately do
   // NOT include feedback OTHERS left about them: that raw per-person data is
@@ -200,6 +214,12 @@ export async function GET() {
       orientationSelfDescribe: account.orientation_self_describe,
       orientationConsentAt: account.orientation_consent_at,
       orientationVisible: account.orientation_visible,
+      // The member's own private reliability standing (never shown to hosts/peers).
+      reliability: {
+        lateCancellationStreak: Number(account.late_cancellation_streak ?? 0),
+        lateCancellationStreakStartedAt: account.late_cancellation_streak_started_at,
+        pausedUntil: account.reliability_paused_until,
+      },
       sports: account.sports,
       photos: profilePhotos.map((photo) => ({
         id: String(photo.id),
@@ -218,6 +238,7 @@ export async function GET() {
     safetyAppealsSubmitted: safetyAppeals,
     memberBlocksCreated: blocks,
     privateEventReflections: eventReflections,
+    attendanceConfirmations,
     eventRoomMessagesSent: eventMessagesSent,
     privatePeerFeedbackGiven: peerFeedbackGiven,
     mobileDeviceSessions: mobileDevices,

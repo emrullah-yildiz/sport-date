@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { cancelAttendanceByToken, confirmAttendanceByToken, type AttendanceActionResult } from "@/lib/attendance-confirmations";
+import { attendanceActionRateLimitRules, enforceRateLimit } from "@/lib/rate-limit";
 
 // Public, token-authorized attendance confirm/cancel (no login) —
 // CX-20260704-feature-event-attendance-confirmation. The signed single-purpose
@@ -41,6 +42,24 @@ export async function POST(request: Request) {
   if (!UUID_PATTERN.test(eventId) || token.length < 16 || (action !== "confirm" && action !== "cancel")) {
     if (wantsJson) return NextResponse.json({ error: "Invalid request." }, { status: 400 });
     return NextResponse.redirect(new URL(`/e/${UUID_PATTERN.test(eventId) ? eventId : ""}`, request.url), 303);
+  }
+
+  // Bounded per-IP + per-token rate limit on this un-authenticated endpoint. The
+  // token's entropy already blocks enumeration; this caps abuse and repeated
+  // replays of a `?t=` token exposed via referrer/history/logs. Enforced only for
+  // a well-formed request so garbage never consumes a legitimate token's budget.
+  const limited = await enforceRateLimit(
+    "attendance",
+    attendanceActionRateLimitRules(request, token),
+    "Too many attendance actions in a short period. Please wait a moment and try again.",
+  );
+  if (limited) {
+    if (wantsJson) return limited;
+    // No-JS fallback: land back on the confirm/cancel page, which re-reads state.
+    const url = new URL(`/e/${eventId}/${action}`, request.url);
+    url.searchParams.set("t", token);
+    url.searchParams.set("state", "invalid");
+    return NextResponse.redirect(url, 303);
   }
 
   const result = action === "confirm"

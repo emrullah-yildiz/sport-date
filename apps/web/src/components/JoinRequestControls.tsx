@@ -27,15 +27,28 @@ type ReliabilityNotice = {
   timeZone: string;
 };
 
+// Why a directly-opened invitation isn't requestable for this viewer, so the CTA
+// can render an honest disabled state instead of a silently-failing "Request a
+// place" (CX-20260704 core-loop-hardening item 1). "full" is handled by isFull;
+// "eligible" renders the normal form.
+type JoinEligibilityInfo = {
+  reason: "eligible" | "age" | "language" | "full" | "past";
+  minimumAge: number;
+  maximumAge: number;
+  language: string;
+};
+
 export default function JoinRequestControls({
   eventId,
   request,
   reliability,
+  eligibility,
   isFull = false,
 }: {
   eventId: string;
   request: DiscoveryRequest | null;
   reliability?: ReliabilityNotice;
+  eligibility?: JoinEligibilityInfo;
   // The event has no places left (derived from the SAME availability helper the
   // hero "Fully booked" badge uses, so the two can't drift). Threaded in so a
   // capacity-full event replaces the open request form with an honest "full"
@@ -207,6 +220,27 @@ export default function JoinRequestControls({
   );
 
   function panel() {
+    // Directly-opened invitation the join gate would reject for THIS viewer (age
+    // outside range / language mismatch / already started). Only replaces the
+    // pre-request form (status === null) — a member who already holds a request or
+    // place keeps their own state below. "full" falls through to the honest full
+    // state; "eligible" renders the normal form. Placed first so a member-specific
+    // hard block is never masked by a generic "full" message
+    // (CX-20260704 core-loop-hardening item 1: the CTA never silently no-ops).
+    if (status === null && eligibility && (eligibility.reason === "age" || eligibility.reason === "language" || eligibility.reason === "past")) {
+      const copy = eligibility.reason === "past"
+        ? "This game has already started, so requests are closed. There are other games coming up."
+        : eligibility.reason === "age"
+          ? `This game welcomes ages ${eligibility.minimumAge}–${eligibility.maximumAge}, so it isn't open for you to request a place. There are other games looking for players.`
+          : `This game is run in ${eligibility.language}, which isn't one of the languages on your profile, so it isn't open for you to request. You can add languages in your profile, or find other games.`;
+      return (
+        <Panel key="ineligible" className="join-state closed" role="status">
+          <strong tabIndex={-1} ref={attachConfirmation}>You can&apos;t request a place here.</strong>
+          <p>{copy}</p>
+          {browseOtherGames}
+        </Panel>
+      );
+    }
     // Fully booked + no request of one's own: the event has no place to ask for, so
     // show an honest "full" state with a calm next step INSTEAD of the open request
     // form the server capacity guard would 409

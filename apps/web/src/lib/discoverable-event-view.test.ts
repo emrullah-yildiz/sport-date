@@ -4,7 +4,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ getDatabase: vi.fn() }));
 
 import { getDatabase } from "@/lib/db";
-import { getDiscoverableEvent, getDiscoverableEvents } from "./events";
+import { computeJoinEligibility, getDiscoverableEvent, getDiscoverableEvents } from "./events";
 
 // Reconstruct the raw SQL a tagged-template `sql` call was built from, so a test
 // can assert on the WHERE clause without a live database. The neon/postgres client
@@ -66,9 +66,32 @@ describe("getDiscoverableEvent — direct single-event public invitation view (C
     const view = await getDiscoverableEvent({ id: OTHER_ID, age: 55 }, EVENT_ID);
     expect(view).not.toBeNull();
     expect(view!.viewerIsHost).toBe(false);
+    // No age/skill/language/capacity GATING in the WHERE — the direct link is not
+    // the feed. (Note: candidate.languages is SELECTed for the eligibility hint
+    // below, but there is no language WHERE filter.)
     expect(lastQuery).not.toContain("BETWEEN events.minimum_age");
     expect(lastQuery).not.toContain("compatible_sport");
-    expect(lastQuery).not.toContain("candidate.languages");
+    expect(lastQuery).not.toContain("UNNEST(candidate.languages)");
+  });
+
+  it("computes an eligibility reason for the direct view so the CTA never silently no-ops (item 1)", async () => {
+    const future = "2099-07-10T16:00:00.000Z"; // clearly upcoming, so never "past"
+    // Age-excluded viewer (event welcomes 24–38; viewer is 55) → "age".
+    mockDb([publicRow({ starts_at: future, member_languages: ["English"] })]);
+    const excluded = await getDiscoverableEvent({ id: OTHER_ID, age: 55 }, EVENT_ID);
+    expect(excluded!.eligibility).toBe("age");
+    // The direct view SELECTs the member's languages to power the hint.
+    expect(lastQuery).toContain("candidate.languages AS member_languages");
+
+    // In-range, language-overlapping, room left → eligible.
+    mockDb([publicRow({ starts_at: future, member_languages: ["English"], accepted_count: 1, capacity: 4 })]);
+    const ok = await getDiscoverableEvent({ id: OTHER_ID, age: 30 }, EVENT_ID);
+    expect(ok!.eligibility).toBe("eligible");
+
+    // The host viewing their own event is never gated by eligibility.
+    mockDb([publicRow({ starts_at: future, host_user_id: HOST_ID, member_languages: [] })]);
+    const host = await getDiscoverableEvent({ id: HOST_ID, age: 55 }, EVENT_ID);
+    expect(host!.eligibility).toBe("eligible");
   });
 
   it("only ever renders a published event (draft/cancelled/completed are gated out)", async () => {
@@ -114,6 +137,34 @@ describe("getDiscoverableEvent — direct single-event public invitation view (C
   });
 });
 
+describe("computeJoinEligibility — mirrors the join-gate reasons (item 1)", () => {
+  const NOW = new Date("2026-07-04T12:00:00.000Z");
+  const base = {
+    startsAt: "2026-07-10T12:00:00.000Z", minimumAge: 24, maximumAge: 38, viewerAge: 30,
+    memberLanguages: ["English"], eventLanguage: "English", acceptedCount: 1, capacity: 4, hasLiveRequest: false,
+  };
+  it("returns 'eligible' when age, language, timing and capacity all allow a request", () => {
+    expect(computeJoinEligibility(base, NOW)).toBe("eligible");
+  });
+  it("returns 'past' for an event that already started", () => {
+    expect(computeJoinEligibility({ ...base, startsAt: "2026-07-01T12:00:00.000Z" }, NOW)).toBe("past");
+  });
+  it("returns 'age' when the viewer is outside the welcomed range (either end)", () => {
+    expect(computeJoinEligibility({ ...base, viewerAge: 18 }, NOW)).toBe("age");
+    expect(computeJoinEligibility({ ...base, viewerAge: 55 }, NOW)).toBe("age");
+  });
+  it("returns 'language' when the member lists languages and none overlap", () => {
+    expect(computeJoinEligibility({ ...base, memberLanguages: ["Romanian"], eventLanguage: "English" }, NOW)).toBe("language");
+    // A member with NO listed language has no preference → not gated on language.
+    expect(computeJoinEligibility({ ...base, memberLanguages: [] }, NOW)).toBe("eligible");
+  });
+  it("returns 'full' only when at capacity AND the viewer holds no live request", () => {
+    expect(computeJoinEligibility({ ...base, acceptedCount: 4, capacity: 4 }, NOW)).toBe("full");
+    // A member who already holds a place/pending request is not shut out by capacity.
+    expect(computeJoinEligibility({ ...base, acceptedCount: 4, capacity: 4, hasLiveRequest: true }, NOW)).toBe("eligible");
+  });
+});
+
 describe("getDiscoverableEvents — the FEED keeps every gate EXCEPT the profile-sport requirement (CX-20260704)", () => {
   let lastQuery = "";
   function mockDb(rows: Array<Record<string, unknown>>) {
@@ -149,6 +200,15 @@ describe("getDiscoverableEvents — the FEED keeps every gate EXCEPT the profile
     expect(lastQuery).toContain("< events.capacity");
     expect(lastQuery).toContain("events.status = 'published'");
     expect(lastQuery).toContain("user_blocks");
+  });
+
+  it("keeps a FULL event visible only to a member with a LIVE request, not a cancelled/declined one (item 4)", async () => {
+    mockDb([]);
+    await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "", language: "", withinDays: 7 });
+    // The capacity exemption is scoped to pending/accepted, so a stale (cancelled/
+    // declined) request no longer keeps a full event dangling a doomed re-request.
+    expect(lastQuery).toContain("member_request.status IN ('pending', 'accepted')");
+    expect(lastQuery).not.toContain("member_request.id IS NOT NULL");
   });
 
   it("still narrows to ONE sport when the explicit sport filter is chosen", async () => {

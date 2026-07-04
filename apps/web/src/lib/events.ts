@@ -38,7 +38,30 @@ export type DiscoveryEvent = Readonly<{
 // directly-opened invitation link — CX-20260701-view-public-invitation-404s). The
 // hard guards are preserved: only `published` events render, mutual-block still
 // hides blocked parties from each other, and the precise venue is never included.
-export type DiscoveryEventView = DiscoveryEvent & { viewerIsHost: boolean };
+// Why a directly-opened invitation is (not) requestable for THIS viewer. The feed
+// pre-filters these out, but a directly-opened /discover/events/{id} link can land
+// on an event the join gate (createEventJoinRequest) would reject, so the direct
+// view computes the reason and the CTA renders a clear disabled state instead of a
+// silent no-op (CX-20260704 core-loop-hardening item 1). "eligible" = requestable.
+export type JoinEligibility = "eligible" | "age" | "language" | "full" | "past";
+export type DiscoveryEventView = DiscoveryEvent & { viewerIsHost: boolean; eligibility: JoinEligibility };
+
+// Pure mirror of the createEventJoinRequest guards that can silently bar a
+// non-host viewer on a published, non-blocked event: the event already started,
+// the viewer's age is outside the welcomed range, their language doesn't overlap,
+// or it is full with no live request of their own. Host-exclusion and block are
+// handled elsewhere (viewerIsHost / the query's block guard).
+export function computeJoinEligibility(input: {
+  startsAt: string; minimumAge: number; maximumAge: number; viewerAge: number;
+  memberLanguages: readonly string[]; eventLanguage: string;
+  acceptedCount: number; capacity: number; hasLiveRequest: boolean;
+}, now: Date = new Date()): JoinEligibility {
+  if (new Date(input.startsAt).getTime() <= now.getTime()) return "past";
+  if (input.viewerAge < input.minimumAge || input.viewerAge > input.maximumAge) return "age";
+  if (!eventLanguageMatchesMemberPreference(input.memberLanguages, input.eventLanguage)) return "language";
+  if (!input.hasLiveRequest && input.acceptedCount >= input.capacity) return "full";
+  return "eligible";
+}
 
 type HostEventRow = {
   id: string; sport: string; title: string; description: string; starts_at: string;
@@ -210,7 +233,12 @@ export async function getDiscoverableEvents(
       )
       AND (
         (SELECT COUNT(*) FROM event_participants WHERE event_id = events.id) < events.capacity
-        OR member_request.id IS NOT NULL
+        -- Keep a FULL event visible only to a member who still holds a LIVE
+        -- request/place on it (so their own pending/accepted state renders). A
+        -- member who cancelled or was declined has no re-requestable spot on a full
+        -- event, so it should drop out of their feed rather than dangle a doomed
+        -- "Request a place" (CX-20260704 core-loop-hardening item 4).
+        OR member_request.status IN ('pending', 'accepted')
       )
       AND (${filters.city} = '' OR LOWER(events.public_city) = LOWER(${filters.city}))
       AND (${filters.sport} = '' OR LOWER(events.sport) = LOWER(${filters.sport}))
@@ -271,7 +299,8 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
       events.public_approximate_latitude, events.public_approximate_longitude,
       (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count,
       member_request.id AS request_id, member_request.status AS request_status,
-      member_request.skip_count AS request_skip_count
+      member_request.skip_count AS request_skip_count,
+      candidate.languages AS member_languages
     FROM events
     JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
     JOIN users AS candidate ON candidate.id = ${user.id} AND candidate.account_status = 'active'
@@ -285,10 +314,12 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
            OR (blocker_user_id = events.host_user_id AND blocked_user_id = ${user.id})
       )
     LIMIT 1
-  ` as unknown as DiscoveryEventRow[];
+  ` as unknown as Array<DiscoveryEventRow & { member_languages: string[] | null }>;
 
   const row = rows[0];
   if (!row) return null;
+  const viewerIsHost = String(row.host_user_id) === String(user.id);
+  const hasLiveRequest = row.request_status === "pending" || row.request_status === "accepted";
   return {
     id: row.id, sport: row.sport, title: row.title, description: row.description,
     startsAt: row.starts_at, timeZone: row.time_zone, durationMinutes: row.duration_minutes,
@@ -299,7 +330,14 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
     placesRemaining: Math.max(0, row.capacity - row.accepted_count),
     ...coarseApproximateForResponse(row.public_approximate_latitude, row.public_approximate_longitude),
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
-    viewerIsHost: String(row.host_user_id) === String(user.id),
+    viewerIsHost,
+    // The host never requests a place (they manage the event), so eligibility is
+    // irrelevant to them; compute it for every non-host viewer so the CTA is honest.
+    eligibility: viewerIsHost ? "eligible" : computeJoinEligibility({
+      startsAt: row.starts_at, minimumAge: row.minimum_age, maximumAge: row.maximum_age, viewerAge: user.age,
+      memberLanguages: row.member_languages ?? [], eventLanguage: row.language,
+      acceptedCount: row.accepted_count, capacity: row.capacity, hasLiveRequest,
+    }),
   };
 }
 
