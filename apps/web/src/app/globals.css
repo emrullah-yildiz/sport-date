@@ -1347,8 +1347,9 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 .profile-photos-error { margin: 12px 0; padding: 12px 15px; border-radius: 12px; background: rgba(255,110,104,.14); border: 1px solid rgba(255,110,104,.4); color: var(--warn); }
 .profile-photos-status { margin: 12px 0; color: var(--text-muted); font-weight: 700; }
 .profile-photos-series { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; margin: 20px 0; padding: 0; list-style: none; }
-.profile-photo-item { position: relative; display: flex; flex-direction: column; gap: 10px; }
-.profile-photo-image { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-raised); }
+.profile-photo-item { display: flex; flex-direction: column; gap: 10px; }
+.profile-photo-frame { position: relative; display: block; }
+.profile-photo-image { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-raised); }
 .profile-photo-primary-tag { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 999px; background: var(--lime); color: var(--bg); font-size: 11px; font-weight: 900; letter-spacing: .04em; }
 .profile-photo-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .profile-photo-btn { min-height: 40px; min-width: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface-raised); color: var(--text); font-weight: 700; font-size: 12.5px; line-height: 1; cursor: pointer; }

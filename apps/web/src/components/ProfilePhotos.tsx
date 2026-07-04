@@ -169,40 +169,42 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
         <ol className="profile-photos-series" aria-label={`${firstName}'s photos, in order`}>
           {photos.map((photo, index) => (
             <li className="profile-photo-item" key={photo.id}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="profile-photo-image"
-                src={`/api/photos/${photo.id}`}
-                alt={photo.alt || `${firstName}, photo ${index + 1} of ${photos.length}`}
-                loading="lazy"
-                width={220}
-                height={220}
-              />
-              {photo.isPrimary ? <span className="profile-photo-primary-tag">Main photo</span> : null}
-              {photo.moderationStatus === "pending" ? (
-                <span className="profile-photo-pending-tag" role="status">Being checked — only you can see this yet</span>
-              ) : null}
-              {pendingDelete === photo.id ? (
-                <div className="profile-photo-delete-confirm" role="group" aria-label={`Remove photo ${index + 1}?`}>
-                  <span>Remove?</span>
-                  <button type="button" className="ppd-yes" onClick={() => remove(photo.id)} aria-label={`Confirm remove photo ${index + 1}`}>
-                    Delete
+              <div className="profile-photo-frame">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="profile-photo-image"
+                  src={`/api/photos/${photo.id}`}
+                  alt={photo.alt || `${firstName}, photo ${index + 1} of ${photos.length}`}
+                  loading="lazy"
+                  width={220}
+                  height={220}
+                />
+                {photo.isPrimary ? <span className="profile-photo-primary-tag">Main photo</span> : null}
+                {photo.moderationStatus === "pending" ? (
+                  <span className="profile-photo-pending-tag" role="status">Being checked — only you can see this yet</span>
+                ) : null}
+                {pendingDelete === photo.id ? (
+                  <div className="profile-photo-delete-confirm" role="group" aria-label={`Remove photo ${index + 1}?`}>
+                    <span>Remove?</span>
+                    <button type="button" className="ppd-yes" onClick={() => remove(photo.id)} aria-label={`Confirm remove photo ${index + 1}`}>
+                      Delete
+                    </button>
+                    <button type="button" className="ppd-no" onClick={() => setPendingDelete(null)} aria-label="Keep photo">
+                      Keep
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="profile-photo-delete"
+                    onClick={() => setPendingDelete(photo.id)}
+                    aria-label={`Remove photo ${index + 1}`}
+                    title="Remove photo"
+                  >
+                    ✕
                   </button>
-                  <button type="button" className="ppd-no" onClick={() => setPendingDelete(null)} aria-label="Keep photo">
-                    Keep
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="profile-photo-delete"
-                  onClick={() => setPendingDelete(photo.id)}
-                  aria-label={`Remove photo ${index + 1}`}
-                  title="Remove photo"
-                >
-                  ✕
-                </button>
-              )}
+                )}
+              </div>
               <div className="profile-photo-controls">
                 <button
                   type="button"
