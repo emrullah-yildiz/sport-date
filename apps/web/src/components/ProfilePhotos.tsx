@@ -16,6 +16,7 @@ type Photo = {
   position: number;
   isPrimary: boolean;
   createdAt: string;
+  moderationStatus?: "approved" | "pending" | "rejected";
 };
 
 const ACCEPT = ACCEPTED_PROFILE_PHOTO_MIME_TYPES.join(",");
@@ -81,7 +82,9 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "The photo couldn’t be saved.");
       await refresh();
-      setStatus("Photo added.");
+      setStatus(data.held
+        ? "Photo added — it’s being checked before others can see it."
+        : "Photo added.");
     } catch (uploadError) {
       setError(uploadError instanceof Error ? uploadError.message : "The photo couldn’t be saved.");
     } finally {
@@ -143,6 +146,10 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
         A small series so people can recognise you at the meeting point. Optional, always yours to change — no scores,
         no ranking. {PROFILE_PHOTO_RULES_SUMMARY}
       </p>
+      <p className="profile-photos-guideline">
+        No nudity or sexual content — this isn’t that kind of platform. Photos are screened automatically before others
+        can see them; a new photo may be held briefly for a quick check.
+      </p>
 
       {!storageConfigured && loaded ? (
         <p className="profile-photos-notice" role="status">
@@ -172,6 +179,9 @@ export default function ProfilePhotos({ firstName }: { firstName: string }) {
                 height={220}
               />
               {photo.isPrimary ? <span className="profile-photo-primary-tag">Main photo</span> : null}
+              {photo.moderationStatus === "pending" ? (
+                <span className="profile-photo-pending-tag" role="status">Being checked — only you can see this yet</span>
+              ) : null}
               <div className="profile-photo-controls">
                 <button
                   type="button"

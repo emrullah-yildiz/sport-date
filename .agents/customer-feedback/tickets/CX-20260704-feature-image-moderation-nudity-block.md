@@ -1,6 +1,6 @@
 # CX-20260704-feature-image-moderation-nudity-block
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — owner-directive (2026-07-04): nudes / sexually-explicit images are NOT allowed. Safety + brand integrity depend on this.
 - Customer journey: a member uploads a profile photo → it is automatically screened → sexual/nude content is rejected before it is ever shown; borderline goes to the moderation queue.
@@ -21,6 +21,10 @@ Add an **automated image-safety check** to the photo-upload path that blocks nud
 - Clear guideline copy at the upload point: no nudity or sexual content; this is not that kind of platform.
 - typecheck/lint/test/prod build green; tests cover: provider-rejects-explicit path, borderline→queue, provider-absent fail-safe behavior (does NOT auto-approve explicit), and the uploader error contract.
 - Docs updated (the moderation seam + provider dependency).
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
 
 ## Guardrails
 

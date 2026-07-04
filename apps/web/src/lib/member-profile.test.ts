@@ -18,16 +18,16 @@ vi.mock("@/lib/db", () => ({ getDatabase: () => fakeSql }));
 
 // The photo lookup is a separate, already block-gated call; stub it so the test is
 // about the authorization boundary, not photo storage.
-const listProfilePhotos = vi.fn((_userId: string): Promise<unknown[]> => Promise.resolve([]));
-vi.mock("@/lib/photos", () => ({ listProfilePhotos: (userId: string) => listProfilePhotos(userId) }));
+const listApprovedProfilePhotos = vi.fn((_userId: string): Promise<unknown[]> => Promise.resolve([]));
+vi.mock("@/lib/photos", () => ({ listApprovedProfilePhotos: (userId: string) => listApprovedProfilePhotos(userId) }));
 
 import { getViewableMemberProfile, memberProfileRelationshipLabel } from "./member-profile";
 
 function reset(rows: unknown[]) {
   capturedQueries.length = 0;
   nextRows = rows;
-  listProfilePhotos.mockClear();
-  listProfilePhotos.mockResolvedValue([]);
+  listApprovedProfilePhotos.mockClear();
+  listApprovedProfilePhotos.mockResolvedValue([]);
 }
 
 const ROW = {
@@ -54,7 +54,7 @@ describe("getViewableMemberProfile authorization boundary", () => {
     const result = await getViewableMemberProfile("7", "7");
     expect(result).toBeNull();
     expect(capturedQueries).toHaveLength(0);
-    expect(listProfilePhotos).not.toHaveBeenCalled();
+    expect(listApprovedProfilePhotos).not.toHaveBeenCalled();
   });
 
   it("rejects a non-numeric / unenumerable target id without a query", async () => {
@@ -88,7 +88,7 @@ describe("getViewableMemberProfile authorization boundary", () => {
     const result = await getViewableMemberProfile("7", "42");
     expect(result).toBeNull();
     // Never loads photos for a viewer with no qualifying relationship.
-    expect(listProfilePhotos).not.toHaveBeenCalled();
+    expect(listApprovedProfilePhotos).not.toHaveBeenCalled();
   });
 
   it("maps a qualifying row to a privacy-safe profile and loads that member's photos", async () => {
@@ -100,7 +100,7 @@ describe("getViewableMemberProfile authorization boundary", () => {
     expect(result!.seeking).toBe("friendship");
     expect(result!.sports).toEqual([{ name: "Tennis", skillLevel: "intermediate", frequency: "weekly" }]);
     expect(result!.prompts).toEqual([{ prompt: "A perfect Saturday game is…", answer: "Doubles, then coffee." }]);
-    expect(listProfilePhotos).toHaveBeenCalledWith("42");
+    expect(listApprovedProfilePhotos).toHaveBeenCalledWith("42");
   });
 
   it("leaks NO contact detail or precise/private location field", async () => {

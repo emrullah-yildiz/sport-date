@@ -54,6 +54,13 @@ export async function POST(request: Request) {
   const bytes = new Uint8Array(await file.arrayBuffer());
   const result = await addProfilePhoto(user.id, validation.mimeType, validation.alt, bytes);
   if (!result.ok) {
+    if (result.reason === "rejected") {
+      // Clear and non-shaming: this platform doesn't allow nudity/sexual imagery.
+      return NextResponse.json(
+        { error: "This image can’t be used. Profile photos can’t contain nudity or sexual content — please choose a different photo.", code: "image-rejected" },
+        { status: 422 },
+      );
+    }
     if (result.reason === "not-configured") {
       return NextResponse.json(
         { error: "Photo uploads aren’t available yet. The rest of your profile is unaffected.", code: "storage-unavailable" },
@@ -68,5 +75,7 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ error: "The photo couldn’t be saved. Please try again." }, { status: 502 });
   }
-  return NextResponse.json({ success: true, photo: result.photo }, { status: 201 });
+  // `held` is true when the photo is pending automated review — visible to the
+  // owner but not to other members until it's approved.
+  return NextResponse.json({ success: true, photo: result.photo, held: result.held }, { status: 201 });
 }

@@ -1515,3 +1515,7 @@ button:disabled:hover, button[disabled]:hover {
 .feedback-thread-reply-foot button:disabled { opacity: .5; cursor: not-allowed; }
 .feedback-thread-reply-foot button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .feedback-thread-reply-error { margin: 0; color: var(--danger); font-size: var(--fs-small); }
+
+/* Image-safety guideline + held-photo indicator (CX-20260704). */
+.profile-photos-guideline { margin: 6px 0 0; padding: 10px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
+.profile-photo-pending-tag { position: absolute; top: 10px; right: 10px; max-width: 70%; padding: 4px 10px; border-radius: 999px; background: rgba(67,198,245,.16); color: var(--accent-info); font-size: 10px; font-weight: 900; letter-spacing: .02em; line-height: 1.2; }

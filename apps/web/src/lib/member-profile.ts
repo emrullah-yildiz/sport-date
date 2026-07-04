@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getDatabase } from "@/lib/db";
-import { listProfilePhotos, type ProfilePhoto } from "@/lib/photos";
+import { listApprovedProfilePhotos, type ProfilePhoto } from "@/lib/photos";
 import type { SessionUser } from "@/lib/session";
 
 // A member's profile as it appears to ANOTHER member (never self-view). This is a
@@ -190,8 +190,10 @@ export async function getViewableMemberProfile(
   if (!row) return null;
 
   // The block check above has already passed for this pairing, so it is safe to load
-  // (and later serve) this member's photos to the viewer.
-  const photos = await listProfilePhotos(String(row.id));
+  // (and later serve) this member's photos to the viewer. Only APPROVED photos are
+  // surfaced to another member — pending (awaiting image screening) and rejected
+  // photos are held and never shown (CX-20260704-feature-image-moderation).
+  const photos = await listApprovedProfilePhotos(String(row.id));
 
   return {
     id: String(row.id),

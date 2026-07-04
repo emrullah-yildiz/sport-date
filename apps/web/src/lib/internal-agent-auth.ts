@@ -12,3 +12,17 @@ export function isAuthorizedFeedbackAgent(request: Request): boolean {
   const header = request.headers.get("authorization");
   return header === `Bearer ${secret}`;
 }
+
+/**
+ * Same fail-closed guard for the internal photo-moderation actions
+ * (CX-20260704-feature-image-moderation-nudity-block): approve/reject a photo
+ * held for review. Bearer `MODERATION_AGENT_SECRET`; refuses when unset, so a
+ * misconfigured deploy never exposes an unauthenticated moderation trigger and
+ * members (who never hold the secret) can't approve or reject photos.
+ */
+export function isAuthorizedModerationAgent(request: Request): boolean {
+  const secret = process.env.MODERATION_AGENT_SECRET;
+  if (!secret) return false;
+  const header = request.headers.get("authorization");
+  return header === `Bearer ${secret}`;
+}

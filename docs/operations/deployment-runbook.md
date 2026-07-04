@@ -65,6 +65,8 @@ routes, the cron-authorized session-cleanup endpoint).
    | `SENTRY_DSN` | error reporting (EU region) | Sentry (owner step 5) | |
    | `CRON_SECRET` | shared bearer for the session-cleanup + attendance-reminder crons | generate a long random value | The cron endpoints **fail closed** if unset (never run unauthenticated). |
    | `FEEDBACK_AGENT_SECRET` | shared bearer for the internal feedback agent/admin API | generate a long random value | The `/api/internal/feedback*` write path **fails closed** if unset; members never hold it, so they can't post as "team" or change a status. |
+   | `MODERATION_AGENT_SECRET` | shared bearer for the internal photo-moderation approve/reject API | generate a long random value | `/api/internal/photo-moderation/[photoId]` **fails closed** if unset; resolves photos held for review. |
+   | `IMAGE_MODERATION_PROVIDER` (+ its key) | owner-provisioned image-safety provider id | empty until owner provisions one | When absent, new photo uploads are **held pending** (fail-safe), never auto-approved. Sending member images to a vendor is owner-gated; prefer an EU/GDPR-appropriate provider. |
 
    > `RUN_DB_INTEGRATION` is **test-only** and must NEVER be set in production.
 

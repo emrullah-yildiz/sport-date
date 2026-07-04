@@ -22,10 +22,14 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   const sql = getDatabase();
   // Resolve the photo id to its private blob pathname. A viewer must not be blocked
   // by the photo's owner (and vice versa); otherwise any authenticated member may
-  // view a member's profile photos in-app.
+  // view a member's profile photos in-app. AND a non-owner may only fetch an
+  // APPROVED photo — a pending (awaiting image screening) or rejected photo is
+  // served only to its own owner, never to other members
+  // (CX-20260704-feature-image-moderation-nudity-block).
   const rows = (await sql`
     SELECT blob_pathname FROM profile_photos AS photo
     WHERE photo.id = ${id}::uuid
+      AND (photo.user_id = ${viewer.id} OR photo.moderation_status = 'approved')
       AND NOT EXISTS (
         SELECT 1 FROM user_blocks
         WHERE (blocker_user_id = ${viewer.id} AND blocked_user_id = photo.user_id)

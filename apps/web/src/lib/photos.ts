@@ -9,7 +9,10 @@ import {
 } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
+import { moderateProfileImage } from "@/lib/image-moderation";
 import { deleteProfilePhotoBlob, storeProfilePhoto } from "@/lib/photo-storage";
+
+export type PhotoModerationStatus = "approved" | "pending" | "rejected";
 
 // Server-side profile photo domain operations (CX-20260701-profile-photo-series-up-to-six).
 //
@@ -25,6 +28,8 @@ export type ProfilePhoto = Readonly<{
   position: number;
   isPrimary: boolean;
   createdAt: string;
+  /** Automated-safety state. Only 'approved' photos are shown to other members. */
+  moderationStatus: PhotoModerationStatus;
 }>;
 
 type PhotoRow = {
@@ -33,6 +38,7 @@ type PhotoRow = {
   position: number;
   is_primary: boolean;
   created_at: string;
+  moderation_status: PhotoModerationStatus;
 };
 
 function mapRow(row: PhotoRow): ProfilePhoto {
@@ -42,16 +48,39 @@ function mapRow(row: PhotoRow): ProfilePhoto {
     position: row.position,
     isPrimary: row.is_primary,
     createdAt: row.created_at,
+    moderationStatus: row.moderation_status,
   };
 }
 
-/** The member's photos in presentation order (primary first among equal positions). */
+/**
+ * The OWNER's own photos (every status), in presentation order. The owner sees
+ * their pending/rejected photos with their state so the UI can explain that a
+ * held photo isn't visible to others yet.
+ */
 export async function listProfilePhotos(userId: string): Promise<ProfilePhoto[]> {
   const sql = getDatabase();
+  // Approved + pending (held) only. A 'rejected' photo has had its blob deleted,
+  // so it is excluded here — it would otherwise render as a broken image.
   const rows = (await sql`
-    SELECT id, alt, position, is_primary, created_at
+    SELECT id, alt, position, is_primary, created_at, moderation_status
     FROM profile_photos
-    WHERE user_id = ${userId}
+    WHERE user_id = ${userId} AND moderation_status <> 'rejected'
+    ORDER BY position ASC, created_at ASC
+  `) as unknown as PhotoRow[];
+  return rows.map(mapRow);
+}
+
+/**
+ * The APPROVED photos of a member, for viewing by OTHER members. Pending photos
+ * (uncertain or awaiting screening) and rejected photos are never surfaced to a
+ * viewer — the automated fail-safe hold. Callers must still apply the block gate.
+ */
+export async function listApprovedProfilePhotos(userId: string): Promise<ProfilePhoto[]> {
+  const sql = getDatabase();
+  const rows = (await sql`
+    SELECT id, alt, position, is_primary, created_at, moderation_status
+    FROM profile_photos
+    WHERE user_id = ${userId} AND moderation_status = 'approved'
     ORDER BY position ASC, created_at ASC
   `) as unknown as PhotoRow[];
   return rows.map(mapRow);
@@ -67,13 +96,55 @@ export async function getOwnedPhotoPathname(userId: string, photoId: string): Pr
 }
 
 export type AddPhotoResult =
-  | { ok: true; photo: ProfilePhoto }
-  | { ok: false; reason: "not-configured" | "strip-failed" | "storage-error" | "limit" };
+  | { ok: true; photo: ProfilePhoto; held: boolean }
+  | { ok: false; reason: "not-configured" | "strip-failed" | "storage-error" | "limit" | "rejected" };
 
 /**
- * Store the bytes in the private blob store (metadata stripped there) and record
- * the photo. The insert is guarded by a COUNT so the 6-photo ceiling holds even
- * under concurrency; if the ceiling is hit the just-stored blob is cleaned up.
+ * File a SYSTEM entry in the existing moderation queue for a photo held for
+ * review (borderline classification, or no provider configured). No member is
+ * the reporter (reporter_user_id is left NULL); the subject is the photo owner.
+ * The photo id + reason travel in the details/metadata so a moderator can locate
+ * it. Best-effort — a queue-write failure must not fail the upload.
+ */
+async function fileSystemPhotoReview(userId: string, photoId: string, reason: string): Promise<void> {
+  try {
+    const sql = getDatabase();
+    // A provider "uncertain" flag is a potential-sexual-content signal; a plain
+    // hold (no provider / not implemented / error) is a neutral awaiting-screening
+    // item. Categorise honestly so the queue isn't mislabelled.
+    const isSexualSignal = reason === "uncertain" || reason === "explicit";
+    const category = isSexualSignal ? "sexual_misconduct" : "other";
+    const priority = isSexualSignal ? "urgent" : "standard";
+    const details = `[auto image screening] profile photo ${photoId} held for review (reason: ${reason}). Awaiting a moderator decision; the photo is hidden from other members until approved.`;
+    const reportId = crypto.randomUUID();
+    const metadata = JSON.stringify({ subject: "profile_photo", photoId, reason, source: "image-moderation" });
+    await sql.transaction([
+      sql`
+        INSERT INTO safety_reports (id, reporter_user_id, reported_user_id, category, details, priority)
+        VALUES (${reportId}::uuid, NULL, ${userId}, ${category}, ${details}, ${priority})
+      `,
+      sql`
+        INSERT INTO moderation_audit_log (report_id, actor_type, actor_user_id, action, next_status, metadata)
+        VALUES (${reportId}::uuid, 'system', NULL, 'report_created', 'open', ${metadata}::jsonb)
+      `,
+    ]);
+  } catch (error) {
+    console.error("Failed to file system photo-review report (non-fatal):", error);
+  }
+}
+
+/**
+ * Screen, then store. The image is FIRST run through the fail-safe moderation
+ * seam (`moderateProfileImage`):
+ *   - "reject" (nude/sexually-explicit) → the bytes are NEVER stored; a calm,
+ *     non-shaming rejection is returned.
+ *   - "review" (uncertain, or no provider configured, or provider error) → the
+ *     photo is stored as `pending` (shown only to its owner) and a system entry
+ *     is filed in the moderation queue for human review. We never auto-approve
+ *     an unverifiable image, so explicit content can never fail open.
+ *   - "allow" (a configured provider classed it clean) → stored `approved`.
+ * The 6-photo ceiling is still enforced by the COUNT-guarded insert; a held/
+ * approved orphan blob is cleaned up if the ceiling is hit.
  */
 export async function addProfilePhoto(
   userId: string,
@@ -81,6 +152,13 @@ export async function addProfilePhoto(
   alt: string,
   bytes: Uint8Array,
 ): Promise<AddPhotoResult> {
+  // Screen BEFORE anything is stored, so rejected bytes never reach the store.
+  const moderation = await moderateProfileImage(contentType, bytes);
+  if (moderation.decision === "reject") {
+    return { ok: false, reason: "rejected" };
+  }
+  const status: PhotoModerationStatus = moderation.decision === "allow" ? "approved" : "pending";
+
   const stored = await storeProfilePhoto(userId, contentType, bytes);
   if (!stored.ok) {
     if (stored.reason === "not-configured") return { ok: false, reason: "not-configured" };
@@ -92,13 +170,14 @@ export async function addProfilePhoto(
   const id = crypto.randomUUID();
   try {
     const rows = (await sql`
-      INSERT INTO profile_photos (id, user_id, blob_pathname, content_type, byte_size, alt, position, is_primary)
+      INSERT INTO profile_photos (id, user_id, blob_pathname, content_type, byte_size, alt, position, is_primary, moderation_status)
       SELECT ${id}::uuid, ${userId}, ${stored.pathname}, ${stored.contentType}, ${stored.byteSize}, ${alt},
         COALESCE((SELECT MAX(position) + 1 FROM profile_photos WHERE user_id = ${userId}), 0),
-        NOT EXISTS (SELECT 1 FROM profile_photos WHERE user_id = ${userId})
+        NOT EXISTS (SELECT 1 FROM profile_photos WHERE user_id = ${userId}),
+        ${status}
       WHERE (SELECT COUNT(*) FROM profile_photos WHERE user_id = ${userId}) < ${MAX_PROFILE_PHOTOS}
         AND EXISTS (SELECT 1 FROM users WHERE id = ${userId} AND account_status = 'active')
-      RETURNING id, alt, position, is_primary, created_at
+      RETURNING id, alt, position, is_primary, created_at, moderation_status
     `) as unknown as PhotoRow[];
     if (rows.length === 0) {
       // Ceiling hit (or account gone) between the storage write and the insert —
@@ -106,11 +185,41 @@ export async function addProfilePhoto(
       await deleteProfilePhotoBlob(stored.pathname);
       return { ok: false, reason: "limit" };
     }
-    return { ok: true, photo: mapRow(rows[0]) };
+    if (status === "pending") {
+      await fileSystemPhotoReview(userId, id, moderation.reason);
+    }
+    return { ok: true, photo: mapRow(rows[0]), held: status === "pending" };
   } catch (error) {
     await deleteProfilePhotoBlob(stored.pathname);
     throw error;
   }
+}
+
+/**
+ * Resolve a photo held for review — the moderator/agent decision. `approve`
+ * makes it visible to others; `reject` hides it and deletes its blob (the bytes
+ * leave the store). Returns false when the photo doesn't exist. Used by the
+ * protected internal moderation route.
+ */
+export async function setPhotoModerationStatus(photoId: string, action: "approve" | "reject"): Promise<boolean> {
+  const sql = getDatabase();
+  if (action === "reject") {
+    const rows = (await sql`
+      UPDATE profile_photos SET moderation_status = 'rejected'
+      WHERE id = ${photoId}::uuid AND moderation_status <> 'rejected'
+      RETURNING blob_pathname
+    `) as unknown as Array<{ blob_pathname: string }>;
+    if (rows.length === 0) return false;
+    // A rejected image should not linger in the store.
+    await deleteProfilePhotoBlob(rows[0].blob_pathname);
+    return true;
+  }
+  const rows = (await sql`
+    UPDATE profile_photos SET moderation_status = 'approved'
+    WHERE id = ${photoId}::uuid
+    RETURNING id
+  `) as unknown as Array<{ id: string }>;
+  return rows.length > 0;
 }
 
 /** Delete a member's photo and its blob. Re-primaries the series if needed. */

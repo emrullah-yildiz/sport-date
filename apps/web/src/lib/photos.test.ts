@@ -6,6 +6,7 @@ vi.mock("@/lib/photo-storage", () => ({
   storeProfilePhoto: vi.fn(),
   deleteProfilePhotoBlob: vi.fn(),
 }));
+vi.mock("@/lib/image-moderation", () => ({ moderateProfileImage: vi.fn() }));
 
 let addProfilePhoto: typeof import("./photos").addProfilePhoto;
 let reorderProfilePhotos: typeof import("./photos").reorderProfilePhotos;
@@ -13,6 +14,7 @@ let reportProfilePhoto: typeof import("./photos").reportProfilePhoto;
 let getDatabase: typeof import("@/lib/db").getDatabase;
 let storeProfilePhoto: typeof import("@/lib/photo-storage").storeProfilePhoto;
 let deleteProfilePhotoBlob: typeof import("@/lib/photo-storage").deleteProfilePhotoBlob;
+let moderateProfileImage: typeof import("@/lib/image-moderation").moderateProfileImage;
 
 // Minimal tagged-template SQL stub. Each call returns the next queued result.
 function mockSql(results: unknown[][]) {
@@ -35,12 +37,16 @@ beforeAll(async () => {
   ({ addProfilePhoto, reorderProfilePhotos, reportProfilePhoto } = await import("./photos"));
   ({ getDatabase } = await import("@/lib/db"));
   ({ storeProfilePhoto, deleteProfilePhotoBlob } = await import("@/lib/photo-storage"));
+  ({ moderateProfileImage } = await import("@/lib/image-moderation"));
 });
 
 beforeEach(() => {
   vi.mocked(getDatabase).mockReset();
   vi.mocked(storeProfilePhoto).mockReset();
   vi.mocked(deleteProfilePhotoBlob).mockReset();
+  vi.mocked(moderateProfileImage).mockReset();
+  // Default: a configured provider classed the image clean (approved).
+  vi.mocked(moderateProfileImage).mockResolvedValue({ decision: "allow", provider: "test", reason: "clean" });
 });
 
 describe("addProfilePhoto", () => {
@@ -82,8 +88,44 @@ describe("addProfilePhoto", () => {
 
     const result = await addProfilePhoto("42", "image/jpeg", "court", new Uint8Array([1]));
     expect(result.ok).toBe(true);
-    if (result.ok) expect(result.photo.isPrimary).toBe(true);
+    if (result.ok) {
+      expect(result.photo.isPrimary).toBe(true);
+      expect(result.held).toBe(false); // clean → approved, visible to others
+    }
     expect(deleteProfilePhotoBlob).not.toHaveBeenCalled();
+  });
+
+  it("REJECTS an explicit image at upload: nothing is stored and no row is written", async () => {
+    vi.mocked(moderateProfileImage).mockResolvedValue({ decision: "reject", provider: "test", reason: "explicit" });
+    const result = await addProfilePhoto("42", "image/jpeg", "", new Uint8Array([1]));
+    expect(result).toEqual({ ok: false, reason: "rejected" });
+    // Fail-safe: the bytes never reached the store and the DB was never touched.
+    expect(storeProfilePhoto).not.toHaveBeenCalled();
+    expect(getDatabase).not.toHaveBeenCalled();
+  });
+
+  it("HOLDS an uncertain/no-provider image as pending and files a system moderation review", async () => {
+    vi.mocked(moderateProfileImage).mockResolvedValue({ decision: "review", provider: "none", reason: "no-provider-fail-safe" });
+    vi.mocked(storeProfilePhoto).mockResolvedValue({
+      ok: true, pathname: "profile-photos/42/x", byteSize: 10, contentType: "image/jpeg",
+    });
+    const { sql, args } = mockSql([[
+      { id: "22222222-2222-4222-8222-222222222222", alt: "", position: 0, is_primary: true, created_at: "t", moderation_status: "pending" },
+    ]]);
+    let transactionCalls = 0;
+    (sql as unknown as { transaction: unknown }).transaction = () => { transactionCalls += 1; return Promise.resolve([]); };
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    const result = await addProfilePhoto("42", "image/jpeg", "", new Uint8Array([1]));
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.held).toBe(true);
+      expect(result.photo.moderationStatus).toBe("pending");
+    }
+    // The INSERT persisted the pending status…
+    expect(args[0]).toContain("pending");
+    // …and a system moderation-queue entry was filed (the transaction).
+    expect(transactionCalls).toBe(1);
   });
 });
 
