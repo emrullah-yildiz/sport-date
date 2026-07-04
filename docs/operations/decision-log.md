@@ -1,5 +1,15 @@
 # Decision log
 
+## 2026-07-04 - Host request queues cannot depend on optional sport-profile rows
+
+Members are allowed to request an event without listing that sport in their profile. Every downstream host/room query must therefore treat the matching `user_sports` row as optional. The host queue and accepted-participant room query now use a left join with an honest “not listed” skill fallback; an absent sport row can no longer hide a valid pending request, its approve/pass controls, or an accepted participant. Host authorization remains embedded in the event join condition, and precise location is still disclosed only after acceptance.
+
+## 2026-07-04 - Exact event addresses use authenticated search-and-select pins
+
+Hosts now search for an event arrival address and must choose a geocoder suggestion before event creation or a location edit succeeds. The selected latitude/longitude pair is stored in the existing private event-location record and is used by the post-acceptance directions link; free text without a pin is rejected at the API boundary. Discovery, public invitations, social previews, and notifications remain approximate-only and never join or serialize the private location.
+
+The authenticated `/api/locations/search` proxy uses Photon’s OpenStreetMap-based search-as-you-type API, returns at most six data-minimized suggestions, applies per-user and per-IP rate limits, disables caching, and does not forward the member’s IP, cookies, session, or identity. The provider receives the typed location query and the Sport Date server IP; the UI discloses OpenStreetMap attribution. `LOCATION_SEARCH_BASE_URL` makes the provider replaceable/self-hostable. The public Photon demo is suitable for low-volume preview use but has no availability guarantee and may throttle heavy traffic, so production-scale use requires a self-hosted instance or a reviewed contracted provider. Exact-location access control is unchanged: only the host and accepted participants receive the stored pin.
+
 ## 2026-07-01 - Discovery skill matching is inclusive upward, not exact (CX-20260701)
 
 Owner decision applied (direct feedback 2026-07-01, "I cannot find events published by others"). Skill levels are ordered beginner < intermediate < advanced. Events list the levels they welcome and default to `[beginner, intermediate]`. The old matching clause `compatible_sport.skill_level = ANY(events.experience_levels)` required EXACT membership, so a member whose sport skill is `advanced` matched **no** default event and got an empty/sparse discover feed with no explanation — a silent discovery-fairness failure at the most important first moment.

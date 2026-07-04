@@ -47,6 +47,18 @@ export function validateEventPostalCode(raw: unknown): { valid: true; postalCode
   return { valid: true, postalCode };
 }
 
+export function validatePinnedEventLocation(latitude: unknown, longitude: unknown): { valid: true; latitude: number; longitude: number } | { valid: false; error: string } {
+  if (latitude === null || latitude === undefined || latitude === "" || longitude === null || longitude === undefined || longitude === "") {
+    return { valid: false, error: "Choose a suggested address to set its map pin." };
+  }
+  const lat = typeof latitude === "number" ? latitude : Number(latitude);
+  const lng = typeof longitude === "number" ? longitude : Number(longitude);
+  if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lng) || lng < -180 || lng > 180) {
+    return { valid: false, error: "Choose a suggested address to set its map pin." };
+  }
+  return { valid: true, latitude: lat, longitude: lng };
+}
+
 /** The full one-line address for display on an accepted surface. */
 export function formatFullAddress(input: { address: string; postalCode?: string | null; city?: string | null }): string {
   return [input.address, input.postalCode ?? "", input.city ?? ""]

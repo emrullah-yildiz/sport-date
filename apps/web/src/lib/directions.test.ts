@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDirectionsUrl, formatFullAddress, validateEventPostalCode } from "./directions";
+import { buildDirectionsUrl, formatFullAddress, validateEventPostalCode, validatePinnedEventLocation } from "./directions";
 
 describe("buildDirectionsUrl — keyless Google Maps directions", () => {
   it("prefers precise coordinates when available", () => {
@@ -18,6 +18,14 @@ describe("buildDirectionsUrl — keyless Google Maps directions", () => {
   it("ignores non-finite coordinates and uses the address instead", () => {
     const url = buildDirectionsUrl({ latitude: Number.NaN, longitude: 26, venueName: "V", address: "A" });
     expect(url).toContain(encodeURIComponent("V, A"));
+  });
+});
+
+describe("validatePinnedEventLocation", () => {
+  it("requires a valid selected coordinate pair", () => {
+    expect(validatePinnedEventLocation(44.4268, 26.1025)).toEqual({ valid: true, latitude: 44.4268, longitude: 26.1025 });
+    expect(validatePinnedEventLocation(null, null).valid).toBe(false);
+    expect(validatePinnedEventLocation(91, 26).valid).toBe(false);
   });
 });
 

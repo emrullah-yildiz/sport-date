@@ -115,7 +115,7 @@ export default function HostRequestDecision({
     return (
       <motion.div key="deciding" className="host-decision" {...panelMotion}>
         <button className="skip-request" type="button" onClick={() => decide("skip")} disabled={submitting}>{hostSkipButtonLabel(skipCount)}</button>
-        <button className="accept-request" type="button" onClick={() => decide("accept")} disabled={submitting}>Accept</button>
+        <button className="accept-request" type="button" onClick={() => decide("accept")} disabled={submitting}>Approve request</button>
         {skipCount >= 2 ? <p className="host-decision-note">This next skip closes the request quietly.</p> : null}
         {error ? <p role="alert">{error}</p> : null}
       </motion.div>

@@ -348,11 +348,13 @@ export async function getHostJoinRequests(eventId: string, hostId: string): Prom
     SELECT request.id, request.status, request.skip_count, request.introduction, request.requested_at,
       request.requester_user_id,
       requester.first_name, DATE_PART('year', AGE(CURRENT_DATE, requester.date_of_birth))::integer AS age,
-      requester.bio, requester.languages, sport.skill_level
+      requester.bio, requester.languages, COALESCE(sport.skill_level, 'not listed') AS skill_level
     FROM join_requests AS request
     JOIN events ON events.id = request.event_id AND events.host_user_id = ${hostId}
     JOIN users AS requester ON requester.id = request.requester_user_id
-    JOIN user_sports AS sport ON sport.user_id = requester.id AND LOWER(sport.sport) = LOWER(events.sport)
+    -- A member may request an event without listing that sport in their profile.
+    -- The optional sport row enriches the card but must never hide the request.
+    LEFT JOIN user_sports AS sport ON sport.user_id = requester.id AND LOWER(sport.sport) = LOWER(events.sport)
     WHERE request.event_id = ${eventId}::uuid
     ORDER BY CASE request.status WHEN 'pending' THEN 0 WHEN 'accepted' THEN 1 ELSE 2 END, request.updated_at DESC
   ` as unknown as HostJoinRequestRow[];
@@ -509,7 +511,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     SELECT
       member.id AS user_id,
       member.first_name,
-      sport.skill_level,
+      COALESCE(sport.skill_level, 'not listed') AS skill_level,
       ${latestUpdateId}::uuid IS NOT NULL
         AND EXISTS (
           SELECT 1 FROM event_update_notice_receipts
@@ -524,7 +526,7 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     FROM event_participants AS participant
     JOIN users AS member ON member.id = participant.user_id AND member.account_status = 'active'
     JOIN events ON events.id = participant.event_id
-    JOIN user_sports AS sport ON sport.user_id = member.id AND LOWER(sport.sport) = LOWER(events.sport)
+    LEFT JOIN user_sports AS sport ON sport.user_id = member.id AND LOWER(sport.sport) = LOWER(events.sport)
     WHERE participant.event_id = ${eventId}::uuid
       AND NOT EXISTS (
         SELECT 1 FROM user_blocks

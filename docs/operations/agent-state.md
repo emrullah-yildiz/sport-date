@@ -1,5 +1,13 @@
 # Agent state
 
+## Latest work cycle - 2026-07-04 (host request controls)
+
+**Pending join requests are actionable again.** The host queue had drifted from the relaxed join rule: members may request without listing the event sport, but an inner `user_sports` join silently removed their request card and its controls. The queue and accepted-participant room query now retain those members with a “not listed” skill fallback. Hosting cards with pending requests deep-link directly to `#join-requests`, the primary decision now reads “Approve request,” and members with a pending/accepted request see “Manage request” from discovery so cancellation is findable. Host authorization and post-acceptance exact-location gating are unchanged. Regression coverage pins the optional-sport case and host-owned query boundary. Verification: full web suite green (923 passed, 12 skipped), web typecheck and production build green, lint green with two pre-existing warnings.
+
+## Latest work cycle - 2026-07-04
+
+**Exact event pin selection is implemented.** Event create/edit now offers an accessible debounced address search, requires the host to choose a suggestion, persists its precise coordinates in the existing private-location boundary, and makes “Get directions” target that pin. An authenticated, rate-limited, no-store server proxy data-minimizes Photon/OpenStreetMap results and avoids sending member identity, cookies, or client IP to the geocoder. Exact pins remain limited to hosts and accepted participants. Provider availability is the remaining operational risk; `LOCATION_SEARCH_BASE_URL` supports a reviewed/self-hosted replacement before scale. Verification: live Photon response checked; full web suite green (922 passed, 12 skipped), lint green with two pre-existing warnings, web typecheck green, and the Next.js production build green.
+
 ## Planning snapshot — 2026-07-01 (Planner)
 
 **Current focus:** Product is fully functional and prod is healthy; all P0/P1 are done and verified. The loop is now grooming and closing the remaining trust/safety, recovery, and vibe polish so the free core loop is credible before any monetization work begins.

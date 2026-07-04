@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 import { type EventCreationInput, validateEventCreation } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
-import { validateEventPostalCode } from "@/lib/directions";
+import { validateEventPostalCode, validatePinnedEventLocation } from "@/lib/directions";
 import { classifyEventUpdateSeverity, type EventUpdateField } from "@/lib/event-updates";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -106,6 +106,8 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
   const postalCode = postal.postalCode;
 
   const event = validation.data;
+  const pin = validatePinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
+  if (!pin.valid) return NextResponse.json({ error: pin.error, errors: [pin.error] }, { status: 400 });
   const sql = getDatabase();
   const currentRows = await sql`
     SELECT

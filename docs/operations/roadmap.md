@@ -18,6 +18,7 @@
 - [x] Define and test event lifecycle, capacity, adult age range, location, language, experience, blocking, cancellation, and visibility rules.
 - [x] Implement authenticated profile editing with server-derived ownership and shared validation.
 - [x] Implement host event creation with separate public event and private meeting-location persistence.
+- [x] Replace free-text event directions with authenticated address autocomplete, explicit suggestion selection, and stored private pin coordinates.
 - [x] Implement privacy-preserving discovery eligibility and city, sport, language, and time filters.
 - [x] Implement request, accept, skip, third-skip decline, requester cancellation, and atomic seat-capacity invariants.
 - [x] Add server-authorized event rooms for hosts and accepted participants without open messaging.

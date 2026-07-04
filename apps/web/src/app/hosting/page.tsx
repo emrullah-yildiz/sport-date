@@ -47,7 +47,7 @@ function HostedEventCard({ event }: { event: HostedEvent }) {
             {isUpcoming ? (
               coordination.hasPending ? (
                 <dd>
-                  <Link href={`/events/${event.id}`} aria-label={`${coordination.pendingLabel} for ${event.title} — open to accept or decline`}>
+                  <Link href={`/events/${event.id}#join-requests`} aria-label={`${coordination.pendingLabel} for ${event.title} — open to approve or pass`}>
                     {coordination.pendingLabel} <span aria-hidden="true">→</span>
                   </Link>
                 </dd>
@@ -80,8 +80,8 @@ function HostedEventCard({ event }: { event: HostedEvent }) {
         </div>
       ) : null}
       <footer>
-        <Link href={`/events/${event.id}`} aria-label={`Manage ${event.title}`}>
-          {event.hostedStatus === "upcoming" ? "Manage, edit or cancel" : "Review this event"} <span aria-hidden="true">→</span>
+        <Link href={coordination?.hasPending ? `/events/${event.id}#join-requests` : `/events/${event.id}`} aria-label={`Manage ${event.title}`}>
+          {event.hostedStatus === "upcoming" ? (coordination?.hasPending ? "Review requests, edit or cancel" : "Manage, edit or cancel") : "Review this event"} <span aria-hidden="true">→</span>
         </Link>
       </footer>
     </article>

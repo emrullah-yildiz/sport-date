@@ -4,7 +4,7 @@ import { validateEventCreation } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getDatabase } from "@/lib/db";
-import { validateEventPostalCode } from "@/lib/directions";
+import { validateEventPostalCode, validatePinnedEventLocation } from "@/lib/directions";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -39,6 +39,8 @@ export async function POST(request: Request) {
   const postalCode = postal.postalCode;
 
   const event = validation.data;
+  const pin = validatePinnedEventLocation(event.location.private.latitude, event.location.private.longitude);
+  if (!pin.valid) return NextResponse.json({ error: pin.error, errors: [pin.error] }, { status: 400 });
   const eventId = crypto.randomUUID();
   const experienceLevels = JSON.stringify(event.experienceLevels);
   const sql = getDatabase();

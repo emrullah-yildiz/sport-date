@@ -188,6 +188,7 @@ export function fieldForServerMessage(message: string): EventFieldName | null {
   if (text.includes("public area") || text.includes("area")) return "areaLabel";
   if (text.includes("venue")) return "venueName";
   if (text.includes("postal")) return "postalCode";
+  if (text.includes("map pin") || text.includes("suggested address")) return "address";
   if (text.includes("address")) return "address";
   if (text.includes("instructions")) return "instructions";
   return null;

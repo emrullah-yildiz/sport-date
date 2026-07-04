@@ -220,7 +220,7 @@ export default async function HostEventPage({
       <HostEditEventForm event={event} />
       <HostCancelEventControl eventId={event.id} />
 
-      <section className="host-requests">
+      <section className="host-requests" id="join-requests" tabIndex={-1}>
         <p className="panel-label">Join requests</p>
         <h2>{requests.length === 0 ? "The sideline is quiet." : `${requests.length} ${requests.length === 1 ? "person" : "people"} responded`}</h2>
 

@@ -221,7 +221,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
                   <p className="discovery-description">{event.description}</p>
                 </div>
                 <div className="discovery-meta"><span>{event.language}</span><span>{event.experienceLevels.join(" / ")}</span><span>Ages {event.minimumAge}–{event.maximumAge}</span></div>
-                <footer><span>{event.request ? joinRequestStateHeadline(event.request.status) : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request ? "View request" : "See the invitation"}</Link></footer>
+                <footer><span>{event.request ? joinRequestStateHeadline(event.request.status) : `Hosted by ${event.hostFirstName}`}</span><Link href={`/discover/events/${event.id}`}>{event.request && (event.request.status === "pending" || event.request.status === "accepted") ? "Manage request" : event.request ? "View request" : "See the invitation"}</Link></footer>
               </article>
             );
           })}</div>

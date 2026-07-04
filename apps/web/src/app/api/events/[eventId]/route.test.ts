@@ -83,7 +83,7 @@ describe("browser host event cancellation route", () => {
           participantAgeRange: { minimum: 24, maximum: 38 },
           location: {
             public: { city: "Bucharest", countryCode: "RO", areaLabel: "Floreasca", approximateLatitude: null, approximateLongitude: null },
-            private: { venueName: "Court 2", address: "Exact address", postalCode: "010101", instructions: "Ask for the evening group.", latitude: null, longitude: null },
+            private: { venueName: "Court 2", address: "Exact address", postalCode: "010101", instructions: "Ask for the evening group.", latitude: 44.4268, longitude: 26.1025 },
           },
         }),
       }),
