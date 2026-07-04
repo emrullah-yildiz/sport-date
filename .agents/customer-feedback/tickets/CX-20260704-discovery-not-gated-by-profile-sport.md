@@ -1,6 +1,6 @@
 # CX-20260704-discovery-not-gated-by-profile-sport
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P0` — owner-confirmed defect (2026-07-04): a member cannot discover events for sports they haven't added to their profile. Verified against prod: account 35 (Bucharest, age 31) does NOT see the Bucharest Tennis event solely because Tennis isn't in its profile. This silently hides most events from most members — kills discovery/liquidity.
 - Customer journey: a member opens Discover → should see all compatible local events (any sport) → today only sees events whose sport is already in their profile.
