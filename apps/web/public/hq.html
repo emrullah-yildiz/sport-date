@@ -87,6 +87,14 @@
   .st.c-run{ color:var(--neon); } .st.c-idle{ color:var(--mut); } .st.c-done{ color:var(--blue); } .st.c-wait{ color:var(--amber); }
   .btnrow{ margin-top:14px; }
   .btn{ display:inline-block; border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:13px; font-weight:700; color:var(--neon); margin-right:8px; }
+  /* visible agent board (each agent + what it's working on right now) */
+  .aboard{ border:1px solid var(--line); border-radius:14px; background:var(--panel); overflow:hidden; }
+  .aboard .r{ display:flex; gap:11px; align-items:flex-start; padding:13px 18px; border-bottom:1px solid var(--line); }
+  .aboard .r:last-child{ border-bottom:0; }
+  .aboard .dot{ width:9px; height:9px; border-radius:50%; margin-top:6px; flex:none; }
+  .aboard .rn{ font-size:14px; font-weight:700; }
+  .aboard .rs{ font-size:13px; color:#c8d3d0; margin-top:2px; line-height:1.5; }
+  .aboard .st{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; margin-left:auto; flex:none; padding-top:4px; }
 </style>
 </head>
 <body>
@@ -101,19 +109,13 @@
   </div>
 
   <div id="roster" aria-label="Agent roster">
-    <h4>Agent roster — as of the last CEO cycle (2026-07-04, late night)</h4>
-    <div class="r"><span class="dot run"></span><div><div class="rn">CEO (Claude, main session)</div><div class="rs">Orchestrating: shipped SEO/OG layer, filed survey + conversion tickets, runs standups</div></div><span class="st c-run">Running</span></div>
-    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — event-invite ticket</div><div class="rs">✅ Shipped: /e/{id} public invite + on-brand OG card, 785 tests green, live-verified, pushed (186k tokens)</div></div><span class="st c-done">Done</span></div>
-    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — landing conversion pack</div><div class="rs">✅ Shipped: intents lead the hero, "Early preview · open" badge, credentials-last signup; 795 tests, live-verified at 390px (245k tokens)</div></div><span class="st c-done">Done</span></div>
-    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — /research market survey</div><div class="rs">✅ LIVE on prod: anonymous survey, unlinkable contact table, 820 tests, migration auto-applied (313k tokens)</div></div><span class="st c-done">Done</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">Builder — invite-a-friend</div><div class="rs">⏸ Paused: hit the API session limit mid-build (resets ~06:10 Bucharest). Not started — resumes automatically then (P2)</div></div><span class="st c-wait">Paused</span></div>
-    <div class="r"><span class="dot done"></span><div><div class="rn">Funnel/SEO auditor (Explore)</div><div class="rs">Done: 9 findings returned; metadata layer already shipped from them (61k tokens)</div></div><span class="st c-done">Done</span></div>
-    <div class="r"><span class="dot run"></span><div><div class="rn">Social growth autopilot</div><div class="rs">Active: 10 posts queued, first publishes 06:00; batch 03 drafted (TikTok photo-mode)</div></div><span class="st c-run">Active</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">User-simulator — essential-ops QA</div><div class="rs">⏸ Paused: session limit before the deep pass (only set up its worktree). CEO ran surface QA in the meantime (all green); deep member-journey pass resumes ~06:10</div></div><span class="st c-wait">Paused</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">Builder — group chat (P1)</div><div class="rs">Assigned: private chat for accepted event attendees. Dispatched; runs when the API session limit clears (~06:10). Adds a migration → commit-not-push</div></div><span class="st c-wait">Assigned</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">Builder — attendance confirm + T-2h reminder (P1)</div><div class="rs">Queued: confirm/cancel loop, tokenized links, DARK email behind EMAIL_DELIVERY_ENABLED (card #9), Vercel cron</div></div><span class="st c-wait">Queued</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">Builder — invite-a-friend (P2)</div><div class="rs">Queued behind the two P1 features</div></div><span class="st c-wait">Queued</span></div>
-    <div class="r"><span class="dot idle"></span><div><div class="rn">Experience loop (Planner/Tester/User-sim)</div><div class="rs">Standby: 4-agent loop not running a tick right now; backlog was cleared, new tickets await next run</div></div><span class="st c-idle">Standby</span></div>
+    <h4>Agent roster — as of the last CEO cycle (2026-07-04, off-style fix pass)</h4>
+    <div class="r"><span class="dot run"></span><div><div class="rn">CEO (Claude, main session)</div><div class="rs">Shipping off-style UI fixes + refreshing the HQ agent board</div></div><span class="st c-run">Running</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — safety &amp; hardening bundle</div><div class="rs">✅ 3 audit tickets shipped (attendance reliability, co-participant block, hardening); 994 tests, pushed</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Visual-QA auditor</div><div class="rs">✅ Full CSS cascade audit → 9 off-style findings; confirmed ones fixed &amp; live</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — region empty-state</div><div class="rs">✅ Honest "not live near you yet" empty state + privacy-safe demand capture, shipped</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot run"></span><div><div class="rn">Social growth autopilot</div><div class="rs">Active: 10 posts queued (Jul 4–8); measure/prune loop armed. Video track paused on card #1</div></div><span class="st c-run">Active</span></div>
+    <div class="r"><span class="dot idle"></span><div><div class="rn">Experience loop (Planner/Tester/User-sim)</div><div class="rs">Standby: buildable backlog cleared, awaits next dispatch</div></div><span class="st c-idle">Standby</span></div>
     <div class="r"><span class="dot idle"></span><div><div class="rn">Video production</div><div class="rs">Blocked: awaiting owner's AI-video tool (decision card #1); 5 posts paused</div></div><span class="st c-idle">Blocked</span></div>
   </div>
 
@@ -209,16 +211,15 @@
     </div>
   </div>
 
-  <h2 class="sec">▸ Agent standup (2026-07-04)</h2>
-  <div class="note">
-    <p><b>Experience loop:</b> the four-agent build loop (Planner → Builder → Tester → User-simulator) has
-    <b>cleared its entire buildable backlog</b> — two explorer rounds were fully built, verified, and archived, plus the
-    P0 auto-migrate-on-deploy infra shipped and live-verified. Product is healthy; nothing in-app is broken. The loop is
-    now <b>idle, blocked only on you</b> (cards #5–7).</p>
-    <p><b>Social growth agent:</b> live and producing — 10 in-brand posts designed and auto-scheduled (Jul 4–8), measure/prune
-    loop armed for first follower data. Video track paused pending card #1.</p>
-    <p><b>My intervention as CEO:</b> idle engineering is wasted runway, so I've redirected it to growth — two buildable,
-    non-owner-gated tickets filed below. That keeps the Builder shipping revenue-path work while you clear the blockers.</p>
+  <h2 class="sec">▸ Agents — what each is working on right now</h2>
+  <div class="aboard">
+    <div class="r"><span class="dot run"></span><div><div class="rn">CEO (Claude, main session)</div><div class="rs">Shipping the off-style UI fix pass (readiness CTA, profile-editor checkboxes, photo controls, select/focus tokens) and refreshing this board.</div></div><span class="st c-run">Running</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — safety &amp; hardening bundle</div><div class="rs">✅ Shipped 3 audit tickets: attendance-cancel reliability + sweep window, co-participant block safety, core-loop hardening. 994 tests, pushed.</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Visual-QA auditor</div><div class="rs">✅ Full globals.css cascade audit → 9 off-style findings returned; every confirmed one now fixed &amp; live.</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Builder — region empty-state</div><div class="rs">✅ Honest "not live in your area yet — you're on the early list" empty state + privacy-safe demand capture. Shipped.</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot run"></span><div><div class="rn">Social growth autopilot</div><div class="rs">10 in-brand posts scheduled (Jul 4–8); measure/prune loop armed for first follower data. Video track paused on card #1.</div></div><span class="st c-run">Active</span></div>
+    <div class="r"><span class="dot idle"></span><div><div class="rn">Experience loop (Planner / Tester / User-sim)</div><div class="rs">Buildable backlog cleared; on standby for the next dispatch. Tester runs in an isolated worktree to avoid build collisions.</div></div><span class="st c-idle">Standby</span></div>
+    <div class="r"><span class="dot idle"></span><div><div class="rn">Video production</div><div class="rs">Blocked awaiting your AI-video tool (decision card #1); 5 posts paused.</div></div><span class="st c-idle">Blocked</span></div>
   </div>
 
   <h2 class="sec">▸ New tasks I've assigned the agents</h2>
