@@ -1,5 +1,11 @@
 # Decision log
 
+## 2026-07-04 - Join-request decisions notify the requester without exposing host behavior or location
+
+Approved and finally declined join requests now produce one best-effort transactional email through the shared fail-closed Gmail delivery gate. The notification is triggered only after the database transition succeeds and is shared by browser and mobile host actions. Delivery failure never rolls back or falsely reports the host's completed decision; the in-app request state remains authoritative.
+
+Intermediate host skips remain private and send no email. Only the third skip, which changes the request to `declined`, sends the final closed-request notice. Decline copy exposes neither skip count nor a host reason. Approval email contains the public approximate area and links the authenticated member to the event room; it never queries or embeds `event_private_locations`, the precise pin, or arrival address. This preserves the rule that exact meeting details are disclosed only through authorized post-acceptance access.
+
 ## 2026-07-04 - Gmail is the private-beta transactional email provider
 
 The owner approved their connected Gmail account as the temporary private-beta sender, using the verified `support@keepitup.social` alias. One server-only Gmail API adapter now serves email verification, password reset, T-2h attendance reminders, and feedback-thread updates. It requests only the owner-authorized send capability; the application does not read or modify the mailbox. The adapter exchanges a refresh token for short-lived access tokens, builds multipart text/HTML MIME, and returns only Gmail’s message id. It never logs OAuth secrets or email bodies.

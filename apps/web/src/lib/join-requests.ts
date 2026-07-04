@@ -16,6 +16,7 @@ import {
 } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
+import { notifyRequesterOfJoinDecision } from "@/lib/join-request-notifications";
 
 type ReliabilityRow = {
   late_cancellation_streak: number;
@@ -224,7 +225,10 @@ export async function decideEventJoinRequest(eventId: string, requestId: string,
         AND request.status = 'pending'
       RETURNING request.status, request.skip_count
     `;
-    return rows[0] ? { status: String(rows[0].status), skipCount: Number(rows[0].skip_count) } : null;
+    if (!rows[0]) return null;
+    const decision = { status: String(rows[0].status), skipCount: Number(rows[0].skip_count) };
+    if (decision.status === "declined") await notifyRequesterOfJoinDecision(eventId, requestId, "declined");
+    return decision;
   }
 
   const rows = await sql`
@@ -267,5 +271,7 @@ export async function decideEventJoinRequest(eventId: string, requestId: string,
       AND request.requester_user_id = inserted_participant.user_id
     RETURNING request.id, request.skip_count
   `;
-  return rows[0] ? { status: "accepted", skipCount: Number(rows[0].skip_count) } : null;
+  if (!rows[0]) return null;
+  await notifyRequesterOfJoinDecision(eventId, requestId, "accepted");
+  return { status: "accepted", skipCount: Number(rows[0].skip_count) };
 }

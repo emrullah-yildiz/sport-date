@@ -18,8 +18,10 @@ function fakeSql(strings: TemplateStringsArray, ...values: unknown[]) {
 }
 
 vi.mock("@/lib/db", () => ({ getDatabase: () => fakeSql }));
+vi.mock("@/lib/join-request-notifications", () => ({ notifyRequesterOfJoinDecision: vi.fn() }));
 
-import { createEventJoinRequest } from "./join-requests";
+import { notifyRequesterOfJoinDecision } from "./join-request-notifications";
+import { createEventJoinRequest, decideEventJoinRequest } from "./join-requests";
 
 const EVENT_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const REQUESTER = { id: "11", age: 30 };
@@ -33,6 +35,7 @@ function program(...queued: unknown[][]) {
   capturedQueries.length = 0;
   responses = queued;
   call = 0;
+  vi.clearAllMocks();
 }
 
 describe("createEventJoinRequest re-request after an on-time self-cancel", () => {
@@ -126,5 +129,42 @@ describe("createEventJoinRequest never bypasses an active reliability cool-down 
     const result = await createEventJoinRequest(EVENT_ID, REQUESTER, "");
     expect(result).toEqual({ requestId: "req-2", status: "pending" });
     expect(capturedQueries).toHaveLength(2);
+  });
+});
+
+describe("join request decision notifications", () => {
+  it("notifies an accepted requester exactly once after the seat is committed", async () => {
+    program([{ id: "req-1", skip_count: 0 }]);
+
+    await expect(decideEventJoinRequest(EVENT_ID, "req-1", "host-1", "accept")).resolves.toEqual({
+      status: "accepted",
+      skipCount: 0,
+    });
+
+    expect(notifyRequesterOfJoinDecision).toHaveBeenCalledOnce();
+    expect(notifyRequesterOfJoinDecision).toHaveBeenCalledWith(EVENT_ID, "req-1", "accepted");
+  });
+
+  it("keeps an ordinary skip private and sends no requester notification", async () => {
+    program([{ status: "pending", skip_count: 1 }]);
+
+    await expect(decideEventJoinRequest(EVENT_ID, "req-1", "host-1", "skip")).resolves.toEqual({
+      status: "pending",
+      skipCount: 1,
+    });
+
+    expect(notifyRequesterOfJoinDecision).not.toHaveBeenCalled();
+  });
+
+  it("notifies once when the final skip closes the request", async () => {
+    program([{ status: "declined", skip_count: 3 }]);
+
+    await expect(decideEventJoinRequest(EVENT_ID, "req-1", "host-1", "skip")).resolves.toEqual({
+      status: "declined",
+      skipCount: 3,
+    });
+
+    expect(notifyRequesterOfJoinDecision).toHaveBeenCalledOnce();
+    expect(notifyRequesterOfJoinDecision).toHaveBeenCalledWith(EVENT_ID, "req-1", "declined");
   });
 });

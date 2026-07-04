@@ -1,5 +1,9 @@
 # Agent state
 
+## Latest work cycle - 2026-07-04 (join-request decision notifications)
+
+**Requesters are proactively informed when their request reaches a real outcome.** A successful host approval now sends one transactional email linking the accepted member to the authorized event room; a final third-skip decline sends a private, dignity-preserving closed-request notice. Intermediate skips send nothing and neither email reveals skip history, host reasoning, or the exact meeting address. Browser and mobile decisions share the same post-commit notification boundary, delivery remains fail-closed behind the approved Gmail configuration, and email failure cannot undo the authoritative in-app decision. Verification: full suite green (940 web tests passed, 12 skipped; 218 domain tests passed), all workspace typechecks green, production build green, and lint green with two pre-existing warnings.
+
 ## Latest work cycle - 2026-07-04 (Gmail transactional delivery)
 
 **Owner-approved Gmail delivery is code-complete and dark until credentials land.** A single server-only Gmail API sender now covers verification, password reset, T-2h attendance reminders, and feedback updates. It uses short-lived access tokens obtained from the owner-authorized refresh token, sends multipart text/HTML, logs neither credentials nor message bodies, and fails closed unless the provider flag, OAuth client/secret/refresh token, verified sender alias, and canonical app origin are all configured. `.env.production.example` and the HQ blocker card now state the exact remaining owner steps. Verification: full web suite green (932 passed, 12 skipped), web typecheck and production build green, lint green with two pre-existing warnings. Remaining owner action: verify `support@keepitup.social` as Gmail “Send mail as,” create/authorize the narrow Gmail OAuth client, store secrets directly in Vercel, then authorize a single live test send before enabling delivery.
