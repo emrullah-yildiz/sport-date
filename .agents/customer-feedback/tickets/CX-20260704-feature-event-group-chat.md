@@ -1,6 +1,6 @@
 # CX-20260704-feature-event-group-chat
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner-requested feature (2026-07-04). Coordination is what makes a small group actually meet; chat is core to Phase-2 liquidity/retention.
 - Customer journey: member's join request is accepted → they + the host get a private event group chat to coordinate (who's bringing balls, running late, where exactly to meet once shared) → the event happens.
@@ -29,6 +29,7 @@ A private **group chat per event**, accessible ONLY to the host and members whos
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress`. The private per-event group chat already shipped under `CX-20260702-event-room-chat-for-accepted-participants` and satisfies most acceptance criteria (server-enforced host-or-accepted access on read AND write, both-direction block-muting, per-message report → existing safety queue, block-via-report, leave/host-remove revoke access, per-member+per-IP rate limit with no IP in rows, calm polling delivery, empty/loading/error-retry states, 44px mobile design, sender first-name only, never renders the private venue). This ticket adds the one genuinely-missing item — **own-message soft delete** — plus the warmer empty state and the pending-member "chat opens once accepted" note, and updates docs.
+- 2026-07-04 | build | implemented in commit 3d06cc1 — **MIGRATION ADDED `db/032_event_message_soft_delete.sql` (deleted_at column), committed NOT pushed** (orchestrator pushes; deploy auto-migrate applies; already applied to dev DB + column verified). `deleteOwnEventMessage` (server-side ownership + access re-check, scoped to sender + not-already-deleted); read path suppresses deleted body → "Message deleted" tombstone; new `DELETE /api/events/[id]/messages/[messageId]` (CSRF+auth, uniform 404). Warmer empty state; pending-member chat-opens-once-accepted note on the public event detail. docs/product/event-domain.md updated with the group-chat model + access rule + soft-delete. Checks: typecheck ✓ lint ✓ vitest 830 ✓ (10 new) prod build ✓. Unverified: browser-driven chat UI (accepted-only room needs a multi-account accepted-join setup) — verified at source/unit/route/build/migration level.
 
 ## Guardrails
 

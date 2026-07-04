@@ -41,9 +41,25 @@
   .kbd{ color:var(--mut); font-size:11px; }
   .two{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; }
   @media (max-width:760px){ .two{ grid-template-columns:1fr; gap:20px; } .foot{ left:5vw; right:5vw; } .slide{ padding:5vh 6vw; } }
+  .dl{ position:fixed; top:2.4vh; right:7vw; z-index:6; background:var(--neon); color:#0c0f10;
+    border:0; border-radius:10px; padding:9px 14px; font-weight:800; font-size:13px; cursor:pointer; }
+  .dl:hover{ filter:brightness(1.08); }
+  @media (max-width:760px){ .dl{ right:5vw; } }
+  /* Print / Save-as-PDF: lay every slide out on its own page, keep brand colors. */
+  @media print{
+    @page{ size: landscape; margin: 0; }
+    html,body{ height:auto; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .deck{ height:auto; overflow:visible; }
+    .slide{ display:flex !important; opacity:1 !important; position:relative; inset:auto;
+      width:100%; min-height:100vh; padding:8vh 8vw; page-break-after:always; break-after:page;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .slide:last-of-type{ page-break-after:auto; break-after:auto; }
+    .nav,.foot,.dl{ display:none !important; }
+  }
 </style>
 </head>
 <body>
+<button id="dl" class="dl" aria-label="Download deck as PDF" title="Download / Save as PDF">⤓ Download PDF</button>
 <div class="deck" id="deck">
 
   <section class="slide">
@@ -212,6 +228,8 @@ document.getElementById("prev").onclick=()=>go(i-1);
 document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key===" ")go(i+1); if(e.key==="ArrowLeft")go(i-1); });
 let sx=0; document.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});
 document.addEventListener("touchend",e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>50) go(dx<0?i+1:i-1); },{passive:true});
+// Download = browser print-to-PDF (print CSS lays every slide on its own page)
+document.getElementById("dl").onclick=()=>window.print();
 go(0);
 </script>
 </body>
