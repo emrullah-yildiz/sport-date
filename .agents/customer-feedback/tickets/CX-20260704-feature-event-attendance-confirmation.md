@@ -1,6 +1,6 @@
 # CX-20260704-feature-event-attendance-confirmation
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). No-shows are the #1 killer of small-group events; a T-2h confirm/cancel loop protects liquidity and frees spots for others.
 - Customer journey: ~2 hours before an event starts, each accepted attendee is asked "Still coming?" → they Approve (confirm) or Cancel (release their spot) → host sees a live confirmed count; a cancelled spot reopens.
@@ -28,6 +28,7 @@ A **T-2h attendance confirmation** loop for accepted attendees, delivered **in-a
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
+- 2026-07-04 | build | implemented in commit 8f2d2e5 — **MIGRATION ADDED `db/033_event_attendance_confirmations.sql`, committed NOT pushed** (orchestrator pushes; deploy auto-migrate applies; already applied to dev DB). **Cron route + schedule: `GET /api/internal/attendance-reminders` every 15 min (`*/15 * * * *`) in `apps/web/vercel.json`**, CRON_SECRET bearer, fails closed. Idempotent T-2h sweep (ON CONFLICT DO NOTHING). Tokenized no-login `/e/{id}/confirm|cancel?t=…` (32-byte secret, SHA-256 hash stored, expire at start, per-membership, read-only GET + POST /api/attendance progressive form); cancel releases the seat (deletes event_participants → spots-left increments + cancels join request); reversible only by re-requesting. In-app "Still coming?" prompt on the room (authed /api/events/{id}/attendance, own place only) + host confirmed/pending/cancelled breakdown. Email built DARK behind EMAIL_DELIVERY_ENABLED (fail-closed logged no-op mirroring photo-storage/auth-email — no real mail). Non-response stays pending (no auto-cancel). Checks: typecheck ✓ lint ✓ vitest 861 ✓ (26 new incl. dark-no-op-never-sends + cancel-releases-spot + hash-not-raw + fail-closed cron) prod build ✓. Live-verified on a prod server: cron auth 401/401/200, seeded in-window token confirmed→cancelled → DB status cancelled + seat released (0 participants) + join request cancelled + reconfirm→already-cancelled; seed cleaned. Unverified: prod migration + Vercel Cron registration + CRON_SECRET/plan (owner deploy); real email stays owner-gated.
 
 ## Guardrails
 
