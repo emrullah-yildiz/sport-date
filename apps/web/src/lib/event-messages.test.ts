@@ -4,7 +4,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ getDatabase: vi.fn() }));
 
 import { getDatabase } from "@/lib/db";
-import { canPostEventMessage, getEventMessages, postEventMessage } from "./event-messages";
+import { canPostEventMessage, deleteOwnEventMessage, getEventMessages, postEventMessage } from "./event-messages";
 
 // Reconstruct the raw SQL text (with bound values inlined as «value») a tagged
 // `sql` call was built from, so authorization/block clauses can be asserted
@@ -84,12 +84,12 @@ describe("event-room chat read (getEventMessages)", () => {
     const { queries } = mockDbSequence([
       [{ ["?column?"]: 1 }], // authorized
       [
-        { id: "m1", sender_user_id: HOST_ID, sender_first_name: "Ana", body: "Welcome!", created_at: "2026-07-10T10:00:00Z" },
+        { id: "m1", sender_user_id: HOST_ID, sender_first_name: "Ana", body: "Welcome!", created_at: "2026-07-10T10:00:00Z", deleted_at: null },
       ],
     ]);
     const messages = await getEventMessages(EVENT_ID, ACCEPTED_ID);
     expect(messages).toEqual([
-      { id: "m1", senderUserId: HOST_ID, senderFirstName: "Ana", body: "Welcome!", createdAt: "2026-07-10T10:00:00Z", isMine: false },
+      { id: "m1", senderUserId: HOST_ID, senderFirstName: "Ana", body: "Welcome!", createdAt: "2026-07-10T10:00:00Z", isMine: false, deleted: false },
     ]);
     const threadQuery = queries[1];
     // Oldest-first so newest renders at the bottom.
@@ -104,7 +104,7 @@ describe("event-room chat read (getEventMessages)", () => {
   it("marks the viewer's own messages and never selects any location column", async () => {
     const { queries } = mockDbSequence([
       [{ ["?column?"]: 1 }],
-      [{ id: "m2", sender_user_id: ACCEPTED_ID, sender_first_name: "Bob", body: "On my way", created_at: "2026-07-10T10:05:00Z" }],
+      [{ id: "m2", sender_user_id: ACCEPTED_ID, sender_first_name: "Bob", body: "On my way", created_at: "2026-07-10T10:05:00Z", deleted_at: null }],
     ]);
     const messages = await getEventMessages(EVENT_ID, ACCEPTED_ID);
     expect(messages![0].isMine).toBe(true);
@@ -113,6 +113,57 @@ describe("event-room chat read (getEventMessages)", () => {
     expect(queries[1]).not.toContain("venue_name");
     expect(queries[1]).not.toContain("address");
     expect(queries[1]).not.toContain("precise_");
+  });
+
+  it("renders a soft-deleted message as a bodiless tombstone (deleted content never leaves the server)", async () => {
+    mockDbSequence([
+      [{ ["?column?"]: 1 }],
+      [{ id: "m9", sender_user_id: ACCEPTED_ID, sender_first_name: "Bob", body: "the secret address is…", created_at: "2026-07-10T10:20:00Z", deleted_at: "2026-07-10T10:21:00Z" }],
+    ]);
+    const messages = await getEventMessages(EVENT_ID, ACCEPTED_ID);
+    expect(messages![0].deleted).toBe(true);
+    // The original body is suppressed — a client can never read removed content.
+    expect(messages![0].body).toBe("");
+    expect(JSON.stringify(messages)).not.toContain("secret address");
+  });
+});
+
+describe("event-room chat own-message soft delete (deleteOwnEventMessage)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("refuses to delete for a viewer without chat access (re-checks authz first)", async () => {
+    const { queries } = mockDbSequence([[]]); // authorization returns no row
+    expect(await deleteOwnEventMessage(EVENT_ID, EVENT_ID, OTHER_ID)).toBe(false);
+    // No UPDATE was issued.
+    expect(queries.some((q) => q.includes("UPDATE event_messages"))).toBe(false);
+  });
+
+  it("soft-deletes only the caller's OWN, not-yet-deleted message", async () => {
+    const { queries } = mockDbSequence([
+      [{ ["?column?"]: 1 }], // authorized
+      [{ id: "m5" }], // one row updated
+    ]);
+    expect(await deleteOwnEventMessage(EVENT_ID, EVENT_ID, ACCEPTED_ID)).toBe(true);
+    const update = queries[1];
+    expect(update).toContain("UPDATE event_messages");
+    expect(update).toContain("SET deleted_at = NOW()");
+    // Scoped to the sender + the message + not-already-deleted, so no one can
+    // delete another member's message and a re-delete is a no-op.
+    expect(update).toContain(`sender_user_id = «${ACCEPTED_ID}»`);
+    expect(update).toContain("deleted_at IS NULL");
+  });
+
+  it("returns false when nothing was updated (not the sender / already deleted / unknown)", async () => {
+    mockDbSequence([[{ ["?column?"]: 1 }], []]); // authorized, but UPDATE matched no row
+    expect(await deleteOwnEventMessage(EVENT_ID, EVENT_ID, ACCEPTED_ID)).toBe(false);
+  });
+
+  it("rejects a malformed event or message id without touching the database", async () => {
+    const sql = vi.fn();
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+    expect(await deleteOwnEventMessage("not-a-uuid", EVENT_ID, ACCEPTED_ID)).toBe(false);
+    expect(await deleteOwnEventMessage(EVENT_ID, "not-a-uuid", ACCEPTED_ID)).toBe(false);
+    expect(sql).not.toHaveBeenCalled();
   });
 });
 
@@ -130,7 +181,7 @@ describe("event-room chat write (postEventMessage)", () => {
   it("inserts and returns the stored message for an authorized viewer", async () => {
     const { queries } = mockDbSequence([
       [{ ["?column?"]: 1 }],
-      [{ id: "m3", sender_user_id: ACCEPTED_ID, sender_first_name: "Bob", body: "See you there", created_at: "2026-07-10T10:10:00Z" }],
+      [{ id: "m3", sender_user_id: ACCEPTED_ID, sender_first_name: "Bob", body: "See you there", created_at: "2026-07-10T10:10:00Z", deleted_at: null }],
     ]);
     const message = await postEventMessage(EVENT_ID, ACCEPTED_ID, "See you there");
     expect(message).toMatchObject({ id: "m3", body: "See you there", isMine: true, senderFirstName: "Bob" });

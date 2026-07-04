@@ -1,6 +1,6 @@
 # CX-20260704-feature-event-group-chat
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner-requested feature (2026-07-04). Coordination is what makes a small group actually meet; chat is core to Phase-2 liquidity/retention.
 - Customer journey: member's join request is accepted → they + the host get a private event group chat to coordinate (who's bringing balls, running late, where exactly to meet once shared) → the event happens.
@@ -25,6 +25,10 @@ A private **group chat per event**, accessible ONLY to the host and members whos
 - **DB:** additive migration for an `event_messages` table (id, event_id, sender_id, body, created_at; index on (event_id, created_at)). Optional lightweight per-member last-read marker for an unread badge. No message edit/delete-for-everyone in v1 (report instead); a member may delete their OWN message (soft).
 - **Docs updated:** add the feature + data model to the relevant docs (architecture/feature overview, and `docs/design-system.md` if a new component pattern is introduced). Note the access rule explicitly.
 - typecheck / lint / test / prod build green; tests cover the access matrix (accepted can post; pending/blocked/removed cannot), the block-mutes-messages rule, and rate limiting.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress`. The private per-event group chat already shipped under `CX-20260702-event-room-chat-for-accepted-participants` and satisfies most acceptance criteria (server-enforced host-or-accepted access on read AND write, both-direction block-muting, per-message report → existing safety queue, block-via-report, leave/host-remove revoke access, per-member+per-IP rate limit with no IP in rows, calm polling delivery, empty/loading/error-retry states, 44px mobile design, sender first-name only, never renders the private venue). This ticket adds the one genuinely-missing item — **own-message soft delete** — plus the warmer empty state and the pending-member "chat opens once accepted" note, and updates docs.
 
 ## Guardrails
 

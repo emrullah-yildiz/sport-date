@@ -12,6 +12,7 @@ type ChatMessage = {
   body: string;
   createdAt: string;
   isMine: boolean;
+  deleted: boolean;
 };
 
 type LoadState = "loading" | "ready" | "error";
@@ -39,6 +40,7 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState("");
   const [reportFor, setReportFor] = useState<ChatMessage | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const lastCountRef = useRef(0);
 
@@ -93,6 +95,26 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
     lastCountRef.current = messages.length;
   }, [messages]);
 
+  // Soft-delete one of the viewer's OWN messages. On success we mark it deleted
+  // locally (tombstone) so the thread doesn't reshuffle; a failure is silent-safe
+  // (the next poll reflects the true state).
+  async function deleteMine(message: ChatMessage) {
+    if (deletingId) return;
+    setDeletingId(message.id);
+    try {
+      const response = await fetch(`/api/events/${eventId}/messages/${message.id}`, { method: "DELETE" });
+      if (response.ok) {
+        setMessages((current) =>
+          current.map((item) => (item.id === message.id ? { ...item, deleted: true, body: "" } : item)),
+        );
+      }
+    } catch {
+      // Leave the message as-is; the poll will reconcile.
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   async function send(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const body = draft.trim();
@@ -144,7 +166,7 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
             </button>
           </div>
         ) : messages.length === 0 ? (
-          <p className="room-chat-empty">Say hello and sort the details. No one has posted yet.</p>
+          <p className="room-chat-empty">No messages yet — say hi 👋</p>
         ) : (
           <ol className="room-chat-messages">
             {messages.map((message) => (
@@ -153,8 +175,22 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
                   <strong>{message.isMine ? "You" : message.senderFirstName}</strong>
                   <time dateTime={message.createdAt}>{formatTime(message.createdAt, timeZone)}</time>
                 </div>
-                <p>{message.body}</p>
-                {!message.isMine ? (
+                {message.deleted ? (
+                  <p className="room-chat-message-deleted">Message deleted</p>
+                ) : (
+                  <p>{message.body}</p>
+                )}
+                {message.deleted ? null : message.isMine ? (
+                  <button
+                    type="button"
+                    className="room-chat-message-delete"
+                    onClick={() => void deleteMine(message)}
+                    disabled={deletingId === message.id}
+                    aria-label="Delete your message"
+                  >
+                    {deletingId === message.id ? "Deleting…" : "Delete"}
+                  </button>
+                ) : (
                   <button
                     type="button"
                     className="room-chat-report-open"
@@ -163,7 +199,7 @@ export default function EventRoomChat({ eventId, timeZone }: { eventId: string; 
                   >
                     Report
                   </button>
-                ) : null}
+                )}
               </li>
             ))}
           </ol>

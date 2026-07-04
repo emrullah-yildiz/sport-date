@@ -13,6 +13,13 @@ export type EventMessage = Readonly<{
   body: string;
   createdAt: string;
   isMine: boolean;
+  /**
+   * True when the sender soft-deleted their own message. The `body` is then an
+   * empty string — deleted content is NEVER sent to clients — and the UI renders
+   * a calm tombstone. The row is kept so ordering and the moderation trail stay
+   * intact (CX-20260704-feature-event-group-chat).
+   */
+  deleted: boolean;
 }>;
 
 type EventMessageRow = {
@@ -21,6 +28,7 @@ type EventMessageRow = {
   sender_first_name: string;
   body: string;
   created_at: string;
+  deleted_at: string | null;
 };
 
 /**
@@ -78,7 +86,7 @@ export async function getEventMessages(eventId: string, userId: string): Promise
   const sql = getDatabase();
   const rows = await sql`
     SELECT message.id, message.sender_user_id, sender.first_name AS sender_first_name,
-      message.body, message.created_at
+      message.body, message.created_at, message.deleted_at
     FROM event_messages AS message
     JOIN users AS sender ON sender.id = message.sender_user_id AND sender.account_status = 'active'
     WHERE message.event_id = ${eventId}::uuid
@@ -93,14 +101,43 @@ export async function getEventMessages(eventId: string, userId: string): Promise
     ORDER BY message.created_at ASC, message.id ASC
     LIMIT 200
   ` as unknown as EventMessageRow[];
-  return rows.map((row) => ({
-    id: row.id,
-    senderUserId: String(row.sender_user_id),
-    senderFirstName: row.sender_first_name,
-    body: row.body,
-    createdAt: row.created_at,
-    isMine: String(row.sender_user_id) === String(userId),
-  }));
+  return rows.map((row) => {
+    const deleted = row.deleted_at !== null;
+    return {
+      id: row.id,
+      senderUserId: String(row.sender_user_id),
+      senderFirstName: row.sender_first_name,
+      // Deleted content never leaves the server — the tombstone carries no body.
+      body: deleted ? "" : row.body,
+      createdAt: row.created_at,
+      isMine: String(row.sender_user_id) === String(userId),
+      deleted,
+    };
+  });
+}
+
+/**
+ * Soft-delete the viewer's OWN message. Only the original sender may delete, and
+ * only while they still have chat access (removed/blocked members can't reach
+ * the room, so they can't delete either). The row is kept with `deleted_at` set
+ * so the moderation trail survives; the read path then suppresses its body.
+ * Returns true when a not-yet-deleted message the viewer owns was removed, false
+ * otherwise (unknown id, not the sender, already deleted, or no access).
+ */
+export async function deleteOwnEventMessage(eventId: string, messageId: string, userId: string): Promise<boolean> {
+  if (!UUID_PATTERN.test(eventId) || !UUID_PATTERN.test(messageId)) return false;
+  if (!(await canPostEventMessage(eventId, userId))) return false;
+  const sql = getDatabase();
+  const rows = await sql`
+    UPDATE event_messages
+    SET deleted_at = NOW()
+    WHERE id = ${messageId}::uuid
+      AND event_id = ${eventId}::uuid
+      AND sender_user_id = ${userId}
+      AND deleted_at IS NULL
+    RETURNING id
+  ` as unknown as Array<{ id: string }>;
+  return rows.length > 0;
 }
 
 /**
@@ -138,5 +175,6 @@ export async function postEventMessage(
     body: row.body,
     createdAt: row.created_at,
     isMine: true,
+    deleted: false,
   };
 }

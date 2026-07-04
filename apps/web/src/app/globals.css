@@ -1419,3 +1419,12 @@ button:disabled:hover, button[disabled]:hover {
 .research-privacy a { color: var(--accent-info); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .research-privacy a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 750px) { .research-panel { padding: 22px 18px; } .research-actions button { width: 100%; } .research-rating-row { justify-content: flex-start; } }
+
+/* Own-message soft delete + tombstone in the event group chat (CX-20260704). */
+.room-chat-message-delete { justify-self: start; min-height: 44px; margin-top: 2px; padding: 6px 4px; border: 0; background: transparent; color: var(--text-muted); font-size: 12px; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.room-chat-message-delete:hover:not(:disabled) { color: var(--danger); }
+.room-chat-message-delete:disabled { opacity: .6; cursor: default; }
+.room-chat-message-delete:focus-visible, .room-chat-report-open:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.room-chat-message-deleted { margin: 0; color: var(--text-muted); font-style: italic; font-size: 14px; }
+/* Pre-acceptance note: the group chat opens once accepted (CX-20260704). */
+.event-detail-chat-locked { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }

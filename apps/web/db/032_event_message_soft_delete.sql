@@ -1,0 +1,18 @@
+-- Own-message soft delete for the event group chat
+-- (CX-20260704-feature-event-group-chat).
+--
+-- Additive, backwards-compatible: a single nullable column on the existing
+-- event_messages table. Old code that never selects it keeps working, so a
+-- deploy-before-migrate window does not 500 the existing chat.
+--
+-- A member may delete their OWN message. We SOFT delete (set deleted_at) rather
+-- than hard delete so:
+--   - the moderation/report trail keeps the original evidence (a message can be
+--     reported before or after the sender removes it), and
+--   - the row's ordering context is preserved so the thread doesn't silently
+--     reshuffle for everyone else.
+-- The read path suppresses the body of a deleted message server-side (clients
+-- never receive removed content) and renders a calm tombstone instead. There is
+-- deliberately NO delete-for-everyone / edit in v1 — report is the path for
+-- someone else's message.
+ALTER TABLE event_messages ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
