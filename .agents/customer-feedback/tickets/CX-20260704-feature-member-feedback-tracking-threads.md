@@ -1,6 +1,6 @@
 # CX-20260704-feature-member-feedback-tracking-threads
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). Members who submit feedback must feel heard and see action taken; a black-hole feedback box erodes the trust the whole brand is built on.
 - Customer journey: member submits feedback → gets an honest acknowledgement + a place to track it → sees status change and a reply thread as the team/AI agent handles it → can reply → feels heard.
@@ -35,6 +35,7 @@ Turn the existing one-way feedback box into a **tracked, two-way conversation** 
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
+- 2026-07-04 | build | implemented in commit 2bc7803 — **MIGRATION ADDED `db/034_feedback_ticket_threads.sql`, committed NOT pushed** (orchestrator pushes; deploy auto-migrate applies; already applied to dev DB). Honest member-visible status lifecycle (received→in review→planned→in progress→resolved + closed-not-planned) in pure `lib/feedback-thread.ts` (labels/meanings + legacy normalize + comment validation + DARK email gate). Member: `/feedback` list with unread "update from team" pill + tracking links; `/feedback/[id]` owner-enforced thread page (You vs KeepItUp team, status meaning, progress track, reply box, mark-seen on open); honest acknowledgement. Member reply via authed rate-limited `POST /api/feedback/[id]/comments` (owner-only, never lights own badge). PROTECTED internal path `GET /api/internal/feedback` + `POST /api/internal/feedback/[id]` {reply?,status?} behind `FEEDBACK_AGENT_SECRET` (fails closed; members can't reach it). Dark email via EMAIL_DELIVERY_ENABLED. Privacy: per-submitter only; safety reports NOT merged. Checks: typecheck ✓ lint ✓ vitest 887 ✓ (26 new incl. owner-only access, member/team reply markers, status transition, unauthorized-internal reject, dark-email-never-sends) prod build ✓. Live-verified on prod server: internal auth 401/401/200; seeded ticket → team reply + status=planned via secret → DB team comment + status planned + unread=true; mark-seen flipped unread 1→0; seed cleaned. Docs: `docs/product/feedback-tracking.md` + runbook env. Unverified: prod migration + FEEDBACK_AGENT_SECRET provisioning (owner deploy); real email owner-gated; member pages verified at lib/DB/build level (no browser session driven).
 
 ## Guardrails
 
