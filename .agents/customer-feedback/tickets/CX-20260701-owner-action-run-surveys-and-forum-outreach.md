@@ -1,6 +1,6 @@
 # CX-20260701-owner-action-run-surveys-and-forum-outreach
 
-- Status: `blocked-owner`
+- Status: `blocked-owner` — **PARTIALLY UNBLOCKED 2026-07-04:** owner authorized running the market surveys ("do market surveys using support@keepitup.social, pick the environment yourself"). The SURVEY half is superseded by `CX-20260704-research-self-hosted-market-survey` (`ready`, self-hosted /research route). This ticket now covers ONLY the remaining owner half: forum/community outreach posting (external accounts + posting = owner-executed) and the EU-counsel pass on notices.
 - Severity: `medium`
 - Priority: `P2` — real external market signal is valuable, but external posting/recruiting is an owner action and cannot be done by agents; not member-buildable. (RICE not applicable to an owner action.)
 - Customer journey: (market research / recruitment — external; no in-app member surface)
