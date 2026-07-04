@@ -1,6 +1,6 @@
 # CX-20260704-research-self-hosted-market-survey
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner authorized running market surveys (2026-07-04, "do market surveys using support@keepitup.social, pick the environment yourself"). CEO environment decision: **self-hosted in our app** — no third-party account needed, GDPR under our own policy, data in our DB.
 - Customer journey: visitor (from IG bio/posts or landing) → /research → answers anonymously in ~2 min → optional opt-in to deeper questions + follow-up contact → thank-you.
@@ -35,6 +35,10 @@ Implement the research survey from `docs/marketing/member-survey-and-forum-kit.m
 
 - The kit's "no data collection until…" preconditions are satisfied by the owner's 2026-07-04 authorization + on-page notice + support@keepitup.social as responder; EU-counsel review remains an open owner card — keep the collected surface minimal accordingly.
 - WTP answers are directional only — never quote them as pricing evidence or traction.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
 
 ## Why (CEO note)
 

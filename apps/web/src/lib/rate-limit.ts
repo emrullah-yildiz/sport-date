@@ -368,6 +368,21 @@ export function authTokenConfirmRateLimitRules(request: Request, token: string):
   ];
 }
 
+/**
+ * Anonymous research-survey writes (CX-20260704). IP-keyed only — the survey
+ * stores no identity, so the IP is the sole abuse handle. The key is hashed
+ * into a transient counter (like every rule here) and the IP itself is NEVER
+ * written to the research tables. Generous enough for a shared household/NAT
+ * (each respondent makes up to 3 writes: answers, extension, contact).
+ */
+export function researchSurveyRateLimitRules(request: Request): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "research-survey-ip", limit: 20, windowMs: 60 * 60 * 1000, key: `ip:${ip}` },
+    { name: "research-survey-ip-day", limit: 60, windowMs: 24 * 60 * 60 * 1000, key: `ip:${ip}` },
+  ];
+}
+
 export async function resetRateLimitStoreForTests(): Promise<void> {
   await store.clear();
   mutationCount = 0;
