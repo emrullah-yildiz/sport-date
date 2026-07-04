@@ -212,7 +212,7 @@ export async function GET() {
   return NextResponse.json(body, {
     headers: {
       "Cache-Control": "no-store",
-      "Content-Disposition": `attachment; filename="sport-date-account-${user.id}.json"`,
+      "Content-Disposition": `attachment; filename="keepitup-account-${user.id}.json"`,
     },
   });
 }

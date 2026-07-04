@@ -19,6 +19,9 @@ const sans = Inter({
 });
 
 export const metadata: Metadata = {
+  // Canonical origin for the live brand domain; makes every relative OG/twitter
+  // image below resolve to an absolute https://keepitup.social/... URL.
+  metadataBase: new URL("https://keepitup.social"),
   // One brand source of truth: a page sets just its own label (e.g. "Discover
   // events") and `%s` composes it with the brand name; pages that set no title
   // fall back to the full brand title.
@@ -28,6 +31,30 @@ export const metadata: Metadata = {
   },
   description:
     "Meet compatible people through small, local sports — from running and padel to chess. Adults only, Europe first, privacy-first.",
+  // Social preview for every route that doesn't override it: link reshares
+  // (WhatsApp/IG DMs/X) render a real card instead of a bare URL.
+  openGraph: {
+    type: "website",
+    siteName: BRAND_NAME,
+    title: BRAND_TITLE,
+    description:
+      "Meet compatible people through small, local sports — from running and padel to chess. Adults only, Europe first, privacy-first.",
+    images: [
+      {
+        url: "/brand/keepitup-banner-social.png",
+        width: 1500,
+        height: 500,
+        alt: `${BRAND_NAME} — meet through movement`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: BRAND_TITLE,
+    description:
+      "Meet compatible people through small, local sports. Adults only, Europe first, privacy-first.",
+    images: ["/brand/keepitup-banner-social.png"],
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -7,11 +7,14 @@ import { sportEmoji } from "@/lib/sports";
 import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  // Absolute so the root layout's "%s — Rally" template does not append the
-  // brand name twice on the marketing home (its title already ends in "Rally").
+  // Absolute so the root layout's `%s — KeepItUp` template does not append the
+  // brand name twice on the marketing home (its title is already the full
+  // brand title).
   title: { absolute: BRAND_TITLE },
   description:
     "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults only, Europe first.",
+  // The marketing home is the indexable entry point (the root 307s here).
+  alternates: { canonical: "/landing" },
 };
 
 const steps = [

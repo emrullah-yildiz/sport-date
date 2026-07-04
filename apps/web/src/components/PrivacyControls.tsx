@@ -25,7 +25,7 @@ export default function PrivacyControls() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "sport-date-account.json";
+      link.download = "keepitup-account.json";
       link.click();
       URL.revokeObjectURL(url);
       setMessage("Your machine-readable account export is ready. It reflects the current preview boundary described in the Privacy Notice preview.");
