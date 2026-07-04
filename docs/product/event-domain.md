@@ -22,12 +22,13 @@ A request is eligible only when:
 - the event is published and has not started;
 - accepted participation remains below capacity;
 - the requester is an adult and inside the host's adult age range;
-- the requester has the sport at an allowed experience level;
 - the requester speaks the event language;
 - the requester is not the host; and
 - neither host nor requester has blocked the other.
 
-Blocking resolves to a generic unavailable result. The product must not reveal who blocked whom. Age, skill, and language mismatch explanations need a UX review before they become member-facing; eligibility codes are server/domain facts, not finished rejection copy.
+**Discovery is NOT gated by the viewer's profile sports** (owner directive 2026-07-04, CX-20260704-discovery-not-gated-by-profile-sport). A member sees — and can request — every otherwise-eligible local event regardless of whether that sport (or a compatible skill) is in their profile; the previous mandatory `user_sports` JOIN silently hid most events from most members and killed discovery/liquidity. Sport is now only an **explicit** discovery filter (type a sport to narrow to it; blank = all sports). The feed (`getDiscoverableEvents`) and the join gate (`createEventJoinRequest`) drop that JOIN in lockstep, so a member is never shown an event they would then be barred from requesting. `memberSkillMatchesEvent` remains a pure helper for optional informational hints only — never a visibility/join gate. All other gates above are unchanged, and the host still accepts or skips each request.
+
+Blocking resolves to a generic unavailable result. The product must not reveal who blocked whom. Age and language mismatch explanations need a UX review before they become member-facing; eligibility codes are server/domain facts, not finished rejection copy.
 
 ## Location authorization
 

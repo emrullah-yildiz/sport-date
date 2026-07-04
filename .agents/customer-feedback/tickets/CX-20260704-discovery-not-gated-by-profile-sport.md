@@ -1,6 +1,6 @@
 # CX-20260704-discovery-not-gated-by-profile-sport
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P0` — owner-confirmed defect (2026-07-04): a member cannot discover events for sports they haven't added to their profile. Verified against prod: account 35 (Bucharest, age 31) does NOT see the Bucharest Tennis event solely because Tennis isn't in its profile. This silently hides most events from most members — kills discovery/liquidity.
 - Customer journey: a member opens Discover → should see all compatible local events (any sport) → today only sees events whose sport is already in their profile.
@@ -27,6 +27,10 @@ Remove the **mandatory profile-sport gate** from the discovery FEED so events ar
 - Web and mobile discover stay in sync (shared lib).
 - typecheck/lint/test/prod build green; update the discovery-filter tests that asserted the profile-sport JOIN.
 - Docs updated if the discovery rules are documented.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent). Removing the mandatory sport/skill `JOIN user_sports` from the discovery FEED per the ticket. To preserve the documented shown⟺joinable invariant ("a member is never shown an event they would then be barred from requesting"), I am ALSO removing the identical sport/skill JOIN from the join gate (`createEventJoinRequest`) — otherwise a member would see the Tennis event but be barred from requesting it, re-introducing the exact P0 one tap later. All other gates (published, future/in-window, not-host, age, language, capacity, city, blocks) are unchanged in BOTH. Flagging in case the owner wanted visibility-only.
 
 ## Guardrails
 

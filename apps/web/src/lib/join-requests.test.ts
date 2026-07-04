@@ -75,7 +75,7 @@ describe("createEventJoinRequest still enforces every join guard on re-request",
     expect(result).toBeNull();
   });
 
-  it("keeps the published/open/capacity/block/age/skill/language guards in the SQL", async () => {
+  it("keeps published/open/capacity/block/age/language guards but NO LONGER requires the profile sport/skill (CX-20260704)", async () => {
     program([CLEAN_RELIABILITY], [{ id: "req-1", status: "pending" }]);
     await createEventJoinRequest(EVENT_ID, REQUESTER, "");
     const insert = capturedQueries[1];
@@ -89,6 +89,13 @@ describe("createEventJoinRequest still enforces every join guard on re-request",
     expect(insert).toMatch(/user_blocks/);
     // Age eligibility is still enforced.
     expect(insert).toMatch(/BETWEEN events\.minimum_age AND events\.maximum_age/);
+    // Language preference is still enforced.
+    expect(insert).toMatch(/candidate\.languages/);
+    // The sport/skill gate is GONE — mirrors getDiscoverableEvents so a member is
+    // never shown an event they'd then be barred from requesting. The
+    // `compatible_sport` alias only ever existed on that removed JOIN.
+    expect(insert).not.toContain("JOIN user_sports");
+    expect(insert).not.toContain("compatible_sport");
   });
 });
 

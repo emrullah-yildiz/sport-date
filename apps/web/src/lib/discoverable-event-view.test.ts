@@ -114,7 +114,7 @@ describe("getDiscoverableEvent — direct single-event public invitation view (C
   });
 });
 
-describe("getDiscoverableEvents — the FEED keeps its host-exclusion + compatibility gating (unchanged)", () => {
+describe("getDiscoverableEvents — the FEED keeps every gate EXCEPT the profile-sport requirement (CX-20260704)", () => {
   let lastQuery = "";
   function mockDb(rows: Array<Record<string, unknown>>) {
     const sql = vi.fn((strings: TemplateStringsArray, ...values: unknown[]) => {
@@ -131,12 +131,33 @@ describe("getDiscoverableEvents — the FEED keeps its host-exclusion + compatib
     expect(lastQuery).toContain("events.host_user_id <> «11111111-1111-4111-8111-111111111111»");
   });
 
-  it("still applies the feed compatibility filters (skill, age, language, capacity)", async () => {
+  it("NO LONGER requires the event's sport/skill to be in the viewer's profile (the P0 fix)", async () => {
     mockDb([]);
     await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "", language: "", withinDays: 7 });
-    expect(lastQuery).toContain("compatible_sport");
+    // The mandatory JOIN that hid events for un-listed sports is gone: a member
+    // WITHOUT the sport (the prod repro: account 35, no Tennis) now sees it. The
+    // `compatible_sport` alias only ever existed on that removed JOIN.
+    expect(lastQuery).not.toContain("compatible_sport");
+    expect(lastQuery).not.toContain("JOIN user_sports");
+  });
+
+  it("still applies every OTHER feed gate (age, language, capacity) unchanged", async () => {
+    mockDb([]);
+    await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "", language: "", withinDays: 7 });
     expect(lastQuery).toContain("BETWEEN events.minimum_age AND events.maximum_age");
     expect(lastQuery).toContain("candidate.languages");
     expect(lastQuery).toContain("< events.capacity");
+    expect(lastQuery).toContain("events.status = 'published'");
+    expect(lastQuery).toContain("user_blocks");
+  });
+
+  it("still narrows to ONE sport when the explicit sport filter is chosen", async () => {
+    mockDb([]);
+    await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "Tennis", language: "", withinDays: 7 });
+    // The explicit filter is applied verbatim (case-insensitive) …
+    expect(lastQuery).toContain("LOWER(events.sport) = LOWER(«Tennis»)");
+    // … and still without the profile-sport JOIN.
+    expect(lastQuery).not.toContain("compatible_sport");
+    expect(lastQuery).not.toContain("JOIN user_sports");
   });
 });

@@ -116,25 +116,18 @@ export function eventLanguageMatchesMemberPreference(
 }
 
 /**
- * Discovery skill-matching rule (owner decision 2026-07-01).
+ * Skill-matching rule — INFORMATIONAL ONLY as of
+ * CX-20260704-discovery-not-gated-by-profile-sport (owner directive 2026-07-04).
  *
- * Skill levels are ordered beginner (1) < intermediate (2) < advanced (3). An
- * event lists the experience levels it welcomes (default `[beginner,
- * intermediate]`). Matching is INCLUSIVE UPWARD: a member matches an event when
- * their skill level is at least the EASIEST level the event welcomes — i.e. a
- * stronger player can always join an easier game. The previous rule required an
- * exact membership (`skill_level = ANY(experience_levels)`), which silently hid
- * every default event from an `advanced` member and gave them an empty discover
- * feed with no explanation (CX-20260701).
- *
- * What this does NOT do: it does not let an UNDER-qualified member into an event
- * (a beginner still does not match an `advanced`-only event — the host listed the
- * floor they want). It loosens ONLY the skill filter; age, location, language,
- * capacity, blocks, and host-exclusion gating are untouched and enforced
- * independently. This mirrors the SQL skill clause in `getDiscoverableEvents` and
- * the join gate in `createEventJoinRequest` exactly so discovery and the
- * request-to-join boundary can never drift (a member is never shown an event they
- * would be barred from joining).
+ * Skill levels are ordered beginner (1) < intermediate (2) < advanced (3), and a
+ * member matches an event INCLUSIVE UPWARD (at least the easiest level the event
+ * welcomes). This pure helper is retained for optional informational use (e.g. a
+ * "this is above your listed level" hint), but it is NO LONGER a visibility or
+ * join gate: discovery and `createEventJoinRequest` no longer require the viewer
+ * to have the event's sport (or a compatible skill) in their profile, so a member
+ * can see AND request any otherwise-eligible local event. All the real gates
+ * (published/future, host-exclusion, age, language, capacity, blocks) live in the
+ * SQL of those two functions and are unchanged.
  */
 const SKILL_RANK: Readonly<Record<string, number>> = { beginner: 1, intermediate: 2, advanced: 3 };
 
@@ -195,15 +188,14 @@ export async function getDiscoverableEvents(
     FROM events
     JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
     JOIN users AS candidate ON candidate.id = ${user.id} AND candidate.account_status = 'active'
-    JOIN user_sports AS compatible_sport
-      ON compatible_sport.user_id = ${user.id}
-      AND LOWER(compatible_sport.sport) = LOWER(events.sport)
-      AND (CASE LOWER(compatible_sport.skill_level)
-        WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 0 END) >= (
-        SELECT MIN(CASE LOWER(level)
-          WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 99 END)
-        FROM UNNEST(events.experience_levels) AS level
-      )
+    -- NOTE (CX-20260704-discovery-not-gated-by-profile-sport, owner directive):
+    -- discovery no longer requires the viewer to have the event sport (or a
+    -- compatible skill) in their profile. The mandatory user_sports JOIN that hid
+    -- every event for a sport the member had not listed is removed, so all
+    -- compatible local events are visible regardless of profile sports. Sport is
+    -- now only the EXPLICIT filter in the WHERE clause below. The join gate in
+    -- createEventJoinRequest is relaxed identically, so a member is still never
+    -- shown an event they would then be barred from requesting.
     LEFT JOIN join_requests AS member_request
       ON member_request.event_id = events.id AND member_request.requester_user_id = ${user.id}
     WHERE events.status = 'published'

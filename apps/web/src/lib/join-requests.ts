@@ -81,19 +81,14 @@ export async function createEventJoinRequest(
     SELECT ${requestId}::uuid, events.id, candidate.id, ${introduction}
     FROM events
     JOIN users AS candidate ON candidate.id = ${requester.id} AND candidate.account_status = 'active'
-    JOIN user_sports AS compatible_sport
-      ON compatible_sport.user_id = candidate.id
-      AND LOWER(compatible_sport.sport) = LOWER(events.sport)
-      -- Inclusive skill matching (owner decision 2026-07-01, see events.ts
-      -- memberSkillMatchesEvent): a member matches when their skill rank is at
-      -- least the easiest level the event welcomes. Mirrors getDiscoverableEvents
-      -- so a member is never shown an event in discovery they cannot join here.
-      AND (CASE LOWER(compatible_sport.skill_level)
-        WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 0 END) >= (
-        SELECT MIN(CASE LOWER(level)
-          WHEN 'beginner' THEN 1 WHEN 'intermediate' THEN 2 WHEN 'advanced' THEN 3 ELSE 99 END)
-        FROM UNNEST(events.experience_levels) AS level
-      )
+    -- NOTE (CX-20260704-discovery-not-gated-by-profile-sport, owner directive):
+    -- the sport/skill user_sports JOIN gate is removed here to MIRROR the same
+    -- relaxation in getDiscoverableEvents. A member no longer needs the event
+    -- sport (or a compatible skill) in their profile to request a place, so a
+    -- member is never shown an event in discovery they would then be barred from
+    -- requesting. All other guards below (published/future, host-exclusion, age,
+    -- language, capacity, blocks) still apply. The host still accepts or skips
+    -- each request, so this is not a capability claim, just relaxed matching.
     WHERE events.id = ${eventId}::uuid
       AND events.status = 'published' AND events.starts_at > NOW()
       AND events.host_user_id <> candidate.id

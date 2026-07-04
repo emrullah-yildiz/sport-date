@@ -143,7 +143,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       )}
       <form className="discover-filters" method="get">
         <label>City<input name="city" defaultValue={requestedCity} placeholder={area.memberArea ? `Near ${area.memberArea}` : "Any city"} title="Leave blank to see events near your profile area" /></label>
-        <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any in your profile" title="Defaults to any sport in your profile" /></label>
+        <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any sport" title="Leave blank to see events for every sport; type one to narrow to it" /></label>
         <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible" title="Defaults to any compatible language" /></label>
         <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>
         <label>Distance<select name="radius" defaultValue={requestedRadiusKm ? String(requestedRadiusKm) : ""} title={plus ? "Filter by how far you'll travel, with finer Plus distance bands." : "Filter by how far you'll travel. 'My area' keeps the profile-area default; 'Search everywhere' is on the note above."}>
