@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { MEMBER_FEEDBACK_STATUS_INFO, normalizeMemberFeedbackStatus } from "@/lib/feedback-thread";
+
 type Ticket = {
   id: string;
   category: string;
@@ -15,7 +17,12 @@ type Ticket = {
   severity: string;
   status?: string;
   createdAt: string;
+  hasUnread?: boolean;
 };
+
+function statusLabel(status: string | undefined): string {
+  return MEMBER_FEEDBACK_STATUS_INFO[normalizeMemberFeedbackStatus(status)].label;
+}
 
 type FormValues = Omit<Ticket, "id" | "status" | "createdAt">;
 
@@ -45,10 +52,6 @@ const LABELS: Record<string, string> = {
   medium: "Blocked a task",
   high: "Could not continue",
   blocker: "Completely blocked",
-  open: "Shared",
-  in_progress: "Being reviewed",
-  resolved: "Addressed",
-  closed: "Closed",
 };
 
 function displayLabel(value: string) {
@@ -99,11 +102,12 @@ export function FeedbackConfirmation({
     <div className="feedback-confirmation" role="status" aria-live="polite">
       <p className="panel-label">Shared</p>
       <h3 className="feedback-confirmation-title" tabIndex={-1} ref={headingRef}>
-        Thank you — your feedback is with the team.
+        We&apos;ve received this — you can track it and see replies here.
       </h3>
       <p>
-        It&apos;s now in <strong>&ldquo;What you&apos;ve shared&rdquo;</strong>, where you can follow where it lands. There&apos;s
-        nothing more you need to do.
+        It&apos;s now in <strong>&ldquo;What you&apos;ve shared&rdquo;</strong> below, marked <strong>Received</strong>. Open it to
+        follow its status and reply to the team as they respond. We can&apos;t promise a timeline, but nothing you send
+        disappears into a void.
       </p>
       <div className="feedback-confirmation-actions">
         <a
@@ -323,16 +327,22 @@ export default function FeedbackWorkspace() {
         {!loading && !loadError && tickets.length > 0 ? (
           <div className="feedback-ticket-list">
             {tickets.map((ticket) => (
-              <article key={ticket.id} className="feedback-ticket">
-                <header><span>{displayLabel(ticket.category)}</span><span>{displayLabel(ticket.status ?? "open")}</span></header>
-                <h3>{ticket.summary}</h3>
-                <p>{ticket.details}</p>
+              <article key={ticket.id} className={`feedback-ticket${ticket.hasUnread ? " has-unread" : ""}`}>
+                <header>
+                  <span>{displayLabel(ticket.category)}</span>
+                  <span className="feedback-ticket-status">{statusLabel(ticket.status)}</span>
+                </header>
+                <h3>
+                  <Link href={`/feedback/${ticket.id}`} className="feedback-ticket-link">{ticket.summary}</Link>
+                </h3>
+                {ticket.hasUnread ? <p className="feedback-ticket-unread" role="status">Update from the KeepItUp team — open to read</p> : null}
+                <p className="feedback-ticket-details">{ticket.details}</p>
                 <dl>
-                  <div><dt>Surface</dt><dd>{displayLabel(ticket.surface)}</dd></div>
                   <div><dt>Impact</dt><dd>{displayLabel(ticket.severity)}</dd></div>
                   <div><dt>Page</dt><dd>{ticket.currentPath}</dd></div>
                   <div><dt>Shared</dt><dd>{new Date(ticket.createdAt).toLocaleDateString()}</dd></div>
                 </dl>
+                <p className="feedback-ticket-track"><Link href={`/feedback/${ticket.id}`}>Open &amp; reply →</Link></p>
               </article>
             ))}
           </div>

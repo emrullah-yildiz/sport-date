@@ -40,7 +40,9 @@ describe("FeedbackConfirmation success state", () => {
   it("announces the calm result once inside a polite live region", () => {
     const html = render();
     expect(html).toMatch(POLITE_LIVE_REGION);
-    expect(html).toContain("your feedback is with the team");
+    // Honest acknowledgement that also points to tracking + replies (CX-20260704).
+    expect(html).toContain("We&#x27;ve received this");
+    expect(html).toContain("track it and see replies here");
   });
 
   it("makes the confirmation heading a keyboard focus target so focus can move to it on submit", () => {

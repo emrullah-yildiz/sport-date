@@ -63,7 +63,8 @@ routes, the cron-authorized session-cleanup endpoint).
    | `EMAIL_DELIVERY_PROVIDER` | provider id once Gate 4 lands | Gate 4 | Empty until then. |
    | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | shared rate-limit store | Upstash (owner step 4) | **Both** required to activate the shared limiter; otherwise in-memory fallback. |
    | `SENTRY_DSN` | error reporting (EU region) | Sentry (owner step 5) | |
-   | `CRON_SECRET` | shared bearer for the session-cleanup cron | generate a long random value | The cron endpoint **fails closed** if unset (never runs unauthenticated). |
+   | `CRON_SECRET` | shared bearer for the session-cleanup + attendance-reminder crons | generate a long random value | The cron endpoints **fail closed** if unset (never run unauthenticated). |
+   | `FEEDBACK_AGENT_SECRET` | shared bearer for the internal feedback agent/admin API | generate a long random value | The `/api/internal/feedback*` write path **fails closed** if unset; members never hold it, so they can't post as "team" or change a status. |
 
    > `RUN_DB_INTEGRATION` is **test-only** and must NEVER be set in production.
 

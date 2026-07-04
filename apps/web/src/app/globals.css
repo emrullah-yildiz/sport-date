@@ -1461,3 +1461,57 @@ button:disabled:hover, button[disabled]:hover {
 .host-attendance-counts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
 .host-attendance-counts span { padding: 10px 16px; border-radius: 999px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); }
 .host-attendance-counts strong { color: var(--text); font-size: 16px; }
+
+/* Two-way feedback tracking + thread (CX-20260704). Mobile-first, 44px targets. */
+.feedback-ticket.has-unread { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.feedback-ticket-link { color: var(--text); text-decoration: none; }
+.feedback-ticket-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.feedback-ticket-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.feedback-ticket-status { color: var(--accent); font-weight: 800; }
+.feedback-ticket-unread { margin: 0; padding: 8px 12px; border-radius: 10px; background: rgba(59,234,126,.12); color: var(--accent); font-size: var(--fs-small); font-weight: 800; }
+.feedback-ticket-details { color: var(--text-muted); }
+.feedback-ticket-track { margin: 0; }
+.feedback-ticket-track a { color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; display: inline-flex; align-items: center; }
+.feedback-ticket-track a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.feedback-thread-shell { width: min(760px, calc(100% - 40px)); margin: 30px auto 80px; display: grid; gap: 22px; }
+.feedback-thread-back a { color: var(--accent-info); font-weight: 700; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+.feedback-thread-back a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.feedback-thread-header { display: grid; gap: 12px; }
+.feedback-thread-header .eyebrow { color: var(--accent); }
+.feedback-thread-header h1 { margin: 0; font-size: var(--fs-h1); line-height: 1.1; }
+.feedback-status { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; background: var(--surface-raised); }
+.feedback-status-label { color: var(--accent); font-weight: 900; }
+.feedback-status--closed_not_planned .feedback-status-label { color: var(--text-muted); }
+.feedback-status--resolved .feedback-status-label { color: var(--accent); }
+.feedback-status-meaning { color: var(--text-muted); line-height: 1.5; }
+.feedback-status-track { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.feedback-status-track li { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); font-weight: 700; }
+.feedback-status-track li span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: 0 0 auto; }
+.feedback-status-track li.is-reached { color: var(--text); }
+.feedback-status-track li.is-reached span { background: var(--accent); }
+.feedback-thread-detail, .feedback-thread { padding: 24px 24px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); }
+.feedback-thread-detail .panel-label, .feedback-thread .panel-label { color: var(--accent) !important; }
+.feedback-thread-details-body { margin: 12px 0 16px; color: var(--text); line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.feedback-thread-detail dl { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; }
+.feedback-thread-detail dt { color: var(--text-muted); font-size: var(--fs-label); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.feedback-thread-detail dd { margin: 3px 0 0; color: var(--text); }
+.feedback-thread-empty { margin: 12px 0 0; color: var(--text-muted); line-height: 1.55; }
+.feedback-thread-list, .feedback-thread-added { display: grid; gap: 12px; margin: 14px 0 0; padding: 0; list-style: none; }
+.feedback-comment { display: grid; gap: 5px; padding: 13px 15px; border-radius: 14px; background: var(--surface-raised); border: 1px solid var(--line); }
+.feedback-comment.is-mine { border-color: rgba(59,234,126,.35); }
+.feedback-comment.is-team { border-color: rgba(67,198,245,.4); background: rgba(67,198,245,.06); }
+.feedback-comment-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.feedback-comment-head strong { font-size: 14px; }
+.feedback-comment.is-team .feedback-comment-head strong { color: var(--accent-info); }
+.feedback-comment-head time { color: var(--text-muted); font-size: 12px; }
+.feedback-comment p { margin: 0; color: var(--text); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.feedback-thread-reply { margin-top: 16px; display: grid; gap: 12px; }
+.feedback-thread-reply label { color: var(--text-muted); font-size: var(--fs-small); font-weight: 700; }
+.feedback-thread-reply textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-raised); color: var(--text); font: inherit; }
+.feedback-thread-reply textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.feedback-thread-reply-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.feedback-thread-reply-foot span { color: var(--text-muted); font-size: 12px; }
+.feedback-thread-reply-foot button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--accent); color: var(--bg); font-weight: 800; cursor: pointer; }
+.feedback-thread-reply-foot button:disabled { opacity: .5; cursor: not-allowed; }
+.feedback-thread-reply-foot button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.feedback-thread-reply-error { margin: 0; color: var(--danger); font-size: var(--fs-small); }

@@ -335,6 +335,14 @@ export function eventMessageRateLimitRules(request: Request, userId: string): re
   ];
 }
 
+export function feedbackCommentRateLimitRules(request: Request, userId: string): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "feedback-comment-ip", limit: 40, windowMs: 10 * 60 * 1000, key: `ip:${ip}` },
+    { name: "feedback-comment-user", limit: 20, windowMs: 10 * 60 * 1000, key: `user:${userId}` },
+  ];
+}
+
 export function safetyReportRateLimitRules(request: Request, userId: string): readonly RateLimitRule[] {
   const ip = getRequestIp(request);
   return [

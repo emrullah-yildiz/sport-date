@@ -1,6 +1,6 @@
 # CX-20260704-feature-member-feedback-tracking-threads
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). Members who submit feedback must feel heard and see action taken; a black-hole feedback box erodes the trust the whole brand is built on.
 - Customer journey: member submits feedback → gets an honest acknowledgement + a place to track it → sees status change and a reply thread as the team/AI agent handles it → can reply → feels heard.
@@ -31,6 +31,10 @@ Turn the existing one-way feedback box into a **tracked, two-way conversation** 
 - **DB:** additive migration — a `feedback_ticket_comments` table (id, ticket_id, author_kind `member|team`, author_id, body, created_at) + a `status` column on `feedback_tickets` if not already present (+ `last_activity_at`). No raw internal notes stored in member-visible fields.
 - typecheck / lint / test / prod build green; tests cover: owner-only access, member reply, team reply via the internal path, status transition, and the unauthorised-internal-write rejection.
 - **Docs updated:** the feedback lifecycle, the thread model, and the internal agent-handling path.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
 
 ## Guardrails
 
