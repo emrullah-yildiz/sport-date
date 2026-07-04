@@ -1,6 +1,6 @@
 # CX-20260704-region-honest-empty-state-and-demand-capture
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — pre-launch, anyone (any country, incl. non-launch EU + US) can sign up but finds no events. Turn the dead-end into honest expectation-setting + a demand signal instead of churn.
 - Customer journey: a new member (or a curious US/other-region visitor) signs up → discovery has no events near them → today that's a silent empty void → should be a warm "we're not in your area yet, you're on the early list" moment that also captures where they'd play.
@@ -32,3 +32,7 @@ Make the no-events-nearby experience honest and useful for ANY region:
 ## Why (CEO note)
 
 We shouldn't throw away out-of-region interest by blocking it — we should convert it into a map of where to launch next. Every "wrong city" signup becomes a data point instead of a bounce.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, set `in-progress`, recorded as implementation owner. New `RegionInterestSignal` client component replaces the two "own-area empty" discover branches (near-me-default + no-narrowing-filters default) with an honest pre-launch note ("KeepItUp isn't live near {area} yet — Europe first — you're here early; events appear as hosts start them"), a one-tap privacy-safe demand signal (posts ONLY the member's already-stored approximate area into the EXISTING anonymous research pipeline via `q8_area` — no new PII, no new table/migration, anonymous/unlinked row), plus "Tell us where you'd play" (/research) and "See how it works" (/landing). No geo gate added; no fabricated events/scarcity. Kept the honest Search-everywhere / Host-the-first-one CTAs. New component test (4 cases) covers the empty-state branch, the no-area degrade, and the anti-dark-pattern tripwire.

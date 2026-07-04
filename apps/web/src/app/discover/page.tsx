@@ -7,6 +7,7 @@ import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPT
 import { isPlus } from "@/lib/entitlements";
 import { joinRequestStateHeadline } from "@/lib/join-request-policy";
 import PrimaryNav from "@/components/PrimaryNav";
+import RegionInterestSignal from "@/components/RegionInterestSignal";
 import SiteFooter from "@/components/SiteFooter";
 import UseMyLocationControl from "@/components/UseMyLocationControl";
 import { getDiscoverableEvents, type DiscoveryEvent, type DiscoveryFilters } from "@/lib/events";
@@ -182,7 +183,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
               </>
             ) : area.isNearMeDefault ? (
               <>
-                <p>Nothing&apos;s open near <strong>{area.memberArea}</strong> just yet. Widen your search to see events in other areas, or start one close to home.</p>
+                <RegionInterestSignal area={area.memberArea} />
                 <Link href="/discover?near=all">Search everywhere</Link>
                 <Link href="/events/new">Host the first one</Link>
               </>
@@ -193,8 +194,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
               </>
             ) : (
               <>
-                <p>No events are open to you just yet. Try searching everywhere to see other areas, or start one yourself — hosting the first event is often how a new area gets going.</p>
-                <Link href="/discover?near=all">Search everywhere</Link>
+                <RegionInterestSignal area={area.memberArea} />
+                {area.memberArea ? <Link href="/discover?near=all">Search everywhere</Link> : null}
                 <Link href="/events/new">Host the first one</Link>
               </>
             )}

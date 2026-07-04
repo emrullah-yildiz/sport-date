@@ -945,6 +945,12 @@ a.logo:hover { color: var(--text); }
 .discovery-card a:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .discovery-empty { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-top: 24px; padding: 30px; border-radius: 22px; background: var(--surface); border: 1px solid var(--line); }.discovery-empty a { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; white-space: nowrap; min-height: 44px; padding: 12px 16px; border-radius: 12px; background: var(--lime); color: var(--bg); font-weight: 900; transition: box-shadow 160ms ease, transform 160ms ease; }.discovery-empty a:hover { box-shadow: var(--glow-accent); transform: translateY(-2px); }.discovery-empty a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .discovery-empty a:hover { transform: none; } }
+.discovery-empty:has(.region-interest) { flex-direction: column; align-items: flex-start; }
+.region-interest { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
+.region-interest p { margin: 0; color: var(--muted); line-height: 1.6; }
+.region-interest-thanks { color: var(--accent); font-weight: 700; }
+.region-interest-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.region-interest-actions .btn-secondary { min-height: 44px; }
 @media (max-width: 850px) { .discover-filters { grid-template-columns: 1fr 1fr; }.discover-filters button { grid-column: 1 / -1; }.discovery-grid { grid-template-columns: 1fr; } } @media (max-width: 600px) { .discover-page { padding-inline: 20px; }.discover-filters { grid-template-columns: 1fr; }.discover-filters button { grid-column: auto; }.results-heading,.discovery-empty { align-items: flex-start; flex-direction: column; } }
 .discovery-card footer a { display: inline-flex; align-items: center; min-height: 44px; border-radius: 12px; padding: 10px 16px; background: var(--lime); color: var(--bg); font-weight: 800; white-space: nowrap; }
 .hosting-page { min-height: 100vh; padding: 0 32px 90px; background: var(--bg); }
