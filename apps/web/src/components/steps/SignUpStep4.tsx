@@ -6,7 +6,7 @@ import { BRAND_NAME } from "@/lib/brand";
 import { useSignUpStore } from "@/lib/sign-up-store";
 
 const seekingOptions: Array<{ value: Seeking; label: string; description: string }> = [
-  { value: "dating", label: "Dating", description: "Open to a romantic connection" },
+  { value: "dating", label: "Dating", description: "Open to meeting a romantic partner — a real connection, not a hookup" },
   { value: "friendship", label: "Friendship", description: "Looking for people to play with" },
   { value: "group", label: "Group events", description: "Focused on social sports activities" },
 ];

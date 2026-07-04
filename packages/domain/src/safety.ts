@@ -1,5 +1,5 @@
 export const SAFETY_REPORT_CATEGORIES = [
-  "harassment", "hate", "sexual_misconduct", "violence_threat", "stalking",
+  "harassment", "hate", "sexual_misconduct", "sexual_intent", "violence_threat", "stalking",
   "scam", "impersonation", "suspected_underage", "unsafe_event", "no_show", "other",
 ] as const;
 
@@ -58,7 +58,7 @@ const USER_ID_PATTERN = /^\d+$/;
 
 export function priorityForSafetyCategory(category: SafetyReportCategory): SafetyPriority {
   if (category === "violence_threat" || category === "stalking" || category === "suspected_underage") return "critical";
-  if (category === "sexual_misconduct" || category === "hate" || category === "unsafe_event") return "urgent";
+  if (category === "sexual_misconduct" || category === "sexual_intent" || category === "hate" || category === "unsafe_event") return "urgent";
   return "standard";
 }
 

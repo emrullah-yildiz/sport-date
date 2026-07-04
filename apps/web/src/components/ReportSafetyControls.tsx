@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 
 const categoryLabels: Record<SafetyReportCategory, string> = {
   harassment: "Harassment", hate: "Hate or discrimination", sexual_misconduct: "Sexual misconduct",
+  sexual_intent: "Sexual or inappropriate intent (e.g. a hookup-oriented event)",
   violence_threat: "Violence or threat", stalking: "Stalking or unwanted following", scam: "Scam",
   impersonation: "Impersonation", suspected_underage: "Suspected underage member",
   unsafe_event: "Unsafe event or location", no_show: "No-show", other: "Something else",

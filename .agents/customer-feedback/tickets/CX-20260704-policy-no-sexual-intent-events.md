@@ -1,6 +1,6 @@
 # CX-20260704-policy-no-sexual-intent-events
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `high`
 - Priority: `P1` — owner-directive (2026-07-04, interpreted): **no sexual intent at events.** KeepItUp is for dating/friendship/community through activity — NOT sexual encounters/hookups. (Interpretation of an ambiguous instruction — confirm with owner if wrong.)
 - Customer journey: a host creates an event / sets intentions → the product and guidelines make clear sexual/hookup-oriented events are not allowed → members can report ones that are → moderation acts.
@@ -22,6 +22,10 @@ Make it explicit — in copy, in the intention options, in guidelines, and in mo
 - A **report reason** for "sexual/inappropriate intent" exists on events and profiles, routing into the existing moderation queue; a hosting-guideline violation is actionable by moderation (hide/remove).
 - No new dark patterns; keep it dignified. typecheck/lint/test/prod build green; tests cover the report-reason wiring + that no sexual intention option is selectable.
 - Docs / guideline pages updated.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
 
 ## Guardrails
 

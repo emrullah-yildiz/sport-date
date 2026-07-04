@@ -243,6 +243,12 @@ export default function CreateEventForm() {
         </div>
       ) : null}
 
+      <p className="event-form-standard" role="note">
+        A quick standard: events are for a real shared activity — dating, friendship, or community
+        through the game. Events organised for sexual purposes or hookups aren&rsquo;t allowed. See the{" "}
+        <a href="/hosting-guidelines">hosting guidelines</a>.
+      </p>
+
       <nav className="event-form-progress" aria-label="Event details progress">
         <p className="event-form-progress-lede">Three calm sections. One publish at the end—your details are kept as you go.</p>
         <ol className="event-form-progress-rail">

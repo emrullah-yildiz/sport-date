@@ -165,6 +165,16 @@ export default async function HostingPage({ searchParams }: { searchParams: Prom
         </details>
 
         <details className="hosting-standard">
+          <summary>Events are for real activity — not sexual encounters</summary>
+          <ul>
+            <li>Every event is built around a genuine shared activity. {BRAND_NAME} is for dating, friendship, or community through the game — it is not a hookup app.</li>
+            <li>Do not organise events for sexual purposes, and do not use an event, profile, or the room chat for sexual solicitation.</li>
+            <li>Dating here means meeting a person you might click with — not arranging sex. Wanting a romantic connection is welcome; a sexual-encounter listing is not.</li>
+            <li>Events or profiles set up for sexual intent can be reported (&ldquo;Sexual or inappropriate intent&rdquo;) and moderators can hide or remove them.</li>
+          </ul>
+        </details>
+
+        <details className="hosting-standard">
           <summary>What host status does not mean</summary>
           <ul>
             <li>Host status is not identity verification, safety certification, or professional coaching authority.</li>

@@ -1,12 +1,32 @@
 import { describe, expect, it } from "vitest";
 
-import { priorityForSafetyCategory, validateEvidenceReference, validateModerationAppealUpdate, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
+import { SAFETY_REPORT_CATEGORIES, priorityForSafetyCategory, validateEvidenceReference, validateModerationAppealUpdate, validateModerationCaseUpdate, validateSafetyAppeal, validateSafetyReport } from "./safety";
+import { SEEKING_OPTIONS } from "./registration";
 
 describe("safety reports", () => {
   it("prioritizes immediate physical and minor-safety risks", () => {
     expect(priorityForSafetyCategory("violence_threat")).toBe("critical");
     expect(priorityForSafetyCategory("suspected_underage")).toBe("critical");
     expect(priorityForSafetyCategory("harassment")).toBe("standard");
+  });
+
+  it("offers a 'sexual/inappropriate intent' report reason, routed as urgent (CX-20260704)", () => {
+    expect(SAFETY_REPORT_CATEGORIES).toContain("sexual_intent");
+    expect(priorityForSafetyCategory("sexual_intent")).toBe("urgent");
+    // It is accepted as a valid category on an event report (routes to the queue).
+    const result = validateSafetyReport({
+      reportedUserId: null, eventId: "2c3b5c84-6926-4ba6-b926-5ceaf9e01399",
+      category: "sexual_intent", details: "This event is clearly organised as a hookup, not a real activity.", blockUser: false,
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) expect(result.priority).toBe("urgent");
+  });
+
+  it("has NO sexual/hookup intention option — dating means meeting a person, not sex", () => {
+    expect(SEEKING_OPTIONS).toEqual(["dating", "friendship", "group"]);
+    for (const option of SEEKING_OPTIONS as readonly string[]) {
+      expect(option).not.toMatch(/sex|hookup|hook-up|casual|nsfw/i);
+    }
   });
 
   it("accepts a structured event report with optional blocking", () => {

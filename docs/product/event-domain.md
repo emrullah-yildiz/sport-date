@@ -45,6 +45,14 @@ The exact venue, address, coordinates, and arrival instructions are available on
 
 Authorization must be derived server-side from the event and participation records. A client-supplied role or participation string is never sufficient.
 
+## No sexual-intent events (product policy)
+
+KeepItUp is for dating, friendship, or community **through a real shared activity** — it is not a hookup app (owner directive 2026-07-04, CX-20260704-policy-no-sexual-intent-events). Events must not be organised for sexual purposes, and no event, profile, or event-room chat may be used for sexual solicitation. Dating here means meeting a romantic partner — a real connection, not arranging sex; wanting romance is fully welcome, a sexual-encounter listing is not. This is enforced through **guidelines + reporting + moderation**, never surveillance of private messages:
+
+- The member intention options remain dating / friendship / community (`SEEKING_OPTIONS` = `dating` / `friendship` / `group`) — there is deliberately **no** sexual/hookup option, and the copy clarifies dating ≠ sexual encounter.
+- The hosting standards (`/hosting#standards`) and safety guidelines (`/safety#guidelines`) state the standard plainly, and event creation shows a short reminder at the point of creation.
+- Members can report an event or profile with the **`sexual_intent`** reason ("Sexual or inappropriate intent"), which routes into the same moderation queue as any other report (urgent priority) so a moderator can hide/remove the event or act on the member.
+
 ## Join decisions
 
 Join requests begin pending. The host may accept or skip. The third skip currently becomes a decline. Acceptance must be atomic with capacity enforcement so two simultaneous decisions cannot overfill an event. Cancellation by requester or host must close precise-location access immediately where practical.

@@ -50,6 +50,16 @@ export default function SafetyGuidelines() {
         </details>
 
         <details className="safety-guideline">
+          <summary>What this is for — and what it isn&apos;t</summary>
+          <ul>
+            <li>Meeting is organised around a real shared activity. This is for dating, friendship, or community through the game — it is not a hookup app.</li>
+            <li>Events must not be organised for sexual purposes, and no one should use an event, profile, or chat for sexual solicitation.</li>
+            <li>Dating here means meeting a person, not arranging sex — wanting a romantic connection is welcome; a sexual-encounter listing is not.</li>
+            <li>See something set up for sexual intent? Report it (&ldquo;Sexual or inappropriate intent&rdquo;) and moderators can hide or remove it.</li>
+          </ul>
+        </details>
+
+        <details className="safety-guideline">
           <summary>If something feels wrong</summary>
           <ul>
             <li>Block immediately if you need distance. Blocking removes shared requests, places, room access, and exact-location access.</li>
