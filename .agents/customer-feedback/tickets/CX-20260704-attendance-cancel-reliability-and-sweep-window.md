@@ -1,6 +1,6 @@
 # CX-20260704-attendance-cancel-reliability-and-sweep-window
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — two real bugs in the attendance loop found by the core-path audit (2026-07-04).
 - Surface: `lib/attendance-confirmations.ts`, `lib/join-requests.ts`, attendance API routes, `vercel.json`
@@ -18,3 +18,8 @@ Fix (until a sub-hourly scheduler exists — Vercel Pro cron or a free external 
 
 ## DoD
 - typecheck/lint/test/prod build green; tests cover Bug A parity + Bug B honest-empty-state. Likely no migration. `git pull --rebase`. Commit AND push (no migration) — unless you add one, then commit-not-push + report. Don't touch public/*.html or docs/marketing/**.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented, status → `implemented`. Bug A: extracted the single late-cancellation accounting entry point `recordLateCancellationSignal(userId, context, now)` in `lib/join-requests.ts` (refactored `cancelEventJoinRequest` onto it, no behaviour change) and now call it from BOTH `cancelAttendanceByToken` and `cancelAttendanceByMember` in `lib/attendance-confirmations.ts` after the seat is released. Context = `{ wasAccepted: has_seat, hoursUntilStart, viaSafetyPath: false }` (attendance loop has no safety variant — that path lives in `safety-actions.ts`); the domain rule (`applyLateCancellation`) still owns whether the timing counts, so the T-2h cancel now accrues the SAME signal as the normal cancel and can no longer evade it. No circular import (join-requests does not import attendance-confirmations). Bug B: widened the sweep window from 2h to `SWEEP_WINDOW_HOURS = 26` (brackets the daily `0 9 * * *` cron + 2h margin) so every upcoming event gets a row on the first sweep that sees it (at-most-once marker unchanged); `getEventAttendanceBreakdown` now returns `remindersSent` (true only when a confirmation row exists) and the host panel labels the empty state honestly ("Confirmation reminders haven't gone out for this event yet") instead of misleading all-zeros. Real fix (sub-hourly trigger) noted in code — HQ card #11. Checks: typecheck/lint (pre-existing warnings only)/test (web 973 pass/12 skip; 4 new attendance tests: token parity, member parity, expired no-signal, honest empty breakdown)/production build all green. No migration. Pushed to origin/main.

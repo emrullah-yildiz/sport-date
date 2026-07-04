@@ -159,12 +159,18 @@ export default async function HostEventPage({
         <section className="host-attendance" aria-labelledby="host-attendance-heading">
           <p className="panel-label">Starting soon</p>
           <h2 id="host-attendance-heading">Who&apos;s confirmed</h2>
-          <p>Each accepted attendee is being asked to confirm or release their place. Anyone still pending simply hasn&apos;t answered yet — no one is dropped automatically.</p>
-          <div className="host-attendance-counts">
-            <span><strong>{attendanceBreakdown.confirmed}</strong> confirmed</span>
-            <span><strong>{attendanceBreakdown.pending}</strong> pending</span>
-            <span><strong>{attendanceBreakdown.cancelled}</strong> released</span>
-          </div>
+          {attendanceBreakdown.remindersSent ? (
+            <>
+              <p>Each accepted attendee is being asked to confirm or release their place. Anyone still pending simply hasn&apos;t answered yet — no one is dropped automatically.</p>
+              <div className="host-attendance-counts">
+                <span><strong>{attendanceBreakdown.confirmed}</strong> confirmed</span>
+                <span><strong>{attendanceBreakdown.pending}</strong> pending</span>
+                <span><strong>{attendanceBreakdown.cancelled}</strong> released</span>
+              </div>
+            </>
+          ) : (
+            <p>Confirmation reminders haven&apos;t gone out for this event yet, so there&apos;s nothing to show here. Once they&apos;re sent, you&apos;ll see who has confirmed, who&apos;s still deciding, and who released their place.</p>
+          )}
         </section>
       ) : null}
 

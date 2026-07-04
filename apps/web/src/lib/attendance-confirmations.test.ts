@@ -3,11 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ getDatabase: vi.fn() }));
 vi.mock("@/lib/gmail-email-delivery", () => ({ sendGmailEmail: vi.fn() }));
+vi.mock("@/lib/join-request-notifications", () => ({ notifyRequesterOfJoinDecision: vi.fn() }));
 
 import { getDatabase } from "@/lib/db";
 import { sendGmailEmail } from "@/lib/gmail-email-delivery";
 import { hashAttendanceToken } from "./attendance-confirmation";
 import {
+  cancelAttendanceByMember,
   cancelAttendanceByToken,
   confirmAttendanceByToken,
   getEventAttendanceBreakdown,
@@ -72,9 +74,11 @@ describe("runAttendanceReminderSweep — idempotent T-2h selection", () => {
     expect(summary.suppressed).toBe(1);
     expect(summary.simulated).toBe(0);
 
-    // Selection window + "no confirmation yet" guard.
+    // Selection window + "no confirmation yet" guard. The window is widened to
+    // bracket the daily cron (CX-20260704 Bug B) — 26h, not 2h.
     expect(queries[0]).toContain("e.status = 'published'");
-    expect(queries[0]).toContain("INTERVAL '2 hours'");
+    expect(queries[0]).toContain("INTERVAL '1 hour'");
+    expect(queries[0]).toContain("«26»");
     expect(queries[0]).toContain("NOT EXISTS");
     expect(queries[0]).toContain("event_attendance_confirmations");
     // Idempotent insert.
@@ -152,6 +156,30 @@ describe("cancelAttendanceByToken — releases the spot", () => {
     expect(release).toContain("event_attendance_confirmations");
   });
 
+  it("records the SAME late-cancellation reliability signal as the normal cancel path (Bug A parity)", async () => {
+    // load conf row → release → SELECT reliability (member has a clean streak) → UPDATE users
+    const { queries } = mockDbSequence([
+      [confRow()],
+      [],
+      [{ late_cancellation_streak: 0, late_cancellation_streak_started_at: null, reliability_paused_until: null }],
+      [],
+    ]);
+    expect(await cancelAttendanceByToken(EVENT_ID, RAW, NOW)).toBe("cancelled");
+    // The reliability accounting ran: it read the member's standing and persisted
+    // the incremented streak — the T-2h cancel can no longer evade the signal.
+    expect(queries[2]).toContain("late_cancellation_streak");
+    expect(queries[2]).toContain("FROM users WHERE id = «202»");
+    expect(queries[3]).toContain("UPDATE users");
+    expect(queries[3]).toContain("SET late_cancellation_streak = «1»");
+  });
+
+  it("does not accrue a signal for an already-started (expired) or already-cancelled place", async () => {
+    // expired → early return, no release/reliability query
+    const expired = mockDbSequence([[confRow({ starts_at: PAST })]]);
+    expect(await cancelAttendanceByToken(EVENT_ID, RAW, NOW)).toBe("expired");
+    expect(expired.queries).toHaveLength(1);
+  });
+
   it("is idempotent when already cancelled, and rejects an expired token", async () => {
     mockDbSequence([[confRow({ status: "cancelled" })]]);
     expect(await cancelAttendanceByToken(EVENT_ID, RAW, NOW)).toBe("cancelled");
@@ -166,6 +194,24 @@ describe("cancelAttendanceByToken — releases the spot", () => {
     expect(await cancelAttendanceByToken("not-a-uuid", RAW, NOW)).toBe("invalid");
     expect(await cancelAttendanceByToken(EVENT_ID, "short", NOW)).toBe("invalid");
     expect(sql).not.toHaveBeenCalled();
+  });
+});
+
+describe("cancelAttendanceByMember — in-app prompt parity", () => {
+  it("releases the seat AND accrues the reliability signal, just like the token + normal cancel paths", async () => {
+    // getViewerAttendanceState → INSERT cancelled conf → release seat/request → SELECT reliability → UPDATE users
+    const { queries } = mockDbSequence([
+      [{ starts_at: FUTURE, time_zone: "Europe/Bucharest", is_host: false, has_seat: true, confirmation_status: "pending" }],
+      [],
+      [],
+      [{ late_cancellation_streak: 1, late_cancellation_streak_started_at: "2026-08-14T12:00:00.000Z", reliability_paused_until: null }],
+      [],
+    ]);
+    expect(await cancelAttendanceByMember(EVENT_ID, "202", NOW)).toBe("cancelled");
+    expect(queries[2]).toContain("DELETE FROM event_participants");
+    expect(queries[3]).toContain("FROM users WHERE id = «202»");
+    expect(queries[4]).toContain("UPDATE users");
+    expect(queries[4]).toContain("SET late_cancellation_streak = «2»");
   });
 });
 
@@ -184,10 +230,17 @@ describe("getViewerAttendanceState + host breakdown", () => {
   });
 
   it("host breakdown counts by status and is scoped to the host's own event", async () => {
-    const { queries } = mockDbSequence([[{ confirmed: 3, pending: 1, cancelled: 2 }]]);
+    const { queries } = mockDbSequence([[{ total: 6, confirmed: 3, pending: 1, cancelled: 2 }]]);
     const breakdown = await getEventAttendanceBreakdown(EVENT_ID, "101");
-    expect(breakdown).toEqual({ confirmed: 3, pending: 1, cancelled: 2 });
+    expect(breakdown).toEqual({ confirmed: 3, pending: 1, cancelled: 2, remindersSent: true });
     expect(queries[0]).toContain("e.host_user_id = «101»");
     expect(queries[0]).toContain("FILTER (WHERE c.status = 'confirmed')");
+  });
+
+  it("labels the breakdown honestly (remindersSent=false) when no confirmation rows exist yet (Bug B)", async () => {
+    // Event exists but the daily sweep hasn't created any rows → all counts 0.
+    mockDbSequence([[{ total: 0, confirmed: 0, pending: 0, cancelled: 0 }]]);
+    const breakdown = await getEventAttendanceBreakdown(EVENT_ID, "101");
+    expect(breakdown).toEqual({ confirmed: 0, pending: 0, cancelled: 0, remindersSent: false });
   });
 });

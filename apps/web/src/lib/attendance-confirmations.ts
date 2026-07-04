@@ -12,8 +12,11 @@ import {
   isWithinReminderWindow,
   type AttendanceStatus,
 } from "@/lib/attendance-confirmation";
+import type { CancellationContext } from "@sport-date/domain";
+
 import { getDatabase } from "@/lib/db";
 import { sendGmailEmail } from "@/lib/gmail-email-delivery";
+import { recordLateCancellationSignal } from "@/lib/join-requests";
 
 // DB operations for the T-2h attendance confirmation loop
 // (CX-20260704-feature-event-attendance-confirmation). Pure token/window/email
@@ -32,6 +35,11 @@ export type AttendanceEventSummary = Readonly<{
   startsAt: string;
   timeZone: string;
 }>;
+
+/** Hours between `now` and the event start (negative once it has started). */
+function hoursUntilStart(startsAt: string, now: Date): number {
+  return (new Date(startsAt).getTime() - now.getTime()) / 3_600_000;
+}
 
 function formatWhen(startsAt: string, timeZone: string): string {
   const date = new Date(startsAt);
@@ -115,7 +123,24 @@ export async function cancelAttendanceByToken(eventId: string, rawToken: string,
   if (attendanceTokenExpired(row.starts_at, now)) return "expired";
   if (row.status === "cancelled") return "cancelled"; // idempotent
   await releaseSeatAndCancel(String(row.event_id), String(row.member_id), row.id);
+  // Same late-cancellation reliability accounting as the normal "Cancel my place"
+  // path (lib/join-requests.ts) — the T-2h token cancel is the latest, most
+  // disruptive cancel and must NOT be able to evade the signal. `has_seat` proves
+  // the place was accepted; the domain rule decides whether the timing counts.
+  // This is never a safety exit (the safety path lives in safety-actions.ts).
+  await recordLateCancellationSignal(String(row.member_id), attendanceCancelContext(row.has_seat, row.starts_at, now), now);
   return "cancelled";
+}
+
+/** Context for a cancel taken through the attendance loop (token link or in-app prompt). */
+function attendanceCancelContext(hasSeat: boolean, startsAt: string, now: Date): CancellationContext {
+  return {
+    wasAccepted: Boolean(hasSeat),
+    hoursUntilStart: hoursUntilStart(startsAt, now),
+    // The attendance loop has no safety variant; a report/block exit routes through
+    // safety-actions.ts, never here. Documented escape hatch stays false.
+    viaSafetyPath: false,
+  };
 }
 
 /**
@@ -142,11 +167,22 @@ async function releaseSeatAndCancel(eventId: string, memberId: string, confirmat
 
 /**
  * The idempotent reminder sweep. For every published event starting within the
- * next 2 hours, create a `pending` confirmation (+ token) for each accepted
+ * sweep window, create a `pending` confirmation (+ token) for each accepted
  * attendee that has none yet, and dispatch the DARK reminder email. The UNIQUE
  * (event_id, member_id) + `ON CONFLICT DO NOTHING` + the "no row yet" filter make
  * overlapping cron runs safe — an attendee is reminded at most once.
+ *
+ * WINDOW (CX-20260704 Bug B): the cron only runs once a day (`0 9 * * *`, the
+ * Hobby-plan daily cron limit). A 2-hour window meant only events starting
+ * ~09:00–11:00 UTC ever got a row, so every other event's host breakdown showed
+ * misleading zeros. Until a sub-hourly trigger exists (Vercel Pro cron or a free
+ * external trigger — HQ card #11), the window brackets the full daily cadence
+ * plus margin (26h) so every upcoming event is reminded on the first sweep that
+ * sees it. The tradeoff is an earlier-than-T-2h reminder; the at-most-once marker
+ * ensures it is still sent only once. A sub-hourly trigger is the real fix.
  */
+const SWEEP_WINDOW_HOURS = 26;
+
 export async function runAttendanceReminderSweep(now: Date = new Date()): Promise<{ created: number; sent: number; simulated: number; suppressed: number; failed: number }> {
   const sql = getDatabase();
   const nowIso = now.toISOString();
@@ -158,7 +194,7 @@ export async function runAttendanceReminderSweep(now: Date = new Date()): Promis
     JOIN users AS m ON m.id = p.user_id AND m.account_status = 'active'
     WHERE e.status = 'published'
       AND e.starts_at > ${nowIso}::timestamptz
-      AND e.starts_at <= ${nowIso}::timestamptz + INTERVAL '2 hours'
+      AND e.starts_at <= ${nowIso}::timestamptz + (${SWEEP_WINDOW_HOURS} * INTERVAL '1 hour')
       AND NOT EXISTS (
         SELECT 1 FROM event_attendance_confirmations AS c
         WHERE c.event_id = e.id AND c.member_id = m.id
@@ -297,10 +333,23 @@ export async function cancelAttendanceByMember(eventId: string, userId: string, 
     SET status = 'cancelled', cancelled_at = NOW(), updated_at = NOW()
     WHERE event_id = ${eventId}::uuid AND requester_user_id = ${userId} AND status IN ('pending', 'accepted')
   `;
+  // In-app attendance cancel accrues the SAME reliability signal as the normal
+  // cancel path. getViewerAttendanceState only returns non-null when the viewer
+  // holds a seat, so this is always an accepted place.
+  await recordLateCancellationSignal(String(userId), attendanceCancelContext(true, state.startsAt, now), now);
   return "cancelled";
 }
 
-export type AttendanceBreakdown = Readonly<{ confirmed: number; pending: number; cancelled: number }>;
+export type AttendanceBreakdown = Readonly<{
+  confirmed: number;
+  pending: number;
+  cancelled: number;
+  // False when NO confirmation row exists yet for this event — i.e. the daily
+  // sweep has not created rows, so zero counts would be misleading. The host panel
+  // labels this honestly ("reminders not yet sent") instead of showing all-zeros
+  // as if everyone had been asked and no one answered (CX-20260704 Bug B).
+  remindersSent: boolean;
+}>;
 
 /** Host-only confirmed/pending/cancelled counts for an event the viewer hosts. */
 export async function getEventAttendanceBreakdown(eventId: string, hostId: string): Promise<AttendanceBreakdown | null> {
@@ -308,6 +357,7 @@ export async function getEventAttendanceBreakdown(eventId: string, hostId: strin
   const sql = getDatabase();
   const rows = await sql`
     SELECT
+      COUNT(c.id)::integer AS total,
       COUNT(*) FILTER (WHERE c.status = 'confirmed')::integer AS confirmed,
       COUNT(*) FILTER (WHERE c.status = 'pending')::integer AS pending,
       COUNT(*) FILTER (WHERE c.status = 'cancelled')::integer AS cancelled
@@ -316,8 +366,8 @@ export async function getEventAttendanceBreakdown(eventId: string, hostId: strin
     WHERE e.id = ${eventId}::uuid AND e.host_user_id = ${hostId}
     GROUP BY e.id
     LIMIT 1
-  ` as unknown as Array<{ confirmed: number; pending: number; cancelled: number }>;
+  ` as unknown as Array<{ total: number; confirmed: number; pending: number; cancelled: number }>;
   const row = rows[0];
   if (!row) return null;
-  return { confirmed: row.confirmed, pending: row.pending, cancelled: row.cancelled };
+  return { confirmed: row.confirmed, pending: row.pending, cancelled: row.cancelled, remindersSent: row.total > 0 };
 }

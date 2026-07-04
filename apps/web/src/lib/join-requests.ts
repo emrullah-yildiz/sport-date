@@ -59,6 +59,32 @@ async function persistReliabilityState(userId: string, state: ReliabilityState):
   `;
 }
 
+/**
+ * Record ONE late-cancellation reliability signal for a member, reading their
+ * current standing and folding in the given cancellation context. This is the
+ * single accounting entry point shared by EVERY member-initiated cancel path
+ * (the normal "Cancel my place" flow below AND the T-2h attendance confirm/cancel
+ * links + in-app prompt in `attendance-confirmations.ts`), so no cancel path can
+ * evade the signal by which button the member taps. The domain rule
+ * (`applyLateCancellation`) owns whether the context actually counts — a safety
+ * exit (`viaSafetyPath`), an early cancel, or a still-pending place counts for
+ * nothing. Idempotent per call; safe to call once after the seat is released.
+ */
+export async function recordLateCancellationSignal(
+  userId: string,
+  context: CancellationContext,
+  now: Date = new Date(),
+): Promise<void> {
+  const sql = getDatabase();
+  const currentRows = (await sql`
+    SELECT late_cancellation_streak, late_cancellation_streak_started_at, reliability_paused_until
+    FROM users WHERE id = ${userId}
+  `) as unknown as ReliabilityRow[];
+  if (currentRows.length === 0) return;
+  const nextState = applyLateCancellation(toReliabilityState(currentRows[0]), context, now);
+  await persistReliabilityState(userId, nextState);
+}
+
 export type CreateJoinRequestResult =
   | { requestId: string; status: "pending" }
   | { paused: true; notice: ReliabilityNotice }
@@ -190,15 +216,7 @@ export async function cancelEventJoinRequest(
     hoursUntilStart: Number(rows[0].hours_until_start),
     viaSafetyPath: exitReasonIsSafety(reason),
   };
-  const now = new Date();
-  const currentRows = (await sql`
-    SELECT late_cancellation_streak, late_cancellation_streak_started_at, reliability_paused_until
-    FROM users WHERE id = ${requesterId}
-  `) as unknown as ReliabilityRow[];
-  if (currentRows.length > 0) {
-    const nextState = applyLateCancellation(toReliabilityState(currentRows[0]), context, now);
-    await persistReliabilityState(requesterId, nextState);
-  }
+  await recordLateCancellationSignal(requesterId, context, new Date());
 
   return true;
 }
