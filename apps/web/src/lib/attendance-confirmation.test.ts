@@ -106,6 +106,11 @@ describe("buildAttendanceReminderEmail", () => {
     expect(draft.cancelUrl).toBe("https://keepitup.social/e/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/cancel?t=raw-token-value-1234567890");
     expect(draft.text).toContain("Floreasca, Bucharest");
     expect(draft.html).toContain("support@keepitup.social");
+    expect(draft.html).toContain(">Approve</a>");
+    expect(draft.html).toContain(">Cancel</a>");
+    expect(draft.html).toContain("display:inline-block");
+    expect(draft.text).toContain("Approve attendance:");
+    expect(draft.text).toContain("Cancel attendance (frees your spot):");
     // No fake urgency, and it makes clear doing nothing keeps the place.
     expect(draft.text).toContain("If you do nothing, your place is kept");
     // Never leaks an exact venue — only the approximate area label is present.

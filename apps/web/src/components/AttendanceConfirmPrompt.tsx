@@ -64,11 +64,11 @@ export default function AttendanceConfirmPrompt({
       <div className="attendance-prompt-actions">
         {status === "confirmed" ? null : (
           <button type="button" className="btn btn--primary" onClick={() => void act("confirm")} disabled={busy !== null}>
-            {busy === "confirm" ? "Saving…" : "Yes, I'm coming"}
+            {busy === "confirm" ? "Saving…" : "Approve"}
           </button>
         )}
         <button type="button" className="btn btn--secondary" onClick={() => void act("cancel")} disabled={busy !== null}>
-          {busy === "cancel" ? "Releasing…" : "I can't make it"}
+          {busy === "cancel" ? "Releasing…" : "Cancel"}
         </button>
       </div>
       {error ? <p className="attendance-prompt-error" role="alert">{error}</p> : null}

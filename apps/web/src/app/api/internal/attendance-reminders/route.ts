@@ -3,13 +3,15 @@ import { NextResponse } from "next/server";
 import { runAttendanceReminderSweep } from "@/lib/attendance-confirmations";
 import { DatabaseNotConfiguredError } from "@/lib/db";
 
-// Protected internal endpoint invoked by Vercel Cron (see `vercel.json`, every
-// ~15 min). It runs the idempotent T-2h attendance reminder sweep: create one
+// Protected internal endpoint invoked by a scheduler. It runs the idempotent
+// T-2h attendance reminder sweep: create one
 // `pending` confirmation (+ token) per accepted attendee of an event starting
 // within 2h that has none yet, and dispatch the DARK reminder email (a logged
 // no-op until the owner enables delivery). Authorizes the shared CRON_SECRET and
 // FAILS CLOSED when it is absent — a misconfigured deploy never exposes an
-// unauthenticated trigger (mirrors /api/internal/session-cleanup).
+// unauthenticated trigger (mirrors /api/internal/session-cleanup). Vercel Hobby
+// currently invokes it daily; reliable T-2h delivery still needs an approved
+// sub-daily scheduler or Vercel Pro.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 

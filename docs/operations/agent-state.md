@@ -1,5 +1,9 @@
 # Agent state
 
+## Latest work cycle - 2026-07-04 (attendance decision buttons)
+
+**The two-hour attendance reminder now presents explicit Approve and Cancel controls.** The HTML email uses email-client-safe inline-styled buttons; its plain-text fallback labels the same two actions. The in-app prompt and tokenized confirmation pages use matching labels. Email links remain read-only GETs that open a confirmation page, with the actual mutation performed by POST, so mail scanners cannot approve or cancel a participant automatically. Focused tests and the full web suite are green (942 passed, 12 skipped), web typecheck is green, and lint is green with two pre-existing warnings. A real Gmail message has not yet been sent because production still has `EMAIL_DELIVERY_ENABLED=false`. Operational blocker: Vercel Hobby schedules the protected reminder sweep only once daily at 09:00 UTC; reliable two-hour delivery requires an approved sub-daily external scheduler or Vercel Pro.
+
 ## Latest work cycle - 2026-07-04 (join-request decision notifications)
 
 **Requesters are proactively informed when their request reaches a real outcome.** A successful host approval now sends one transactional email linking the accepted member to the authorized event room; a final third-skip decline sends a private, dignity-preserving closed-request notice. Intermediate skips send nothing and neither email reveals skip history, host reasoning, or the exact meeting address. Browser and mobile decisions share the same post-commit notification boundary, delivery remains fail-closed behind the approved Gmail configuration, and email failure cannot undo the authoritative in-app decision. Verification: full suite green (940 web tests passed, 12 skipped; 218 domain tests passed), all workspace typechecks green, production build green, and lint green with two pre-existing warnings.

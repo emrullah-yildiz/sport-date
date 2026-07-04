@@ -83,7 +83,7 @@ export default function AttendanceActionPanel({
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="action" value={action} />
       <button type="submit" className={action === "cancel" ? "btn btn--secondary btn--lg" : "btn btn--primary btn--lg"} disabled={busy}>
-        {busy ? "Saving…" : action === "confirm" ? "Yes, I'm coming" : "I can't make it"}
+        {busy ? "Saving…" : action === "confirm" ? "Approve" : "Cancel"}
       </button>
     </form>
   );
