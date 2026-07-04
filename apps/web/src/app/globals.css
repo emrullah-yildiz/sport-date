@@ -1533,3 +1533,12 @@ button:disabled:hover, button[disabled]:hover {
 .accepted-meeting-instructions { display: block; margin-top: 14px; color: var(--text-muted); line-height: 1.5; }
 .room-meeting .accepted-meeting-directions { background: var(--accent); color: var(--bg); }
 .host-location-card.private .accepted-meeting-address { color: var(--text-muted); }
+
+/* Invite a friend — share the public /e/{id} invite (CX-20260704, P2). */
+.event-invite-friend { max-width: 1120px; margin: 18px auto 0; padding: 22px 26px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.event-invite-friend .panel-label { color: var(--accent) !important; }
+.invite-friend { display: grid; gap: 8px; margin-top: 8px; }
+.invite-friend-button { justify-self: start; min-height: 44px; padding: 11px 18px; border: 1.5px solid var(--accent); border-radius: 14px; background: transparent; color: var(--accent); font-weight: 900; cursor: pointer; }
+.invite-friend-button:hover { background: rgba(59,234,126,.12); }
+.invite-friend-button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.invite-friend-status { margin: 0; max-width: 720px; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }

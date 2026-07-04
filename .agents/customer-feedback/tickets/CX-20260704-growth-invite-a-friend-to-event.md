@@ -1,6 +1,6 @@
 # CX-20260704-growth-invite-a-friend-to-event
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P2` — ethical word-of-mouth loop; grows local density (the Phase-2 liquidity lever) without paid spend. Depends on nothing owner-gated.
 - Customer journey: a member joining/attending an event invites a specific friend to come along → friend lands on the public invite (see `CX-20260704-growth-shareable-event-invite-og-image`) → joins → density compounds.
@@ -20,6 +20,10 @@ Add a lightweight **"Invite a friend"** action on an event so a member can share
 - Shared link is the public invite from the related ticket (approximate-area only, no PII).
 - If attribution is included: store inviter→joiner at most as a private count; **never** publicly rank members, never show "who invited whom" to others.
 - Works on mobile web; 44px touch targets (matches the loop's existing a11y bar).
+
+## Handoff log
+
+- 2026-07-04 | build | picked up + implemented (Experience Build Agent). No migration of its own, BUT it sits atop 3 unpushed migration commits (035/036/037) — NOT pushed, to avoid carrying those migration commits ahead of the orchestrator's deploy; the orchestrator's push of the migration commits carries this along.
 
 ## Guardrails (hard — anti-dark-pattern)
 
