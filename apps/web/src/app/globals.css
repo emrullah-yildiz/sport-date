@@ -437,6 +437,96 @@ a.logo:hover { color: var(--text); }
   .landing-footer-shell { flex-direction: column; align-items: flex-start; }
 }
 
+/* ===========================================================================
+   LANDING — SPORTY MOTION ENERGY (CX-20260704-interactive-sporty-experience)
+   Tasteful, performant micro-motion that reads as "keep it up / momentum":
+   a gently floating preview card, a breathing hero glow, and springy lift on
+   the tactile cards/chips. All motion is COSMETIC and wrapped so
+   prefers-reduced-motion gets a calm, fully-equivalent static page. No libs,
+   no layout thrash (transform/opacity only), no infinite attention-grab beyond
+   a slow ambient loop that never demands interaction.
+   =========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  .preview-card { animation: hero-float 6s ease-in-out infinite; }
+  .hero-visual::before { animation: hero-glow-breathe 7s ease-in-out infinite; }
+  .sport-chip { transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease; }
+  .sport-chip:hover { transform: translateY(-3px); box-shadow: var(--glow-accent); border-color: var(--accent); }
+  .step-card, .safety-card { transition: transform 200ms ease, box-shadow 200ms ease; }
+  .step-card:hover, .safety-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+}
+@keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes hero-glow-breathe { 0%, 100% { opacity: .75; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } }
+
+/* ===========================================================================
+   WARM-UP MICRO-GAME (landing) — optional, self-contained, points OUTWARD.
+   ≥44px tap target, visible focus, mobile-first. Reduced-motion parity below.
+   =========================================================================== */
+.warmup { margin: 8px 0 40px; padding: 32px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.warmup-head { display: grid; gap: 10px; max-width: 560px; margin-bottom: 22px; }
+.warmup-eyebrow { color: var(--accent); }
+.warmup-title { margin: 0; font-size: var(--fs-h2); }
+.warmup-lede { margin: 0; color: var(--muted); font-size: var(--fs-small); line-height: 1.6; }
+.warmup-stage { display: grid; gap: 18px; place-items: center; text-align: center; }
+.warmup-meters { display: flex; gap: 34px; }
+.warmup-meter { display: grid; gap: 2px; }
+.warmup-meter-label { color: var(--text-muted); font-size: var(--fs-label); font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.warmup-meter-value { font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -.02em; line-height: 1; }
+.warmup-meter--count .warmup-meter-value { color: var(--accent); font-size: 40px; }
+.warmup-track { width: min(360px, 100%); height: 8px; border-radius: 99px; background: var(--surface-raised); overflow: hidden; }
+.warmup-track-fill { height: 100%; border-radius: 99px; background: var(--accent); transition: width 120ms linear; }
+/* The tap target: big, sporty, neon fill with near-black text (AA per palette). */
+.warmup-tap { position: relative; display: grid; place-items: center; gap: 2px; width: min(280px, 100%); min-height: 128px; padding: 20px; border: 0; border-radius: var(--radius-lg); background: var(--accent); color: var(--bg); cursor: pointer; box-shadow: var(--glow-accent); user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.warmup-tap:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.warmup-tap-word { font-family: var(--font-display); font-size: 34px; font-weight: 800; letter-spacing: .02em; }
+.warmup-tap-sub { font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.warmup-start { min-width: 220px; }
+.warmup-result { position: relative; display: grid; gap: 6px; place-items: center; padding: 10px 0 2px; }
+.warmup-burst { position: absolute; inset: -20px; z-index: 0; border-radius: 50%; background: radial-gradient(circle, rgba(59, 234, 126, .5) 0%, rgba(59, 234, 126, 0) 68%); pointer-events: none; }
+.warmup-result > :not(.warmup-burst) { position: relative; z-index: 1; }
+.warmup-result-emoji { font-size: 44px; line-height: 1; }
+.warmup-result-headline { margin: 0; font-family: var(--font-display); font-size: var(--fs-h3); font-weight: 800; }
+.warmup-result-count { margin: 0; color: var(--text); font-size: var(--fs-small); font-weight: 700; }
+.warmup-result-blurb { margin: 0; max-width: 420px; color: var(--muted); font-size: var(--fs-small); line-height: 1.55; }
+.warmup-cta { margin: 4px 0 0; color: var(--muted); font-size: var(--fs-small); }
+.warmup-cta--ready { color: var(--text); font-weight: 700; }
+.warmup-cta-link { color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.warmup-cta-link--muted { color: var(--text-muted); font-weight: 700; }
+.warmup-cta-link:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .warmup-track-fill { transition: none; }
+}
+@media (max-width: 640px) {
+  .warmup { padding: 24px 20px; }
+  .warmup-meters { gap: 26px; }
+}
+
+/* ===========================================================================
+   READINESS INDICATOR (/profile) — HONEST "You're ready to play".
+   Reflects a REAL capability (has a sport → matchable), not a vanity metric.
+   =========================================================================== */
+.readiness { position: relative; overflow: hidden; margin: 22px 0; padding: 28px; border-radius: var(--radius-lg); background: var(--surface); border: 1px solid var(--line); }
+.readiness--ready { border-color: var(--accent); }
+.readiness-body { position: relative; z-index: 1; display: grid; gap: 12px; }
+.readiness-title { margin: 0; font-size: var(--fs-h2); }
+.readiness-copy { margin: 0; max-width: 560px; color: var(--muted); font-size: var(--fs-small); line-height: 1.6; }
+.readiness-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.readiness-list { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; list-style: none; }
+.readiness-item { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border-radius: var(--radius); background: var(--surface-raised); border: 1px solid var(--line); }
+.readiness-item--essential { border-color: rgba(59, 234, 126, .35); }
+.readiness-check { display: grid; place-items: center; width: 26px; height: 26px; flex: 0 0 auto; border-radius: 50%; background: var(--surface); color: var(--text-muted); font-weight: 900; }
+.readiness-item--done .readiness-check { background: var(--accent); color: var(--bg); }
+.readiness-item-label { flex: 1 1 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 700; color: var(--text); }
+.readiness-tag { font-size: var(--fs-label); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.readiness-tag--optional { color: var(--text-muted); }
+.readiness-item-state { margin-left: auto; }
+.readiness-item-state .profile-empty-action { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.readiness-item-state .profile-empty-action:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.readiness-done-note { color: var(--text-muted); font-size: var(--fs-small); font-weight: 700; }
+.readiness-enrichment-note { margin: 8px 0 0; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
+@media (max-width: 640px) {
+  .readiness-item-state { margin-left: 0; }
+}
+
 /* Sign-up Page */
 /* Anchor the card toward the top so the primary heading is the first thing in
    view, rather than floating mid-screen with a dead band above it at desktop

@@ -58,3 +58,32 @@ negotiable (AA contrast, visible focus, 44px targets, reduced-motion). Interacti
 retain visible focus states, descriptive labels, reduced-motion support, and touch targets of at
 least 44 pixels. Product copy must describe only implemented capabilities.
 
+## 2026-07-04 — Sporty energy + the warm-up micro-game (anti-dark-pattern)
+
+`CX-20260704-interactive-sporty-experience-microgames`. The landing gained tasteful,
+performant motion (a floating preview card, a breathing hero glow, springy hover-lift on
+chips/cards — all `transform`/`opacity` only, all inside `prefers-reduced-motion:
+no-preference`, so reduced-motion members get a calm, equivalent static page) plus one
+OPTIONAL warm-up micro-game.
+
+- **WarmUpGame** (`apps/web/src/components/WarmUpGame.tsx`, logic in
+  `apps/web/src/lib/warmup-game.ts`): a 5-second "how many taps?" round with a live count,
+  a warm non-comparative result, and a single OUTWARD CTA ("find a game near you"). The
+  logic is a small **mode registry** so a tennis-serve timing mode can be added next
+  without reshaping the component. Real `<button>` tap target (keyboard + touch), ≥44px,
+  outcome announced once via a polite live region, springy press + result bloom both fall
+  back to static under reduced motion. Cost is trivial — no new dependency, framer-motion
+  was already in the bundle; the game is a small client island loaded with the landing.
+- **ReadinessIndicator** (`apps/web/src/components/ReadinessIndicator.tsx`, logic in
+  `@sport-date/domain` `calculateProfileReadiness`): an HONEST "You're ready to play" on
+  `/profile`, true once the member has a real capability (≥1 sport → matchable). Enrichment
+  items are genuinely optional (never a gate); the ready moment is marked with the existing
+  decorative `MomentGlow`.
+
+**Brand line (durable guardrail):** this is delight that points people OUTWARD to go DO the
+sport — not retention. The game saves/ranks nothing, has no streak, high-score, daily-return
+loop, escalating levels, or variable reward, and gates nothing (signup, discovery, safety are
+never contingent on playing). Success beats fire only on REAL accomplishments. The
+`ethical-energy-guardrails` and `warmup-game` / `WarmUpGame` tests tripwire against any
+manipulative mechanic re-entering these surfaces.
+

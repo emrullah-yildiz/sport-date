@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import BetaTermExplainer from "@/components/BetaTermExplainer";
+import WarmUpGame from "@/components/WarmUpGame";
 import { BRAND_NAME, BRAND_TITLE, Wordmark } from "@/lib/brand";
 import { sportEmoji } from "@/lib/sports";
 import { getCurrentUser } from "@/lib/session";
@@ -193,6 +194,15 @@ export default async function LandingPage() {
             </div>
           </div>
         </section>
+      </div>
+
+      <div className="landing-shell">
+        {/* Optional warm-up micro-game — points OUTWARD to a real game, gates nothing.
+            Signed-in members are sent to discovery; visitors to sign-up. */}
+        <WarmUpGame
+          ctaHref={user ? "/discover" : "/signup"}
+          ctaLabel={user ? "Jump into a game near you" : "Find a game near you"}
+        />
       </div>
 
       <section id="how-it-works" className="landing-section how-section" aria-labelledby="how-title">

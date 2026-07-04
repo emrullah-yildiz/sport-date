@@ -10,6 +10,7 @@ import EditProfileForm from "@/components/EditProfileForm";
 import ProfileEmptyAction from "@/components/ProfileEmptyAction";
 import MilestoneMoment from "@/components/MilestoneMoment";
 import MovementArc from "@/components/MovementArc";
+import ReadinessIndicator from "@/components/ReadinessIndicator";
 import MobileSessionControls from "@/components/MobileSessionControls";
 import PlusBilling from "@/components/PlusBilling";
 import ProfilePhotos from "@/components/ProfilePhotos";
@@ -22,6 +23,7 @@ import { isBillingConfigured } from "@/lib/stripe";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
 import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
+import { calculateProfileReadiness } from "@sport-date/domain";
 import { getSensitiveProfile } from "@/lib/sensitive-profile";
 import { getCurrentUser, type SessionUser } from "@/lib/session";
 
@@ -82,6 +84,15 @@ export default async function ProfilePage() {
   // when billing is dormant (flag off / no keys); `isPlus` fails closed to FREE.
   const billingConfigured = isBillingConfigured();
   const memberIsPlus = isPlus(user);
+  // Honest readiness from REAL profile facts — a sport is the true gate to being
+  // matchable; the rest is optional polish (see ReadinessIndicator / domain).
+  const readiness = calculateProfileReadiness({
+    hasSport: user.sports.length > 0,
+    hasIntro: user.bio.trim().length > 0,
+    hasLanguage: user.languages.length > 0,
+    hasPrompt: user.prompts.length > 0,
+    hasPhoto: photos.length > 0,
+  });
 
   return (
     <main className="profile-page">
@@ -131,6 +142,7 @@ export default async function ProfilePage() {
           </ul>
         </nav>
       </div>
+      <ReadinessIndicator readiness={readiness} firstName={user.firstName} />
       <section className="profile-grid">
         <article className="profile-panel">
           <p className="panel-label">Intro</p>
