@@ -31,10 +31,11 @@ describe("SignUpForm header hierarchy — one dominant per-step focal point", ()
     const h1s = html.match(/<h1[^>]*>/g) ?? [];
     // Exactly one dominant heading per step — no stacked second title.
     expect(h1s.length).toBe(1);
-    // The single h1 is the step's question. Since CX-20260704 the wizard leads
-    // with the invested, personal step — sports — so step 1's question is the
-    // sports picker, and the first heading a sighted member reads.
-    expect(html).toMatch(/<h1[^>]*>What sports do you play\?<\/h1>/);
+    // The single h1 is the step's question. Since the CX-20260704 interactive
+    // redesign the wizard leads with the warm, personal step — the member's name —
+    // so step 1's question is "What should we call you?", the first heading a
+    // sighted member reads.
+    expect(html).toMatch(/<h1[^>]*>What should we call you\?<\/h1>/);
   });
 
   it("no longer renders the persistent title as a competing heading", () => {
@@ -43,7 +44,7 @@ describe("SignUpForm header hierarchy — one dominant per-step focal point", ()
     // present, is a subordinate non-heading eyebrow.
     expect(html).not.toMatch(/<h[1-4][^>]*>Join the movement<\/h[1-4]>/i);
     // The step question is not demoted to an h2 sitting under a larger title.
-    expect(html).not.toMatch(/<h2[^>]*>What sports do you play\?<\/h2>/);
+    expect(html).not.toMatch(/<h2[^>]*>What should we call you\?<\/h2>/);
   });
 
   it("keeps the brand line present but subordinate (a labelled eyebrow, not a headline)", () => {
@@ -74,16 +75,17 @@ describe("SignUpForm reciprocal sign-in cross-link", () => {
 });
 
 /**
- * Tripwire for CX-20260704-landing-conversion-pack (fix 3): investment first,
- * credentials last. Step 1 must be the sports picker, NOT the account
- * credentials — a cold mobile visitor is never asked for email + a 12-char
- * password + date of birth + terms before any value.
+ * Tripwire for CX-20260704-landing-conversion-pack (fix 3) + the CX-20260704
+ * interactive redesign: investment first, credentials last. Step 1 must be the
+ * warm personal question (the member's name), NOT the account credentials — a
+ * cold mobile visitor is never asked for email + a 12-char password + date of
+ * birth + terms before any value.
  */
 describe("SignUpForm step order — credentials are not the first ask", () => {
-  it("renders the sports picker on step 1, with no credential inputs", () => {
+  it("renders the name question on step 1, with no credential inputs", () => {
     const html = markup();
-    // The invested, personal start: the sports grid renders immediately…
-    expect(html).toContain('id="signup-custom-sport"');
+    // The warm, personal start: the first-name field renders immediately…
+    expect(html).toContain('id="signup-first-name"');
     // …and none of the credential fields are on the opening step.
     expect(html).not.toContain('id="signup-email"');
     expect(html).not.toContain('id="signup-password"');

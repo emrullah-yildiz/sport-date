@@ -84,18 +84,43 @@ recommended. Each is marked `[basis — counsel-confirmable]`.
 | Languages | You | Match you to events in languages you share | Performance of a contract `[basis — counsel-confirmable]` |
 | "Seeking" (dating / friendship / group) | You | Reflect what you are looking for; this is treated as a member-controlled preference, never as a consolation ranking | Performance of a contract `[basis — counsel-confirmable — and see note below]` |
 | Sports, skill level, frequency | You | Match you to compatible activities | Performance of a contract `[basis — counsel-confirmable]` |
+| Gender (Woman / Man / Non-binary / self-describe / prefer-not-to-say) and an optional ≤80-char self-describe text | You, optionally | Let you present yourself; support future, member-controlled matching | Performance of a contract / consent `[basis — counsel-confirmable]`. **Optional**; nullable; not shown publicly unless you turn on `gender_visible`. Stored in `users` (`gender`, `gender_self_describe`, `gender_visible`). |
+| **Sexual orientation** (Straight / Gay / Lesbian / Bisexual / Pansexual / Asexual / Queer / Questioning / self-describe / prefer-not-to-say) and an optional ≤80-char self-describe text | You, optionally | Help match you for dating, if you choose to share it | **Explicit consent (GDPR Article 9(2)(a))** `[basis — counsel-confirmable]`. **Optional and never required to finish signup.** See the special-category note below. |
 
 > **Special-category data note.** Sport Date is positioned around *dating,
 > friendship, or group activity* without treating one as a lesser option
-> (`seeking`), and members write free-text bios. A service that lets people seek
-> dating, combined with free-text fields, can foreseeably reveal or allow
-> inference of data that GDPR Article 9 treats as special category (e.g. sexual
-> orientation). The product does **not** ask for, require, or structure
-> special-category data, and free-text fields are length-bounded. Whether the
-> *purpose* (facilitating dating) means an Article 9 condition (e.g. explicit
-> consent) is required, and whether this notice and the consent flow must reflect
-> that, is the single most important substantive legal question and is **flagged
-> for qualified-counsel confirmation**, not resolved here.
+> (`seeking`), and members write free-text bios — which can already foreseeably
+> reveal or allow inference of GDPR Article 9 data. In addition, the product now
+> lets a member **optionally** record their **sexual orientation**, which is
+> squarely Article 9 special-category data. It is handled with explicit safeguards:
+>
+> - **Optional and unbundled.** It is never required to register or to use any
+>   feature. It is collected on its own signup step, separate from the Terms
+>   acceptance, behind a **dedicated, explicit opt-in** ("Store my sexual
+>   orientation… used only to help match me for dating… I can change or delete it
+>   anytime").
+> - **No consent, no storage.** A member can select a value and still leave the
+>   opt-in unticked — in that case **nothing is stored**. This is enforced in one
+>   place in the domain layer (`sanitizeSensitiveProfileFields`) and again by a
+>   database `CHECK` (migration `038_profile_gender_orientation`): a
+>   `sexual_orientation` value cannot exist without an `orientation_consent_at`
+>   consent timestamp.
+> - **Private by default, member-controlled.** Both gender and orientation default
+>   to **not shown publicly** (`gender_visible` / `orientation_visible` default
+>   `FALSE`); the member controls exposure. Matching/discovery *use* of these
+>   fields is a separate, not-yet-built change.
+> - **Editable, exportable, erasable.** They live on the `users` row, so they are
+>   fully editable from the profile editor, included in the GDPR data export
+>   (`/api/account/export`, with the consent timestamp), and removed on account
+>   erasure with the rest of the profile. Clearing the orientation also clears its
+>   consent stamp and visibility.
+> - **Minimised.** Free-text self-describe fields are length-bounded (≤80 chars).
+>
+> Whether "explicit consent" is the correct and sufficient Article 9(2) condition
+> for this purpose, and whether the consent copy and retention here are adequate,
+> remains the single most important substantive legal question and is **flagged
+> for qualified-counsel confirmation** (HQ EU-counsel review, card #7), not
+> resolved here.
 
 ### 3.2 Events you host or join
 

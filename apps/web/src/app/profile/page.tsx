@@ -22,6 +22,7 @@ import { isBillingConfigured } from "@/lib/stripe";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
 import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
+import { getSensitiveProfile } from "@/lib/sensitive-profile";
 import { getCurrentUser, type SessionUser } from "@/lib/session";
 
 export const metadata = { title: "Your profile" };
@@ -69,11 +70,12 @@ function describeSport(
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const [movementProgress, communicationPreferences, receivedRating, photos] = await Promise.all([
+  const [movementProgress, communicationPreferences, receivedRating, photos, sensitiveProfile] = await Promise.all([
     getMemberMovementProgress(user.id),
     getCommunicationPreferences(user.id),
     getReceivedRatingAggregate(user.id),
     listProfilePhotos(user.id),
+    getSensitiveProfile(user.id),
   ]);
   const primaryPhoto = photos.find((photo) => photo.isPrimary) ?? photos[0] ?? null;
   // Server-computed billing/entitlement state. The Plus surface is fully hidden
@@ -216,7 +218,7 @@ export default async function ProfilePage() {
       <CommunicationPreferences preferences={communicationPreferences} />
       <WebSessionControls />
       <MobileSessionControls />
-      <EditProfileForm profile={user} />
+      <EditProfileForm profile={{ ...user, ...sensitiveProfile }} />
       <PrivacyControls />
       <SiteFooter />
     </main>

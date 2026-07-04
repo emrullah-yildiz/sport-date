@@ -1,6 +1,6 @@
 # CX-20260704-interactive-onboarding-gender-orientation
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). A warm, one-thing-at-a-time onboarding lifts completion; gender + orientation are core to a credible dating product and to future matching.
 - Customer journey: new member signs up → a friendly, interactive step-by-step flow (one focused question per screen) → completes a richer, dating-ready profile.
@@ -28,6 +28,10 @@ Redesign onboarding into a **more interactive, one-question-per-step** flow, and
 - Existing signup still works; DOB 18+ + terms + password policy unchanged; update the sign-up-step tests for the new order/fields.
 - typecheck/lint/test/prod build green; tests cover: optional sensitive fields (finish without them), consent required to store orientation, back-nav data retention, inclusive option sets, erasure/export include the new fields.
 - **Docs updated** (profile data model + the special-category handling).
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
 
 ## Guardrails
 

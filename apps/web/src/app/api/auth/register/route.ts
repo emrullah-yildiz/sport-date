@@ -41,16 +41,27 @@ export async function POST(request: Request) {
       skill_level: sport.skillLevel,
       frequency: sport.frequency,
     })));
+    // Optional, GDPR-careful identity fields (CX-20260704). The domain sanitizer
+    // has already dropped an orientation value that lacked explicit consent, so
+    // `input.sexualOrientation` is non-null ONLY when consent was given; we stamp
+    // the consent moment accordingly (the DB additionally CHECKs this pairing).
+    const genderSelfDescribe = input.genderSelfDescribe || null;
+    const orientationSelfDescribe = input.orientationSelfDescribe || null;
+    const orientationConsentAt = input.sexualOrientation ? new Date().toISOString() : null;
 
     const users = await sql`
       WITH new_user AS (
         INSERT INTO users (
           email, password_hash, date_of_birth, first_name, last_name,
-          location, bio, seeking, accepted_terms_at, email_verified
+          location, bio, seeking, accepted_terms_at, email_verified,
+          gender, gender_self_describe, gender_visible,
+          sexual_orientation, orientation_self_describe, orientation_consent_at, orientation_visible
         )
         VALUES (
           ${input.email}, ${passwordHash}, ${input.dateOfBirth}, ${input.firstName},
-          ${input.lastName}, ${input.location}, ${input.bio}, ${input.seeking}, NOW(), FALSE
+          ${input.lastName}, ${input.location}, ${input.bio}, ${input.seeking}, NOW(), FALSE,
+          ${input.gender}, ${genderSelfDescribe}, ${input.genderVisible},
+          ${input.sexualOrientation}, ${orientationSelfDescribe}, ${orientationConsentAt}, ${input.orientationVisible}
         )
         ON CONFLICT (email) DO NOTHING
         RETURNING id, email

@@ -29,6 +29,14 @@ export async function PATCH(request: Request) {
   })));
   const languagesJson = JSON.stringify(input.languages);
   const promptsJson = JSON.stringify(input.prompts.map((prompt) => ({ prompt: prompt.prompt, answer: prompt.answer })));
+  // Optional, GDPR-careful identity fields (CX-20260704). The sanitizer inside
+  // validateProfileUpdate already dropped an orientation value without consent,
+  // so `input.sexualOrientation` is non-null only when consent applies. We stamp
+  // the consent moment on first store and clear it (with the value) when the
+  // member removes their orientation — keeping the DB CHECK satisfied.
+  const genderSelfDescribe = input.genderSelfDescribe || null;
+  const orientationSelfDescribe = input.orientationSelfDescribe || null;
+  const orientationConsentAt = input.sexualOrientation ? new Date().toISOString() : null;
   const sql = getDatabase();
   const results = await sql.transaction((transaction) => [
     transaction`
@@ -37,7 +45,14 @@ export async function PATCH(request: Request) {
           location = ${input.location}, bio = ${input.bio},
           languages = ARRAY(SELECT jsonb_array_elements_text(${languagesJson}::jsonb)),
           personality_prompts = ${promptsJson}::jsonb,
-          seeking = ${input.seeking}, updated_at = NOW()
+          seeking = ${input.seeking},
+          gender = ${input.gender}, gender_self_describe = ${genderSelfDescribe},
+          gender_visible = ${input.genderVisible},
+          sexual_orientation = ${input.sexualOrientation},
+          orientation_self_describe = ${orientationSelfDescribe},
+          orientation_consent_at = ${orientationConsentAt},
+          orientation_visible = ${input.orientationVisible},
+          updated_at = NOW()
       WHERE id = ${user.id} AND account_status = 'active'
       RETURNING id
     `,

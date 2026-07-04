@@ -3,24 +3,42 @@
 import { validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { useState } from "react";
+import { type ComponentType, useState } from "react";
 
 import { BRAND_NAME } from "@/lib/brand";
-import { signUpStepError } from "@/lib/sign-up-steps";
+import { SIGN_UP_STEP_ORDER, signUpStepError } from "@/lib/sign-up-steps";
 import { useSignUpStore } from "@/lib/sign-up-store";
-import SignUpStep1 from "./steps/SignUpStep1";
-import SignUpStep2 from "./steps/SignUpStep2";
-import SignUpStep3 from "./steps/SignUpStep3";
-import SignUpStep4 from "./steps/SignUpStep4";
-import SignUpStep5 from "./steps/SignUpStep5";
+import StepName from "./steps/StepName";
+import StepGender from "./steps/StepGender";
+import StepOrientation from "./steps/StepOrientation";
+import StepBirthday from "./steps/StepBirthday";
+import StepSports from "./steps/StepSports";
+import StepIntentions from "./steps/StepIntentions";
+import StepPhotos from "./steps/StepPhotos";
+import StepLocation from "./steps/StepLocation";
+import StepCredentials from "./steps/StepCredentials";
+import StepReview from "./steps/StepReview";
 
-// Investment first, credentials LAST (CX-20260704-landing-conversion-pack):
-// sports → intent/bio → name/area → account credentials → review. The order
-// mirrors SIGN_UP_STEP_ORDER in @/lib/sign-up-steps (the tested source of
-// truth); the per-step gate below validates by that same sequence. All answers
-// live in the zustand store, so moving Back never loses anything. The password
-// / DOB / terms REQUIREMENTS are unchanged — only their position moved.
-const steps = [SignUpStep3, SignUpStep4, SignUpStep2, SignUpStep1, SignUpStep5];
+// Interactive, one-question-per-step signup (CX-20260704-interactive-onboarding-
+// gender-orientation). Each step asks a single focused thing; the order is the
+// tested source of truth in @/lib/sign-up-steps (SIGN_UP_STEP_ORDER), and the
+// per-step gate below validates by that same sequence. Credentials stay LAST
+// (investment first, credentials last — the prior conversion decision); the
+// password / DOB / terms REQUIREMENTS are unchanged, only their position. All
+// answers live in the zustand store, so moving Back never loses anything.
+const stepComponents: Record<(typeof SIGN_UP_STEP_ORDER)[number], ComponentType> = {
+  name: StepName,
+  gender: StepGender,
+  orientation: StepOrientation,
+  birthday: StepBirthday,
+  sports: StepSports,
+  intentions: StepIntentions,
+  photos: StepPhotos,
+  location: StepLocation,
+  credentials: StepCredentials,
+  review: StepReview,
+};
+const steps = SIGN_UP_STEP_ORDER.map((id) => stepComponents[id]);
 
 export default function SignUpForm() {
   const step = useSignUpStore((state) => state.step);
@@ -53,6 +71,22 @@ export default function SignUpForm() {
     if (step > 1) setStep(step - 1);
   };
 
+  // Best-effort: upload the optional photos the member selected during signup to
+  // the existing authenticated endpoint now that the session cookie is set. The
+  // first becomes their primary photo. A failure here never blocks account
+  // creation — they can add photos later from their profile.
+  const uploadSelectedPhotos = async (files: File[]) => {
+    for (const file of files) {
+      try {
+        const form = new FormData();
+        form.append("photo", file);
+        await fetch("/api/account/photos", { method: "POST", body: form });
+      } catch {
+        // Ignore — photos are optional and can be added later.
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     setError("");
     const state = useSignUpStore.getState();
@@ -68,6 +102,8 @@ export default function SignUpForm() {
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Registration failed.");
+      const selectedPhotos = [...state.additionalPhotos];
+      if (selectedPhotos.length > 0) await uploadSelectedPhotos(selectedPhotos);
       reset();
       setIsComplete(true);
     } catch (submissionError) {

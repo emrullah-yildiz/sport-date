@@ -2,28 +2,20 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { dateOfBirthError } from "@sport-date/domain";
-import { useState } from "react";
 import { useSignUpStore } from "@/lib/sign-up-store";
 
-export default function SignUpStep1() {
+export default function StepCredentials() {
   const email = useSignUpStore((state) => state.email);
   const password = useSignUpStore((state) => state.password);
-  const dateOfBirth = useSignUpStore((state) => state.dateOfBirth);
   const acceptedTerms = useSignUpStore((state) => state.acceptedTerms);
   const setField = useSignUpStore((state) => state.setField);
   const passwordStrength = [password.length >= 12, /[a-z]/.test(password) && /[A-Z]/.test(password), /\d/.test(password), /[^A-Za-z0-9]/.test(password)].filter(Boolean).length;
-
-  // Validate the birthday the moment it is entered/changed, not only at submit.
-  // Reuses the same domain age logic as the final-submit guard.
-  const [dobTouched, setDobTouched] = useState(false);
-  const dobError = dobTouched && dateOfBirth ? dateOfBirthError(dateOfBirth) : null;
 
   return (
     <motion.div className="signup-step">
       {/* Credentials are the FINAL input step (CX-20260704): the member has
           already built their profile, so this step frames the account as saving
-          that work. Requirements themselves are unchanged. */}
+          that work. The 12-char multi-class password policy + terms are unchanged. */}
       <h1>Save your profile</h1>
       <p>Last step — create the login that keeps the profile you just built.</p>
       <div className="form-group">
@@ -34,21 +26,6 @@ export default function SignUpStep1() {
         <label htmlFor="signup-password">Password</label>
         <input id="signup-password" type="password" autoComplete="new-password" placeholder="At least 12 characters" value={password} onChange={(event) => setField("password", event.target.value)} />
         {password ? <div className="password-strength"><div className="strength-bar"><div className="strength-fill" style={{ width: `${passwordStrength * 25}%` }} /></div><p className="strength-text">{["Very weak", "Weak", "Fair", "Good", "Strong"][passwordStrength]}</p></div> : null}
-      </div>
-      <div className="form-group">
-        <label htmlFor="signup-date-of-birth">Date of Birth (18+ only)</label>
-        <input
-          id="signup-date-of-birth"
-          type="date"
-          autoComplete="bday"
-          value={dateOfBirth}
-          aria-invalid={dobError ? true : undefined}
-          aria-describedby={dobError ? "signup-date-of-birth-error" : undefined}
-          onChange={(event) => { setDobTouched(true); setField("dateOfBirth", event.target.value); }}
-          onBlur={() => setDobTouched(true)}
-        />
-        <p className="field-format-hint">Date order follows your browser&apos;s region (e.g. dd/mm/yyyy in Europe).</p>
-        {dobError ? <p id="signup-date-of-birth-error" className="field-error" role="alert">{dobError}</p> : null}
       </div>
       <label className="terms terms-check">
         <input type="checkbox" checked={acceptedTerms} onChange={(event) => setField("acceptedTerms", event.target.checked)} />

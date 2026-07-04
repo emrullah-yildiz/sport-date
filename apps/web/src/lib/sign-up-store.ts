@@ -1,4 +1,4 @@
-import type { RegistrationSport, Seeking } from "@sport-date/domain";
+import type { Gender, RegistrationSport, Seeking, SexualOrientation } from "@sport-date/domain";
 import { create } from "zustand";
 
 export interface SignUpFields {
@@ -14,6 +14,17 @@ export interface SignUpFields {
   seeking: Seeking;
   sports: RegistrationSport[];
   acceptedTerms: boolean;
+  // Optional, GDPR-careful identity fields (CX-20260704). Gender is optional and
+  // not public by default; sexual orientation is Article 9 special-category data
+  // stored ONLY with explicit opt-in (`orientationConsent`). Visibility flags
+  // default to false — the member controls exposure.
+  gender: Gender | null;
+  genderSelfDescribe: string;
+  genderVisible: boolean;
+  sexualOrientation: SexualOrientation | null;
+  orientationSelfDescribe: string;
+  orientationVisible: boolean;
+  orientationConsent: boolean;
   profilePhoto: File | null;
   additionalPhotos: File[];
 }
@@ -44,6 +55,13 @@ const initialState: SignUpFields = {
   seeking: "dating",
   sports: [],
   acceptedTerms: false,
+  gender: null,
+  genderSelfDescribe: "",
+  genderVisible: false,
+  sexualOrientation: null,
+  orientationSelfDescribe: "",
+  orientationVisible: false,
+  orientationConsent: false,
   profilePhoto: null,
   additionalPhotos: [],
 };

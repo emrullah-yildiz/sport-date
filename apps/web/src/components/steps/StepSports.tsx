@@ -14,7 +14,7 @@ const sports = SPORT_PRESETS;
 const MAX_SPORTS = 5;
 const MAX_SPORT_NAME = 60;
 
-export default function SignUpStep3() {
+export default function StepSports() {
   const selected = useSignUpStore((state) => state.sports);
   const addSport = useSignUpStore((state) => state.addSport);
   const removeSport = useSignUpStore((state) => state.removeSport);

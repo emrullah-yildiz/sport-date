@@ -23,6 +23,13 @@ type AccountExportRow = {
   created_at: string;
   updated_at: string;
   personality_prompts: Array<{ prompt: string; answer: string }> | null;
+  gender: string | null;
+  gender_self_describe: string | null;
+  gender_visible: boolean;
+  sexual_orientation: string | null;
+  orientation_self_describe: string | null;
+  orientation_consent_at: string | null;
+  orientation_visible: boolean;
   sports: Array<{ name: string; skillLevel: string; frequency: string }>;
 };
 
@@ -37,6 +44,9 @@ export async function GET() {
       users.location, users.timezone, users.bio, users.languages, users.seeking,
       users.email_verified, users.accepted_terms_at, users.created_at, users.updated_at,
       users.personality_prompts,
+      users.gender, users.gender_self_describe, users.gender_visible,
+      users.sexual_orientation, users.orientation_self_describe,
+      users.orientation_consent_at, users.orientation_visible,
       COALESCE(
         jsonb_agg(
           jsonb_build_object(
@@ -178,6 +188,18 @@ export async function GET() {
       createdAt: account.created_at,
       updatedAt: account.updated_at,
       personalityPrompts: account.personality_prompts ?? [],
+      // Optional, GDPR-careful identity fields (CX-20260704). Included in full so
+      // the member's export is complete: gender + sexual orientation, their
+      // self-describe text, the per-field visibility flags, and — for the
+      // Article 9 special-category orientation — the exact moment consent to
+      // store it was recorded (null when never provided).
+      gender: account.gender,
+      genderSelfDescribe: account.gender_self_describe,
+      genderVisible: account.gender_visible,
+      sexualOrientation: account.sexual_orientation,
+      orientationSelfDescribe: account.orientation_self_describe,
+      orientationConsentAt: account.orientation_consent_at,
+      orientationVisible: account.orientation_visible,
       sports: account.sports,
       photos: profilePhotos.map((photo) => ({
         id: String(photo.id),

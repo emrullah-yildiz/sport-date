@@ -1,6 +1,91 @@
 export const SEEKING_OPTIONS = ["dating", "friendship", "group"] as const;
 export type Seeking = (typeof SEEKING_OPTIONS)[number];
 
+// Inclusive gender options (CX-20260704-interactive-onboarding-gender-orientation).
+// Optional; never gates participation or safety. `self_describe` pairs with a
+// bounded free-text field; `prefer_not_to_say` is a first-class choice.
+export const GENDER_OPTIONS = ["woman", "man", "non_binary", "self_describe", "prefer_not_to_say"] as const;
+export type Gender = (typeof GENDER_OPTIONS)[number];
+
+// Inclusive sexual-orientation options. This is GDPR Article 9 SPECIAL-CATEGORY
+// data — collected ONLY with an explicit, unbundled opt-in and stored only when
+// consent is given (see sanitizeSensitiveProfileFields). Always optional.
+export const SEXUAL_ORIENTATION_OPTIONS = [
+  "straight", "gay", "lesbian", "bisexual", "pansexual", "asexual", "queer", "questioning", "self_describe", "prefer_not_to_say",
+] as const;
+export type SexualOrientation = (typeof SEXUAL_ORIENTATION_OPTIONS)[number];
+
+export const SELF_DESCRIBE_MAX = 80;
+
+/**
+ * The optional gender + sexual-orientation profile fields, plus their
+ * per-field visibility flags and the orientation consent flag. Kept as one
+ * pure sanitizer shared by registration and profile-update so the GDPR rules
+ * live in exactly one place.
+ */
+export type SensitiveProfileFields = Readonly<{
+  gender: Gender | null;
+  genderSelfDescribe: string;
+  genderVisible: boolean;
+  sexualOrientation: SexualOrientation | null;
+  orientationSelfDescribe: string;
+  orientationVisible: boolean;
+  /** True only when the member gave the explicit opt-in to store their orientation. */
+  orientationConsent: boolean;
+}>;
+
+function optionOrNull<T extends string>(value: unknown, options: readonly T[]): T | null {
+  return typeof value === "string" && (options as readonly string[]).includes(value) ? (value as T) : null;
+}
+
+/**
+ * Sanitize the optional, GDPR-careful gender/orientation fields.
+ *
+ * - Both are OPTIONAL: an unset/invalid enum yields null, never an error.
+ * - `*_self_describe` is only kept when the value is `self_describe`, trimmed and
+ *   bounded ({@link SELF_DESCRIBE_MAX}); over-length is the only error here.
+ * - Orientation is SPECIAL-CATEGORY: it is stored ONLY with explicit consent —
+ *   without `orientationConsent === true` the orientation (and its self-describe)
+ *   are dropped to null, so a member who picks one but does not opt in has
+ *   nothing sensitive stored. The DB additionally CHECKs consent (migration 038).
+ * - Visibility flags default to FALSE (not publicly shown); the member controls them.
+ */
+export function sanitizeSensitiveProfileFields(raw: unknown): { data: SensitiveProfileFields; errors: string[] } {
+  const input = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const errors: string[] = [];
+
+  const gender = optionOrNull(input.gender, GENDER_OPTIONS);
+  let genderSelfDescribe = "";
+  if (gender === "self_describe") {
+    genderSelfDescribe = typeof input.genderSelfDescribe === "string" ? input.genderSelfDescribe.trim() : "";
+    if (genderSelfDescribe.length > SELF_DESCRIBE_MAX) errors.push(`Keep your gender description to ${SELF_DESCRIBE_MAX} characters or fewer.`);
+  }
+  const genderVisible = input.genderVisible === true;
+
+  const orientationConsent = input.orientationConsent === true;
+  let sexualOrientation = optionOrNull(input.sexualOrientation, SEXUAL_ORIENTATION_OPTIONS);
+  let orientationSelfDescribe = "";
+  if (sexualOrientation === "self_describe") {
+    orientationSelfDescribe = typeof input.orientationSelfDescribe === "string" ? input.orientationSelfDescribe.trim() : "";
+    if (orientationSelfDescribe.length > SELF_DESCRIBE_MAX) errors.push(`Keep your orientation description to ${SELF_DESCRIBE_MAX} characters or fewer.`);
+  }
+  // Consent gate: without explicit opt-in, no special-category data is stored.
+  if (!orientationConsent) {
+    sexualOrientation = null;
+    orientationSelfDescribe = "";
+  }
+  const orientationVisible = input.orientationVisible === true;
+
+  return {
+    data: {
+      gender, genderSelfDescribe, genderVisible,
+      sexualOrientation, orientationSelfDescribe, orientationVisible,
+      orientationConsent: orientationConsent && sexualOrientation !== null,
+    },
+    errors,
+  };
+}
+
 export const SPORT_SKILL_LEVELS = ["beginner", "intermediate", "advanced"] as const;
 export type SportSkillLevel = (typeof SPORT_SKILL_LEVELS)[number];
 
@@ -24,7 +109,7 @@ export type RegistrationInput = Readonly<{
   seeking: Seeking;
   sports: readonly RegistrationSport[];
   acceptedTerms: boolean;
-}>;
+}> & SensitiveProfileFields;
 
 export type RegistrationValidation =
   | { valid: true; data: RegistrationInput }
@@ -89,7 +174,7 @@ export type ProfileUpdateInput = Readonly<{
   languages: readonly string[];
   sports: readonly RegistrationSport[];
   prompts: readonly PersonalityPrompt[];
-}>;
+}> & SensitiveProfileFields;
 
 export type ProfileUpdateValidation =
   | { valid: true; data: ProfileUpdateInput }
@@ -148,9 +233,14 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
     }
   }
   if (new Set(sports.map((sport) => sport.name.toLowerCase())).size !== sports.length) errors.push("Choose each sport only once.");
+  // The optional gender/orientation fields ride the same profile-update path so a
+  // member can add, change, or clear them (and toggle their visibility) later —
+  // the orientation consent + special-category rules stay in one sanitizer.
+  const sensitive = sanitizeSensitiveProfileFields(input);
+  errors.push(...sensitive.errors);
   return errors.length > 0
     ? { valid: false, errors }
-    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports, prompts } };
+    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports, prompts, ...sensitive.data } };
 }
 
 export function ageOnDate(dateOfBirth: string, today = new Date()): number | null {
@@ -253,13 +343,15 @@ export function validateRegistration(
   if (new Set(sports.map((sport) => sport.name.toLowerCase())).size !== sports.length) {
     errors.push("Choose each sport only once.");
   }
+  const sensitive = sanitizeSensitiveProfileFields(input);
+  errors.push(...sensitive.errors);
   if (errors.length > 0) return { valid: false, errors };
 
   return {
     valid: true,
     data: {
       email, password, dateOfBirth, firstName, lastName, location, bio,
-      seeking: seeking as Seeking, sports, acceptedTerms,
+      seeking: seeking as Seeking, sports, acceptedTerms, ...sensitive.data,
     },
   };
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import type { PersonalityPrompt, RegistrationSport, Seeking, SportFrequency, SportSkillLevel } from "@sport-date/domain";
-import { MAX_PERSONALITY_PROMPTS, PERSONALITY_PROMPT_ANSWER_MAX, PERSONALITY_PROMPT_QUESTIONS } from "@sport-date/domain";
+import type { Gender, PersonalityPrompt, RegistrationSport, Seeking, SexualOrientation, SportFrequency, SportSkillLevel } from "@sport-date/domain";
+import { MAX_PERSONALITY_PROMPTS, PERSONALITY_PROMPT_ANSWER_MAX, PERSONALITY_PROMPT_QUESTIONS, SELF_DESCRIBE_MAX } from "@sport-date/domain";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+
+import { GENDER_CHOICES, SEXUAL_ORIENTATION_CHOICES } from "@/lib/sensitive-profile-options";
 
 type EditableProfile = {
   firstName: string;
@@ -14,6 +16,14 @@ type EditableProfile = {
   seeking: Seeking;
   sports: readonly RegistrationSport[];
   prompts: readonly PersonalityPrompt[];
+  // Optional, GDPR-careful identity fields (CX-20260704).
+  gender: Gender | null;
+  genderSelfDescribe: string;
+  genderVisible: boolean;
+  sexualOrientation: SexualOrientation | null;
+  orientationSelfDescribe: string;
+  orientationVisible: boolean;
+  orientationConsent: boolean;
 };
 
 // The persistent, focusable success confirmation. Extracted so its
@@ -109,6 +119,9 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
           bio: fields.bio, seeking: fields.seeking, sports: fields.sports,
           languages: fields.languagesText.split(",").map((language) => language.trim()).filter(Boolean),
           prompts: fields.prompts.map((prompt) => ({ prompt: prompt.prompt, answer: prompt.answer.trim() })).filter((prompt) => prompt.answer),
+          gender: fields.gender, genderSelfDescribe: fields.genderSelfDescribe, genderVisible: fields.genderVisible,
+          sexualOrientation: fields.sexualOrientation, orientationSelfDescribe: fields.orientationSelfDescribe,
+          orientationVisible: fields.orientationVisible, orientationConsent: fields.orientationConsent,
         }),
       });
       const result = await response.json();
@@ -165,6 +178,65 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
             </div>
           ))}
           <button id="edit-profile-prompts" className="add-sport" type="button" disabled={fields.prompts.length >= MAX_PERSONALITY_PROMPTS || availablePrompts.length === 0} onClick={addPrompt}>Add a prompt</button>
+        </fieldset>
+        <fieldset id="edit-profile-identity">
+          <legend>Gender &amp; orientation (optional)</legend>
+          <p className="edit-prompts-hint">Both are optional and yours to change or clear anytime. They stay private unless you choose to show them. Sexual orientation is stored only if you tick the consent box.</p>
+          <span className="field-label">Gender</span>
+          <div className="choice-grid" role="group" aria-label="Gender">
+            {GENDER_CHOICES.map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                aria-pressed={fields.gender === option.value}
+                className={`choice-chip ${fields.gender === option.value ? "active" : ""}`}
+                onClick={() => setFields((current) => ({ ...current, gender: current.gender === option.value ? null : option.value }))}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {fields.gender === "self_describe" ? (
+            <label>Describe your gender
+              <input maxLength={SELF_DESCRIBE_MAX} value={fields.genderSelfDescribe} onChange={(event) => setFields({ ...fields, genderSelfDescribe: event.target.value })} placeholder="In your own words" />
+            </label>
+          ) : null}
+          {fields.gender && fields.gender !== "prefer_not_to_say" ? (
+            <label className="terms-check"><input type="checkbox" checked={fields.genderVisible} onChange={(event) => setFields({ ...fields, genderVisible: event.target.checked })} /><span>Show my gender on my profile</span></label>
+          ) : null}
+
+          <span className="field-label">Sexual orientation</span>
+          <div className="choice-grid" role="group" aria-label="Sexual orientation">
+            {SEXUAL_ORIENTATION_CHOICES.map((option) => (
+              <button
+                type="button"
+                key={option.value}
+                aria-pressed={fields.sexualOrientation === option.value}
+                className={`choice-chip ${fields.sexualOrientation === option.value ? "active" : ""}`}
+                onClick={() => setFields((current) => (
+                  current.sexualOrientation === option.value
+                    ? { ...current, sexualOrientation: null, orientationConsent: false, orientationVisible: false }
+                    : { ...current, sexualOrientation: option.value }
+                ))}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          {fields.sexualOrientation === "self_describe" ? (
+            <label>Describe your orientation
+              <input maxLength={SELF_DESCRIBE_MAX} value={fields.orientationSelfDescribe} onChange={(event) => setFields({ ...fields, orientationSelfDescribe: event.target.value })} placeholder="In your own words" />
+            </label>
+          ) : null}
+          {fields.sexualOrientation ? (
+            <div className="consent-block">
+              <label className="terms-check"><input type="checkbox" checked={fields.orientationConsent} onChange={(event) => setFields((current) => ({ ...current, orientationConsent: event.target.checked, orientationVisible: event.target.checked ? current.orientationVisible : false }))} /><span>Store my sexual orientation. Used only to help match me for dating; optional; I can change or delete it anytime. Not shown publicly unless I choose to show it.</span></label>
+              {!fields.orientationConsent ? <p className="consent-hint" role="note">Without this ticked, your orientation won&rsquo;t be saved.</p> : null}
+              {fields.orientationConsent ? (
+                <label className="terms-check"><input type="checkbox" checked={fields.orientationVisible} onChange={(event) => setFields({ ...fields, orientationVisible: event.target.checked })} /><span>Also show it on my profile</span></label>
+              ) : null}
+            </div>
+          ) : null}
         </fieldset>
         {confirmation ? <EditProfileConfirmation message={confirmation} attach={attachConfirmation} /> : null}
         {error ? <p className="error-message" role="alert">{error}</p> : null}
