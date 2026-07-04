@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "@/lib/discovery-card";
+import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea, toDisplayCase } from "@/lib/discovery-card";
 import { applyAdvancedFilters, ALL_RADIUS_OPTIONS_KM, resolveAdvancedFilters, SCHEDULE_WINDOWS } from "@/lib/discovery-advanced-filters";
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPTIONS_KM, resolveDiscoveryCentre } from "@/lib/discovery-geo";
 import { isPlus } from "@/lib/entitlements";
@@ -108,7 +108,11 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   // Warm, personal, located arrival greeting — built only from the member's own first
   // name and approximate profile area (no new data/query, no precise location, no
   // fabricated traction). Replaces the static pre-signup marketing hero.
-  const greeting = buildDiscoveryGreeting(user.firstName, area.memberArea, { searchEverywhere });
+  // Display-only de-shouting: a member whose stored name/area is all-caps ("BUCHAREST")
+  // shouldn't have it echoed back a dozen times. Never used for the DB query — that
+  // still runs on area.effectiveCity (raw).
+  const displayArea = toDisplayCase(area.memberArea);
+  const greeting = buildDiscoveryGreeting(toDisplayCase(user.firstName), displayArea, { searchEverywhere });
 
   return (
     <main className="discover-page">
@@ -122,19 +126,19 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         <p className="discover-area-note">
           <span>
             You&apos;re seeing events within <strong>{requestedRadiusKm} km</strong> of{" "}
-            {geoCentre.source === "device" ? "your approximate current area" : <strong>{area.memberArea}</strong>}.
+            {geoCentre.source === "device" ? "your approximate current area" : <strong>{displayArea}</strong>}.
           </span>
           <Link href="/discover" className="discover-broaden">Back to my area</Link>
         </p>
       ) : area.isNearMeDefault ? (
         <p className="discover-area-note">
-          <span>You&apos;re seeing events open near <strong>{area.memberArea}</strong>, your profile area, that you&apos;re eligible to join.</span>
+          <span>You&apos;re seeing events open near <strong>{displayArea}</strong>, your profile area, that you&apos;re eligible to join.</span>
           <Link href="/discover?near=all" className="discover-broaden">Search everywhere</Link>
         </p>
       ) : searchEverywhere && !requestedCity ? (
         <p className="discover-area-note">
           <span>You&apos;re seeing events open everywhere that you&apos;re eligible to join.</span>
-          {area.memberArea ? <Link href="/discover" className="discover-broaden">Back to near {area.memberArea}</Link> : null}
+          {displayArea ? <Link href="/discover" className="discover-broaden">Back to near {displayArea}</Link> : null}
         </p>
       ) : (
         <p className="discover-area-note">
@@ -142,7 +146,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         </p>
       )}
       <form className="discover-filters" method="get">
-        <label>City<input name="city" defaultValue={requestedCity} placeholder={area.memberArea ? `Near ${area.memberArea}` : "Any city"} title="Leave blank to see events near your profile area" /></label>
+        <label>City<input name="city" defaultValue={requestedCity} placeholder={displayArea ? `Near ${displayArea}` : "Any city"} title="Leave blank to see events near your profile area" /></label>
         <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any sport" title="Leave blank to see events for every sport; type one to narrow to it" /></label>
         <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible" title="Defaults to any compatible language" /></label>
         <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>
@@ -172,7 +176,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       <UseMyLocationControl defaultRadiusKm={RADIUS_OPTIONS_KM[1]} />
 
       <section className="discovery-results" aria-live="polite">
-        <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : describeDiscoveryResultsHeading({ count: events.length, memberArea: area.memberArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
+        <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : describeDiscoveryResultsHeading({ count: events.length, memberArea: displayArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
         {events.length === 0 ? (
           <div className="discovery-empty">
             {radiusActive ? (
@@ -182,22 +186,14 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
                 <Link href="/events/new">Host the first one</Link>
               </>
             ) : area.isNearMeDefault ? (
-              <>
-                <RegionInterestSignal area={area.memberArea} />
-                <Link href="/discover?near=all">Search everywhere</Link>
-                <Link href="/events/new">Host the first one</Link>
-              </>
+              <RegionInterestSignal area={displayArea} />
             ) : hasNarrowingFilters ? (
               <>
                 <p>Nothing matches these filters right now. Try widening your search — clear the city, sport, or language filters, or look further ahead in time.</p>
                 <Link href="/discover">Clear the filters</Link>
               </>
             ) : (
-              <>
-                <RegionInterestSignal area={area.memberArea} />
-                {area.memberArea ? <Link href="/discover?near=all">Search everywhere</Link> : null}
-                <Link href="/events/new">Host the first one</Link>
-              </>
+              <RegionInterestSignal area={displayArea} />
             )}
           </div>
         ) : (

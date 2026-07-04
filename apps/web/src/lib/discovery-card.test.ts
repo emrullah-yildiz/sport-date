@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea } from "./discovery-card";
+import { buildDiscoveryGreeting, describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatDiscoveryArea, formatDiscoveryDate, resolveDiscoveryArea, toDisplayCase } from "./discovery-card";
 
 // These pin the scan-critical presentation rules for the /discover card hierarchy
 // (CX-20260701-discover-cards-inverted-hierarchy-unscannable-feed): the "when" is
@@ -132,6 +132,27 @@ describe("resolveDiscoveryArea", () => {
 // welcome): the /discover header greets the member by their own first name and orients
 // them to their own approximate area, using only already-available data — no marketing
 // billboard, no precise location, no fabricated traction.
+describe("toDisplayCase", () => {
+  it("de-shouts an all-caps name or place for display", () => {
+    expect(toDisplayCase("BUCHAREST")).toBe("Bucharest");
+    expect(toDisplayCase("EMRULLAH")).toBe("Emrullah");
+    expect(toDisplayCase("CLUJ-NAPOCA")).toBe("Cluj-Napoca");
+  });
+
+  it("leaves intentional casing untouched (any lower-case = as-entered)", () => {
+    expect(toDisplayCase("McDonald")).toBe("McDonald");
+    expect(toDisplayCase("O'Brien")).toBe("O'Brien");
+    expect(toDisplayCase("Bucharest")).toBe("Bucharest");
+    expect(toDisplayCase("iOS")).toBe("iOS");
+  });
+
+  it("trims and tolerates empty input", () => {
+    expect(toDisplayCase("  BERLIN ")).toBe("Berlin");
+    expect(toDisplayCase("")).toBe("");
+    expect(toDisplayCase("   ")).toBe("");
+  });
+});
+
 describe("buildDiscoveryGreeting", () => {
   it("greets the member by first name and names their own approximate area", () => {
     expect(buildDiscoveryGreeting("Ana", "Bucharest")).toEqual({

@@ -61,29 +61,29 @@ export default function RegionInterestSignal({ area }: { area?: string }) {
     <div className="region-interest">
       <p>
         {trimmedArea
-          ? `${BRAND_NAME} isn't live near ${trimmedArea} yet.`
-          : `${BRAND_NAME} isn't live in many places yet.`}{" "}
-        We&apos;re opening it city by city — Europe first — and you&apos;re here early. As hosts
-        start events {trimmedArea ? `near ${trimmedArea}` : "near you"}, they&apos;ll show up right here.
+          ? `No ${BRAND_NAME} games near ${trimmedArea} yet — you're here early.`
+          : `No ${BRAND_NAME} games in your area yet — you're here early.`}{" "}
+        We&apos;re opening city by city, Europe first, so new events show up here as hosts create them.
       </p>
 
-      {state === "done" ? (
+      {state === "done" && trimmedArea ? (
         <p className="region-interest-thanks" role="status">
-          Thanks — we&apos;ve noted interest{trimmedArea ? ` near ${trimmedArea}` : ""}. This helps us decide where to open next.
+          Thanks — we&apos;ll let you know as games open near {trimmedArea}. It also helps us decide where to open next.
         </p>
       ) : (
         <div className="region-interest-actions">
           {trimmedArea ? (
             <button
               type="button"
-              className="btn-secondary"
+              className="region-interest-primary"
               onClick={() => void raiseHand()}
               disabled={state === "submitting"}
             >
-              {state === "submitting" ? "Noting…" : `Tell us you'd play near ${trimmedArea}`}
+              {state === "submitting" ? "Noting…" : `Notify me about games near ${trimmedArea}`}
             </button>
           ) : null}
-          <Link href="/research">Tell us where you&apos;d play</Link>
+          <Link href="/events/new">Host the first one</Link>
+          <Link href="/discover?near=all">Search everywhere</Link>
           <Link href="/landing">See how it works</Link>
         </div>
       )}

@@ -131,6 +131,20 @@ export type DiscoveryGreeting = Readonly<{
   subheading: string;
 }>;
 
+/**
+ * De-shout a stored name or place for DISPLAY only. Members who type their name or
+ * city in all-caps ("EMRULLAH", "BUCHAREST") shouldn't have it echoed back a dozen
+ * times across the discover page. We normalise ONLY when the value is entirely
+ * upper-case — anything with existing lower-case letters is intentional casing
+ * (McDonald, O'Brien, iOS) and is left untouched. Never feed this into a query;
+ * it is purely presentational.
+ */
+export function toDisplayCase(value: string): string {
+  const trimmed = (value ?? "").trim();
+  if (!trimmed || /\p{Ll}/u.test(trimmed)) return trimmed;
+  return trimmed.replace(/\p{L}[\p{L}'’]*/gu, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
+}
+
 export function buildDiscoveryGreeting(
   firstName: string,
   memberArea: string,

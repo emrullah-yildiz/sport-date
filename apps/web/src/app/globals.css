@@ -954,8 +954,15 @@ a.logo:hover { color: var(--text); }
 .region-interest { display: flex; flex-direction: column; gap: 12px; max-width: 640px; }
 .region-interest p { margin: 0; color: var(--muted); line-height: 1.6; }
 .region-interest-thanks { color: var(--accent); font-weight: 700; }
-.region-interest-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.region-interest-actions .btn-secondary { min-height: 44px; }
+.region-interest-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.region-interest-primary { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 12px 18px; border: 0; border-radius: 12px; background: var(--lime); color: var(--bg); font-weight: 900; font-size: 14px; cursor: pointer; }
+.region-interest-primary:hover:not(:disabled) { box-shadow: var(--glow-accent); }
+.region-interest-primary:disabled { opacity: .6; cursor: progress; }
+.region-interest-primary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* Secondary empty-state links: ghost/outline so the primary "notify me" stands alone.
+   Higher specificity than the blanket green `.discovery-empty a`. */
+.discovery-empty .region-interest-actions a { background: transparent; color: var(--text); border: 1.5px solid var(--line); font-weight: 800; font-size: 14px; padding: 11px 16px; }
+.discovery-empty .region-interest-actions a:hover { transform: none; border-color: rgba(244,247,242,.32); box-shadow: var(--glow-accent); }
 @media (max-width: 850px) { .discover-filters { grid-template-columns: 1fr 1fr; }.discover-filters button { grid-column: 1 / -1; }.discovery-grid { grid-template-columns: 1fr; } } @media (max-width: 600px) { .discover-page { padding-inline: 20px; }.discover-filters { grid-template-columns: 1fr; }.discover-filters button { grid-column: auto; }.results-heading,.discovery-empty { align-items: flex-start; flex-direction: column; } }
 .discovery-card footer a { display: inline-flex; align-items: center; min-height: 44px; border-radius: 12px; padding: 10px 16px; background: var(--lime); color: var(--bg); font-weight: 800; white-space: nowrap; }
 .hosting-page { min-height: 100vh; padding: 0 32px 90px; background: var(--bg); }
