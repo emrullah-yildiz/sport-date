@@ -193,7 +193,7 @@
       <div class="pri">Blocker · unlocks reminders</div>
       <h3>9 · Gmail transactional delivery</h3>
       <p>Owner approved Gmail for the private beta. The fail-closed Gmail API adapter now covers verification, password reset, T-2h attendance reminders, and feedback updates. Delivery stays dark until the OAuth client, refresh token, and verified <code>support@keepitup.social</code> sender alias are stored in Vercel.</p>
-      <div class="rec">Owner action: authorize the narrow <code>gmail.send</code> scope, verify the sender alias, and place the OAuth secrets directly in Vercel. Then run one test send before switching <code>EMAIL_DELIVERY_ENABLED=true</code>.</div>
+      <div class="rec">⚠ <b>Creds + flag ARE set; sending FAILS on the last step.</b> Tested live 2026-07-04: 2 real sends accepted (202) but NEITHER delivered. Cause: <code>support@keepitup.social</code> is not a <b>verified "Send mail as" alias</b> in the <code>ey.myacc@gmail.com</code> account — Google's confirmation email ("Gmail Confirmation - Send Mail as…", today 11:37) is unclicked. <b>Owner fix (1 min): click that confirmation link</b> (or Gmail → Settings → Accounts → Send mail as → confirm), then I re-test. Alt: point <code>GMAIL_SENDER_EMAIL</code> at <code>ey.myacc@gmail.com</code> (no alias needed).</div>
     </div>
     <div class="dec">
       <div class="pri">⚠ Live &amp; fail-safe · needs provider for auto-approve</div>
