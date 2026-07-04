@@ -31,9 +31,10 @@ describe("SignUpForm header hierarchy — one dominant per-step focal point", ()
     const h1s = html.match(/<h1[^>]*>/g) ?? [];
     // Exactly one dominant heading per step — no stacked second title.
     expect(h1s.length).toBe(1);
-    // The single h1 is the step's question (step 1 = "Let's get started"),
-    // so the step question is the first heading a sighted member reads.
-    expect(html).toMatch(/<h1[^>]*>Let&#x27;s get started<\/h1>/);
+    // The single h1 is the step's question. Since CX-20260704 the wizard leads
+    // with the invested, personal step — sports — so step 1's question is the
+    // sports picker, and the first heading a sighted member reads.
+    expect(html).toMatch(/<h1[^>]*>What sports do you play\?<\/h1>/);
   });
 
   it("no longer renders the persistent title as a competing heading", () => {
@@ -42,7 +43,7 @@ describe("SignUpForm header hierarchy — one dominant per-step focal point", ()
     // present, is a subordinate non-heading eyebrow.
     expect(html).not.toMatch(/<h[1-4][^>]*>Join the movement<\/h[1-4]>/i);
     // The step question is not demoted to an h2 sitting under a larger title.
-    expect(html).not.toMatch(/<h2[^>]*>Let&#x27;s get started<\/h2>/);
+    expect(html).not.toMatch(/<h2[^>]*>What sports do you play\?<\/h2>/);
   });
 
   it("keeps the brand line present but subordinate (a labelled eyebrow, not a headline)", () => {
@@ -69,6 +70,25 @@ describe("SignUpForm reciprocal sign-in cross-link", () => {
     expect(html).toContain('href="/login"');
     // …and be framed as a sign-in path for someone who already has a profile.
     expect(html).toMatch(/Already have a profile\?/);
+  });
+});
+
+/**
+ * Tripwire for CX-20260704-landing-conversion-pack (fix 3): investment first,
+ * credentials last. Step 1 must be the sports picker, NOT the account
+ * credentials — a cold mobile visitor is never asked for email + a 12-char
+ * password + date of birth + terms before any value.
+ */
+describe("SignUpForm step order — credentials are not the first ask", () => {
+  it("renders the sports picker on step 1, with no credential inputs", () => {
+    const html = markup();
+    // The invested, personal start: the sports grid renders immediately…
+    expect(html).toContain('id="signup-custom-sport"');
+    // …and none of the credential fields are on the opening step.
+    expect(html).not.toContain('id="signup-email"');
+    expect(html).not.toContain('id="signup-password"');
+    expect(html).not.toContain('id="signup-date-of-birth"');
+    expect(html).not.toMatch(/accept the/); // terms confirmation copy
   });
 });
 

@@ -1,38 +1,26 @@
 "use client";
 
-import { dateOfBirthError, validateRegistration } from "@sport-date/domain";
+import { validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 
 import { BRAND_NAME } from "@/lib/brand";
-import { useSignUpStore, type SignUpState } from "@/lib/sign-up-store";
+import { signUpStepError } from "@/lib/sign-up-steps";
+import { useSignUpStore } from "@/lib/sign-up-store";
 import SignUpStep1 from "./steps/SignUpStep1";
 import SignUpStep2 from "./steps/SignUpStep2";
 import SignUpStep3 from "./steps/SignUpStep3";
 import SignUpStep4 from "./steps/SignUpStep4";
 import SignUpStep5 from "./steps/SignUpStep5";
 
-const steps = [SignUpStep1, SignUpStep2, SignUpStep3, SignUpStep4, SignUpStep5];
-
-function stepError(step: number, state: SignUpState): string | null {
-  if (step === 1) {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email)) return "Enter a valid email address.";
-    if (state.password.length < 12) return "Use at least 12 characters for your password.";
-    if (!/[a-z]/.test(state.password) || !/[A-Z]/.test(state.password) || !/\d/.test(state.password)) {
-      return "Include upper-case, lower-case, and numeric characters.";
-    }
-    const dobError = dateOfBirthError(state.dateOfBirth);
-    if (dobError) return dobError;
-    if (!state.acceptedTerms) return "Confirm the Terms and Safety Guidelines to continue.";
-  }
-  if (step === 2 && (!state.firstName.trim() || !state.lastName.trim() || !state.location.trim())) {
-    return "Complete your name and location.";
-  }
-  if (step === 3 && state.sports.length === 0) return "Choose at least one sport.";
-  if (step === 4 && state.bio.length > 200) return "Keep your bio within 200 characters.";
-  return null;
-}
+// Investment first, credentials LAST (CX-20260704-landing-conversion-pack):
+// sports → intent/bio → name/area → account credentials → review. The order
+// mirrors SIGN_UP_STEP_ORDER in @/lib/sign-up-steps (the tested source of
+// truth); the per-step gate below validates by that same sequence. All answers
+// live in the zustand store, so moving Back never loses anything. The password
+// / DOB / terms REQUIREMENTS are unchanged — only their position moved.
+const steps = [SignUpStep3, SignUpStep4, SignUpStep2, SignUpStep1, SignUpStep5];
 
 export default function SignUpForm() {
   const step = useSignUpStore((state) => state.step);
@@ -54,7 +42,7 @@ export default function SignUpForm() {
   const CurrentStep = steps[step - 1];
 
   const handleNext = () => {
-    const message = stepError(step, useSignUpStore.getState());
+    const message = signUpStepError(step, useSignUpStore.getState());
     if (message) return setError(message);
     setError("");
     if (step < steps.length) setStep(step + 1);

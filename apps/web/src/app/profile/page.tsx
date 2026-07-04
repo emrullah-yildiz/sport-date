@@ -87,7 +87,7 @@ export default async function ProfilePage() {
       <section className="profile-hero">
         <div>
           <div className="eyebrow eyebrow-with-explainer">
-            Your private beta profile
+            Your early-preview profile
             <BetaTermExplainer className="eyebrow-explainer" />
           </div>
           <h1>{user.firstName} {user.lastName}</h1>

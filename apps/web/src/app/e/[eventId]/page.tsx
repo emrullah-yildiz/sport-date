@@ -169,8 +169,9 @@ export default async function PublicEventInvitePage({ params }: { params: Promis
               )}
               {!user ? (
                 <p className="public-invite-cta-note">
-                  {BRAND_NAME} is in private beta for adults. Creating a profile takes a
-                  couple of minutes; the host then decides on your request.
+                  {BRAND_NAME} is an early preview, open to adults (18+) — no invite
+                  needed. Creating a profile takes a couple of minutes; the host then
+                  decides on your request.
                 </p>
               ) : null}
             </div>

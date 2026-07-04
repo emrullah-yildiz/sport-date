@@ -21,7 +21,11 @@ export default function SignUpStep1() {
 
   return (
     <motion.div className="signup-step">
-      <h1>Let&apos;s get started</h1>
+      {/* Credentials are the FINAL input step (CX-20260704): the member has
+          already built their profile, so this step frames the account as saving
+          that work. Requirements themselves are unchanged. */}
+      <h1>Save your profile</h1>
+      <p>Last step — create the login that keeps the profile you just built.</p>
       <div className="form-group">
         <label htmlFor="signup-email">Email</label>
         <input id="signup-email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => setField("email", event.target.value)} />

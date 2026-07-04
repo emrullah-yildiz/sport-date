@@ -125,10 +125,13 @@ export default async function LandingPage() {
             <h1 id="hero-title" className="hero-title">
               Meet people through a real game, <span className="accent">not another profile.</span>
             </h1>
+            {/* The three intents lead the subtitle so a cold visitor (incl. from a
+                dating-angled post) can confirm fit above the fold on a phone —
+                equal standing, no intent framed as lesser (CX-20260704). */}
             <p className="hero-subtitle">
-              {BRAND_NAME} organises the first encounter around a small local sport — a run, a padel
-              match, a chess game. Know the level, time, area, and intentions before you request a
-              place.
+              For dating, friendship, or community — all equally welcome. {BRAND_NAME} organises
+              the first encounter around a small local sport: a run, a padel match, a chess game,
+              with the level, time, and area clear before you request a place.
             </p>
             <div className="hero-cta">
               {user ? (
@@ -143,11 +146,14 @@ export default async function LandingPage() {
                 </>
               )}
             </div>
+            {/* Signed-out badge: honest OPEN wording without a tap — access
+                genuinely requires no invite (the explainer states the same), so
+                the badge must not read as a closed door (CX-20260704). */}
             {user ? (
               <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
             ) : (
               <div className="microcopy">
-                Private beta · Adults only · Europe first
+                Early preview · Open to adults (18+) · Europe first
                 <BetaTermExplainer className="microcopy-explainer" />
               </div>
             )}
@@ -270,7 +276,7 @@ export default async function LandingPage() {
         <p>
           {user
             ? "Your profile is ready. Jump back into what's happening near you."
-            : "Create a private beta profile, pick your sports, and help shape how adults meet through movement."}
+            : "Create a free profile — the early preview is open, no invite needed — pick your sports, and help shape how adults meet through movement."}
         </p>
         {user ? (
           <Link href="/discover" className="btn btn--accent btn--lg">Enter {BRAND_NAME}</Link>

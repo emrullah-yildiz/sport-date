@@ -12,8 +12,10 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 //
 // Reused for any rare term surfaced to members by passing a different `label` / `points`.
 
-// The honest, preview-era explanation of "private beta". Kept here so every surface tells
-// the member the same true story. Each point is a short fact, not a promise.
+// The honest explanation of the "early preview" (the member-visible term since
+// CX-20260704 — "private beta" read as a closed door when access is genuinely
+// open). Kept here so every surface tells the member the same true story. Each
+// point is a short fact, not a promise.
 export const PRIVATE_BETA_POINTS: readonly string[] = [
   "This is an early preview for adults (18+), launching in Europe first.",
   "Features are still being built — some are marked “preview” and may change or arrive later.",
@@ -21,7 +23,7 @@ export const PRIVATE_BETA_POINTS: readonly string[] = [
   "Access is open: anyone eligible can create a profile — no invite is required.",
 ];
 
-export const PRIVATE_BETA_LABEL = "What is the private beta?";
+export const PRIVATE_BETA_LABEL = "What does “early preview” mean?";
 
 // Presentational note — exported so it can be rendered and asserted in isolation. It is
 // the exact content the disclosure renders when open.

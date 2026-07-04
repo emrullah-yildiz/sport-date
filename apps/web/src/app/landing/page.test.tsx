@@ -80,6 +80,48 @@ describe("LandingPage auth-awareness", () => {
   });
 });
 
+/**
+ * Tripwires for CX-20260704-landing-conversion-pack (fixes 1 + 2).
+ *
+ * 1. The three intents (dating / friendship / community) must be stated in the
+ *    HERO — a cold visitor from a dating-angled post has to confirm fit above
+ *    the fold, not in body copy three screens down. Equal standing: one phrase,
+ *    no intent framed as a consolation prize.
+ * 2. The hero badge must read as an OPEN door. Access genuinely requires no
+ *    invite, so "Private beta" (which reads as gated) must not be the badge.
+ */
+describe("LandingPage hero — intents above the fold and honest open badge", () => {
+  it("names all three intents with equal standing inside the hero subtitle", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    // The intents live in the hero subtitle itself (above the fold), before the
+    // how-it-works section ever starts.
+    const subtitleStart = html.indexOf('class="hero-subtitle"');
+    const intents = html.indexOf("dating, friendship, or community");
+    const howItWorks = html.indexOf('id="how-it-works"');
+    expect(subtitleStart).toBeGreaterThan(-1);
+    expect(intents).toBeGreaterThan(subtitleStart);
+    expect(intents).toBeLessThan(howItWorks);
+    // Equal standing framing accompanies them.
+    expect(html).toContain("all equally welcome");
+  });
+
+  it("replaces the closed-door badge with honest open wording (still adults-only, still Europe first)", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    expect(html).toContain("Early preview · Open to adults (18+) · Europe first");
+    // The gated-sounding badge is gone from the hero…
+    expect(html).not.toContain("Private beta · Adults only · Europe first");
+    // …and no fabricated openness: the explainer disclosure stays alongside,
+    // telling the same true story ("no invite is required").
+    expect(html).toContain("term-explainer");
+  });
+});
+
 describe('LandingPage "How it works" ordered sequence', () => {
   it("renders the three steps as an equal-weight 1 -> 2 -> 3 sequence, each with a number then a heading", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);

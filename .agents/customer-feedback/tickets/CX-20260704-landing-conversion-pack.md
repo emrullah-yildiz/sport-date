@@ -1,6 +1,6 @@
 # CX-20260704-landing-conversion-pack
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — first cold Instagram traffic (all mobile) starts hitting /landing on 2026-07-04; these are the audited top conversion leaks.
 - Customer journey: cold IG visitor taps bio link → /landing → understands it's for them (incl. dating) and that they can get in → signup completes on a phone.
@@ -21,6 +21,10 @@
 - No copy claims anything unimplemented; "open" wording matches reality (no invite gate exists).
 - Signup step order: profile-building steps → credentials last; abandonment-safe (no data loss when navigating back); tests updated for the new order; password rules unchanged.
 - typecheck / lint / test / prod build green.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
 
 ## Why (CEO note)
 
