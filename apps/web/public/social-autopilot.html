@@ -35,7 +35,13 @@
   .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; }
   .post{ background:var(--panel); border:1px solid var(--line); border-radius:14px; overflow:hidden; display:flex; flex-direction:column; }
   .post .thumb{ position:relative; aspect-ratio:1/1; background:var(--panel2); }
-  .post .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .post .thumb img{ width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in; transition:transform .15s ease; }
+  .post .thumb img:hover{ transform:scale(1.03); }
+  #lb{ position:fixed; inset:0; background:rgba(10,13,15,.92); display:none; align-items:center; justify-content:center;
+    z-index:50; cursor:zoom-out; padding:24px; }
+  #lb.open{ display:flex; }
+  #lb img{ max-width:min(92vw,900px); max-height:88vh; border-radius:14px; border:1px solid var(--line); box-shadow:0 12px 60px rgba(0,0,0,.6); }
+  #lb .x{ position:fixed; top:14px; right:20px; font-size:30px; color:var(--mut); background:none; border:0; cursor:pointer; }
   .post .car{ position:absolute; top:8px; right:8px; background:rgba(0,0,0,.6); color:var(--ink); font-size:11px; padding:3px 7px; border-radius:8px; }
   .post .meta{ padding:11px 12px 13px; }
   .post .when{ font-size:12px; color:var(--neon); font-weight:700; }
@@ -136,6 +142,16 @@ document.getElementById("paused").innerHTML = paused.map(p=>`
       <span class="tag pause">Paused</span>
     </div>
   </div>`).join("");
+// lightbox: click a thumbnail to expand; click/Esc to close
+document.body.insertAdjacentHTML("beforeend",
+  `<div id="lb" role="dialog" aria-label="Image preview"><button class="x" aria-label="Close">×</button><img alt=""></div>`);
+const lb=document.getElementById("lb"), lbImg=lb.querySelector("img");
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.tagName==="IMG" && !lb.contains(t)){ lbImg.src=t.src; lbImg.alt=t.alt||""; lb.classList.add("open"); }
+  else if(lb.classList.contains("open")){ lb.classList.remove("open"); lbImg.src=""; }
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remove("open"); lbImg.src=""; } });
 </script>
 </body>
 </html>

@@ -52,13 +52,39 @@
   .st.next{ background:rgba(232,176,75,.15); color:var(--amber); }
   .st.later{ background:rgba(67,198,245,.13); color:var(--blue); }
   .cards{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
-  .cards img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; border:1px solid var(--line); display:block; }
+  .cards img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:12px; border:1px solid var(--line); display:block;
+    cursor:zoom-in; transition:transform .15s ease; }
+  .cards img:hover{ transform:scale(1.03); }
+  /* lightbox */
+  #lb{ position:fixed; inset:0; background:rgba(10,13,15,.92); display:none; align-items:center; justify-content:center;
+    z-index:50; cursor:zoom-out; padding:24px; }
+  #lb.open{ display:flex; }
+  #lb img{ max-width:min(92vw,900px); max-height:88vh; border-radius:14px; border:1px solid var(--line); box-shadow:0 12px 60px rgba(0,0,0,.6); }
+  #lb .x{ position:fixed; top:14px; right:20px; font-size:30px; color:var(--mut); background:none; border:0; cursor:pointer; }
   .log{ border:1px solid var(--line); border-radius:14px; background:var(--panel); overflow:hidden; }
   .log .item{ padding:14px 18px; border-bottom:1px solid var(--line); }
   .log .item:last-child{ border-bottom:0; }
   .log .d{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--mut); }
   .log .t{ font-size:14px; margin-top:4px; }
   .foot{ margin-top:34px; font-size:12px; color:var(--mut); line-height:1.7; }
+  /* agent roster popover */
+  .badge{ cursor:pointer; user-select:none; border:1px solid var(--line); border-radius:10px; padding:8px 12px; background:var(--panel); }
+  .badge:hover{ border-color:rgba(59,234,126,.5); }
+  #roster{ display:none; position:fixed; top:70px; right:18px; width:min(430px,92vw); z-index:60;
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; box-shadow:0 16px 60px rgba(0,0,0,.55); overflow:hidden; }
+  #roster.open{ display:block; }
+  #roster h4{ margin:0; padding:12px 16px; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); border-bottom:1px solid var(--line); }
+  #roster .r{ display:flex; gap:10px; align-items:flex-start; padding:11px 16px; border-bottom:1px solid var(--line); }
+  #roster .r:last-child{ border-bottom:0; }
+  #roster .dot{ width:9px; height:9px; border-radius:50%; margin-top:5px; flex:none; }
+  .dot.run{ background:var(--neon); box-shadow:0 0 9px 2px rgba(59,234,126,.8); animation:pulse 1.2s infinite; }
+  .dot.idle{ background:#3a444b; }
+  .dot.done{ background:var(--blue); }
+  .dot.wait{ background:var(--amber); }
+  #roster .rn{ font-size:13.5px; font-weight:700; }
+  #roster .rs{ font-size:12px; color:var(--mut); margin-top:1px; }
+  #roster .st{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; margin-left:auto; flex:none; padding-top:3px; }
+  .st.c-run{ color:var(--neon); } .st.c-idle{ color:var(--mut); } .st.c-done{ color:var(--blue); } .st.c-wait{ color:var(--amber); }
   .btnrow{ margin-top:14px; }
   .btn{ display:inline-block; border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:13px; font-weight:700; color:var(--neon); margin-right:8px; }
 </style>
@@ -71,7 +97,18 @@
       <h1>CEO Command Center</h1>
       <div class="who">Acting CEO: <b>Claude</b> · Owner: <b>Emrullah</b> · you approve + provision; I run strategy &amp; execution.</div>
     </div>
-    <div class="badge"><span class="led"></span>Agents live · updated 2026-07-04</div>
+    <div class="badge" id="badge" role="button" aria-expanded="false" title="Click to see every agent's status"><span class="led"></span>Agents live · updated 2026-07-04 ▾</div>
+  </div>
+
+  <div id="roster" aria-label="Agent roster">
+    <h4>Agent roster — as of the last CEO cycle (2026-07-04, late night)</h4>
+    <div class="r"><span class="dot run"></span><div><div class="rn">CEO (Claude, main session)</div><div class="rs">Orchestrating: shipped SEO/OG layer, filed survey + conversion tickets, runs standups</div></div><span class="st c-run">Running</span></div>
+    <div class="r"><span class="dot run"></span><div><div class="rn">Builder — event-invite ticket</div><div class="rs">In progress: public share link + OG card (`/e/[id]`); lib + tests already in tree</div></div><span class="st c-run">Running</span></div>
+    <div class="r"><span class="dot done"></span><div><div class="rn">Funnel/SEO auditor (Explore)</div><div class="rs">Done: 9 findings returned; metadata layer already shipped from them (~61k tokens)</div></div><span class="st c-done">Done</span></div>
+    <div class="r"><span class="dot run"></span><div><div class="rn">Social growth autopilot</div><div class="rs">Active: 10 posts queued, first publishes 06:00; batch 03 drafted (TikTok photo-mode)</div></div><span class="st c-run">Active</span></div>
+    <div class="r"><span class="dot wait"></span><div><div class="rn">Builder — next in queue</div><div class="rs">Waiting: /research survey (P1) + landing conversion pack (P1) queued behind current build</div></div><span class="st c-wait">Queued</span></div>
+    <div class="r"><span class="dot idle"></span><div><div class="rn">Experience loop (Planner/Tester/User-sim)</div><div class="rs">Standby: 4-agent loop not running a tick right now; backlog was cleared, new tickets await next run</div></div><span class="st c-idle">Standby</span></div>
+    <div class="r"><span class="dot idle"></span><div><div class="rn">Video production</div><div class="rs">Blocked: awaiting owner's AI-video tool (decision card #1); 5 posts paused</div></div><span class="st c-idle">Blocked</span></div>
   </div>
 
   <h2 class="sec">▸ CEO briefing</h2>
@@ -183,6 +220,19 @@
     I'll log per-agent actuals here as each background run completes. Cash spend stays €0 until you approve a paid tool (cards #1/#4).</p>
   </div>
 
+  <div class="note" style="margin-top:12px">
+    <p style="font-size:14px; margin:0 0 8px"><b>Token-efficiency policy (adopted 2026-07-04, owner-directed) — cut cost, keep quality:</b></p>
+    <p style="font-size:13px; color:#c8d3d0; margin:0; line-height:1.7">
+    <b>1 · Right-size the model per task.</b> Mechanical work (rendering, status edits, file moves) runs on the small/cheap model tier; full reasoning is reserved for building, verifying, and strategy. Quality lives in the hard steps — not in using a big model to rename files.<br>
+    <b>2 · State lives in files, not in conversation.</b> HQ, tickets, and logs carry the memory; long chat context is the single biggest token burner. Fresh sessions per workstream start from these files instead of dragging history.<br>
+    <b>3 · Agents return conclusions, not file dumps.</b> Background agents read narrowly (grep/sections, never whole trees) and report a summary; their full transcripts never enter my context.<br>
+    <b>4 · Batch, don't drip.</b> One wake-up produces a whole batch (e.g. all creatives for the week) instead of many small turns that each re-read the growing context.<br>
+    <b>5 · No polling, no re-verification.</b> Event-driven wake-ups only (agent-completion notifications); green tests/builds are trusted once, not re-read.<br>
+    <b>6 · Template reuse.</b> The creative system is templated — a new post is a small text delta on a proven design, not a fresh design exploration.<br>
+    <b>7 · Tight tickets.</b> Precise acceptance criteria stop agents from wandering; wandering is where quality-neutral tokens go to die.<br>
+    <b>Quality floor (non-negotiable):</b> full verification (typecheck/lint/test/prod-build), adversarial review on revenue-path code, and full-reasoning strategy stay at maximum — savings come from cheap steps, never from the definition of done.</p>
+  </div>
+
   <h2 class="sec">▸ Strategy to profitability</h2>
   <div class="phase">
     <div class="ph">
@@ -213,6 +263,7 @@
 
   <h2 class="sec">▸ CEO report log</h2>
   <div class="log">
+    <div class="item"><div class="d">2026-07-04 · Efficiency</div><div class="t">Adopted the 7-point token-efficiency policy (owner-directed): right-sized models per task, file-based state over long context, summary-only agents, batching, no polling, template reuse, tight tickets — with an explicit quality floor that verification and strategy never get cheapened.</div></div>
     <div class="item"><div class="d">2026-07-04 · Research + funnel</div><div class="t">Owner authorized market surveys (support@keepitup.social as responder) — CEO chose self-hosted /research; build ticket filed P1. Funnel audit returned 9 findings; shipped the metadata layer immediately (OG/Twitter cards, canonical, robots, sitemap on keepitup.social — reshares of the bio link now render a real card) and filed the landing-conversion pack (intents in hero, open-preview wording, credentials-last signup) as P1. Builder is in-progress on the event-invite ticket. Token spend now reported on this page (owner request).</div></div>
     <div class="item"><div class="d">2026-07-04 · Self-leadership</div><div class="t">Owner delegated full execution ("make money, do what needs to be done"). Actions: launched the Builder agent on the P1 event-invite ticket; launched a funnel/SEO audit of the landing page before tomorrow's first Instagram traffic; drafted batch 03 including TikTok photo-mode slideshows — activating the TikTok channel WITHOUT the video tool. Regular content is now CEO-approved under the standing mandate; money/prize/legal items still wait for the owner.</div></div>
     <div class="item"><div class="d">2026-07-04 · Unblocked ✅</div><div class="t">Owner connected keepitup.social to Vercel (verified: site, HQ, and all creatives serve on the domain; SSL live) and switched Instagram to Business (verified in Buffer: auto-publish, insights on). Decision card #3 closed — two blockers remain: AI-video tool (#1) and giveaway prize (#2).</div></div>
@@ -230,10 +281,23 @@
     This is a static status snapshot the agents regenerate — not a live control panel.
   </div>
 </div>
+<div id="lb" role="dialog" aria-label="Image preview"><button class="x" aria-label="Close">×</button><img alt=""></div>
 <script>
 const B="/brand/social/";
 const imgs=["b3-01-ick-cured.png","p3-meme-thumb-vs-legs.png","b1-02-encourage-quote.png","b1-04-three-intents.png","b1-03-safety-1-cover.png","b1-06-court-vision.png","b1-01-silence-run.png","b3-02-finish-the-sentence.png"];
 document.getElementById("cards").innerHTML=imgs.map(f=>`<img loading="lazy" src="${B}${f}" alt="KeepItUp social creative">`).join("");
+// agent roster popover
+const badge=document.getElementById("badge"), roster=document.getElementById("roster");
+badge.addEventListener("click",e=>{ e.stopPropagation(); const o=roster.classList.toggle("open"); badge.setAttribute("aria-expanded",o); });
+document.addEventListener("click",e=>{ if(!roster.contains(e.target)) { roster.classList.remove("open"); badge.setAttribute("aria-expanded","false"); } });
+// lightbox: click any image on the page to expand; click/Esc to close
+const lb=document.getElementById("lb"), lbImg=lb.querySelector("img");
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.tagName==="IMG" && !lb.contains(t)){ lbImg.src=t.src; lbImg.alt=t.alt||""; lb.classList.add("open"); }
+  else if(lb.classList.contains("open")){ lb.classList.remove("open"); lbImg.src=""; }
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remove("open"); lbImg.src=""; } });
 </script>
 </body>
 </html>
