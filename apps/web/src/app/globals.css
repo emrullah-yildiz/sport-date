@@ -419,7 +419,12 @@ a.logo:hover { color: var(--text); }
 /* ---- Landing responsive ---- */
 @media (max-width: 960px) {
   .hero-section { grid-template-columns: 1fr; gap: 40px; padding: 56px 0 64px; }
-  .hero-visual { min-height: auto; }
+  /* Single-column mobile: left-align the preview card with the hero text/CTAs
+     instead of centering it (place-items:center left it inset & narrower, which
+     read as a misalignment). Cap width on tablets; full-width flush on phones. */
+  .hero-visual { min-height: auto; justify-items: start; }
+  .hero-visual::before { width: 260px; height: 260px; }
+  .preview-card { width: 100%; max-width: 440px; }
   .steps-grid { grid-template-columns: 1fr; }
   .nav-links { display: none; }
 }
