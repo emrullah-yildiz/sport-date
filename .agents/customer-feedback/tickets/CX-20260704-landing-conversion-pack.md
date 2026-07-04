@@ -1,6 +1,6 @@
 # CX-20260704-landing-conversion-pack
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — first cold Instagram traffic (all mobile) starts hitting /landing on 2026-07-04; these are the audited top conversion leaks.
 - Customer journey: cold IG visitor taps bio link → /landing → understands it's for them (incl. dating) and that they can get in → signup completes on a phone.
@@ -25,6 +25,7 @@
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
+- 2026-07-04 | build | implemented in commit a73bed7 (pushed to origin/main). (1) Hero subtitle now LEADS with "For dating, friendship, or community — all equally welcome" — verified above the fold at 390×844 via prod-server screenshot. (2) Badge → "Early preview · Open to adults (18+) · Europe first"; BetaTermExplainer label → "What does “early preview” mean?" (points unchanged, still honest); consistent term swap on login cross-link, profile eyebrow, signup metadata, landing final CTA, and the public /e invite note. Terms page untouched (legal/owner surface). (3) Signup order now sports → intent/bio → identity → credentials ("Save your profile") → review, via new pure `lib/sign-up-steps.ts` (SIGN_UP_STEP_ORDER + signUpStepError); password 12-char multi-class policy, DOB 18+ gate, terms, meter, and a11y untouched; store-backed steps → Back loses nothing (walked live end-to-end at 390px, "Ana" survived back-nav). Checks: typecheck ✓ lint ✓ vitest 795 ✓ (10 new tests incl. credentials-last + password-policy-unchanged tripwires) prod build ✓. Unverified: real-device fold variance (small phones <844px tall may need one flick — intents sit directly under the h1); Explorer to retest.
 
 ## Why (CEO note)
 
