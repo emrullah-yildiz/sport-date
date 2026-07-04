@@ -1,6 +1,6 @@
 # CX-20260704-event-address-autocomplete-geocode
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — owner report (2026-07-04): "Get directions" is unreliable because the event address is free-text with no real geocoding. Hosts should pick the address like entering a destination in Uber: type → suggestions → select → pin.
 - Customer journey: host types the meeting address → an autocomplete lists matching real places → host selects one → precise lat/lng is captured → accepted attendees get accurate one-tap directions.
@@ -39,6 +39,7 @@ link.
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented in commit 359337e (pushed to main; no migration). Autocomplete + keyless Photon geocoding already filled the structured address and captured lat/lng from a picked suggestion (commit 3b288a9); this unit finished the acceptance criteria: (1) **graceful fallback** — the precise pin is now OPTIONAL server-side (`validateOptionalPinnedEventLocation`), so a geocoder outage or a manually typed address no longer blocks create/edit (coords persist NULL, directions fall back to the typed address; a malformed/out-of-range supplied pin is still rejected); form shows an inline manual-entry hint on outage. (2) **keyboard-navigable suggestions** — Arrow/Enter/Escape with `aria-activedescendant`, 44px targets kept. (3) provider docs (pluggable keyless-by-default Photon via `LOCATION_SEARCH_BASE_URL`; Google/Mapbox optional owner-gated, never hard-required) + privacy + fallback in `docs/product/event-domain.md`. Privacy unchanged (only host-typed event address geocoded; precise coords/address stay out of discovery/public invite/OG — existing query tests). Checks: typecheck ✓ lint ✓ vitest 956 ✓ (new: optional-pin allow/reject, POST /api/events fallback→NULL coords + malformed→400, location-search 503 outage) prod build ✓. Unverified: full create→accept→directions browser flow (host+accepted session) — verified at lib/route/build level.
 
 ## Guardrails
 
