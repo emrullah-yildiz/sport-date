@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: `%s — ${BRAND_NAME}`,
   },
   description:
-    "Meet compatible people through small, local sports — from running and padel to chess. Adults 18+, privacy-first — first events in Europe.",
+    "Meet compatible people through small, local sports — from running and padel to chess. Adults 18+, privacy-first — usable worldwide, Europe-first on privacy.",
   // Social preview for every route that doesn't override it: link reshares
   // (WhatsApp/IG DMs/X) render a real card instead of a bare URL.
   openGraph: {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     siteName: BRAND_NAME,
     title: BRAND_TITLE,
     description:
-      "Meet compatible people through small, local sports — from running and padel to chess. Adults 18+, privacy-first — first events in Europe.",
+      "Meet compatible people through small, local sports — from running and padel to chess. Adults 18+, privacy-first — usable worldwide, Europe-first on privacy.",
     images: [
       {
         url: "/brand/keepitup-banner-social.png",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: BRAND_TITLE,
     description:
-      "Meet compatible people through small, local sports. Adults 18+, privacy-first — first events in Europe.",
+      "Meet compatible people through small, local sports. Adults 18+, privacy-first — usable worldwide, Europe-first on privacy.",
     images: ["/brand/keepitup-banner-social.png"],
   },
 };

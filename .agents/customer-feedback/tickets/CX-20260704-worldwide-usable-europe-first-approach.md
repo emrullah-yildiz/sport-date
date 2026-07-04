@@ -1,6 +1,6 @@
 # CX-20260704-worldwide-usable-europe-first-approach
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner directive (2026-07-04). Clarify KeepItUp is usable worldwide; "Europe-first" is our privacy/safety/compliance/community-building APPROACH, not a geographic restriction. Refines the earlier "first events in Europe" copy pass.
 - Customer journey: any visitor/member (incl. non-EU) understands they can use KeepItUp to organize/join sports events anywhere; participation isn't geo-restricted; local availability depends on hosts.
@@ -53,3 +53,7 @@
 ## Process
 
 - No migration expected. `git pull --rebase` first. Full DoD. **Commit AND PUSH to main** (owner explicitly requested the verified change be pushed). Then report the commit hash + test counts.
+
+## Handoff log
+
+- 2026-07-04 | build | in-progress → implemented by `agent`. Reframed member-visible copy to worldwide-usable + Europe-first-as-approach across landing (hero badge, safety card, open-beta band, footer, metadata), `layout.tsx` metadata + OG/Twitter, `SiteFooter`, `/e/[id]` invite footer, `BetaTermExplainer` points, and added a "Where can I use KeepItUp?" Trust card. No geo restriction added; precise-location privacy unchanged. Tests: landing `page.test.tsx` updated + new `SiteFooter.test.tsx` / `trust/page.test.tsx`. Checks: typecheck + lint + full web suite (950 pass / 12 skip) + production build all green.

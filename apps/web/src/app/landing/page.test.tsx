@@ -108,17 +108,47 @@ describe("LandingPage hero — intents above the fold and honest open badge", ()
     expect(html).toContain("all equally welcome");
   });
 
-  it("replaces the closed-door badge with honest open wording (still adults-only, still Europe first)", async () => {
+  it("replaces the closed-door badge with honest open wording (adults-only, usable worldwide)", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
 
     const html = await render();
 
-    expect(html).toContain("Free beta · open to adults 18+ · first events in Europe");
+    expect(html).toContain("Free beta · open to adults 18+ · usable worldwide");
     // The gated-sounding badge is gone from the hero…
     expect(html).not.toContain("Private beta · Adults only · Europe first");
     // …and no fabricated openness: the explainer disclosure stays alongside,
     // telling the same true story ("no invite is required").
     expect(html).toContain("term-explainer");
+  });
+});
+
+/**
+ * Tripwire for CX-20260704-worldwide-usable-europe-first-approach.
+ *
+ * KeepItUp is usable WORLDWIDE to organize sports events; "Europe-first" is our
+ * privacy/safety/community APPROACH, not a geographic restriction. No member-visible
+ * landing copy may state or imply KeepItUp is available only in Europe. Local
+ * availability depends on hosts — we do not claim to operate everywhere.
+ */
+describe("LandingPage worldwide-usable, Europe-first-as-approach messaging", () => {
+  it("states the worldwide-usable framing and drops the Europe-only phrasings", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    // Worldwide-usable framing is present across the marketing surfaces.
+    expect(html).toContain("usable worldwide");
+    expect(html).toContain("use it worldwide to organize sports events");
+    expect(html).toContain("use KeepItUp worldwide to organize sports events");
+    // Europe-first is preserved as our privacy/community APPROACH, not a location limit.
+    expect(html).toMatch(/Europe-first/);
+    expect(html).toContain("local availability depends on hosts near you");
+
+    // The prior "Europe-only" location-limit phrasings are gone everywhere on the page.
+    expect(html).not.toContain("first events in Europe");
+    expect(html).not.toContain("first events are being seeded in Europe");
+    expect(html).not.toContain("seeding the first events in Europe");
+    expect(html).not.toMatch(/only in Europe/i);
   });
 });
 

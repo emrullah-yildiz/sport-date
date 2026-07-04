@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   // brand title).
   title: { absolute: BRAND_TITLE },
   description:
-    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults 18+; first events in Europe.",
+    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults 18+; usable worldwide, Europe-first on privacy.",
   // The marketing home is the indexable entry point (the root 307s here).
   alternates: { canonical: "/landing" },
 };
@@ -77,7 +77,7 @@ const safety = [
     badge: "GDPR",
     title: "Privacy-first, from day one",
     description:
-      "Everyone gets EU-grade (GDPR) privacy protection from the start. Anyone 18+ can join the free beta; the first events are being seeded in Europe.",
+      "Everyone gets EU-grade (GDPR) privacy protection from the start — we're Europe-first in privacy and safety standards, not in where you can play. Anyone 18+ can use KeepItUp worldwide to organize sports events; local availability depends on hosts near you.",
   },
 ];
 
@@ -153,7 +153,7 @@ export default async function LandingPage() {
               <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
             ) : (
               <div className="microcopy">
-                Free beta · open to adults 18+ · first events in Europe
+                Free beta · open to adults 18+ · usable worldwide
                 <BetaTermExplainer className="microcopy-explainer" />
               </div>
             )}
@@ -292,7 +292,9 @@ export default async function LandingPage() {
             <h2 id="beta-title" className="section-title">Free for everyone, right now.</h2>
             <p className="section-lede">
               {BRAND_NAME} is in open beta — no invite, no payment, open to any adult (18+).
-              We&apos;re seeding the first events in Europe and building in the open; your input steers what comes next.
+              You can use it worldwide to organize sports events; we&apos;re Europe-first in privacy
+              and community building — an approach, not a location limit. Local availability depends
+              on hosts near you, and we&apos;re building in the open; your input steers what comes next.
             </p>
           </div>
           <div className="hero-cta">
@@ -306,7 +308,7 @@ export default async function LandingPage() {
         <div className="landing-footer-shell">
           <div className="landing-footer-brand">
             <Wordmark variant="footer" />
-            <p>Meet through movement. Adults 18+ · first events in Europe.</p>
+            <p>Meet through movement. Adults 18+ · usable worldwide, Europe-first on privacy.</p>
           </div>
           <nav aria-label="Legal and trust links">
             <Link href="/trust">Trust</Link>
