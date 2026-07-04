@@ -1,6 +1,6 @@
 # CX-20260704-interactive-onboarding-gender-orientation
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). A warm, one-thing-at-a-time onboarding lifts completion; gender + orientation are core to a credible dating product and to future matching.
 - Customer journey: new member signs up → a friendly, interactive step-by-step flow (one focused question per screen) → completes a richer, dating-ready profile.
@@ -32,6 +32,7 @@ Redesign onboarding into a **more interactive, one-question-per-step** flow, and
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented, status → `implemented`. Rebuilt the signup wizard as an interactive one-question-per-step flow (name → gender → orientation → birthday → sports → intentions → photos → location → credentials LAST → review) with a Step X/N indicator + progress bar; all answers store-backed so Back preserves data. Added optional gender + sexual-orientation profile fields. Orientation = GDPR Article 9: OPTIONAL, explicit unbundled opt-in, consent-gated in the domain sanitizer AND a DB CHECK (migration 038), private by default with member-controlled visibility, fully editable from the profile editor, in the GDPR export (with consent timestamp), and erased with the users row. Photos step reuses /api/account/photos (skippable, uploaded best-effort post-registration). 18+/terms/12-char password policy unchanged; only positions moved. Sensitive columns kept OUT of getCurrentUser() (hot auth path) and read via a dedicated query to avoid a migration-lag outage. Docs: privacy-notice §3.1 special-category handling updated. Checks: typecheck ✓, lint ✓ (0 errors), web tests ✓ (946 pass/12 skip), domain tests ✓ (224 pass), prod build ✓. Commit `356fb41`. MIGRATION ADDED (038) — committed, NOT pushed. EU-counsel review flagged (HQ card #7).
 
 ## Guardrails
 
