@@ -11,8 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/signup", priority: 0.9 },
     { path: "/login", priority: 0.5 },
     { path: "/trust", priority: 0.7 },
-    { path: "/safety-guidelines", priority: 0.6 },
-    { path: "/hosting-guidelines", priority: 0.6 },
+    // Canonical targets — /safety-guidelines and /hosting-guidelines are 308
+    // redirects into these pages, so the sitemap emits the destinations.
+    { path: "/safety", priority: 0.6 },
+    { path: "/hosting", priority: 0.6 },
     { path: "/privacy", priority: 0.4 },
     { path: "/terms", priority: 0.4 },
   ];
