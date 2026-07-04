@@ -4,6 +4,7 @@ import { validateEventCreation } from "@sport-date/domain";
 import { NextResponse } from "next/server";
 
 import { getDatabase } from "@/lib/db";
+import { validateEventPostalCode } from "@/lib/directions";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
 
@@ -26,6 +27,16 @@ export async function POST(request: Request) {
   if (!validation.valid) {
     return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
   }
+
+  // Structured precise address: the postal code is MANDATORY on create
+  // (CX-20260704). venue name, street address, and city are already required by
+  // the domain validator; the postal code lives on event_private_locations.
+  const rawPostal = (((body as Record<string, unknown>)?.location as Record<string, unknown> | undefined)?.private as Record<string, unknown> | undefined)?.postalCode;
+  const postal = validateEventPostalCode(rawPostal);
+  if (!postal.valid) {
+    return NextResponse.json({ error: postal.error, errors: [postal.error] }, { status: 400 });
+  }
+  const postalCode = postal.postalCode;
 
   const event = validation.data;
   const eventId = crypto.randomUUID();
@@ -53,10 +64,10 @@ export async function POST(request: Request) {
     `,
     transaction`
       INSERT INTO event_private_locations (
-        event_id, venue_name, address, precise_latitude, precise_longitude, arrival_instructions
+        event_id, venue_name, address, postal_code, precise_latitude, precise_longitude, arrival_instructions
       )
       VALUES (
-        ${eventId}::uuid, ${event.location.private.venueName}, ${event.location.private.address},
+        ${eventId}::uuid, ${event.location.private.venueName}, ${event.location.private.address}, ${postalCode},
         ${event.location.private.latitude}, ${event.location.private.longitude},
         ${event.location.private.instructions ?? null}
       )

@@ -1524,3 +1524,12 @@ button:disabled:hover, button[disabled]:hover {
 .event-form-standard { max-width: 760px; margin: 8px 0 0; padding: 12px 16px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
 .event-form-standard a { color: var(--accent-info); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .event-form-standard a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+/* Post-acceptance precise address + keyless directions link (CX-20260704). */
+.accepted-meeting-address { margin: 6px 0 0; color: var(--text); line-height: 1.5; }
+.accepted-meeting-directions { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; margin-top: 12px; padding: 10px 16px; border-radius: 12px; background: var(--accent); color: var(--bg); font-weight: 900; text-decoration: none; }
+.accepted-meeting-directions:hover { box-shadow: var(--glow-accent); }
+.accepted-meeting-directions:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.accepted-meeting-instructions { display: block; margin-top: 14px; color: var(--text-muted); line-height: 1.5; }
+.room-meeting .accepted-meeting-directions { background: var(--accent); color: var(--bg); }
+.host-location-card.private .accepted-meeting-address { color: var(--text-muted); }

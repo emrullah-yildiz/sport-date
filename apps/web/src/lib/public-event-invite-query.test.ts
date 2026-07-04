@@ -67,6 +67,8 @@ describe("getPublicEventInvite — the unauthenticated share read (CX-20260704)"
     expect(lastQuery).not.toContain("address");
     expect(lastQuery).not.toContain("arrival_instructions");
     expect(lastQuery).not.toContain("precise_");
+    // The mandatory precise postal code stays private too (CX-20260704).
+    expect(lastQuery).not.toContain("postal_code");
     // Not even the coarse approximate coordinate: the public page is text-only.
     expect(lastQuery).not.toContain("latitude");
     expect(lastQuery).not.toContain("longitude");

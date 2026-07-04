@@ -17,7 +17,7 @@ type HostEditableEvent = {
   maximumAge: number;
   experienceLevels: string[];
   publicLocation: { city: string; countryCode: string; areaLabel: string };
-  privateLocation: { venueName: string; address: string; instructions: string | null };
+  privateLocation: { venueName: string; address: string; postalCode: string | null; instructions: string | null };
 };
 
 const levels: Array<{ value: ExperienceLevel; label: string }> = [
@@ -76,6 +76,7 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
           private: {
             venueName: form.get("venueName"),
             address: form.get("address"),
+            postalCode: form.get("postalCode"),
             instructions: form.get("instructions"),
             latitude: null,
             longitude: null,
@@ -116,7 +117,7 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
           <label>Duration in minutes<input name="durationMinutes" type="number" min="15" max="480" defaultValue={event.durationMinutes} required /></label>
         </div>
         <div className="edit-profile-row">
-          <label>Total places<input name="capacity" type="number" min="2" max="20" defaultValue={event.capacity} required /></label>
+          <label>Places for others<input name="capacity" type="number" min="2" max="20" defaultValue={event.capacity} required aria-describedby="edit-capacity-hint" /><span id="edit-capacity-hint" className="field-format-hint">You&apos;re already in as host — this is how many others can join, not counting you.</span></label>
           <label>Event language<input name="language" defaultValue={event.language} required maxLength={35} /></label>
         </div>
         <fieldset>
@@ -141,7 +142,8 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
         <label>Area or neighborhood<input name="areaLabel" defaultValue={event.publicLocation.areaLabel} required maxLength={120} /></label>
         <div className="edit-profile-row">
           <label>Venue name<input name="venueName" defaultValue={event.privateLocation.venueName} required maxLength={120} /></label>
-          <label>Exact address<input name="address" defaultValue={event.privateLocation.address} required maxLength={300} /></label>
+          <label>Street and number<input name="address" defaultValue={event.privateLocation.address} required maxLength={300} /></label>
+          <label>Postal code<input name="postalCode" defaultValue={event.privateLocation.postalCode ?? ""} required maxLength={20} placeholder="010101" /></label>
         </div>
         <label>Arrival instructions<textarea name="instructions" defaultValue={event.privateLocation.instructions ?? ""} rows={3} maxLength={500} /></label>
         <p className="field-help">Editing updates the event in place. Time, venue, area, duration, and arrival changes are treated as critical inside the room. Nothing sends out-of-product notifications yet, so only publish changes you are prepared to own inside the current preview boundary.</p>

@@ -11,7 +11,7 @@ export type HostEvent = Readonly<{
   timeZone: string; durationMinutes: number; capacity: number; language: string;
   minimumAge: number; maximumAge: number; experienceLevels: string[]; status: string;
   publicLocation: { city: string; countryCode: string; areaLabel: string };
-  privateLocation: { venueName: string; address: string; instructions: string | null };
+  privateLocation: { venueName: string; address: string; postalCode: string | null; latitude: number | null; longitude: number | null; instructions: string | null };
 }>;
 
 export type DiscoveryFilters = Readonly<{ city: string; sport: string; language: string; withinDays: 1 | 7 | 30 }>;
@@ -45,7 +45,8 @@ type HostEventRow = {
   time_zone: string; duration_minutes: number; capacity: number; language: string;
   minimum_age: number; maximum_age: number; experience_levels: string[]; status: string;
   public_city: string; public_country_code: string; public_area_label: string;
-  venue_name: string; address: string; arrival_instructions: string | null;
+  venue_name: string; address: string; postal_code: string | null;
+  precise_latitude: number | null; precise_longitude: number | null; arrival_instructions: string | null;
 };
 
 type DiscoveryEventRow = {
@@ -154,7 +155,8 @@ export async function getHostEvent(eventId: string, hostId: string): Promise<Hos
   if (!UUID_PATTERN.test(eventId)) return null;
   const sql = getDatabase();
   const rows = await sql`
-    SELECT events.*, private_location.venue_name, private_location.address, private_location.arrival_instructions
+    SELECT events.*, private_location.venue_name, private_location.address, private_location.postal_code,
+      private_location.precise_latitude, private_location.precise_longitude, private_location.arrival_instructions
     FROM events
     JOIN event_private_locations AS private_location ON private_location.event_id = events.id
     WHERE events.id = ${eventId}::uuid AND events.host_user_id = ${hostId}
@@ -168,7 +170,7 @@ export async function getHostEvent(eventId: string, hostId: string): Promise<Hos
     capacity: row.capacity, language: row.language, minimumAge: row.minimum_age,
     maximumAge: row.maximum_age, experienceLevels: row.experience_levels, status: row.status,
     publicLocation: { city: row.public_city, countryCode: row.public_country_code, areaLabel: row.public_area_label },
-    privateLocation: { venueName: row.venue_name, address: row.address, instructions: row.arrival_instructions },
+    privateLocation: { venueName: row.venue_name, address: row.address, postalCode: row.postal_code, latitude: row.precise_latitude, longitude: row.precise_longitude, instructions: row.arrival_instructions },
   };
 }
 
@@ -370,27 +372,37 @@ export async function getHostJoinRequests(eventId: string, hostId: string): Prom
   }));
 }
 
+export type AcceptedMeetingLocation = Readonly<{
+  venueName: string; address: string; postalCode: string | null;
+  latitude: number | null; longitude: number | null; instructions: string | null;
+}>;
+
 export async function getAcceptedEventLocation(
   eventId: string,
   userId: string,
-): Promise<{ venueName: string; address: string; instructions: string | null } | null> {
+): Promise<AcceptedMeetingLocation | null> {
   if (!UUID_PATTERN.test(eventId)) return null;
   const sql = getDatabase();
   const rows = await sql`
-    SELECT private_location.venue_name, private_location.address, private_location.arrival_instructions
+    SELECT private_location.venue_name, private_location.address, private_location.postal_code,
+      private_location.precise_latitude, private_location.precise_longitude, private_location.arrival_instructions
     FROM event_participants AS participant
     JOIN event_private_locations AS private_location ON private_location.event_id = participant.event_id
     JOIN events ON events.id = participant.event_id AND events.status = 'published'
     WHERE participant.event_id = ${eventId}::uuid AND participant.user_id = ${userId}
     LIMIT 1
-  ` as unknown as Array<{ venue_name: string; address: string; arrival_instructions: string | null }>;
-  return rows[0] ? { venueName: rows[0].venue_name, address: rows[0].address, instructions: rows[0].arrival_instructions } : null;
+  ` as unknown as Array<{ venue_name: string; address: string; postal_code: string | null; precise_latitude: number | null; precise_longitude: number | null; arrival_instructions: string | null }>;
+  const row = rows[0];
+  return row
+    ? { venueName: row.venue_name, address: row.address, postalCode: row.postal_code, latitude: row.precise_latitude, longitude: row.precise_longitude, instructions: row.arrival_instructions }
+    : null;
 }
 
 export type EventRoom = Readonly<{
   id: string; title: string; sport: string; startsAt: string; timeZone: string; hasEnded: boolean;
   durationMinutes: number; areaLabel: string; experienceLevels: string[];
-  venueName: string; address: string; instructions: string | null; isHost: boolean;
+  venueName: string; address: string; postalCode: string | null;
+  latitude: number | null; longitude: number | null; instructions: string | null; isHost: boolean;
   // True when this accepted, published, still-upcoming event is the viewer's ONLY
   // event participation — i.e. their first time attending. Derived from existing
   // `event_participants` rows (no schema change); used only to decide whether to
@@ -428,7 +440,8 @@ export type MemberEventSummary = Readonly<{
 type EventRoomRow = {
   id: string; title: string; sport: string; starts_at: string; time_zone: string;
   duration_minutes: number; public_area_label: string; experience_levels: string[];
-  venue_name: string; address: string; arrival_instructions: string | null; is_host: boolean;
+  venue_name: string; address: string; postal_code: string | null;
+  precise_latitude: number | null; precise_longitude: number | null; arrival_instructions: string | null; is_host: boolean;
   host_user_id: string | number; host_first_name: string;
   viewer_request_id: string | null; viewer_request_status: DiscoveryRequest["status"] | null;
   has_ended: boolean; attendance: NonNullable<EventRoom["reflection"]>["attendance"] | null;
@@ -449,7 +462,8 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
   const rooms = await sql`
     SELECT events.id, events.title, events.sport, events.starts_at, events.time_zone,
       events.duration_minutes, events.public_area_label, events.experience_levels,
-      location.venue_name, location.address, location.arrival_instructions,
+      location.venue_name, location.address, location.postal_code,
+      location.precise_latitude, location.precise_longitude, location.arrival_instructions,
       events.host_user_id, host.first_name AS host_first_name,
       (events.host_user_id = ${userId}) AS is_host,
       viewer_request.id AS viewer_request_id, viewer_request.status AS viewer_request_status,
@@ -543,7 +557,8 @@ export async function getEventRoom(eventId: string, userId: string): Promise<Eve
     id: room.id, title: room.title, sport: room.sport, startsAt: room.starts_at,
     timeZone: room.time_zone, durationMinutes: room.duration_minutes,
     areaLabel: room.public_area_label, experienceLevels: room.experience_levels,
-    venueName: room.venue_name, address: room.address,
+    venueName: room.venue_name, address: room.address, postalCode: room.postal_code,
+    latitude: room.precise_latitude, longitude: room.precise_longitude,
     instructions: room.arrival_instructions, isHost: room.is_host, hasEnded: room.has_ended,
     // A member is a first-timer when they host nothing here and this is their only
     // event participation. The preparation card layers on top of this — the page

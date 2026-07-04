@@ -1,6 +1,6 @@
 # CX-20260704-feature-precise-address-and-maps
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). Precise, mandatory meeting location + one-tap directions removes the biggest real-world friction: actually finding the spot.
 - Customer journey: host creates an event → must give a precise address (mandatory, structured) → it stays PRIVATE in discovery → once accepted, the attendee sees the exact address + a "Get directions" Google Maps link.
@@ -23,6 +23,10 @@ Make the meeting location **precise and mandatory**, and give accepted attendees
 - **Capacity excludes the host (owner directive 2026-07-04):** the current behavior already treats "capacity" as joiner spots only (the host doesn't consume a place), but the label **"Total places"** is ambiguous and reads as if the host is included. Make it explicit on the **create** form (`CreateEventForm`), the **edit** form (`HostEditEventForm`), and the event detail display: relabel / add a hint so the host clearly understands the number is **the people they're looking for, NOT counting themselves** (e.g. label "Places for others" or a hint "You're already in as host — this is how many others can join"). Keep the underlying behavior unchanged; update any test that asserts the old "Total places" wording (e.g. `event-create-recovery`, `discovery-card`) so the label/hint stays consistent everywhere ("places left" for joiners is already correct).
 - Mobile-first, 44px targets, a11y; typecheck/lint/test/prod build green; tests cover: mandatory-address validation, private-until-accepted (address/coords absent from the public/discovery payload), and the directions-link builder.
 - Docs updated.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
 
 ## Guardrails
 

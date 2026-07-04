@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import PrimaryNav from "@/components/PrimaryNav";
+import AcceptedMeetingPoint from "@/components/AcceptedMeetingPoint";
 import JoinRequestControls from "@/components/JoinRequestControls";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import ApproximateAreaMap from "@/components/ApproximateAreaMap";
@@ -59,7 +60,7 @@ export default async function DiscoveryEventPage({ params }: { params: Promise<{
       ) : (
         <><JoinRequestControls eventId={event.id} request={event.request} isFull={availability.isFull} reliability={{ tone: standing!.notice.tone, headline: standing!.notice.headline, body: standing!.notice.body, liftsAt: standing!.notice.liftsAt ? standing!.notice.liftsAt.toISOString() : null, timeZone: event.timeZone }} />{event.request?.status === "pending" ? <p className="event-detail-chat-locked">The private group chat with the host and other attendees opens once your request is accepted.</p> : null}</>
       )}</section>
-      {privateLocation ? <section className="accepted-location"><p className="panel-label">Your accepted meeting point</p><h2>{privateLocation.venueName}</h2><p>{privateLocation.address}</p>{privateLocation.instructions ? <small>{privateLocation.instructions}</small> : null}<Link href={`/events/${event.id}/room`}>Enter the event room →</Link></section> : null}
+      {privateLocation ? <section className="accepted-location"><p className="panel-label">Your accepted meeting point</p><AcceptedMeetingPoint venueName={privateLocation.venueName} address={privateLocation.address} postalCode={privateLocation.postalCode} city={event.city} latitude={privateLocation.latitude} longitude={privateLocation.longitude} instructions={privateLocation.instructions} /><Link href={`/events/${event.id}/room`}>Enter the event room →</Link></section> : null}
       <div className="event-safety"><ReportSafetyControls eventId={event.id} subjectUserId={event.hostUserId} subjectName={event.hostFirstName} /></div>
     </main>
   );

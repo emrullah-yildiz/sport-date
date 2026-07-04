@@ -44,6 +44,7 @@ export const EVENT_FIELD_ORDER = [
   "areaLabel",
   "venueName",
   "address",
+  "postalCode",
   "instructions",
 ] as const;
 
@@ -94,7 +95,7 @@ export const EVENT_FORM_SECTIONS: readonly EventFormSection[] = [
   {
     id: "location",
     label: "Where you'll meet",
-    fields: ["city", "countryCode", "areaLabel", "venueName", "address", "instructions"],
+    fields: ["city", "countryCode", "areaLabel", "venueName", "address", "postalCode", "instructions"],
   },
 ] as const;
 
@@ -139,7 +140,7 @@ const FIELD_LABELS: Record<EventFieldName, string> = {
   description: "Description",
   startsAt: "Starts at",
   durationMinutes: "Duration in minutes",
-  capacity: "Total places",
+  capacity: "Places for others",
   language: "Event language",
   experienceLevels: "Experience levels welcome",
   minimumAge: "Minimum age",
@@ -148,7 +149,8 @@ const FIELD_LABELS: Record<EventFieldName, string> = {
   countryCode: "Country code",
   areaLabel: "Area or neighborhood",
   venueName: "Venue name",
-  address: "Exact address",
+  address: "Street and number",
+  postalCode: "Postal code",
   instructions: "Arrival instructions",
 };
 
@@ -185,6 +187,7 @@ export function fieldForServerMessage(message: string): EventFieldName | null {
   if (text.includes("city")) return "city";
   if (text.includes("public area") || text.includes("area")) return "areaLabel";
   if (text.includes("venue")) return "venueName";
+  if (text.includes("postal")) return "postalCode";
   if (text.includes("address")) return "address";
   if (text.includes("instructions")) return "instructions";
   return null;

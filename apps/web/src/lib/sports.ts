@@ -26,7 +26,7 @@ export const SPORT_PRESETS: SportPreset[] = [
   { name: "Cycling", emoji: "🚴" },
   { name: "Swimming", emoji: "🏊" },
   { name: "Yoga", emoji: "🧘" },
-  { name: "Dance", emoji: "💃" },
+  { name: "Dancing", emoji: "💃" },
   { name: "Table Tennis", emoji: "🏓" },
   { name: "Badminton", emoji: "🏸" },
   { name: "Chess", emoji: "♟️" },

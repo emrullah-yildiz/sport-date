@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { type EventCreationInput, validateEventCreation } from "@sport-date/domain";
 
 import { getDatabase } from "@/lib/db";
+import { validateEventPostalCode } from "@/lib/directions";
 import { classifyEventUpdateSeverity, type EventUpdateField } from "@/lib/event-updates";
 import { isTrustedBrowserMutation } from "@/lib/request-security";
 import { getCurrentUser } from "@/lib/session";
@@ -94,6 +95,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
     return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
   }
 
+  // Postal code of the structured precise address (CX-20260704). Required on edit
+  // like on create so the meeting point stays complete; an over-long value is
+  // rejected, an empty one is a validation error.
+  const rawPostal = (((body as Record<string, unknown>)?.location as Record<string, unknown> | undefined)?.private as Record<string, unknown> | undefined)?.postalCode;
+  const postal = validateEventPostalCode(rawPostal);
+  if (!postal.valid) {
+    return NextResponse.json({ error: postal.error, errors: [postal.error] }, { status: 400 });
+  }
+  const postalCode = postal.postalCode;
+
   const event = validation.data;
   const sql = getDatabase();
   const currentRows = await sql`
@@ -152,6 +163,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
       UPDATE event_private_locations
       SET venue_name = ${event.location.private.venueName},
           address = ${event.location.private.address},
+          postal_code = ${postalCode},
           precise_latitude = ${event.location.private.latitude},
           precise_longitude = ${event.location.private.longitude},
           arrival_instructions = ${event.location.private.instructions ?? null},

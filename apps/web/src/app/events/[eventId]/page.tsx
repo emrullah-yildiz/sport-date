@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import PrimaryNav from "@/components/PrimaryNav";
+import AcceptedMeetingPoint from "@/components/AcceptedMeetingPoint";
 import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
@@ -144,7 +145,7 @@ export default async function HostEventPage({
         <div className="event-facts">
           <span>{startsAt}</span>
           <span>{event.durationMinutes} minutes</span>
-          <span>{event.capacity} total places</span>
+          <span>{event.capacity} places for others</span>
           <span>{event.minimumAge}–{event.maximumAge}</span>
           <span>{event.language}</span>
         </div>
@@ -205,9 +206,7 @@ export default async function HostEventPage({
         </article>
         <article className="host-location-card private">
           <p className="panel-label">Accepted people see</p>
-          <h2>{event.privateLocation.venueName}</h2>
-          <p>{event.privateLocation.address}</p>
-          {event.privateLocation.instructions ? <small>{event.privateLocation.instructions}</small> : null}
+          <AcceptedMeetingPoint venueName={event.privateLocation.venueName} address={event.privateLocation.address} postalCode={event.privateLocation.postalCode} city={event.publicLocation.city} latitude={event.privateLocation.latitude} longitude={event.privateLocation.longitude} instructions={event.privateLocation.instructions} />
         </article>
       </section>
 

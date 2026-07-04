@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import PrimaryNav from "@/components/PrimaryNav";
+import AcceptedMeetingPoint from "@/components/AcceptedMeetingPoint";
 import AttendanceConfirmPrompt from "@/components/AttendanceConfirmPrompt";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventRoomChat from "@/components/EventRoomChat";
@@ -168,8 +169,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
       <section className="room-grid">
         <article className="room-meeting">
           <p className="panel-label">{room.hasEnded ? "Where you met" : "Where you are meeting"}</p>
-          <h2>{room.venueName}</h2>
-          <p>{room.address}</p>
+          <AcceptedMeetingPoint venueName={room.venueName} address={room.address} postalCode={room.postalCode} latitude={room.latitude} longitude={room.longitude} instructions={null} />
           {room.instructions ? <blockquote>{room.instructions}</blockquote> : null}
         </article>
         <article className="room-people" id="room-people">

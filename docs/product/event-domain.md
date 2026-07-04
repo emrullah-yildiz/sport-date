@@ -45,6 +45,12 @@ The exact venue, address, coordinates, and arrival instructions are available on
 
 Authorization must be derived server-side from the event and participation records. A client-supplied role or participation string is never sufficient.
 
+### Structured precise address + directions (CX-20260704)
+
+Event creation requires a **structured precise meeting location**: venue name, street & number (`address`), city (the public city), and **postal code** (`event_private_locations.postal_code`, migration 037) — all mandatory and validated non-empty on create/edit (`validateEventPostalCode`). The venue/address/postal code plus the precise coordinates stay in `event_private_locations` and are **private in discovery** — they never appear in the discover feed, the public `/e/{id}` invite, OG images, or notifications (the public reads select an explicit allowlist that never joins the private table; a query-level test asserts `postal_code`/`precise_`/`address` are absent). They unlock ONLY post-acceptance, to the host and accepted attendees, who additionally get a **keyless "Get directions" link** (`buildDirectionsUrl` → `https://www.google.com/maps/dir/?api=1&destination=<lat>,<lng>`, or the url-encoded full address when coordinates are absent). The link is a plain anchor the member taps themselves — no third-party map is embedded, so no location is sent to a vendor pre-acceptance. The shared `AcceptedMeetingPoint` component renders this on the three accepted surfaces (discover accepted view, event room, host event page).
+
+**Capacity is joiner spots only** — the host is already in and does not consume a place. The label reads "Places for others" with the hint "You're already in as host — this is how many others can join, not counting you" on the create form, the edit form, and the event detail; the underlying `capacity` behaviour is unchanged.
+
 ## No sexual-intent events (product policy)
 
 KeepItUp is for dating, friendship, or community **through a real shared activity** — it is not a hookup app (owner directive 2026-07-04, CX-20260704-policy-no-sexual-intent-events). Events must not be organised for sexual purposes, and no event, profile, or event-room chat may be used for sexual solicitation. Dating here means meeting a romantic partner — a real connection, not arranging sex; wanting romance is fully welcome, a sexual-encounter listing is not. This is enforced through **guidelines + reporting + moderation**, never surveillance of private messages:
