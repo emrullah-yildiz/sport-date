@@ -1,6 +1,6 @@
 # CX-20260704-growth-invite-a-friend-to-event
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — ethical word-of-mouth loop; grows local density (the Phase-2 liquidity lever) without paid spend. Depends on nothing owner-gated.
 - Customer journey: a member joining/attending an event invites a specific friend to come along → friend lands on the public invite (see `CX-20260704-growth-shareable-event-invite-og-image`) → joins → density compounds.

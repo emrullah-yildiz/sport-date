@@ -1,6 +1,6 @@
 # CX-20260704-policy-no-sexual-intent-events
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — owner-directive (2026-07-04, interpreted): **no sexual intent at events.** KeepItUp is for dating/friendship/community through activity — NOT sexual encounters/hookups. (Interpretation of an ambiguous instruction — confirm with owner if wrong.)
 - Customer journey: a host creates an event / sets intentions → the product and guidelines make clear sexual/hookup-oriented events are not allowed → members can report ones that are → moderation acts.
@@ -26,6 +26,7 @@ Make it explicit — in copy, in the intention options, in guidelines, and in mo
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented in commit 3d18b8b — **MIGRATION ADDED `db/036_safety_report_sexual_intent_category.sql` (widen category CHECK), committed NOT pushed** (orchestrator pushes; applied to dev DB, CHECK verified). New report reason `sexual_intent` ("Sexual or inappropriate intent (e.g. a hookup-oriented event)") in domain SAFETY_REPORT_CATEGORIES (urgent priority) + both report UIs (ReportSafetyControls, EventRoomChat), routing into the existing moderation queue. Intention options unchanged (no sexual/hookup option ever existed); dating copy clarified (romantic partner, not a hookup) in SignUpStep4. Hosting standards (/hosting#standards) + safety guidelines (/safety#guidelines) gained a plain "events are for real activity, not sexual encounters" section; event-create shows a short standard reminder. Checks: typecheck ✓ lint ✓ web 900 + domain 218 ✓ (new: sexual_intent valid+urgent+accepted-on-event-report; SEEKING_OPTIONS has no sexual option) prod build ✓. Docs: event-domain.md policy section. NOTE: interpreted directive — dating stays fully welcome; confirm interpretation with owner if wrong.
 
 ## Guardrails
 

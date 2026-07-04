@@ -1,6 +1,6 @@
 # CX-20260704-feature-precise-address-and-maps
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). Precise, mandatory meeting location + one-tap directions removes the biggest real-world friction: actually finding the spot.
 - Customer journey: host creates an event → must give a precise address (mandatory, structured) → it stays PRIVATE in discovery → once accepted, the attendee sees the exact address + a "Get directions" Google Maps link.
@@ -27,6 +27,7 @@ Make the meeting location **precise and mandatory**, and give accepted attendees
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented in commit 82e1ad3 — **MIGRATION ADDED `db/037_event_private_location_postal_code.sql` (postal_code), committed NOT pushed** (orchestrator pushes; applied to dev DB, column verified). Mandatory structured precise address (venue + street + city + postal, `validateEventPostalCode`) on create+edit. Precise venue/address/postal/coords stay private in discovery/`/e/{id}`/OG (public allowlist reads never join private table; query test now also asserts no `postal_code`). Post-acceptance: shared `AcceptedMeetingPoint` shows full address + keyless "Get directions" (`buildDirectionsUrl` → maps dir api=1 destination=lat,lng, or url-encoded address) on discover accepted view, event room, host page — plain anchor, no embed, no key. "Dance"→"Dancing". Capacity relabel "Total places"→"Places for others" + host hint on create/edit/detail (behaviour unchanged). Checks: typecheck ✓ lint ✓ vitest 906 ✓ (new: directions builder + keyless + fallback, postal validation, public-query-excludes-postal) prod build ✓. Unverified: full create→accept→directions browser flow (needs host+accepted session) — verified at lib/route/build/migration level; prod migration owner-orchestrated.
 
 ## Guardrails
 

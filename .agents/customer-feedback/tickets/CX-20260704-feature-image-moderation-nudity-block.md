@@ -1,6 +1,6 @@
 # CX-20260704-feature-image-moderation-nudity-block
 
-- Status: `in-progress`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — owner-directive (2026-07-04): nudes / sexually-explicit images are NOT allowed. Safety + brand integrity depend on this.
 - Customer journey: a member uploads a profile photo → it is automatically screened → sexual/nude content is rejected before it is ever shown; borderline goes to the moderation queue.
@@ -25,6 +25,7 @@ Add an **automated image-safety check** to the photo-upload path that blocks nud
 ## Handoff log
 
 - 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent).
+- 2026-07-04 | build | implemented in commit 775939a — **MIGRATION ADDED `db/035_profile_photo_moderation.sql` (moderation_status), committed NOT pushed** (orchestrator pushes; deploy auto-migrate; applied to dev DB). Fail-safe pluggable seam `lib/image-moderation.ts` (reject/review/allow; no-provider/error/null → review, never allow; explicit → reject). `addProfilePhoto` screens BEFORE storing: reject → not stored (422 image-rejected), review → pending + system moderation-queue entry, allow → approved. Visibility gate: `listApprovedProfilePhotos` for cross-member views + serve route owner-or-approved. Owner sees pending with "being checked" note; upload guideline copy added. Human review via protected `POST /api/internal/photo-moderation/[id]` {approve|reject} behind fail-closed `MODERATION_AGENT_SECRET`. Checks: typecheck ✓ lint ✓ vitest 900 ✓ (18 new incl. provider-rejects-explicit, borderline→queue, no-provider-never-auto-approves, uploader error contract, fail-closed internal route) prod build ✓. Live-verified internal route (401 no-secret; approve→200 + DB pending→approved; seed cleaned). Docs: `docs/security/image-moderation.md` + runbook env. Unverified: full browser upload happy-path (no BLOB_READ_WRITE_TOKEN in dev) — covered by lib/route tests; prod migration + provider/secret provisioning owner-orchestrated.
 
 ## Guardrails
 
