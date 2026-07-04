@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>KeepItUp // Social — Content Approval Queue</title>
+<style>
+  :root{
+    --bg:#181d21; --panel:#20262B; --panel2:#242B31; --line:rgba(59,234,126,.20);
+    --neon:#3BEA7E; --ink:#F1F5F3; --mut:#8A9BA0; --amber:#E8B04B; --red:#FF6E68; --blue:#43C6F5;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5; }
+  a{ color:var(--neon); text-decoration:none; }
+  .wrap{ max-width:920px; margin:0 auto; padding:26px 16px 90px; }
+  .top{ display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--line); padding-bottom:16px; }
+  .brand{ font-size:12px; letter-spacing:.26em; color:var(--neon); font-weight:800; text-transform:uppercase; }
+  .top h1{ font-size:26px; margin:6px 0 0; }
+  .who{ font-size:13px; color:var(--mut); margin-top:4px; }
+  h2.sec{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); margin:28px 0 14px; }
+  .note{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--neon); border-radius:12px; padding:18px 20px; }
+  .note p{ margin:0 0 10px; font-size:15px; } .note p:last-child{ margin:0; }
+  /* filter bar */
+  .bar{ display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:18px 0 6px; }
+  .filters{ display:flex; flex-wrap:wrap; gap:8px; }
+  .fbtn{ min-height:44px; display:inline-flex; align-items:center; padding:0 14px; border:1px solid var(--line); border-radius:10px;
+    background:var(--panel); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer; }
+  .fbtn[aria-pressed="true"]{ border-color:var(--neon); color:var(--neon); background:rgba(59,234,126,.10); }
+  .count{ margin-left:auto; font-size:13px; color:var(--mut); }
+  .count b{ color:var(--ink); }
+  /* cards */
+  .cards{ display:grid; gap:14px; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; border-left:3px solid var(--mut); }
+  .card.approved{ border-left-color:var(--neon); }
+  .card.denied{ border-left-color:var(--red); opacity:.72; }
+  .card.pending{ border-left-color:var(--amber); }
+  .chips{ display:flex; flex-wrap:wrap; gap:7px; align-items:center; }
+  .chip{ font-size:11px; letter-spacing:.06em; text-transform:uppercase; font-weight:800; padding:4px 9px; border-radius:7px;
+    background:var(--panel2); color:var(--mut); border:1px solid var(--line); }
+  .chip.plat{ color:var(--blue); } .chip.fmt{ color:var(--ink); }
+  .chip.trend{ color:var(--amber); }
+  .chip.status{ margin-left:auto; }
+  .chip.status.approved{ color:var(--neon); border-color:rgba(59,234,126,.5); }
+  .chip.status.denied{ color:var(--red); border-color:rgba(255,110,104,.5); }
+  .chip.status.pending{ color:var(--amber); border-color:rgba(232,176,75,.5); }
+  .card h3{ margin:12px 0 2px; font-size:18px; }
+  .card .titlerow{ font-size:12px; color:var(--mut); }
+  .hook{ margin:12px 0; font-size:16px; font-weight:700; color:var(--ink); border-left:2px solid var(--neon); padding-left:12px; }
+  .fld{ margin:10px 0; }
+  .fld .lbl{ font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--mut); font-weight:800; margin-bottom:4px; }
+  .fld .val{ font-size:14px; color:#c8d3d0; white-space:pre-wrap; }
+  ol.slides{ margin:6px 0 0; padding-left:22px; } ol.slides li{ font-size:14px; color:#c8d3d0; margin-bottom:5px; }
+  .tags{ display:flex; flex-wrap:wrap; gap:6px; } .tag{ font-size:12px; color:var(--blue); background:rgba(67,198,245,.10); border-radius:6px; padding:2px 7px; }
+  .actions{ display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+  .abtn{ min-height:44px; flex:1 1 auto; min-width:120px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    border:1px solid var(--line); border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:var(--panel2); color:var(--ink); }
+  .abtn.approve{ color:var(--neon); border-color:rgba(59,234,126,.45); }
+  .abtn.approve[aria-pressed="true"]{ background:rgba(59,234,126,.16); }
+  .abtn.deny{ color:var(--red); border-color:rgba(255,110,104,.40); }
+  .abtn.deny[aria-pressed="true"]{ background:rgba(255,110,104,.14); }
+  .abtn:disabled{ opacity:.5; cursor:default; }
+  .commentbox{ margin-top:12px; }
+  textarea{ width:100%; min-height:64px; resize:vertical; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    border-radius:10px; padding:10px 12px; font:inherit; font-size:14px; }
+  textarea:focus{ outline:none; border-color:var(--neon); }
+  .saverow{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .savebtn{ min-height:44px; padding:0 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel2); color:var(--neon);
+    font-size:13px; font-weight:800; cursor:pointer; }
+  .msg{ font-size:12px; color:var(--mut); }
+  .msg.ok{ color:var(--neon); } .msg.err{ color:var(--red); }
+  .empty{ text-align:center; color:var(--mut); padding:40px 10px; font-size:15px; }
+  .foot{ margin-top:34px; font-size:12px; color:var(--mut); line-height:1.7; border-top:1px solid var(--line); padding-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="brand">KeepItUp · Social</div>
+      <h1>Content Approval Queue</h1>
+      <div class="who">Approve, deny, or comment on post ideas the growth agent files. Approved ideas get rendered &amp; scheduled.</div>
+    </div>
+  </div>
+
+  <div id="app">
+    <div class="empty" id="loading">Loading the queue…</div>
+  </div>
+
+  <div class="foot">
+    Owner-only. Ideas are drafts — nothing publishes without your approval. Safety &amp; honesty guardrails always apply.
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var app = document.getElementById("app");
+  var FILTERS = [
+    { key:"all", label:"All", status:null },
+    { key:"pending", label:"Pending", status:"pending" },
+    { key:"approved", label:"Approved", status:"approved" },
+    { key:"denied", label:"Denied", status:"denied" }
+  ];
+  var current = "all";
+  var ideas = [];
+
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+    return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]; }); }
+
+  function apiList(){
+    var f = FILTERS.filter(function(x){ return x.key === current; })[0];
+    var qs = f && f.status ? ("?status=" + encodeURIComponent(f.status)) : "";
+    return fetch("/api/social/ideas" + qs, { credentials:"same-origin", headers:{ "Accept":"application/json" } });
+  }
+
+  function signedOutView(){
+    app.innerHTML =
+      '<div class="note"><p><b>Sign in as the owner to review the queue.</b></p>' +
+      '<p>This page is owner-only. <a href="/login">Sign in</a>, then reload to see the pending post ideas.</p></div>';
+  }
+
+  function errorView(text){
+    app.innerHTML = '<div class="note" style="border-left-color:var(--red)"><p>' + esc(text) + '</p>' +
+      '<p><a href="#" id="retry">Try again</a></p></div>';
+    var r = document.getElementById("retry");
+    if (r) r.addEventListener("click", function(e){ e.preventDefault(); load(); });
+  }
+
+  function statusChip(status){
+    return '<span class="chip status ' + esc(status) + '">' + esc(status) + '</span>';
+  }
+
+  function renderBody(b){
+    b = b || {};
+    var html = "";
+    if (Array.isArray(b.slides) && b.slides.length){
+      html += '<div class="fld"><div class="lbl">Slides</div><ol class="slides">' +
+        b.slides.map(function(s){ return "<li>" + esc(s) + "</li>"; }).join("") + "</ol></div>";
+    }
+    if (b.script){
+      html += '<div class="fld"><div class="lbl">Script</div><div class="val">' + esc(b.script) + "</div></div>";
+    }
+    if (b.caption){
+      html += '<div class="fld"><div class="lbl">Caption</div><div class="val">' + esc(b.caption) + "</div></div>";
+    }
+    if (Array.isArray(b.hashtags) && b.hashtags.length){
+      html += '<div class="fld"><div class="lbl">Hashtags</div><div class="tags">' +
+        b.hashtags.map(function(h){ var t = String(h); if (t[0] !== "#") t = "#" + t; return '<span class="tag">' + esc(t) + "</span>"; }).join("") + "</div></div>";
+    }
+    if (b.cta){
+      html += '<div class="fld"><div class="lbl">Call to action</div><div class="val">' + esc(b.cta) + "</div></div>";
+    }
+    if (b.imageConcept){
+      html += '<div class="fld"><div class="lbl">Image concept</div><div class="val">' + esc(b.imageConcept) + "</div></div>";
+    }
+    return html;
+  }
+
+  function cardHtml(idea){
+    var trend = idea.trend ? '<span class="chip trend">' + esc(idea.trend) + "</span>" : "";
+    return '<article class="card ' + esc(idea.status) + '" data-id="' + esc(idea.id) + '">' +
+      '<div class="chips">' +
+        '<span class="chip plat">' + esc(idea.platform) + "</span>" +
+        '<span class="chip fmt">' + esc(idea.format) + "</span>" +
+        trend + statusChip(idea.status) +
+      "</div>" +
+      "<h3>" + esc(idea.title) + "</h3>" +
+      '<div class="hook">' + esc(idea.hook) + "</div>" +
+      renderBody(idea.body) +
+      '<div class="actions">' +
+        '<button class="abtn approve" data-action="approve" aria-pressed="' + (idea.status === "approved") + '">Approve</button>' +
+        '<button class="abtn deny" data-action="deny" aria-pressed="' + (idea.status === "denied") + '">Deny</button>' +
+      "</div>" +
+      '<div class="commentbox">' +
+        '<label class="lbl" style="display:block;margin-bottom:4px">Owner comment</label>' +
+        '<textarea data-role="comment" placeholder="Notes for the growth agent…">' + esc(idea.ownerComment || "") + "</textarea>" +
+        '<div class="saverow"><button class="savebtn" data-role="save">Save comment</button>' +
+        '<span class="msg" data-role="msg"></span></div>' +
+      "</div>" +
+    "</article>";
+  }
+
+  function render(){
+    var barHtml = '<div class="bar"><div class="filters">' +
+      FILTERS.map(function(f){
+        return '<button class="fbtn" data-filter="' + f.key + '" aria-pressed="' + (f.key === current) + '">' + esc(f.label) + "</button>";
+      }).join("") +
+      '</div><div class="count"><b>' + ideas.length + "</b> " + (ideas.length === 1 ? "idea" : "ideas") + "</div></div>";
+
+    var listHtml = ideas.length
+      ? '<div class="cards">' + ideas.map(cardHtml).join("") + "</div>"
+      : '<div class="empty">No ideas in this view yet.</div>';
+
+    app.innerHTML = barHtml + listHtml;
+    wire();
+  }
+
+  function wire(){
+    Array.prototype.forEach.call(app.querySelectorAll(".fbtn"), function(btn){
+      btn.addEventListener("click", function(){ current = btn.getAttribute("data-filter"); load(); });
+    });
+    Array.prototype.forEach.call(app.querySelectorAll(".card"), function(card){
+      var id = card.getAttribute("data-id");
+      Array.prototype.forEach.call(card.querySelectorAll(".abtn"), function(btn){
+        btn.addEventListener("click", function(){ decide(card, id, { action: btn.getAttribute("data-action") }); });
+      });
+      var save = card.querySelector('[data-role="save"]');
+      save.addEventListener("click", function(){
+        var ta = card.querySelector('[data-role="comment"]');
+        decide(card, id, { comment: ta.value });
+      });
+    });
+  }
+
+  function setMsg(card, text, cls){
+    var m = card.querySelector('[data-role="msg"]');
+    if (!m) return;
+    m.className = "msg" + (cls ? " " + cls : "");
+    m.textContent = text || "";
+  }
+
+  function decide(card, id, payload){
+    var buttons = card.querySelectorAll("button");
+    Array.prototype.forEach.call(buttons, function(b){ b.disabled = true; });
+    setMsg(card, "Saving…");
+    fetch("/api/social/ideas/" + encodeURIComponent(id), {
+      method:"POST",
+      credentials:"same-origin",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" },
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if (res.status === 401 || res.status === 403){ signedOutView(); return null; }
+      if (!res.ok) throw new Error("Save failed (" + res.status + ")");
+      return res.json();
+    }).then(function(data){
+      if (!data) return;
+      setMsg(card, "Saved.", "ok");
+      // Re-fetch to stay honest with the server's truth.
+      load();
+    }).catch(function(err){
+      Array.prototype.forEach.call(buttons, function(b){ b.disabled = false; });
+      setMsg(card, err.message || "Save failed.", "err");
+    });
+  }
+
+  function load(){
+    apiList().then(function(res){
+      if (res.status === 401 || res.status === 403){ signedOutView(); return null; }
+      if (!res.ok) throw new Error("Could not load the queue (" + res.status + ").");
+      return res.json();
+    }).then(function(data){
+      if (!data) return;
+      ideas = Array.isArray(data.ideas) ? data.ideas : [];
+      render();
+    }).catch(function(err){ errorView(err.message || "Could not load the queue."); });
+  }
+
+  load();
+})();
+</script>
+</body>
+</html>

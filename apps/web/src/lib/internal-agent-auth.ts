@@ -26,3 +26,17 @@ export function isAuthorizedModerationAgent(request: Request): boolean {
   const header = request.headers.get("authorization");
   return header === `Bearer ${secret}`;
 }
+
+/**
+ * Same fail-closed guard for the internal social-content seed path
+ * (CX-20260705-social-content-approval-queue): the CEO/growth agent POSTs post
+ * ideas into the owner approval queue. Bearer `SOCIAL_AGENT_SECRET`; refuses
+ * when unset, so a misconfigured deploy never exposes an unauthenticated write
+ * path and members (who never hold the secret) can never seed the queue.
+ */
+export function isAuthorizedSocialAgent(request: Request): boolean {
+  const secret = process.env.SOCIAL_AGENT_SECRET;
+  if (!secret) return false;
+  const header = request.headers.get("authorization");
+  return header === `Bearer ${secret}`;
+}
