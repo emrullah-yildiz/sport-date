@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>KeepItUp — Seed Deck</title>
+<style>
+  :root{ --bg:#181d21; --panel:#20262B; --panel2:#242B31; --line:rgba(59,234,126,.22);
+    --neon:#3BEA7E; --ink:#F1F5F3; --mut:#8A9BA0; --amber:#E8B04B; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; }
+  .deck{ height:100vh; overflow:hidden; position:relative; }
+  .slide{ position:absolute; inset:0; display:none; flex-direction:column; justify-content:center;
+    padding:6vh 7vw; opacity:0; transition:opacity .25s ease; }
+  .slide.on{ display:flex; opacity:1; }
+  .eyebrow{ color:var(--neon); font-size:clamp(11px,1.4vw,14px); font-weight:800; letter-spacing:.22em; text-transform:uppercase; margin-bottom:18px; }
+  h1{ font-size:clamp(32px,6vw,68px); line-height:1.05; letter-spacing:-.01em; }
+  h2{ font-size:clamp(26px,4.4vw,48px); line-height:1.1; margin-bottom:8px; }
+  h1 .g,h2 .g,.g{ color:var(--neon); }
+  p.big{ font-size:clamp(16px,2.3vw,25px); color:#cdd6d3; line-height:1.5; max-width:52ch; margin-top:16px; }
+  ul{ list-style:none; margin-top:22px; display:grid; gap:14px; max-width:60ch; }
+  li{ font-size:clamp(14px,1.9vw,20px); color:#cdd6d3; line-height:1.45; padding-left:26px; position:relative; }
+  li::before{ content:"›"; position:absolute; left:0; color:var(--neon); font-weight:800; }
+  .cols{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px; margin-top:26px; }
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; }
+  .card h3{ font-size:clamp(15px,1.9vw,20px); margin-bottom:6px; }
+  .card .n{ font-size:clamp(22px,3.2vw,34px); font-weight:800; color:var(--neon); }
+  .card p{ font-size:clamp(12px,1.5vw,15px); color:var(--mut); line-height:1.45; }
+  .gallery{ display:flex; gap:14px; margin-top:26px; flex-wrap:wrap; }
+  .gallery img{ width:clamp(110px,15vw,170px); aspect-ratio:1/1; object-fit:cover; border-radius:12px; border:1px solid var(--line); }
+  .cover-mark{ width:clamp(70px,10vw,110px); height:auto; margin-bottom:26px; }
+  .note{ margin-top:22px; font-size:clamp(11px,1.4vw,14px); color:var(--amber); max-width:60ch; }
+  .foot{ position:absolute; bottom:3vh; left:7vw; right:7vw; display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--mut); }
+  .dots{ display:flex; gap:6px; }
+  .dot{ width:7px; height:7px; border-radius:50%; background:#3a444b; cursor:pointer; }
+  .dot.on{ background:var(--neon); }
+  .nav{ position:absolute; bottom:2.4vh; right:7vw; display:flex; gap:8px; z-index:5; }
+  .nav button{ background:var(--panel); border:1px solid var(--line); color:var(--ink); width:38px; height:38px; border-radius:10px; font-size:18px; cursor:pointer; }
+  .kbd{ color:var(--mut); font-size:11px; }
+  .two{ display:grid; grid-template-columns:1.1fr .9fr; gap:40px; align-items:center; }
+  @media (max-width:760px){ .two{ grid-template-columns:1fr; gap:20px; } .foot{ left:5vw; right:5vw; } .slide{ padding:5vh 6vw; } }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+  <section class="slide">
+    <img class="cover-mark" src="/brand/keepitup-mark-transparent-1024.png" alt="KeepItUp">
+    <div class="eyebrow">Seed round · 2026 · DRAFT for founder review</div>
+    <h1>Meet people through a real game,<br><span class="g">not another profile.</span></h1>
+    <p class="big">KeepItUp turns a run, a padel match, or a chess game into the way adults meet — for dating, friendship, and community. Europe first.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">The problem</div>
+    <h2>Meeting people online got <span class="g">worse</span>, not better.</h2>
+    <ul>
+      <li>Dating apps ask you to perform through a profile, then audition strangers in a chat that rarely becomes a meeting.</li>
+      <li>Swipe fatigue is real and rising — endless matches, few real connections, growing distrust.</li>
+      <li>Making friends as an adult is genuinely hard; established sports communities are intimidating to enter alone.</li>
+      <li>The result: people are more "connected" and lonelier than ever.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Why now</div>
+    <h2>The shift to <span class="g">activity-led</span> meeting is happening.</h2>
+    <ul>
+      <li>Swipe-app dissatisfaction is at an all-time high; users are actively leaving for something realer.</li>
+      <li>Run clubs, padel, climbing and social-sport communities are booming across Europe.</li>
+      <li>A loneliness epidemic among 25–39s that governments now treat as a public-health issue.</li>
+      <li>People want fewer, better, in-person connections — not more notifications.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">The solution</div>
+    <div class="two">
+      <div>
+        <h2>KeepItUp: the activity <span class="g">carries the first encounter.</span></h2>
+        <p class="big">Join a small local sports event. The level, time, area and everyone's intention are clear before you request a place. You show up and do something you already enjoy — connection emerges from that, not from a bio.</p>
+      </div>
+      <div class="gallery">
+        <img src="/brand/social/b1-01-silence-run.png" alt="">
+        <img src="/brand/social/b1-06-court-vision.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">How it works</div>
+    <h2>Three steps from sign-up to a real meeting.</h2>
+    <div class="cols">
+      <div class="card"><div class="n">01</div><h3>Build a profile</h3><p>Pick your sports, level, and whether you're open to dating, friendship, or a good group.</p></div>
+      <div class="card"><div class="n">02</div><h3>Discover nearby</h3><p>Small local events with level, time, approximate area and intentions clear — exact spot hidden until accepted.</p></div>
+      <div class="card"><div class="n">03</div><h3>Request &amp; meet</h3><p>The host accepts, private details unlock, a group chat coordinates it, and the game breaks the ice.</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Product — already built</div>
+    <h2>A real, working product — not a mockup.</h2>
+    <div class="cols">
+      <div class="card"><h3>Core loop</h3><p>Profiles, event hosting, join-request flow, discovery with approximate-area privacy.</p></div>
+      <div class="card"><h3>Trust &amp; safety</h3><p>Block, report, leave, moderation queue, GDPR erasure — safety is product work, never paywalled.</p></div>
+      <div class="card"><h3>Coordination</h3><p>Group chat for accepted attendees + T-2h attendance confirm/cancel to cut no-shows.</p></div>
+      <div class="card"><h3>Monetization ready</h3><p>Ethical Plus subscription built in test mode behind a flag; safety &amp; participation stay free.</p></div>
+      <div class="card"><h3>Multi-surface</h3><p>Mobile-first web live on keepitup.social; a native app in development.</p></div>
+      <div class="card"><h3>Privacy by design</h3><p>Exact location never shown pre-acceptance; minimal data; EU-first posture.</p></div>
+    </div>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Why we win</div>
+    <h2>Defensible where swipe apps <span class="g">can't follow.</span></h2>
+    <ul>
+      <li><b>Anti-swipe by design.</b> Our value is a good real experience — worthwhile even when romance isn't the outcome.</li>
+      <li><b>Multi-intent.</b> Dating, friendship and community in one place, none framed as lesser — a far larger, more durable audience than dating alone.</li>
+      <li><b>Trust-first.</b> Privacy-by-design and honest, anti-dark-pattern product earns the trust incumbents have burned.</li>
+      <li><b>Local density is the moat.</b> Liquidity in a neighbourhood compounds and is hard to copy city-by-city.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Market</div>
+    <h2>Big, and we only need <span class="g">one dense city</span> to start.</h2>
+    <div class="cols">
+      <div class="card"><div class="n">100M+</div><p>European adults using dating and social-discovery apps.</p></div>
+      <div class="card"><div class="n">€8B+</div><p>Global online-dating spend — before adding friendship &amp; community intent.</p></div>
+      <div class="card"><div class="n">Bottoms-up</div><p>One dense EU city of active 25–39s → thousands of weekly activity slots at €6.99 = a real, expandable wedge.</p></div>
+    </div>
+    <p class="note">⚠ Market figures are illustrative estimates for framing — founder to validate with sourced data before investor use.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Business model</div>
+    <h2>Ethical freemium — <span class="g">safety always free.</span></h2>
+    <ul>
+      <li><b>KeepItUp Plus — €6.99/mo:</b> convenience &amp; richness only (advanced discovery filters, more of what already exists).</li>
+      <li><b>Free forever:</b> core participation and every safety feature. No paywalled boosts, no paid access to people, no attractiveness/popularity mechanics.</li>
+      <li>Cancel as easily as you subscribe (EU-compliant). Stripe integration built in test mode.</li>
+      <li>Later expansion: host tools, venue partnerships, small event fees — all trust-preserving.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Go-to-market</div>
+    <h2>Organic first, <span class="g">density-led</span>, low CAC.</h2>
+    <ul>
+      <li><b>Live now:</b> an agent-run organic social engine (Instagram/TikTok/YouTube) producing on-brand content daily at near-zero cost.</li>
+      <li><b>Wedge:</b> saturate one European city — reliable hosts, repeat games, real retention — before expanding.</li>
+      <li><b>Viral surface:</b> shareable event invites + bring-a-friend loops turn events into acquisition.</li>
+      <li><b>Signal:</b> an in-product research survey collecting willingness-to-pay and demand by city.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Status — the honest version</div>
+    <h2>Pre-launch, product-complete, <span class="g">motion starting.</span></h2>
+    <ul>
+      <li><b>Built &amp; live:</b> full product on keepitup.social, safety systems, monetization scaffolding, ~800 automated tests, auto-deploy with DB migrations.</li>
+      <li><b>Just switched on:</b> the organic growth engine and the WTP survey — first audience being built now.</li>
+      <li><b>Honest today:</b> this is day-zero on users and revenue. We are not claiming traction we don't have.</li>
+      <li><b>De-risked:</b> the expensive part — a trustworthy, working, safe product — already exists. The seed round buys distribution and density.</li>
+    </ul>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">Team</div>
+    <h2>Lean, technical, <span class="g">AI-augmented.</span></h2>
+    <ul>
+      <li>Founder-led, product- and trust-obsessed, shipping in the open.</li>
+      <li>An AI-augmented operating model: agents run content, QA, and much of the build loop — extraordinary output per euro.</li>
+      <li>Seed hires: a community/city launcher and part-time trust &amp; safety — the two roles density and safety demand.</li>
+    </ul>
+    <p class="note">Team slide is a placeholder framing — founder to complete with real names/bios.</p>
+  </section>
+
+  <section class="slide">
+    <div class="eyebrow">The ask</div>
+    <h2>Raising a <span class="g">seed round</span> to buy density.</h2>
+    <div class="cols">
+      <div class="card"><h3>Use of funds</h3><p>Launch &amp; saturate the first city · scale the organic + paid growth engine · trust &amp; safety / moderation · key hires.</p></div>
+      <div class="card"><h3>18-month goal</h3><p>Prove repeatable local density and Plus conversion in one city, then a playbook to expand to 3–5.</p></div>
+      <div class="card"><h3>Why us, why now</h3><p>Product risk already retired; capital converts directly into meetings, members, and revenue.</p></div>
+    </div>
+    <p class="note">⚠ Raise amount, valuation and terms are founder decisions — intentionally left blank for you to set before sending.</p>
+  </section>
+
+  <section class="slide">
+    <img class="cover-mark" src="/brand/keepitup-mark-transparent-1024.png" alt="KeepItUp">
+    <div class="eyebrow">The vision</div>
+    <h1>A calmer way for cities <span class="g">to meet.</span></h1>
+    <p class="big">Small, safe, repeated. One court, one neighbourhood, one city at a time — until meeting someone new feels as natural as showing up to play. <b>Let's build it.</b></p>
+    <p class="big" style="color:var(--neon)">keepitup.social · support@keepitup.social</p>
+  </section>
+
+  <div class="nav"><button id="prev" aria-label="Previous">‹</button><button id="next" aria-label="Next">›</button></div>
+  <div class="foot"><span class="kbd">← → to navigate · this is a working draft, not final investor copy</span><div class="dots" id="dots"></div></div>
+</div>
+<script>
+const slides=[...document.querySelectorAll(".slide")], dots=document.getElementById("dots");
+let i=0;
+slides.forEach((_,n)=>{ const d=document.createElement("div"); d.className="dot"; d.onclick=()=>go(n); dots.appendChild(d); });
+function go(n){ i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle("on",k===i));
+  [...dots.children].forEach((d,k)=>d.classList.toggle("on",k===i)); }
+document.getElementById("next").onclick=()=>go(i+1);
+document.getElementById("prev").onclick=()=>go(i-1);
+document.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key===" ")go(i+1); if(e.key==="ArrowLeft")go(i-1); });
+let sx=0; document.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});
+document.addEventListener("touchend",e=>{ const dx=e.changedTouches[0].clientX-sx; if(Math.abs(dx)>50) go(dx<0?i+1:i-1); },{passive:true});
+go(0);
+</script>
+</body>
+</html>
