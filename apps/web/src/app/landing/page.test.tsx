@@ -113,7 +113,7 @@ describe("LandingPage hero — intents above the fold and honest open badge", ()
 
     const html = await render();
 
-    expect(html).toContain("Early preview · Open to adults (18+) · Europe first");
+    expect(html).toContain("Free beta · open to all adults (18+) · Europe first");
     // The gated-sounding badge is gone from the hero…
     expect(html).not.toContain("Private beta · Adults only · Europe first");
     // …and no fabricated openness: the explainer disclosure stays alongside,
