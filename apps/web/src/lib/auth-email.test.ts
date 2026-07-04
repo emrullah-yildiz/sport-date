@@ -25,6 +25,10 @@ beforeEach(async () => {
   // Keep email delivery disabled so these tests exercise persistence logic only.
   delete process.env.EMAIL_DELIVERY_ENABLED;
   delete process.env.EMAIL_DELIVERY_PROVIDER;
+  delete process.env.GMAIL_CLIENT_ID;
+  delete process.env.GMAIL_CLIENT_SECRET;
+  delete process.env.GMAIL_REFRESH_TOKEN;
+  delete process.env.GMAIL_SENDER_EMAIL;
   delete process.env.APP_PUBLIC_ORIGIN;
   delete process.env.NEXT_PUBLIC_APP_ORIGIN;
   ({

@@ -51,7 +51,7 @@ async function holdUntilMinimumDuration<T>(
   return result;
 }
 
-type DeliveryState = "unconfigured" | "ready" | "simulated";
+type DeliveryState = "unconfigured" | "ready" | "simulated" | "sent";
 type VerificationRequestState = "created" | "already_verified";
 type VerificationConfirmState = "verified" | "already_verified" | "invalid" | "expired";
 type PasswordResetConfirmState = "reset" | "invalid" | "expired";
@@ -77,7 +77,7 @@ export type AuthEmailDeliveryPreparation = Readonly<{
   state: DeliveryState;
   origin: string | null;
   draft: AuthEmailDraft | null;
-  provider: "disabled" | "console";
+  provider: "disabled" | "console" | "gmail";
   messageId: string | null;
 }>;
 
@@ -103,7 +103,7 @@ async function finalizeDeliveryPreparation(
 
   const dispatch = await dispatchAuthEmail(draft);
   return {
-    state: dispatch.state === "simulated" ? "simulated" : fallbackState,
+    state: dispatch.state === "sent" ? "sent" : dispatch.state === "simulated" ? "simulated" : fallbackState,
     origin,
     draft,
     provider: dispatch.provider,

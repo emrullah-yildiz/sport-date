@@ -2,8 +2,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({ getDatabase: vi.fn() }));
+vi.mock("@/lib/gmail-email-delivery", () => ({ sendGmailEmail: vi.fn() }));
 
 import { getDatabase } from "@/lib/db";
+import { sendGmailEmail } from "@/lib/gmail-email-delivery";
 import { hashAttendanceToken } from "./attendance-confirmation";
 import {
   cancelAttendanceByToken,
@@ -52,7 +54,10 @@ function confRow(over: Partial<Record<string, unknown>> = {}) {
   };
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  for (const key of ["EMAIL_DELIVERY_ENABLED", "EMAIL_DELIVERY_PROVIDER", "GMAIL_CLIENT_ID", "GMAIL_CLIENT_SECRET", "GMAIL_REFRESH_TOKEN", "GMAIL_SENDER_EMAIL"]) delete process.env[key];
+});
 
 describe("runAttendanceReminderSweep — idempotent T-2h selection", () => {
   it("selects published events in the next 2h whose attendees have no confirmation, and inserts with ON CONFLICT DO NOTHING", async () => {
@@ -88,6 +93,28 @@ describe("runAttendanceReminderSweep — idempotent T-2h selection", () => {
     expect(summary.created).toBe(0);
     expect(summary.suppressed).toBe(0);
     consoleSpy.mockRestore();
+  });
+
+  it("removes the at-most-once marker after a Gmail failure so the next sweep can retry", async () => {
+    Object.assign(process.env, {
+      EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "gmail",
+      GMAIL_CLIENT_ID: "id", GMAIL_CLIENT_SECRET: "secret",
+      GMAIL_REFRESH_TOKEN: "refresh", GMAIL_SENDER_EMAIL: "support@keepitup.social",
+    });
+    vi.mocked(sendGmailEmail).mockRejectedValue(new Error("provider unavailable"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { queries } = mockDbSequence([
+      [{ event_id: EVENT_ID, sport: "Tennis", public_area_label: "Floreasca", public_city: "Bucharest", starts_at: FUTURE, time_zone: "Europe/Bucharest", member_id: 202, email: "ana@example.com", first_name: "Ana" }],
+      [{ id: "new-conf" }],
+      [],
+    ]);
+
+    const summary = await runAttendanceReminderSweep(NOW);
+    expect(summary.failed).toBe(1);
+    expect(summary.sent).toBe(0);
+    expect(queries[2]).toContain("DELETE FROM event_attendance_confirmations");
+    expect(queries[2]).toContain("new-conf");
+    errorSpy.mockRestore();
   });
 });
 

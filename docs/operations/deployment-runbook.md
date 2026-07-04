@@ -59,8 +59,10 @@ routes, the cron-authorized session-cleanup endpoint).
    | `APP_PUBLIC_ORIGIN` | Canonical server origin for email links | The deployed origin | Never derived from request headers. |
    | `NEXT_PUBLIC_APP_ORIGIN` | Client-side origin (in the browser bundle) | The deployed origin | |
    | `NODE_ENV` | `production` | Vercel default | Pin for clarity. |
-   | `EMAIL_DELIVERY_ENABLED` | `false` until Gate 4 | keep disabled | No real mail until an owner-approved provider exists. |
-   | `EMAIL_DELIVERY_PROVIDER` | provider id once Gate 4 lands | Gate 4 | Empty until then. |
+   | `EMAIL_DELIVERY_ENABLED` | master transactional-mail switch | keep `false` through setup | Flip only after the owner-authorized Gmail test send succeeds. |
+   | `EMAIL_DELIVERY_PROVIDER` | `gmail` | owner-approved Gate 4 choice | Adapter still fails closed until every required Gmail value exists. |
+   | `GMAIL_CLIENT_ID` / `GMAIL_CLIENT_SECRET` / `GMAIL_REFRESH_TOKEN` | narrow owner-authorized Gmail API credentials | Google OAuth + Vercel secrets | Never commit or paste into chat; use the send-only authorization. |
+   | `GMAIL_SENDER_EMAIL` / `GMAIL_SENDER_NAME` / `GMAIL_REPLY_TO` | verified From identity and replies | Gmail “Send mail as” configuration | Use the verified support alias; missing/unsafe values disable delivery. |
    | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | shared rate-limit store | Upstash (owner step 4) | **Both** required to activate the shared limiter; otherwise in-memory fallback. |
    | `SENTRY_DSN` | error reporting (EU region) | Sentry (owner step 5) | |
    | `CRON_SECRET` | shared bearer for the session-cleanup + attendance-reminder crons | generate a long random value | The cron endpoints **fail closed** if unset (never run unauthenticated). |

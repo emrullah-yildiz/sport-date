@@ -13,6 +13,7 @@ import {
   type AttendanceStatus,
 } from "@/lib/attendance-confirmation";
 import { getDatabase } from "@/lib/db";
+import { sendGmailEmail } from "@/lib/gmail-email-delivery";
 
 // DB operations for the T-2h attendance confirmation loop
 // (CX-20260704-feature-event-attendance-confirmation). Pure token/window/email
@@ -146,7 +147,7 @@ async function releaseSeatAndCancel(eventId: string, memberId: string, confirmat
  * (event_id, member_id) + `ON CONFLICT DO NOTHING` + the "no row yet" filter make
  * overlapping cron runs safe — an attendee is reminded at most once.
  */
-export async function runAttendanceReminderSweep(now: Date = new Date()): Promise<{ created: number; simulated: number; suppressed: number }> {
+export async function runAttendanceReminderSweep(now: Date = new Date()): Promise<{ created: number; sent: number; simulated: number; suppressed: number; failed: number }> {
   const sql = getDatabase();
   const nowIso = now.toISOString();
   const candidates = await sql`
@@ -170,8 +171,10 @@ export async function runAttendanceReminderSweep(now: Date = new Date()): Promis
 
   const origin = resolveAuthEmailOrigin() ?? "https://keepitup.social";
   let created = 0;
+  let sent = 0;
   let simulated = 0;
   let suppressed = 0;
+  let failed = 0;
 
   for (const candidate of candidates) {
     const token = generateAttendanceToken();
@@ -195,12 +198,24 @@ export async function runAttendanceReminderSweep(now: Date = new Date()): Promis
       city: candidate.public_city,
       whenLabel: formatWhen(candidate.starts_at, candidate.time_zone),
     });
-    const result = await dispatchAttendanceReminderEmail(draft);
-    if (result.state === "simulated") simulated += 1;
-    else suppressed += 1;
+    try {
+      const result = await dispatchAttendanceReminderEmail(draft, { send: async (email) => { await sendGmailEmail(email); } });
+      if (result.state === "simulated") simulated += 1;
+      else if (result.state === "sent") sent += 1;
+      else suppressed += 1;
+    } catch {
+      failed += 1;
+      // The insert is the at-most-once marker. Remove it after a provider failure
+      // so the next sweep can retry instead of permanently stranding this reminder.
+      await sql`
+        DELETE FROM event_attendance_confirmations
+        WHERE id = ${inserted[0].id}::uuid AND status = 'pending'
+      `;
+      console.error("Attendance reminder delivery failed; it will be retried on the next sweep.");
+    }
   }
 
-  return { created, simulated, suppressed };
+  return { created, sent, simulated, suppressed, failed };
 }
 
 // ── In-app (authenticated) member + host operations ──────────────────────────

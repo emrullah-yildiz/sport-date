@@ -32,7 +32,9 @@ export async function POST(request: Request) {
       success: true,
       delivery: result.delivery.state,
       message:
-        result.delivery.state === "simulated"
+        result.delivery.state === "sent"
+          ? "Verification instructions were sent to your email address."
+          : result.delivery.state === "simulated"
           ? "A verification flow has been prepared and simulated delivery is enabled for development."
           : result.delivery.state === "ready"
             ? "A verification flow has been prepared and the delivery payload is ready for a transactional provider."

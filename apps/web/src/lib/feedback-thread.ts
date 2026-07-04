@@ -7,6 +7,8 @@
 // member UI. Product feedback ONLY — safety reports live on the moderation path.
 
 /** The honest, member-visible status lifecycle. No fake "resolved". */
+import { resolveTransactionalEmailProvider, type EmailDeliveryEnvironment } from "@/lib/email-provider";
+
 export const MEMBER_FEEDBACK_STATUSES = [
   "received",
   "in_review",
@@ -47,8 +49,8 @@ export function normalizeMemberFeedbackStatus(raw: unknown): MemberFeedbackStatu
 
 // ── Member update notification, built DARK (mirrors the auth/attendance gate) ──
 
-export type FeedbackEmailProvider = "disabled" | "console";
-type EmailEnvironment = Readonly<Record<string, string | undefined>>;
+export type FeedbackEmailProvider = "disabled" | "console" | "gmail";
+type EmailEnvironment = EmailDeliveryEnvironment;
 
 /**
  * FAIL CLOSED: unless `EMAIL_DELIVERY_ENABLED === "true"` with a provider chosen,
@@ -57,8 +59,7 @@ type EmailEnvironment = Readonly<Record<string, string | undefined>>;
  * provision an ESP and flip the flag.
  */
 export function resolveFeedbackEmailProvider(env: EmailEnvironment): FeedbackEmailProvider {
-  if (env.EMAIL_DELIVERY_ENABLED !== "true") return "disabled";
-  return env.EMAIL_DELIVERY_PROVIDER === "console" ? "console" : "disabled";
+  return resolveTransactionalEmailProvider(env);
 }
 
 export type FeedbackUpdateDraft = Readonly<{ to: string; subject: string; text: string; trackUrl: string }>;
@@ -90,7 +91,7 @@ export function buildFeedbackUpdateEmail(input: {
   };
 }
 
-export type FeedbackEmailDispatchResult = Readonly<{ state: "disabled" | "simulated"; provider: FeedbackEmailProvider }>;
+export type FeedbackEmailDispatchResult = Readonly<{ state: "disabled" | "simulated" | "sent"; provider: FeedbackEmailProvider }>;
 
 /**
  * Dispatch the member-update email through the gated seam. DARK by default: the
@@ -111,6 +112,11 @@ export async function dispatchFeedbackNotification(
   if (provider === "console") {
     log("Simulated feedback-update email (delivery is in console/dark mode)", { to: draft.to, subject: draft.subject });
     return { state: "simulated", provider };
+  }
+  if (provider === "gmail") {
+    if (!options.send) throw new Error("Gmail feedback sender is unavailable.");
+    await options.send(draft);
+    return { state: "sent", provider };
   }
   log("Feedback-update email suppressed (EMAIL_DELIVERY_ENABLED is not 'true')", { to: draft.to });
   return { state: "disabled", provider };

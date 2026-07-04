@@ -49,16 +49,16 @@ A note on honesty: nothing below is urgent in a fabricated sense. The product is
 
 ---
 
-## Gate 4 — Email provider selection and credentials
+## Gate 4 — Gmail credentials and activation
 
-**Unblocks:** real email-verification and password-reset delivery (the delivery adapter is built, default-disabled, and provider-gated); the "Email verification and password reset" roadmap item's final step ("sending real emails still requires an owner-approved email provider"); and any future transactional/marketing send.
+**Unblocks:** real email-verification, password-reset, attendance-reminder, and feedback-update delivery. Gmail is owner-approved and the shared adapter is built, tested, default-disabled, and provider-gated.
 
-- **Decision needed:** which transactional email provider to use and authorization to enable real sending, with EU-appropriate data handling.
-- **Recommendation:** select one EU-friendly transactional provider for transactional-only mail (verification, reset), kept behind the existing single adapter seam, with suppression handling and a Data Processing Agreement reviewed under Gate 2. Enable it only after a deployed origin (Gate 1) and counsel review (Gate 2) exist, so links resolve to the canonical production origin and the processor relationship is lawful.
-- **Alternative A:** self-hosted SMTP — maximum control over data, but materially higher deliverability and operational burden, and weaker reputation handling for a new domain.
-- **Alternative B:** defer email entirely and keep both flows on the development console simulation until validation proves demand — zero provider cost, but no real verification or reset mail can be delivered, so the signup flow stays a preview.
-- **Consequence of delay:** no real verification or reset email can be sent; both flows remain testable only via the console simulation; external registration cannot proceed. No user impact today.
-- **Exact action requested:** approve a provider, create the account under owner ownership, supply API credentials via the secret manager, and confirm the sending domain (depends on Gate 1's domain). Authorize enabling delivery only when Gates 1 and 2 are also satisfied.
+- **Decision status:** resolved — the owner approved Gmail for private-beta transactional delivery.
+- **Recommendation:** use the narrow Gmail send authorization with the verified support alias, keep the master switch off through setup, and send one owner-approved test before activation. Move to a dedicated transactional provider before Gmail's beta-scale limits or alias behavior become material.
+- **Alternative A:** keep delivery disabled and continue console simulation; safe, but members receive no verification/reset/reminder mail.
+- **Alternative B:** replace Gmail later with a dedicated EU-oriented provider behind the same adapter boundary; better at scale, but unnecessary for the current private beta.
+- **Consequence of delay:** the code remains safely dark; verification, reset, reminders, and feedback updates remain in-app/console-only.
+- **Exact action requested:** verify `support@keepitup.social` under Gmail “Send mail as”; create and authorize the narrow Gmail OAuth client; store the client id, client secret, refresh token, and sender settings directly in Vercel; then explicitly authorize one live test send and activation.
 
 ---
 
@@ -109,7 +109,7 @@ A note on honesty: nothing below is urgent in a fabricated sense. The product is
 | 1 | Production infrastructure + credentials | Deploy, monitoring, backup, domain, cleanup scheduling, plus prerequisite for Gates 4/6/7 | Approve a minimal single-region EU managed stack; supply credentials via a secret manager. |
 | 2 | EU counsel sign-off | Terms/privacy/consent, retention matrix, `requested_ip_hash` basis, deletion exceptions, feedback-triage retention | Engage counsel in parallel with country choice and hand them the prepared compliance drafts. |
 | 3 | Final brand + launch country/city | Brand screen, social packet, launch content, country-specific privacy notice, real outreach | Confirm Bucharest + the validated corridor conditioned on interview thresholds; name (or defer) the brand. |
-| 4 | Email provider + credentials | Real verification/reset delivery; transactional/marketing send | Pick one EU-friendly transactional provider behind the existing adapter; enable only after Gates 1 and 2. |
+| 4 | Gmail credentials + activation | Real verification/reset/reminder/feedback delivery | Provider approved and adapter complete; add owner-authorized OAuth secrets, verify the support alias, then test before enabling. |
 | 5 | Safety/moderation owner + rota | Messaging, critical-response targets, the moderation-owner launch gate | Name one accountable owner + backup with an escalation path, or launch with messaging disabled. |
 | 6 | Shared edge/gateway rate limiting | Pre-registration shared abuse control; closes the enumeration timing residual | Add it during the Gate 1 rollout with a shared store; agent implements once the store exists. |
 | 7 | Isolated PostgreSQL test DB | Real-SQL integration tests for the auth flows | Provide a disposable Postgres; autonomous once provided — agent writes and runs the tests. |

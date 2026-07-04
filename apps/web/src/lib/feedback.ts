@@ -6,6 +6,7 @@ import type { FeedbackCategory, FeedbackSeverity, FeedbackSurface, FeedbackTicke
 
 import { resolveAuthEmailOrigin } from "@/lib/auth-email-content";
 import { getDatabase } from "@/lib/db";
+import { sendGmailEmail } from "@/lib/gmail-email-delivery";
 import {
   MEMBER_FEEDBACK_STATUS_INFO,
   buildFeedbackUpdateEmail,
@@ -312,7 +313,11 @@ async function notifyMemberOfFeedbackUpdate(ticketId: string): Promise<void> {
       summary: row.summary,
       statusLabel: MEMBER_FEEDBACK_STATUS_INFO[status].label,
     });
-    await dispatchFeedbackNotification(draft, { env: process.env, log: (message, meta) => console.info(message, meta) });
+    await dispatchFeedbackNotification(draft, {
+      env: process.env,
+      send: async (email) => { await sendGmailEmail(email); },
+      log: (message, meta) => console.info(message, meta),
+    });
   } catch (error) {
     console.error("Feedback-update notification failed (non-fatal):", error);
   }

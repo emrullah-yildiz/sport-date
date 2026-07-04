@@ -37,7 +37,9 @@ function normalizeOrigin(raw: string | undefined): string | null {
 
 export function resolveAuthEmailOrigin(env: AuthEmailEnvironment = process.env): string | null {
   return (
-    normalizeOrigin(env.APP_BASE_URL)
+    normalizeOrigin(env.APP_PUBLIC_ORIGIN)
+    ?? normalizeOrigin(env.APP_BASE_URL)
+    ?? normalizeOrigin(env.NEXT_PUBLIC_APP_ORIGIN)
     ?? normalizeOrigin(env.NEXT_PUBLIC_APP_URL)
     ?? normalizeOrigin(env.SITE_URL)
   );

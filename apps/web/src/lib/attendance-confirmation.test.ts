@@ -13,6 +13,7 @@ import {
 } from "./attendance-confirmation";
 
 const NOW = new Date("2026-08-15T12:00:00.000Z");
+const gmailEnv = { EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "gmail", GMAIL_CLIENT_ID: "id", GMAIL_CLIENT_SECRET: "secret", GMAIL_REFRESH_TOKEN: "refresh", GMAIL_SENDER_EMAIL: "support@keepitup.social" };
 
 describe("reminder window + token expiry", () => {
   it("is in-window only for a future start within the next 2 hours", () => {
@@ -50,6 +51,7 @@ describe("dark email gate (fail closed)", () => {
     expect(resolveAttendanceEmailProvider({ EMAIL_DELIVERY_ENABLED: "false", EMAIL_DELIVERY_PROVIDER: "console" })).toBe("disabled");
     expect(resolveAttendanceEmailProvider({ EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "console" })).toBe("console");
     expect(canSendAttendanceEmails({})).toBe(false);
+    expect(resolveAttendanceEmailProvider(gmailEnv)).toBe("gmail");
   });
 
   it("NEVER invokes the real sender while delivery is off (the dark no-op path)", async () => {
@@ -73,6 +75,13 @@ describe("dark email gate (fail closed)", () => {
     expect(result.state).toBe("simulated");
     expect(send).not.toHaveBeenCalled();
     expect(log).toHaveBeenCalled();
+  });
+
+  it("invokes Gmail only after the complete fail-closed configuration resolves", async () => {
+    const send = vi.fn().mockResolvedValue(undefined);
+    const result = await dispatchAttendanceReminderEmail(buildAttendanceReminderEmail(baseInput()), { env: gmailEnv, send });
+    expect(result).toEqual({ state: "sent", provider: "gmail" });
+    expect(send).toHaveBeenCalledOnce();
   });
 });
 

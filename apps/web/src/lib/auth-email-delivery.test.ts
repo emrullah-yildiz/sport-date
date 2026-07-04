@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
+vi.mock("@/lib/gmail-email-delivery", () => ({ sendGmailEmail: vi.fn().mockResolvedValue({ messageId: "gmail-message-1" }) }));
 
 import { dispatchAuthEmail, canSendAuthEmails, resolveAuthEmailProvider } from "./auth-email-delivery";
 
@@ -18,6 +19,15 @@ const draft = {
   },
 };
 
+const gmailEnv = {
+  EMAIL_DELIVERY_ENABLED: "true",
+  EMAIL_DELIVERY_PROVIDER: "gmail",
+  GMAIL_CLIENT_ID: "client-id",
+  GMAIL_CLIENT_SECRET: "client-secret",
+  GMAIL_REFRESH_TOKEN: "refresh-token",
+  GMAIL_SENDER_EMAIL: "support@keepitup.social",
+};
+
 describe("auth email delivery", () => {
   it("stays disabled by default", () => {
     expect(resolveAuthEmailProvider({})).toBe("disabled");
@@ -28,6 +38,12 @@ describe("auth email delivery", () => {
     expect(resolveAuthEmailProvider({ EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "console" })).toBe("console");
     expect(canSendAuthEmails({ EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "console" })).toBe(true);
     expect(resolveAuthEmailProvider({ EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "unknown" })).toBe("disabled");
+  });
+
+  it("enables Gmail only when every credential and the sender alias are configured", () => {
+    expect(resolveAuthEmailProvider(gmailEnv)).toBe("gmail");
+    expect(canSendAuthEmails(gmailEnv)).toBe(true);
+    expect(resolveAuthEmailProvider({ ...gmailEnv, GMAIL_REFRESH_TOKEN: "" })).toBe("disabled");
   });
 
   it("simulates delivery through the console adapter without external network calls", async () => {
@@ -44,5 +60,9 @@ describe("auth email delivery", () => {
     expect(info).toHaveBeenCalledOnce();
 
     info.mockRestore();
+  });
+
+  it("reports a real Gmail dispatch as sent", async () => {
+    await expect(dispatchAuthEmail(draft, gmailEnv)).resolves.toEqual({ state: "sent", provider: "gmail", messageId: "gmail-message-1" });
   });
 });

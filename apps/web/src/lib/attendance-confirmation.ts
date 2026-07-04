@@ -9,6 +9,7 @@
 import crypto from "node:crypto";
 
 import { SUPPORT_EMAIL } from "@/lib/brand";
+import { resolveTransactionalEmailProvider, type EmailDeliveryEnvironment } from "@/lib/email-provider";
 
 /** How far ahead of an event start the confirmation loop opens. */
 export const ATTENDANCE_REMINDER_WINDOW_MS = 2 * 60 * 60 * 1000;
@@ -52,8 +53,8 @@ export function hashAttendanceToken(raw: string): string {
 
 // ── Dark email gate (mirrors auth-email-delivery + photo-storage fail-closed) ──
 
-export type AttendanceEmailProvider = "disabled" | "console";
-type EmailEnvironment = Readonly<Record<string, string | undefined>>;
+export type AttendanceEmailProvider = "disabled" | "console" | "gmail";
+type EmailEnvironment = EmailDeliveryEnvironment;
 
 /**
  * Resolve the email provider. FAIL CLOSED: unless delivery is explicitly enabled
@@ -62,8 +63,7 @@ type EmailEnvironment = Readonly<Record<string, string | undefined>>;
  * provision an ESP and flip the flag — the same gate the auth emails use.
  */
 export function resolveAttendanceEmailProvider(env: EmailEnvironment = process.env): AttendanceEmailProvider {
-  if (env.EMAIL_DELIVERY_ENABLED !== "true") return "disabled";
-  return env.EMAIL_DELIVERY_PROVIDER === "console" ? "console" : "disabled";
+  return resolveTransactionalEmailProvider(env);
 }
 
 export function canSendAttendanceEmails(env: EmailEnvironment = process.env): boolean {
@@ -171,6 +171,12 @@ export async function dispatchAttendanceReminderEmail(
       cancelUrl: draft.cancelUrl,
     });
     return { state: "simulated", provider };
+  }
+
+  if (provider === "gmail") {
+    if (!options.send) throw new Error("Gmail attendance sender is unavailable.");
+    await options.send(draft);
+    return { state: "sent", provider };
   }
 
   // provider === "disabled": fail closed — nothing is sent, nothing is simulated.

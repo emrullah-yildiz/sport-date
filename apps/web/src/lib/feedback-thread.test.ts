@@ -79,4 +79,12 @@ describe("feedback-update email is DARK by default", () => {
     expect(result).toEqual({ state: "disabled", provider: "disabled" });
     expect(send).not.toHaveBeenCalled();
   });
+
+  it("uses the injected Gmail sender only with a complete configuration", async () => {
+    const env = { EMAIL_DELIVERY_ENABLED: "true", EMAIL_DELIVERY_PROVIDER: "gmail", GMAIL_CLIENT_ID: "id", GMAIL_CLIENT_SECRET: "secret", GMAIL_REFRESH_TOKEN: "refresh", GMAIL_SENDER_EMAIL: "support@keepitup.social" };
+    const send = vi.fn().mockResolvedValue(undefined);
+    const draft = buildFeedbackUpdateEmail({ origin: "https://keepitup.social", ticketId: "a", to: "ana@example.com", firstName: "Ana", summary: "Map", statusLabel: "In review" });
+    await expect(dispatchFeedbackNotification(draft, { env, send })).resolves.toEqual({ state: "sent", provider: "gmail" });
+    expect(send).toHaveBeenCalledOnce();
+  });
 });

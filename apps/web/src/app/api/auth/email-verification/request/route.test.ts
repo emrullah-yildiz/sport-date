@@ -69,6 +69,22 @@ describe("email verification request route", () => {
     expect(issueEmailVerificationTokenForUser).toHaveBeenCalledWith(SIGNED_IN_USER.id, SIGNED_IN_USER.email);
   });
 
+  it("reports successful Gmail delivery without exposing provider credentials", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(SIGNED_IN_USER as never);
+    vi.mocked(issueEmailVerificationTokenForUser).mockResolvedValue({
+      state: "created",
+      delivery: { state: "sent", origin: "https://keepitup.social", draft: null, provider: "gmail", messageId: "gmail-1" },
+    } as never);
+
+    const response = await POST(postRequest({}));
+    expect(response.status).toBe(202);
+    await expect(response.json()).resolves.toEqual({
+      success: true,
+      delivery: "sent",
+      message: "Verification instructions were sent to your email address.",
+    });
+  });
+
   it("acknowledges an already-verified account without exposing token internals", async () => {
     vi.mocked(getCurrentUser).mockResolvedValue(SIGNED_IN_USER as never);
     vi.mocked(issueEmailVerificationTokenForUser).mockResolvedValue({

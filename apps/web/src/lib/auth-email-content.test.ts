@@ -9,6 +9,7 @@ import {
 
 describe("auth email content", () => {
   it("resolves a canonical public origin from environment values", () => {
+    expect(resolveAuthEmailOrigin({ APP_PUBLIC_ORIGIN: "https://keepitup.social" })).toBe("https://keepitup.social");
     expect(resolveAuthEmailOrigin({ APP_BASE_URL: "https://sportdate.example/app?ignored=yes" })).toBe("https://sportdate.example");
     expect(resolveAuthEmailOrigin({ NEXT_PUBLIC_APP_URL: "https://beta.sportdate.example/" })).toBe("https://beta.sportdate.example");
     expect(resolveAuthEmailOrigin({ APP_BASE_URL: "mailto:test@example.com", SITE_URL: "https://fallback.example" })).toBe("https://fallback.example");

@@ -1,5 +1,13 @@
 # Decision log
 
+## 2026-07-04 - Gmail is the private-beta transactional email provider
+
+The owner approved their connected Gmail account as the temporary private-beta sender, using the verified `support@keepitup.social` alias. One server-only Gmail API adapter now serves email verification, password reset, T-2h attendance reminders, and feedback-thread updates. It requests only the owner-authorized send capability; the application does not read or modify the mailbox. The adapter exchanges a refresh token for short-lived access tokens, builds multipart text/HTML MIME, and returns only Gmail’s message id. It never logs OAuth secrets or email bodies.
+
+Delivery remains fail-closed: `EMAIL_DELIVERY_ENABLED=true`, `EMAIL_DELIVERY_PROVIDER=gmail`, all four required OAuth/sender values, and a canonical application origin must be present. Missing or malformed configuration resolves to disabled. Secrets belong in Vercel, never Git or chat. This is deliberately a beta-scale bridge: Gmail’s standard-account send limits and possible exposure of the underlying Gmail address behind an alias make a dedicated transactional provider the later scale path.
+
+Attendance reminders retain retry safety: if Gmail fails after the at-most-once confirmation marker is inserted, that pending marker is removed, allowing the next scheduled sweep to retry. Provider failures never convert into a false “sent” result and never expose OAuth or message content in logs.
+
 ## 2026-07-04 - Host request queues cannot depend on optional sport-profile rows
 
 Members are allowed to request an event without listing that sport in their profile. Every downstream host/room query must therefore treat the matching `user_sports` row as optional. The host queue and accepted-participant room query now use a left join with an honest “not listed” skill fallback; an absent sport row can no longer hide a valid pending request, its approve/pass controls, or an accepted participant. Host authorization remains embedded in the event join condition, and precise location is still disclosed only after acceptance.
