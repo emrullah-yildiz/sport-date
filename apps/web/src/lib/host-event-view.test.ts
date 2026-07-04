@@ -15,10 +15,14 @@ describe("resolveHostEventView", () => {
     expect(resolveHostEventView("evt_1", { published: ["0", "1"] }).justPublished).toBe(false);
   });
 
-  it("shares and links to the discovery view so the precise meeting point is never exposed", () => {
+  it("shares and links only to public-safe views so the precise meeting point is never exposed", () => {
     const view = resolveHostEventView("evt_42", { published: "1" });
+    // The host's own preview stays on the authenticated member view.
     expect(view.publicInvitationPath).toBe("/discover/events/evt_42");
     expect(view.publicInvitationPath.startsWith("/discover/")).toBe(true);
+    // The copyable share link is the unauthenticated public invite (CX-20260704),
+    // which carries even less data and renders a rich OG preview.
+    expect(view.shareInvitePath).toBe("/e/evt_42");
     expect(view.managePath).toBe("/hosting");
   });
 });

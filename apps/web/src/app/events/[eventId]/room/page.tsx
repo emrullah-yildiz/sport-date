@@ -59,6 +59,9 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   // calm next step: share the approximate-only public invitation or manage the event.
   const hostAwaitingFirstPlace = room.isHost && room.participants.length === 0;
   const publicInvitationPath = `/discover/events/${room.id}`;
+  // The copyable share link is the UNAUTHENTICATED public invite (CX-20260704):
+  // structured discovery-safe facts only, rich OG preview, never the venue.
+  const shareInvitePath = `/e/${room.id}`;
   // An accepted, non-host attendee who is currently the only participant (just
   // themselves, alongside the host) gets a calm "you're the first" note rather than an
   // absence — never the "0 people joining" contradiction with their own presence.
@@ -179,7 +182,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
                 accepted members will appear as they join.
               </p>
               <p className="room-people-empty-hint">Want to help it along? Share the invitation — it only ever reveals the approximate area, never the exact meeting point.</p>
-              <ShareEventLink path={publicInvitationPath} />
+              <ShareEventLink path={shareInvitePath} />
               <div className="room-people-empty-actions">
                 <Link href={publicInvitationPath} className="room-people-empty-primary">
                   View the public invitation <span aria-hidden="true">→</span>

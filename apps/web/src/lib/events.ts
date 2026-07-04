@@ -2,6 +2,7 @@ import "server-only";
 
 import { getDatabase } from "@/lib/db";
 import { coarsenCoordinates } from "@/lib/discovery-geo";
+import { publicEventInviteFromRow, type PublicEventInvite, type PublicEventInviteRow } from "@/lib/public-event-invite";
 import { type EventUpdateAttendanceIntent } from "@/lib/event-update-intents";
 import { summarizeEventUpdate, type EventUpdateField, type EventUpdateNotice, type EventUpdateSeverity } from "@/lib/event-updates";
 
@@ -306,6 +307,44 @@ export async function getDiscoverableEvent(user: { id: string; age: number }, ev
     request: row.request_id ? { id: row.request_id, status: row.request_status!, skipCount: row.request_skip_count ?? 0 } : null,
     viewerIsHost: String(row.host_user_id) === String(user.id),
   };
+}
+
+/**
+ * The UNAUTHENTICATED public share view of an event (`/e/{id}` and its OG image —
+ * CX-20260704-growth-shareable-event-invite-og-image). This is the only event read
+ * with NO viewer, so it selects strictly LESS than any authenticated view:
+ *
+ * - Only a `published` event by an active host renders; draft/cancelled/completed
+ *   (and any unknown id) return null → the route 404s with zero data leaked.
+ * - The SELECT is an explicit allowlist of structured, discovery-safe columns:
+ *   sport, welcomed levels, language, approximate area label/city/country, start
+ *   time + timezone + duration, capacity and the accepted count. It never joins
+ *   `event_private_locations`, and it deliberately omits the host-authored free
+ *   text (`title`, `description`) and every person (host name, participants) —
+ *   free text can contain the venue, and an unauthenticated page must not become
+ *   a scraping surface for either locations or people.
+ * - Defence in depth: the row is additionally passed through
+ *   `publicEventInviteFromRow`, whose output type structurally cannot carry a
+ *   venue, address, coordinate, or name (see public-event-invite.ts).
+ */
+export async function getPublicEventInvite(eventId: string): Promise<PublicEventInvite | null> {
+  if (!UUID_PATTERN.test(eventId)) return null;
+  const sql = getDatabase();
+  const rows = await sql`
+    SELECT
+      events.id, events.sport, events.experience_levels, events.language,
+      events.public_area_label, events.public_city, events.public_country_code,
+      events.starts_at, events.time_zone, events.duration_minutes, events.capacity,
+      (SELECT COUNT(*)::integer FROM event_participants WHERE event_id = events.id) AS accepted_count
+    FROM events
+    JOIN users AS host ON host.id = events.host_user_id AND host.account_status = 'active'
+    WHERE events.id = ${eventId}::uuid
+      AND events.status = 'published'
+    LIMIT 1
+  ` as unknown as PublicEventInviteRow[];
+  const row = rows[0];
+  if (!row) return null;
+  return publicEventInviteFromRow(row);
 }
 
 export async function getHostJoinRequests(eventId: string, hostId: string): Promise<HostJoinRequest[]> {

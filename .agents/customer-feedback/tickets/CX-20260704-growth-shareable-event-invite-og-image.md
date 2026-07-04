@@ -1,6 +1,6 @@
 # CX-20260704-growth-shareable-event-invite-og-image
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — turns every published event into an organic growth surface; directly compounds the now-live social engine (see `docs/marketing/`). High reach × medium effort × high confidence.
 - Customer journey: host publishes an event → shares a public invite link → friends/social see a rich preview → tap through to request a place (top-of-funnel growth + liquidity).
@@ -27,6 +27,10 @@ Give every published event a **shareable public invite link** with a **rich, on-
 - Anti-dark-pattern: no fake scarcity ("only 1 spot!" unless literally true), no manipulative urgency.
 - Privacy by design: exact location/PII must never appear in the public view, OG image, or meta tags.
 - Only surface implemented fields; don't invent social proof / attendee names.
+
+## Handoff log
+
+- 2026-07-04T00:00Z | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
 
 ## Why (CEO note)
 

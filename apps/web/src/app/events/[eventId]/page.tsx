@@ -125,7 +125,7 @@ export default async function HostEventPage({
             <Link href={view.publicInvitationPath} className="host-published-primary">View the public invitation <span aria-hidden="true">→</span></Link>
             <Link href={view.managePath}>Manage your events</Link>
           </div>
-          <ShareEventLink path={view.publicInvitationPath} />
+          <ShareEventLink path={view.shareInvitePath} />
         </section>
       ) : null}
 
@@ -145,6 +145,20 @@ export default async function HostEventPage({
       <div className="host-room-link">
         <Link href={`/events/${event.id}/room`}>Open the event room →</Link>
       </div>
+
+      {event.status === "published" ? (
+        <section className="host-share-card" aria-labelledby="host-share-heading">
+          <p className="panel-label">Grow the group</p>
+          <h2 id="host-share-heading">Share this invitation anywhere.</h2>
+          <p>
+            The public link works without an account and previews with a rich card in chats
+            and social apps. It shows only the sport, level, approximate area, time, and
+            places left — never the exact meeting point, your name, or any address.
+          </p>
+          <ShareEventLink path={view.shareInvitePath} />
+          <Link href={view.shareInvitePath} className="host-share-preview">See the public invite page →</Link>
+        </section>
+      ) : null}
 
       {room?.latestCriticalUpdateId ? (
         <section className="host-recovery-card">

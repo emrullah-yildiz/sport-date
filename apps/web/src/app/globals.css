@@ -1325,3 +1325,40 @@ button.room-leave-danger:disabled,.room-leave-stay:disabled { opacity: .55; curs
 button:disabled:hover, button[disabled]:hover {
   box-shadow: none;
 }
+
+/* ---- Public shareable event invite (/e/{id} — CX-20260704) + host share card.
+   The unauthenticated landing for a shared invitation: one calm card with the
+   discovery-safe facts, the privacy guarantee stated plainly, and the join CTA
+   into the existing signup/login flow. Reuses the landing navbar/btn chrome. */
+.public-invite-page { min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(180deg, var(--bg) 0%, #0E1512 100%); }
+.public-invite-page > .landing-shell { flex: 1; display: grid; align-content: start; gap: 26px; padding: 56px 0 70px; }
+.public-invite-card { max-width: 760px; display: grid; gap: 20px; padding: 38px 40px; border-radius: 26px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.public-invite-card .eyebrow { color: var(--accent); }
+.public-invite-card h1 { margin: 0; font-size: var(--fs-h1); line-height: 1.1; }
+.public-invite-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 0; }
+.public-invite-facts > div { display: grid; gap: 6px; padding: 15px 17px; border-radius: 15px; background: var(--surface-raised); }
+.public-invite-facts dt { margin: 0; color: var(--text-muted); font-size: var(--fs-label); font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.public-invite-facts dd { margin: 0; color: var(--text); font-weight: 700; line-height: 1.35; }
+.public-invite-facts time { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; }
+.public-invite-day { color: var(--text); }
+.public-invite-time { color: var(--accent); }
+.public-invite-privacy { max-width: 640px; margin: 0; padding-left: 14px; border-left: 3px solid var(--accent); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
+.public-invite-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 4px; }
+.public-invite-cta-note { width: 100%; max-width: 620px; margin: 0; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
+.public-invite-footer { color: var(--text-muted); font-size: var(--fs-small); }
+.public-invite-footer p { margin: 0; }
+.public-invite-footer a { color: var(--accent-info); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.public-invite-footer a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 750px) { .public-invite-card { padding: 26px 22px; } .public-invite-facts { grid-template-columns: 1fr 1fr; } .public-invite-cta .btn { width: 100%; } }
+
+/* Host-side "share this invitation" card on /events/{id} (anthracite surface, so
+   the shared ShareEventLink button is re-tinted from its lime-card defaults). */
+.host-share-card { max-width: 1120px; margin: 0 auto 12px; display: grid; gap: 12px; padding: 28px 30px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); color: var(--text); }
+.host-share-card .panel-label { color: var(--accent) !important; }
+.host-share-card h2 { margin: 0; font-size: var(--fs-h2); }
+.host-share-card > p:not(.panel-label) { max-width: 720px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+.host-share-card .share-event-button { border-color: var(--accent); color: var(--accent); }
+.host-share-card .share-event-button:hover { background: rgba(59,234,126,.12); }
+.host-share-card .share-event-status { color: var(--text-muted); }
+.host-share-preview { display: inline-flex; align-items: center; min-height: 44px; justify-self: start; color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+.host-share-preview:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
