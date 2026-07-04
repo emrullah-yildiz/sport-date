@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   getEventRoom: vi.fn(),
   getPeerFeedbackTargets: vi.fn(),
+  getViewerAttendanceState: vi.fn(() => Promise.resolve(null)),
   notFound: vi.fn(() => {
     throw new Error("notFound");
   }),
@@ -22,6 +23,7 @@ vi.mock("next/navigation", () => ({
 vi.mock("@/lib/session", () => ({ getCurrentUser: mocks.getCurrentUser }));
 vi.mock("@/lib/events", () => ({ getEventRoom: mocks.getEventRoom }));
 vi.mock("@/lib/peer-feedback", () => ({ getPeerFeedbackTargets: mocks.getPeerFeedbackTargets }));
+vi.mock("@/lib/attendance-confirmations", () => ({ getViewerAttendanceState: mocks.getViewerAttendanceState }));
 
 import EventRoomPage from "./page";
 

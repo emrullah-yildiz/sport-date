@@ -258,6 +258,29 @@ procedure for every secret: **rotate at the provider → update the Vercel env v
 - **Verify:** trigger the cron from Vercel ("Run" on the cron) and confirm a
   `200` with a summary, or inspect the function logs for the daily run.
 
+### 7b. Scheduled job — attendance reminders (Vercel Cron)
+
+- **Definition:** `apps/web/vercel.json` → `crons` runs `GET
+  /api/internal/attendance-reminders` every 15 minutes (`*/15 * * * *`).
+  Sub-daily crons require a Vercel plan that permits them.
+- **What it does:** the idempotent T-2h attendance sweep
+  (`runAttendanceReminderSweep`) — for each published event starting within 2h,
+  creates one `pending` confirmation + token per accepted attendee that has none
+  yet, and dispatches the reminder email through the DARK gate. `UNIQUE
+  (event_id, member_id)` + `ON CONFLICT DO NOTHING` make re-runs safe.
+- **Auth:** same shared `Authorization: Bearer ${CRON_SECRET}`, fails closed
+  exactly like session-cleanup (no secret ⇒ 401, never runs unauthenticated).
+- **Email is DARK:** the sweep composes the reminder but sends nothing unless
+  `EMAIL_DELIVERY_ENABLED === "true"` with a provider configured — until then
+  each send is a logged no-op (`suppressed` in the summary), and the confirm/
+  cancel tokens + in-app prompt work regardless. Turning it on is an owner
+  action (provision an ESP, flip the flag); the links expose the approximate
+  area only, never the exact venue.
+- **Migration dependency:** requires `033_event_attendance_confirmations.sql`
+  applied (the deploy-time auto-migrate handles this before the new code serves).
+- **Responses:** `200 { success, summary:{created,simulated,suppressed} }`;
+  `503` if the DB is unconfigured; `500` on unexpected failure (logged).
+
 ---
 
 ## 8. Monitoring

@@ -1,6 +1,6 @@
 # CX-20260704-feature-event-attendance-confirmation
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — owner-requested (2026-07-04). No-shows are the #1 killer of small-group events; a T-2h confirm/cancel loop protects liquidity and frees spots for others.
 - Customer journey: ~2 hours before an event starts, each accepted attendee is asked "Still coming?" → they Approve (confirm) or Cancel (release their spot) → host sees a live confirmed count; a cancelled spot reopens.
@@ -24,6 +24,10 @@ A **T-2h attendance confirmation** loop for accepted attendees, delivered **in-a
 - **DB:** additive migration — `event_attendance_confirmations` (id, event_id, member_id, status pending|confirmed|cancelled, token_hash, reminded_at, responded_at, created_at; unique (event_id, member_id)). Store only a token HASH, never raw.
 - typecheck / lint / test / prod build green; tests cover: the T-2h selection window + idempotency, token confirm/cancel effects, cancel releases a spot, expired/invalid/foreign token rejected, and the dark-email no-op path (asserts nothing sends when the flag is off).
 - **Docs updated:** document the scheduler, the confirmation lifecycle, the token design, and the email-gate dependency in the relevant docs.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, status → `in-progress` (Experience Build Agent, implementation owner per ticket).
 
 ## Guardrails
 

@@ -1428,3 +1428,36 @@ button:disabled:hover, button[disabled]:hover {
 .room-chat-message-deleted { margin: 0; color: var(--text-muted); font-style: italic; font-size: 14px; }
 /* Pre-acceptance note: the group chat opens once accepted (CX-20260704). */
 .event-detail-chat-locked { margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
+
+/* T-2h attendance confirmation loop (CX-20260704). Mobile-first, 44px targets. */
+.attendance-page { min-height: 100vh; background: linear-gradient(180deg, var(--bg) 0%, #0E1512 100%); }
+.attendance-shell { display: grid; padding: 48px 0 70px; max-width: 640px; }
+.attendance-card { display: grid; gap: 18px; padding: 34px 32px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.attendance-card .eyebrow { color: var(--accent); }
+.attendance-card h1 { margin: 0; font-size: var(--fs-h1); line-height: 1.1; }
+.attendance-facts { display: grid; gap: 10px; margin: 4px 0 0; }
+.attendance-facts > div { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; background: var(--surface-raised); }
+.attendance-facts dt { margin: 0; color: var(--text-muted); font-size: var(--fs-label); font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.attendance-facts dd { margin: 0; color: var(--text); font-weight: 700; }
+.attendance-privacy { margin: 0; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
+.attendance-action { display: flex; }
+.attendance-action .btn { width: 100%; }
+.attendance-result { margin: 0; padding: 16px 18px; border-radius: 14px; background: var(--surface-raised); color: var(--text); line-height: 1.55; }
+.attendance-alt { margin: 0; text-align: center; }
+.attendance-alt a { color: var(--accent-info); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.attendance-alt a:focus-visible, .attendance-card a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+/* In-app T-2h prompt on the event room. */
+.attendance-prompt { max-width: 1120px; margin: 18px auto 0; display: grid; gap: 12px; padding: 26px 30px; border-radius: 24px; background: radial-gradient(circle at 90% 0%, rgba(59,234,126,.14), transparent 42%), var(--surface); border: 1px solid var(--line); color: var(--text); }
+.attendance-prompt .panel-label { color: var(--accent) !important; }
+.attendance-prompt h2 { margin: 0; font-size: var(--fs-h2); }
+.attendance-prompt-lede, .attendance-prompt-confirmed { max-width: 720px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+.attendance-prompt-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.attendance-prompt-error { margin: 0; color: var(--danger); font-size: var(--fs-small); }
+/* Host-only attendance breakdown on the event page. */
+.host-attendance { max-width: 1120px; margin: 0 auto 12px; display: grid; gap: 10px; padding: 26px 30px; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); color: var(--text); }
+.host-attendance .panel-label { color: var(--accent) !important; }
+.host-attendance h2 { margin: 0; font-size: var(--fs-h2); }
+.host-attendance > p { max-width: 720px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+.host-attendance-counts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.host-attendance-counts span { padding: 10px 16px; border-radius: 999px; background: var(--surface-raised); color: var(--text-muted); font-size: var(--fs-small); }
+.host-attendance-counts strong { color: var(--text); font-size: 16px; }

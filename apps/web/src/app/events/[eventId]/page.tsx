@@ -8,6 +8,8 @@ import HostRequestDecision from "@/components/HostRequestDecision";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import ShareEventLink from "@/components/ShareEventLink";
 import { getEventRoom, getHostEvent, getHostJoinRequests, type HostJoinRequest } from "@/lib/events";
+import { getEventAttendanceBreakdown } from "@/lib/attendance-confirmations";
+import { isWithinReminderWindow } from "@/lib/attendance-confirmation";
 import { resolveHostEventView } from "@/lib/host-event-view";
 import { summarizeHostRequestQueue } from "@/lib/join-request-policy";
 import { getCurrentUser } from "@/lib/session";
@@ -107,6 +109,12 @@ export default async function HostEventPage({
   const recovery = room?.latestCriticalUpdateId
     ? getRecoveryGuidance(room.criticalUpdateResponseCounts, requestQueue.pendingCount)
     : null;
+  // T-2h attendance breakdown (CX-20260704): show the host a live confirmed/
+  // pending/cancelled read-out once the event is inside the 2h confirmation
+  // window. Host-only; no attendee identities, just honest counts.
+  const attendanceBreakdown = isWithinReminderWindow(event.startsAt)
+    ? await getEventAttendanceBreakdown(eventId, host.id)
+    : null;
 
   return (
     <main className="host-event-page">
@@ -145,6 +153,19 @@ export default async function HostEventPage({
       <div className="host-room-link">
         <Link href={`/events/${event.id}/room`}>Open the event room →</Link>
       </div>
+
+      {attendanceBreakdown ? (
+        <section className="host-attendance" aria-labelledby="host-attendance-heading">
+          <p className="panel-label">Starting soon</p>
+          <h2 id="host-attendance-heading">Who&apos;s confirmed</h2>
+          <p>Each accepted attendee is being asked to confirm or release their place. Anyone still pending simply hasn&apos;t answered yet — no one is dropped automatically.</p>
+          <div className="host-attendance-counts">
+            <span><strong>{attendanceBreakdown.confirmed}</strong> confirmed</span>
+            <span><strong>{attendanceBreakdown.pending}</strong> pending</span>
+            <span><strong>{attendanceBreakdown.cancelled}</strong> released</span>
+          </div>
+        </section>
+      ) : null}
 
       {event.status === "published" ? (
         <section className="host-share-card" aria-labelledby="host-share-heading">

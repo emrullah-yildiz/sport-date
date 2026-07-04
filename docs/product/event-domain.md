@@ -59,6 +59,15 @@ Every event has a private group chat scoped to the host and its `accepted` parti
 
 Broader open one-to-one messaging outside an event's accepted group remains intentionally absent until block/report, moderation evidence, and response operations cover it.
 
+### T-2h attendance confirmation
+
+Accepted attendees are asked to confirm or release their place in the ~2 hours before an event starts (CX-20260704-feature-event-attendance-confirmation). One `event_attendance_confirmations` row per `(event_id, member_id)` (`UNIQUE`) holds `status` (`pending` | `confirmed` | `cancelled`), a token **hash** (never the raw token), `reminded_at`, and `responded_at`.
+
+- **Scheduler.** A Vercel Cron (`vercel.json`) hits the internal route `/api/internal/attendance-reminders` every 15 minutes (`*/15 * * * *`); it is authorised by the shared `CRON_SECRET` bearer and fails closed when the secret is absent. The sweep is idempotent: for each published event starting within the next 2h, it creates a `pending` confirmation + token for every accepted attendee that has none yet (`ON CONFLICT (event_id, member_id) DO NOTHING`), so overlapping runs never double-remind. Every-15-min cron requires a Vercel plan that permits sub-daily crons.
+- **Tokens.** Each confirmation has a single 32-byte URL-safe token; only its SHA-256 hash is stored. The raw token travels in the email link and maps to exactly one membership's row, so a link reaching the wrong inbox can at worst let that person act on that one membership — never enumerate or read another member's data. Tokens expire exactly at event start. The public, no-login routes are `/e/{id}/confirm?t=…` and `/e/{id}/cancel?t=…` (read-only page render on GET; the mutation is a POST to `/api/attendance`, so an email scanner's prefetch cannot act). Confirm → `confirmed`; cancel → `cancelled`, which **releases the seat** (deletes the `event_participants` row so spots-left increments, cancels the join request, and the host's breakdown updates). A released place is reversible only by re-requesting.
+- **In-app.** Within the window the event room shows the accepted member a "Still coming?" confirm/cancel prompt (authenticated `/api/events/{id}/attendance`), and the host page shows a confirmed/pending/cancelled breakdown (counts only, no attendee identities). No punitive surprise: a non-response stays `pending` and is never auto-cancelled.
+- **Email is built DARK.** The reminder email is composed (event, time, approximate area only, Approve/Cancel links, `support@keepitup.social`) and dispatched through a gate that mirrors the auth-email / photo-storage fail-closed pattern: unless `EMAIL_DELIVERY_ENABLED === "true"` with a configured provider, delivery is a logged no-op — **no real mail leaves** — while confirmations, tokens, and the in-app flow all still function. Real delivery requires the owner to provision an ESP and flip the flag; the confirm/cancel links show the approximate area only, so a misdirected email never exposes the exact venue.
+
 ## Required failure and recovery states
 
 - Event fills while a request is being submitted.

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import PrimaryNav from "@/components/PrimaryNav";
+import AttendanceConfirmPrompt from "@/components/AttendanceConfirmPrompt";
 import EventReflectionForm from "@/components/EventReflectionForm";
 import EventRoomChat from "@/components/EventRoomChat";
 import EventUpdateAttendanceIntentControl from "@/components/EventUpdateAttendanceIntentControl";
@@ -17,6 +18,7 @@ import ShareMotivationalCard from "@/components/ShareMotivationalCard";
 import { BRAND_NAME } from "@/lib/brand";
 import { EVENT_UPDATE_FIELD_LABELS, eventUpdateSeverityLabel } from "@/lib/event-updates";
 import { getEventRoom } from "@/lib/events";
+import { getViewerAttendanceState } from "@/lib/attendance-confirmations";
 import { getPeerFeedbackTargets } from "@/lib/peer-feedback";
 import { getCurrentUser } from "@/lib/session";
 
@@ -30,6 +32,13 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
   // for the people the viewer actually co-attended with. The gate itself lives in
   // getPeerFeedbackTargets; here we just avoid the query before the event ends.
   const peerFeedbackTargets = room.hasEnded ? await getPeerFeedbackTargets(room.id, user.id) : [];
+  // T-2h attendance prompt (CX-20260704): shown only to an accepted, non-host
+  // attendee of a not-yet-ended event, and only inside the 2h window. Server-
+  // authoritative — the state (and the confirm/cancel writes it drives) are
+  // re-checked in the lib.
+  const attendanceState = !room.isHost && room.viewerRequest?.status === "accepted" && !room.hasEnded
+    ? await getViewerAttendanceState(room.id, user.id)
+    : null;
 
   const startsAt = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "full",
@@ -247,6 +256,7 @@ export default async function EventRoomPage({ params }: { params: Promise<{ even
           </div>
         </section>
       )}
+      {attendanceState?.withinWindow ? <AttendanceConfirmPrompt eventId={room.id} initialStatus={attendanceState.status} /> : null}
       {canUseChat ? <EventRoomChat eventId={room.id} timeZone={room.timeZone} /> : null}
       {!room.isHost && room.viewerRequest?.status === "accepted" ? <div id="room-leave"><RoomLeaveControl eventId={room.id} requestId={room.viewerRequest.id} safetyControlsId="room-people" /></div> : null}
       {room.hasEnded ? <PostEventAfterglow isHost={room.isHost} hasReflected={room.reflection !== null} /> : null}
