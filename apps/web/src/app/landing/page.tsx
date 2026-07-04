@@ -153,7 +153,7 @@ export default async function LandingPage() {
               <p className="microcopy">You&rsquo;re signed in — pick up where you left off.</p>
             ) : (
               <div className="microcopy">
-                Early preview · Open to adults (18+) · Europe first
+                Free beta · open to all adults (18+) · Europe first
                 <BetaTermExplainer className="microcopy-explainer" />
               </div>
             )}
@@ -283,6 +283,23 @@ export default async function LandingPage() {
         ) : (
           <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
         )}
+      </section>
+
+      <section className="landing-section" aria-labelledby="beta-title">
+        <div className="landing-shell">
+          <div className="section-head">
+            <p className="eyebrow" style={{ color: "var(--lime)" }}>Open beta</p>
+            <h2 id="beta-title" className="section-title">Free for everyone, right now.</h2>
+            <p className="section-lede">
+              {BRAND_NAME} is in open beta — no invite, no payment, open to all adults in Europe.
+              We&apos;re building it in the open, and your input steers what comes next.
+            </p>
+          </div>
+          <div className="hero-cta">
+            <Link href="/research" className="btn btn--secondary btn--lg">Take the 2-min survey</Link>
+            <Link href="/feedback" className="btn btn--secondary btn--lg">Share feedback</Link>
+          </div>
+        </div>
       </section>
 
       <footer className="landing-footer">
