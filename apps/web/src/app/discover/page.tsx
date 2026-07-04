@@ -104,7 +104,6 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
     next.delete("lng");
     return `/discover?${next.toString()}`;
   })();
-  const profileMissingSports = user.sports.length === 0;
   // Warm, personal, located arrival greeting — built only from the member's own first
   // name and approximate profile area (no new data/query, no precise location, no
   // fabricated traction). Replaces the static pre-signup marketing hero.
@@ -128,17 +127,17 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         </p>
       ) : area.isNearMeDefault ? (
         <p className="discover-area-note">
-          <span>You&apos;re seeing events that fit your sports and age range near <strong>{area.memberArea}</strong>, your profile area.</span>
+          <span>You&apos;re seeing events open near <strong>{area.memberArea}</strong>, your profile area, that you&apos;re eligible to join.</span>
           <Link href="/discover?near=all" className="discover-broaden">Search everywhere</Link>
         </p>
       ) : searchEverywhere && !requestedCity ? (
         <p className="discover-area-note">
-          <span>You&apos;re seeing events that fit your sports and age range, everywhere.</span>
+          <span>You&apos;re seeing events open everywhere that you&apos;re eligible to join.</span>
           {area.memberArea ? <Link href="/discover" className="discover-broaden">Back to near {area.memberArea}</Link> : null}
         </p>
       ) : (
         <p className="discover-area-note">
-          <span>You&apos;re seeing events that fit your sports and age range.</span>
+          <span>You&apos;re seeing events you&apos;re eligible to join.</span>
         </p>
       )}
       <form className="discover-filters" method="get">
@@ -175,12 +174,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         <div className="results-heading"><h2>{events.length === 0 ? "A quiet court—for now." : describeDiscoveryResultsHeading({ count: events.length, memberArea: area.memberArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p>Exact meeting points stay hidden until a host accepts a request.</p></div>
         {events.length === 0 ? (
           <div className="discovery-empty">
-            {profileMissingSports ? (
-              <>
-                <p>We match you to events by the sports in your profile, and your profile doesn&apos;t list any yet. Add a sport you play and your matches will start showing up here.</p>
-                <Link href="/profile">Add a sport to your profile</Link>
-              </>
-            ) : radiusActive ? (
+            {radiusActive ? (
               <>
                 <p>Nothing&apos;s open within <strong>{requestedRadiusKm} km</strong> just yet. {nextRadiusKm ? `Try widening the distance to ${nextRadiusKm} km` : "Try searching everywhere"}, or start one close to home.</p>
                 <Link href={widenRadiusHref}>{nextRadiusKm ? `Widen to ${nextRadiusKm} km` : "Search everywhere"}</Link>
@@ -199,8 +193,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
               </>
             ) : (
               <>
-                <p>No compatible events are open near you just yet. It can also help to add more sports and the languages you&apos;re comfortable with to your profile, so more events can match you. Or you can start one yourself.</p>
-                <Link href="/profile">Update your profile</Link>
+                <p>No events are open to you just yet. Try searching everywhere to see other areas, or start one yourself — hosting the first event is often how a new area gets going.</p>
+                <Link href="/discover?near=all">Search everywhere</Link>
                 <Link href="/events/new">Host the first one</Link>
               </>
             )}

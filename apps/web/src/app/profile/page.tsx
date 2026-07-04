@@ -18,6 +18,7 @@ import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import SiteFooter from "@/components/SiteFooter";
 import WebSessionControls from "@/components/WebSessionControls";
 import { getCommunicationPreferences } from "@/lib/communication-preferences";
+import { resolveTransactionalEmailProvider } from "@/lib/email-provider";
 import { isPlus } from "@/lib/entitlements";
 import { isBillingConfigured } from "@/lib/stripe";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
@@ -182,7 +183,7 @@ export default async function ProfilePage() {
           <p className="panel-label">Account</p>
           <h2>Contact &amp; sign-in</h2>
           <p>{user.email}</p>
-          <EmailVerificationControls emailVerified={user.emailVerified} />
+          <EmailVerificationControls emailVerified={user.emailVerified} emailDeliveryLive={resolveTransactionalEmailProvider() === "gmail"} />
         </article>
         <article className="profile-panel profile-sports">
           <p className="panel-label">On the field</p>

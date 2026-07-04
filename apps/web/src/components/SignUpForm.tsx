@@ -40,7 +40,7 @@ const stepComponents: Record<(typeof SIGN_UP_STEP_ORDER)[number], ComponentType>
 };
 const steps = SIGN_UP_STEP_ORDER.map((id) => stepComponents[id]);
 
-export default function SignUpForm() {
+export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliveryLive?: boolean } = {}) {
   const step = useSignUpStore((state) => state.step);
   const setStep = useSignUpStore((state) => state.setStep);
   const reset = useSignUpStore((state) => state.reset);
@@ -119,7 +119,11 @@ export default function SignUpForm() {
         <div className="signup-card signup-success">
           <p className="step-indicator">Account created</p>
           <h1>Welcome to {BRAND_NAME}.</h1>
-          <p>Email verification delivery is not active yet. Your profile remains private, and you will be able to prepare verification from account security once delivery is approved.</p>
+          <p>
+            {emailDeliveryLive
+              ? "Your profile stays private. Whenever you're ready, you can verify your email from account security — request a link and we'll send it to your inbox."
+              : "Your profile stays private. Email verification delivery isn't switched on yet — you'll be able to prepare it from account security as soon as it is."}
+          </p>
           <a className="btn-primary success-link" href="/profile">View your private profile</a>
         </div>
       </div>

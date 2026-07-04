@@ -153,7 +153,7 @@ describe("inline date-of-birth validation", () => {
   });
 
   it("blocks under-18 applicants the moment the birthday is entered", () => {
-    expect(dateOfBirthError("2008-06-30", today)).toBe("You must be 18 or older to use Sport Date.");
+    expect(dateOfBirthError("2008-06-30", today)).toBe("You must be 18 or older to use KeepItUp.");
   });
 
   it("clears once the applicant is 18 or older", () => {

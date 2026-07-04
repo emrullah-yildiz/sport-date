@@ -1,6 +1,6 @@
 # CX-20260704-qa-findings-copy-and-drift
 
-- Status: `ready`
+- Status: `in-progress`
 - Severity: `medium`
 - Priority: `P1` — member-visible defects found by the User-simulator QA pass (2026-07-04). Small, high-confidence fixes.
 - Customer journey: signup + discovery — copy that's off-brand or contradicts current behavior.
@@ -32,3 +32,7 @@
 ## Process
 
 - No migration. `git pull --rebase` first. Full DoD. COMMIT AND PUSH to main. Don't touch `apps/web/public/*.html` or `docs/marketing/**`. Report commit hash + test counts + which strings changed.
+
+## Handoff log
+
+- 2026-07-04 | build | picked up, set `in-progress`, recorded as implementation owner. Fixing all three findings: (1) domain 18+ error "Sport Date"→"KeepItUp" + test; (2) discover area-note + empty-state reworded so a sportless member is never told a profile sport is required (dropped the sport-gate branch entirely — profile sports no longer affect discovery results at all, verified in events.ts, so a "sports refine matches" nudge would itself be inaccurate); (3) signup success + verification-controls copy made delivery-state-aware via `resolveTransactionalEmailProvider()` read at request time (`await connection()` on /signup; /profile already dynamic).

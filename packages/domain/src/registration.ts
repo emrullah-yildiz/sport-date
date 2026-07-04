@@ -277,7 +277,7 @@ export function dateOfBirthError(
   if (!dateOfBirth) return "Enter your date of birth.";
   const age = ageOnDate(dateOfBirth, today);
   if (age === null || age < 0) return "Enter a valid date of birth.";
-  if (age < MINIMUM_AGE) return "You must be 18 or older to use Sport Date.";
+  if (age < MINIMUM_AGE) return "You must be 18 or older to use KeepItUp.";
   return null;
 }
 
