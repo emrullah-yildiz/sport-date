@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <radialGradient id="dusk" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#3BEA7E" stop-opacity="0.20"/>
+      <stop offset="70%" stop-color="#3BEA7E" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#3BEA7E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <rect width="1080" height="1080" fill="url(#dusk)"/>
+  <text x="540" y="150" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="6" fill="#3BEA7E">THE VISION</text>
+  <!-- court surface -->
+  <polygon points="430,300 650,300 850,660 230,660" fill="#242B31"/>
+  <!-- court lines -->
+  <g stroke="#3BEA7E" stroke-width="4" fill="none" stroke-linejoin="round">
+    <polygon points="430,300 650,300 850,660 230,660"/>
+    <line x1="330" y1="470" x2="750" y2="470" stroke-width="6"/>
+    <line x1="540" y1="470" x2="540" y2="660"/>
+    <line x1="388" y1="560" x2="692" y2="560"/>
+  </g>
+  <!-- three players -->
+  <circle cx="360" cy="620" r="16" fill="#F1F5F3"/>
+  <circle cx="700" cy="600" r="16" fill="#F1F5F3"/>
+  <circle cx="540" cy="365" r="14" fill="#3BEA7E"/>
+  <!-- headline -->
+  <text x="540" y="790" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="66" font-weight="800" fill="#F1F5F3">Three people.</text>
+  <text x="540" y="862" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="66" font-weight="800" fill="#F1F5F3">One <tspan fill="#3BEA7E">tennis court.</tspan></text>
+  <text x="540" y="930" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="34" fill="#8A9BA0">Local density beats a big map.</text>
+  <text x="540" y="1024" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#3BEA7E">keepitup.social</text>
+</svg>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <radialGradient id="sun" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#3BEA7E" stop-opacity="0.28"/>
+      <stop offset="55%" stop-color="#3BEA7E" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#3BEA7E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="#20262B"/>
+  <!-- sky glow / low sun -->
+  <rect x="0" y="0" width="1080" height="560" fill="url(#sun)"/>
+  <circle cx="540" cy="540" r="70" fill="#3BEA7E" fill-opacity="0.22"/>
+  <!-- horizon -->
+  <line x1="0" y1="540" x2="1080" y2="540" stroke="#2E6B4A" stroke-width="2"/>
+  <!-- path (perspective) -->
+  <polygon points="505,540 575,540 735,860 345,860" fill="#242B31"/>
+  <line x1="540" y1="560" x2="540" y2="860" stroke="#3A444B" stroke-width="4" stroke-dasharray="14 18"/>
+  <!-- two runners, not talking, mid-stride -->
+  <g stroke="#F1F5F3" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(470,650) scale(1.7)">
+    <circle cx="0" cy="-34" r="9" fill="#F1F5F3" stroke="none"/>
+    <path d="M0,-25 L3,-4"/>
+    <path d="M3,-4 L-11,10"/>
+    <path d="M3,-4 L15,6 L11,18"/>
+    <path d="M1,-20 L-13,-13"/>
+    <path d="M1,-20 L14,-25"/>
+  </g>
+  <g stroke="#F1F5F3" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(600,700) scale(1.9)">
+    <circle cx="0" cy="-34" r="9" fill="#F1F5F3" stroke="none"/>
+    <path d="M0,-25 L3,-4"/>
+    <path d="M3,-4 L-12,9"/>
+    <path d="M3,-4 L14,7 L12,19"/>
+    <path d="M1,-20 L-12,-14"/>
+    <path d="M1,-20 L15,-22"/>
+  </g>
+  <!-- text -->
+  <text x="80" y="945" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="#F1F5F3">A first date where</text>
+  <text x="80" y="1015" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="#F1F5F3"><tspan fill="#3BEA7E">silence</tspan> is allowed.</text>
+  <text x="1000" y="1015" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#8A9BA0">keepitup.social</text>
+</svg>
