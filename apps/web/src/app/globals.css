@@ -1706,3 +1706,11 @@ button:disabled:hover, button[disabled]:hover {
 .address-autocomplete small { color: var(--muted); line-height: 1.45; }
 .address-autocomplete small a { color: var(--accent-info); }
 .address-autocomplete small.address-fallback-hint { color: var(--coral); font-weight: 700; }
+.address-derived-area { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.address-derived-area strong { color: var(--lime); }
+.location-coarse-fallback { display: grid; gap: 12px; padding: 16px; border: 1px dashed var(--line); border-radius: 14px; background: var(--surface-raised); }
+.location-coarse-fallback-lede { margin: 0; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+.location-coarse-fields { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .location-coarse-fields { grid-template-columns: 1fr; } }
+.location-section .location-trust-note { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: 13px; line-height: 1.55; }
+.location-section .location-trust-note strong { color: var(--lime); }

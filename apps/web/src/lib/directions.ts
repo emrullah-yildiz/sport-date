@@ -35,14 +35,20 @@ export function buildDirectionsUrl(input: DirectionsInput): string {
 }
 
 /**
- * Validate the mandatory postal code of the structured precise address. Non-empty,
- * trimmed, ≤ 20 chars (mirrors the DB CHECK). Returns a calm host-voice error the
- * event-create/edit routes surface tied to the postal-code field.
+ * Validate the OPTIONAL postal code of the structured precise address
+ * (CX-20260705: postal code is now DERIVED from the selected map pin, not typed).
+ *
+ * When a host picks a suggestion the postal code arrives with it; when the geocoder
+ * is down or they entered the address by hand, none is available — that must NOT
+ * block publish, so an absent postal code is accepted and stored as `null` (the
+ * directions link then falls back to the url-encoded address). A supplied value is
+ * trimmed and must be ≤ 20 chars (mirrors the nullable DB CHECK).
  */
-export function validateEventPostalCode(raw: unknown): { valid: true; postalCode: string } | { valid: false; error: string } {
+export function validateEventPostalCode(raw: unknown): { valid: true; postalCode: string | null } | { valid: false; error: string } {
   const postalCode = typeof raw === "string" ? raw.trim() : "";
-  if (postalCode.length < 1 || postalCode.length > 20) {
-    return { valid: false, error: "Add a postal code for the meeting address." };
+  if (postalCode.length === 0) return { valid: true, postalCode: null };
+  if (postalCode.length > 20) {
+    return { valid: false, error: "That postal code looks too long — use 20 characters or fewer." };
   }
   return { valid: true, postalCode };
 }

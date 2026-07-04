@@ -28,9 +28,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
   }
 
-  // Structured precise address: the postal code is MANDATORY on create
-  // (CX-20260704). venue name, street address, and city are already required by
-  // the domain validator; the postal code lives on event_private_locations.
+  // Structured precise address: the postal code is DERIVED from the selected pin
+  // and OPTIONAL (CX-20260705) — a pin-less / provider-down publish stores it as
+  // null. Only an over-long supplied value is rejected. Venue name, street address,
+  // and city stay required via the domain validator; the postal code lives on
+  // event_private_locations.
   const rawPostal = (((body as Record<string, unknown>)?.location as Record<string, unknown> | undefined)?.private as Record<string, unknown> | undefined)?.postalCode;
   const postal = validateEventPostalCode(rawPostal);
   if (!postal.valid) {

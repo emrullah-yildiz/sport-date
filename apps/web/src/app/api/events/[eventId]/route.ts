@@ -95,9 +95,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ ev
     return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
   }
 
-  // Postal code of the structured precise address (CX-20260704). Required on edit
-  // like on create so the meeting point stays complete; an over-long value is
-  // rejected, an empty one is a validation error.
+  // Postal code of the structured precise address (CX-20260705): DERIVED from the
+  // pin and OPTIONAL — an absent value is stored as null so an edit made while the
+  // geocoder is down never blocks; only an over-long supplied value is rejected.
   const rawPostal = (((body as Record<string, unknown>)?.location as Record<string, unknown> | undefined)?.private as Record<string, unknown> | undefined)?.postalCode;
   const postal = validateEventPostalCode(rawPostal);
   if (!postal.valid) {

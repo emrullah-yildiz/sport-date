@@ -49,15 +49,18 @@ describe("formatFullAddress", () => {
   });
 });
 
-describe("validateEventPostalCode — mandatory structured address", () => {
+describe("validateEventPostalCode — optional derived postal code (CX-20260705)", () => {
   it("accepts and trims a real postal code", () => {
     expect(validateEventPostalCode("  010101 ")).toEqual({ valid: true, postalCode: "010101" });
   });
 
-  it("rejects an empty, missing, or over-long postal code", () => {
-    expect(validateEventPostalCode("").valid).toBe(false);
-    expect(validateEventPostalCode("   ").valid).toBe(false);
-    expect(validateEventPostalCode(undefined).valid).toBe(false);
+  it("accepts an absent postal code as null so a pin-less / provider-down publish is never blocked", () => {
+    expect(validateEventPostalCode("")).toEqual({ valid: true, postalCode: null });
+    expect(validateEventPostalCode("   ")).toEqual({ valid: true, postalCode: null });
+    expect(validateEventPostalCode(undefined)).toEqual({ valid: true, postalCode: null });
+  });
+
+  it("rejects an over-long postal code", () => {
     expect(validateEventPostalCode("x".repeat(21)).valid).toBe(false);
   });
 });

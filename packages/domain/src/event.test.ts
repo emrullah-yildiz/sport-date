@@ -126,6 +126,28 @@ describe("event creation input", () => {
     }
   });
 
+  // CX-20260705: the public area label is DERIVED from the pin (city + district) and no
+  // longer typed. When a pin resolves only to a city (or the geocoder is down and the
+  // host typed just a city), the area label defaults to the city so discovery always has
+  // a non-empty coarse area and the event still publishes without a pin or postal code.
+  it("defaults the public area label to the city when none is supplied, with no pin", () => {
+    const source = event();
+    const result = validateEventCreation({
+      ...source,
+      startsAt: source.startsAt.toISOString(),
+      location: {
+        public: { city: "Cluj-Napoca", countryCode: "RO", areaLabel: "", approximateLatitude: null, approximateLongitude: null },
+        private: { venueName: "Sala Polivalentă", address: "Bulevardul Eroilor 5", latitude: null, longitude: null },
+      },
+    }, new Date("2026-07-01T00:00:00Z"));
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.location.public.areaLabel).toBe("Cluj-Napoca");
+      // The precise pin is absent — publish is not blocked by a missing pin.
+      expect(result.data.location.private.latitude).toBeNull();
+    }
+  });
+
   it("rejects invalid coordinates, duplicate levels, and thin descriptions", () => {
     const source = event();
     const result = validateEventCreation({

@@ -100,6 +100,78 @@ describe("browser host event cancellation route", () => {
     });
   });
 
+  it("updates without a pin or postal code (provider-down / manual fallback still saves)", async () => {
+    vi.mocked(isTrustedBrowserMutation).mockReturnValue(true);
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: "11111111-1111-4111-8111-111111111111" } as never);
+
+    const sql = Object.assign(
+      vi.fn().mockResolvedValue([{
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        accepted_count: 0,
+        sport: "Tennis",
+        title: "Evening rally",
+        description: "A relaxed rally with room for newcomers and a calmer check-in.",
+        starts_at: "2026-07-10T16:00:00.000Z",
+        time_zone: "Europe/Bucharest",
+        duration_minutes: 90,
+        capacity: 4,
+        language: "English",
+        minimum_age: 24,
+        maximum_age: 38,
+        experience_levels: ["beginner", "intermediate"],
+        public_city: "Cluj-Napoca",
+        public_country_code: "RO",
+        public_area_label: "Cluj-Napoca",
+        public_approximate_latitude: null,
+        public_approximate_longitude: null,
+        venue_name: "Sala Polivalentă",
+        address: "Bulevardul Eroilor 5",
+        precise_latitude: null,
+        precise_longitude: null,
+        arrival_instructions: "Meet at the north entrance.",
+      }]),
+      {
+        transaction: vi.fn().mockResolvedValue([
+          [{ id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
+          [{ event_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }],
+          [{ id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee" }],
+        ]),
+      },
+    );
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    const response = await PATCH(
+      new Request("https://sportdate.example/api/events/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Origin: "https://sportdate.example" },
+        body: JSON.stringify({
+          sport: "Tennis",
+          title: "Evening rally",
+          description: "A relaxed rally with room for newcomers and a clearer arrival plan now.",
+          startsAt: "2026-07-10T16:00:00.000Z",
+          timeZone: "Europe/Bucharest",
+          durationMinutes: 90,
+          capacity: 4,
+          language: "English",
+          experienceLevels: ["beginner", "intermediate"],
+          participantAgeRange: { minimum: 24, maximum: 38 },
+          location: {
+            // No pin, empty derived area label, empty postal code — must still save.
+            public: { city: "Cluj-Napoca", countryCode: "RO", areaLabel: "", approximateLatitude: null, approximateLongitude: null },
+            private: { venueName: "Sala Polivalentă", address: "Bulevardul Eroilor 5", postalCode: "", instructions: "Meet at the north entrance.", latitude: null, longitude: null },
+          },
+        }),
+      }),
+      { params: Promise.resolve({ eventId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" }) },
+    );
+
+    expect(response.status).toBe(200);
+    const payload = await response.json() as { success: boolean; changedFields: string[] };
+    expect(payload.success).toBe(true);
+    // areaLabel defaulted to city, so the public location did not "change" spuriously.
+    expect(payload.changedFields).not.toContain("publicLocation");
+  });
+
   it("cancels a host-owned event", async () => {
     vi.mocked(isTrustedBrowserMutation).mockReturnValue(true);
     vi.mocked(getCurrentUser).mockResolvedValue({ id: "11111111-1111-4111-8111-111111111111" } as never);

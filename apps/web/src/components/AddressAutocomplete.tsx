@@ -2,15 +2,40 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import type { LocationSuggestion } from "@/lib/location-search";
+import { derivePublicAreaFromSuggestion, type LocationSuggestion } from "@/lib/location-search";
 
-type InitialPin = Readonly<{ address: string; latitude: number | null; longitude: number | null }>;
+// The precise pin plus the coarse public fields derived from it. On edit these are
+// prefilled from the stored event so the happy path (a pin already set) renders the
+// slim 3-input shape without asking the host to re-pick.
+type InitialPin = Readonly<{
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  city?: string;
+  countryCode?: string;
+  areaLabel?: string;
+  postalCode?: string | null;
+}>;
 
-export default function AddressAutocomplete({ countryCode, initial, error }: { countryCode: string; initial?: InitialPin; error?: string }) {
+// The coarse, PUBLIC area derived from the selected pin. Never contains the street
+// address or the precise coordinates — only city, sub-city district, country, and
+// the (private) postal code that rides with the pin.
+type DerivedArea = { city: string; countryCode: string; areaLabel: string; postalCode: string };
+
+export default function AddressAutocomplete({ initial, error }: { initial?: InitialPin; error?: string }) {
   const [query, setQuery] = useState(initial?.address ?? "");
   const [selected, setSelected] = useState<LocationSuggestion | null>(initial?.latitude != null && initial.longitude != null ? {
-    id: "existing", label: initial.address, address: initial.address, postalCode: "", city: "", countryCode: "", latitude: initial.latitude, longitude: initial.longitude,
+    id: "existing", label: initial.address, address: initial.address, postalCode: initial.postalCode ?? "", city: initial.city ?? "", district: "", countryCode: initial.countryCode ?? "", latitude: initial.latitude, longitude: initial.longitude,
   } : null);
+  // The derived coarse public area. Set from a chosen suggestion, prefilled from the
+  // stored event on edit, and cleared when the host clears the selection so the
+  // hidden inputs only ever reflect the CURRENTLY selected pin.
+  const [area, setArea] = useState<DerivedArea>({
+    city: initial?.city ?? "",
+    countryCode: initial?.countryCode ?? "",
+    areaLabel: initial?.areaLabel ?? "",
+    postalCode: initial?.postalCode ?? "",
+  });
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [status, setStatus] = useState("");
   // Index of the keyboard-highlighted option, or -1 when none is active. Powers
@@ -33,7 +58,9 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
       setStatus("Searching locations…");
       try {
         const params = new URLSearchParams({ q: query.trim() });
-        if (/^[a-z]{2}$/i.test(countryCode.trim())) params.set("countryCode", countryCode.trim());
+        // Bias by the coarse country the host has confirmed (from a prior pick or
+        // the fallback field). Absent on a first search — Photon still resolves.
+        if (/^[a-z]{2}$/i.test(area.countryCode.trim())) params.set("countryCode", area.countryCode.trim());
         const response = await fetch(`/api/locations/search?${params}`, { signal: controller.signal });
         const result = await response.json() as { suggestions?: LocationSuggestion[]; error?: string };
         if (current !== requestNumber.current) return;
@@ -51,15 +78,30 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
       }
     }, 350);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [query, countryCode, selected]);
+  }, [query, area.countryCode, selected]);
 
   function choose(suggestion: LocationSuggestion) {
     setSelected(suggestion);
     setQuery(suggestion.address);
+    // Derive the coarse public area from the pin (city + district). The precise
+    // street address stays in the visible `address` field only; the derivation
+    // never carries it or the coordinates.
+    setArea(derivePublicAreaFromSuggestion(suggestion));
     setSuggestions([]);
     setActiveIndex(-1);
     setProviderUnavailable(false);
     setStatus(`Pin set at ${suggestion.label}.`);
+  }
+
+  function clearSelection() {
+    setSelected(null);
+    setSuggestions([]);
+    setActiveIndex(-1);
+    setProviderUnavailable(false);
+    setStatus("");
+    // Clear the derived area with the pin so the hidden inputs never carry a coarse
+    // area that no longer matches the selection.
+    setArea({ city: "", countryCode: "", areaLabel: "", postalCode: "" });
   }
 
   function onKeyDown(keyEvent: React.KeyboardEvent<HTMLInputElement>) {
@@ -81,17 +123,23 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
 
   const optionId = (index: number) => `${listId}-option-${index}`;
 
+  // The coarse area is complete only when a pin is selected AND it yielded a city +
+  // country. Otherwise surface the minimal fallback so publish is never hard-blocked
+  // by a geocoder outage or a manually-typed address (city defaults the areaLabel).
+  const areaComplete = Boolean(selected) && area.city.trim().length > 0 && /^[A-Za-z]{2}$/.test(area.countryCode.trim());
+  const areaLabelValue = area.areaLabel.trim() || area.city.trim();
+
   return <div className="address-autocomplete">
-    <label htmlFor="address">Arrival address
+    <label htmlFor="address">Location
       <input
         id="address"
         name="address"
         value={query}
-        onChange={(event) => { setQuery(event.target.value); setSelected(null); setSuggestions([]); setActiveIndex(-1); setProviderUnavailable(false); setStatus(""); }}
+        onChange={(event) => { setQuery(event.target.value); clearSelection(); }}
         onKeyDown={onKeyDown}
         required
         maxLength={300}
-        placeholder="Start typing a venue or street address"
+        placeholder="Search a venue or street address, then choose a result"
         autoComplete="off"
         role="combobox"
         aria-autocomplete="list"
@@ -105,14 +153,31 @@ export default function AddressAutocomplete({ countryCode, initial, error }: { c
     </label>
     <input type="hidden" name="latitude" value={selected?.latitude ?? ""} />
     <input type="hidden" name="longitude" value={selected?.longitude ?? ""} />
+    {/* Derived PUBLIC area label (city + district) and the private postal code that
+        rides with the pin. Coarse only — never the street address or precise coords. */}
+    <input type="hidden" name="areaLabel" value={areaLabelValue} />
+    <input type="hidden" name="postalCode" value={area.postalCode} />
     {suggestions.length > 0 ? <ul id={listId} className="address-suggestions" role="listbox">
       {suggestions.map((suggestion, index) => <li key={suggestion.id} id={optionId(index)} role="option" aria-selected={index === activeIndex}>
         <button type="button" className={index === activeIndex ? "is-active" : undefined} tabIndex={-1} onMouseDown={(mouseEvent) => mouseEvent.preventDefault()} onClick={() => choose(suggestion)}><span aria-hidden="true">●</span><span>{suggestion.label}</span></button>
       </li>)}
     </ul> : null}
-    <p id={`${listId}-status`} className={`address-search-status${selected ? " pin-set" : ""}`} role="status" aria-live="polite">{status || "Choose a result to set the exact map pin."}</p>
+    <p id={`${listId}-status`} className={`address-search-status${selected ? " pin-set" : ""}`} role="status" aria-live="polite">{status || "Choose a result to set the exact map pin — the city and area fill in automatically."}</p>
+    {areaComplete
+      ? <p className="address-derived-area">Discovery will show <strong>{areaLabelValue}{area.countryCode ? `, ${area.countryCode}` : ""}</strong> — the approximate area only. Your exact pin stays private until you accept someone.</p>
+      : <div className="location-coarse-fallback">
+          <p className="location-coarse-fallback-lede">No exact result selected yet. So people can still find the event, tell us just the approximate area — no street address needed here.</p>
+          <div className="location-coarse-fields">
+            <label htmlFor="city">City<input id="city" name="city" value={area.city} onChange={(event) => setArea((current) => ({ ...current, city: event.target.value }))} required maxLength={100} placeholder="București" /></label>
+            <label htmlFor="countryCode">Country code<input id="countryCode" name="countryCode" value={area.countryCode} onChange={(event) => setArea((current) => ({ ...current, countryCode: event.target.value.toUpperCase() }))} required minLength={2} maxLength={2} placeholder="RO" /></label>
+          </div>
+        </div>}
     {providerUnavailable
       ? <small className="address-fallback-hint">Location search is unavailable right now — you can still type the full address by hand and publish. Accepted guests will get directions to that address; add a pin later by editing the event once search is back.</small>
       : <small>Your search is sent to our <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-based location provider. Your identity is not sent, and the selected pin stays private until acceptance.</small>}
+    {areaComplete ? <>
+      <input type="hidden" name="city" value={area.city} />
+      <input type="hidden" name="countryCode" value={area.countryCode} />
+    </> : null}
   </div>;
 }

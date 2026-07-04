@@ -37,7 +37,6 @@ function toLocalDateTimeInput(iso: string) {
 
 export default function HostEditEventForm({ event }: { event: HostEditableEvent }) {
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>(event.experienceLevels.filter((value): value is ExperienceLevel => value === "beginner" || value === "intermediate" || value === "advanced"));
-  const [countryCode, setCountryCode] = useState(event.publicLocation.countryCode);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -138,17 +137,10 @@ export default function HostEditEventForm({ event }: { event: HostEditableEvent 
           <label>Minimum age<input name="minimumAge" type="number" min="18" max="100" defaultValue={event.minimumAge} required /></label>
           <label>Maximum age<input name="maximumAge" type="number" min="18" max="100" defaultValue={event.maximumAge} required /></label>
         </div>
-        <div className="edit-profile-row">
-          <label>City<input name="city" defaultValue={event.publicLocation.city} required maxLength={100} /></label>
-          <label>Country code<input name="countryCode" value={countryCode} onChange={(changeEvent) => setCountryCode(changeEvent.target.value.toUpperCase())} required minLength={2} maxLength={2} /></label>
-        </div>
-        <label>Area or neighborhood<input name="areaLabel" defaultValue={event.publicLocation.areaLabel} required maxLength={120} /></label>
-        <div className="edit-profile-row">
-          <label>Venue name<input name="venueName" defaultValue={event.privateLocation.venueName} required maxLength={120} /></label>
-          <label>Postal code<input name="postalCode" defaultValue={event.privateLocation.postalCode ?? ""} required maxLength={20} placeholder="010101" /></label>
-        </div>
-        <AddressAutocomplete countryCode={countryCode} initial={{ address: event.privateLocation.address, latitude: event.privateLocation.latitude, longitude: event.privateLocation.longitude }} />
-        <label>Arrival instructions<textarea name="instructions" defaultValue={event.privateLocation.instructions ?? ""} rows={3} maxLength={500} /></label>
+        <p className="field-help">Discovery only sees the approximate area (city and district). The exact pin, address, and postal code stay private until you accept someone.</p>
+        <label>Place name<input name="venueName" defaultValue={event.privateLocation.venueName} required maxLength={120} /></label>
+        <AddressAutocomplete initial={{ address: event.privateLocation.address, latitude: event.privateLocation.latitude, longitude: event.privateLocation.longitude, city: event.publicLocation.city, countryCode: event.publicLocation.countryCode, areaLabel: event.publicLocation.areaLabel, postalCode: event.privateLocation.postalCode }} />
+        <label>Arrival details<textarea name="instructions" defaultValue={event.privateLocation.instructions ?? ""} rows={3} maxLength={500} /></label>
         <p className="field-help">Editing updates the event in place. Time, venue, area, duration, and arrival changes are treated as critical inside the room. Nothing sends out-of-product notifications yet, so only publish changes you are prepared to own inside the current preview boundary.</p>
         {message ? <p role="status">{message}</p> : null}
         <button className="privacy-action" type="submit" disabled={submitting || experienceLevels.length === 0}>{submitting ? "Saving..." : "Save event changes"}</button>

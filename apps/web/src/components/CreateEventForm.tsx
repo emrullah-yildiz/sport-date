@@ -31,7 +31,6 @@ type SummaryKind = "empty-required" | "server" | "";
 
 export default function CreateEventForm() {
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>(["beginner", "intermediate"]);
-  const [countryCode, setCountryCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   // Every problem to show at once — tied to a field where one exists — so the
   // host fixes them in one calm pass instead of one-per-round-trip.
@@ -288,11 +287,14 @@ export default function CreateEventForm() {
         <div className="event-field-grid"><label htmlFor="minimumAge">Minimum age<input {...fieldProps("minimumAge")} type="number" min="18" max="100" defaultValue="24" required />{fieldMessage("minimumAge") ? <span id="minimumAge-error" className="field-error">{fieldMessage("minimumAge")}</span> : null}</label><label htmlFor="maximumAge">Maximum age<input {...fieldProps("maximumAge")} type="number" min="18" max="100" defaultValue="38" required />{fieldMessage("maximumAge") ? <span id="maximumAge-error" className="field-error">{fieldMessage("maximumAge")}</span> : null}</label></div>
       </section>
 
-      <section className="event-form-section location-separation" id="section-location" aria-labelledby="section-location-heading">
-        <p className="event-form-step-indicator location-step-indicator">{sectionProgressLabel(2)}</p>
-        <h2 id="section-location-heading" className="visually-hidden">Where you&apos;ll meet</h2>
-        <div className="location-column public-location"><p className="panel-label">Discovery sees</p><h2>An approximate area</h2><p>Enough context to judge the journey. Never the door they should walk through.</p><label htmlFor="city">City<input {...fieldProps("city")} required maxLength={100} />{fieldMessage("city") ? <span id="city-error" className="field-error">{fieldMessage("city")}</span> : null}</label><label htmlFor="countryCode">Country code<input {...fieldProps("countryCode")} value={countryCode} onChange={(event) => setCountryCode(event.target.value.toUpperCase())} required minLength={2} maxLength={2} placeholder="RO" />{fieldMessage("countryCode") ? <span id="countryCode-error" className="field-error">{fieldMessage("countryCode")}</span> : null}</label><label htmlFor="areaLabel">Area or neighborhood<input {...fieldProps("areaLabel")} required maxLength={120} placeholder="Tineretului" />{fieldMessage("areaLabel") ? <span id="areaLabel-error" className="field-error">{fieldMessage("areaLabel")}</span> : null}</label></div>
-        <div className="location-column private-location"><p className="panel-label">Accepted people see</p><h2>The precise meeting point</h2><p>Search like an arrival destination, then choose the right result to set its exact pin. It stays private until acceptance.</p><label htmlFor="venueName">Venue name<input {...fieldProps("venueName")} required maxLength={120} placeholder="Court 2" />{fieldMessage("venueName") ? <span id="venueName-error" className="field-error">{fieldMessage("venueName")}</span> : null}</label><AddressAutocomplete countryCode={countryCode} error={fieldMessage("address")} /><label htmlFor="postalCode">Postal code<input {...fieldProps("postalCode")} required maxLength={20} placeholder="010101" />{fieldMessage("postalCode") ? <span id="postalCode-error" className="field-error">{fieldMessage("postalCode")}</span> : null}</label><label htmlFor="instructions">Arrival instructions<textarea {...fieldProps("instructions")} maxLength={500} rows={3} placeholder="Where to enter, who to ask for, and what to bring." />{fieldMessage("instructions") ? <span id="instructions-error" className="field-error">{fieldMessage("instructions")}</span> : null}</label></div>
+      <section className="event-form-section location-section" id="section-location" aria-labelledby="section-location-heading">
+        <p className="event-form-step-indicator">{sectionProgressLabel(2)}</p>
+        <p className="panel-label">Where you&apos;ll meet</p>
+        <h2 id="section-location-heading">Set the meeting point once.</h2>
+        <p className="location-trust-note">Discovery only ever sees the <strong>approximate area</strong> (city and district). The exact pin, address, and postal code stay private until you accept someone.</p>
+        <label htmlFor="venueName">Place name<input {...fieldProps("venueName")} required maxLength={120} placeholder="Court 2" />{fieldMessage("venueName") ? <span id="venueName-error" className="field-error">{fieldMessage("venueName")}</span> : null}</label>
+        <AddressAutocomplete error={fieldMessage("address")} />
+        <label htmlFor="instructions">Arrival details<textarea {...fieldProps("instructions")} maxLength={500} rows={3} placeholder="Where to enter, who to ask for, and what to bring." />{fieldMessage("instructions") ? <span id="instructions-error" className="field-error">{fieldMessage("instructions")}</span> : null}</label>
       </section>
 
       {issues.length > 0 ? (

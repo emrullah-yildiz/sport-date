@@ -139,6 +139,7 @@ export function validateEventCreation(raw: unknown, now = new Date()): EventCrea
   const approximateLongitude = optionalCoordinate(publicLocation.approximateLongitude, -180, 180);
   const latitude = optionalCoordinate(privateLocation.latitude, -90, 90);
   const longitude = optionalCoordinate(privateLocation.longitude, -180, 180);
+  const publicCity = typeof publicLocation.city === "string" ? publicLocation.city.trim() : "";
   const errors: string[] = [];
 
   if (Number.isNaN(startsAt.getTime())) errors.push("Choose a valid event start time.");
@@ -158,9 +159,13 @@ export function validateEventCreation(raw: unknown, now = new Date()): EventCrea
     experienceLevels: levels,
     location: {
       public: {
-        city: typeof publicLocation.city === "string" ? publicLocation.city.trim() : "",
+        city: publicCity,
         countryCode: typeof publicLocation.countryCode === "string" ? publicLocation.countryCode.trim().toUpperCase() : "",
-        areaLabel: typeof publicLocation.areaLabel === "string" ? publicLocation.areaLabel.trim() : "",
+        // The public area label is DERIVED from the selected pin (city + district)
+        // (CX-20260705). It is no longer typed by hand, so default it to the city
+        // when absent — discovery always has a non-empty coarse area, and a pin that
+        // resolves only to a city still publishes.
+        areaLabel: (typeof publicLocation.areaLabel === "string" ? publicLocation.areaLabel.trim() : "") || publicCity,
         // Coarsen the approximate PUBLIC coordinate to the area grid at the write
         // boundary so a precise value can never be persisted/emitted for the
         // discovery field. `approximateLatitude`/`approximateLongitude` are still the
