@@ -1,0 +1,154 @@
+[
+  {
+    "platform": "both",
+    "format": "reel",
+    "title": "P1 · World Cup pickup-game trend-jack",
+    "trend": "World Cup 2026 knockout stage (round of 16 / quarterfinal week); theme-only, no teams/players/logos/footage.",
+    "hook": "Congratulations, you have watched 90 minutes of the best players on Earth move. Here's a wild idea.",
+    "body": {
+      "caption": "The world is watching people move all month. Borrow 10% of that energy for your own Tuesday. 👟 KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#WorldCup2026", "#MeetThroughMovement", "#SocialSports", "#PickupFootball", "#KeepItUp"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "onScreenText": "you: elite tactical analyst. also you: hasn't kicked a ball since school.",
+      "audio": "Upbeat, non-broadcast trending track picked natively from the platform's sound library.",
+      "idealTime": "Mon 2026-07-06, 19:00 Bucharest — expires/park after 2026-07-12",
+      "videoNeeded": true,
+      "fullSpec": "content-queue/2026-07-batch-05.md P1"
+    }
+  },
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "P2 · World Cup final countdown (\"Final whistle\")",
+    "trend": "World Cup 2026 final, 19 July; factual public schedule reference only, no marks/trophy/crests.",
+    "hook": "One match left. Millions of people about to feel something at the exact same time.",
+    "body": {
+      "slides": [
+        "One match left. Millions of people about to feel something at the exact same time.",
+        "That's the whole pitch, really — shared movement makes strangers feel like they know each other.",
+        "You don't need a final. You need one hour, one small local game, one 'yes'.",
+        "The World Cup ends July 19th. Your next kickabout doesn't have a final whistle.",
+        "Meet through movement. KeepItUp — open worldwide, early access in bio."
+      ],
+      "caption": "Final whistle on the 19th. No whistle on the version where you're the one playing. KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#WorldCupFinal", "#WorldCup2026", "#MeetThroughMovement", "#KeepItUp"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "idealTime": "Fri 2026-07-17, 19:00 Bucharest — must post by 2026-07-19",
+      "videoNeeded": false,
+      "fullSpec": "content-queue/2026-07-batch-05.md P2"
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "reel",
+    "title": "P3 · \"Four tones\" acting trend (texting vs. the court)",
+    "trend": "Viral \"same line, different tone\" acting trend (happy/sarcastic/flirty/deadpan); our own performer, native trend format only.",
+    "hook": "so what do you do — delivered four different ways over text. Only one tone is real.",
+    "body": {
+      "script": "0-2s: phone screen close-up, same text bubble read aloud four ways (happy/sarcastic/flirty/deadpan bored), tagged 'TONE 1-4: TEXTING. Impossible to tell which one is real.' 8-11s: hard cut to the same actor mid-rally on a small court, out of breath, laughing, saying the same line for real — 'IN PERSON: only one tone. The true one.' 12-15s: end card — 'Behavior over bio. Meet through movement. KeepItUp — open worldwide.'",
+      "caption": "Texting: pick a tone, any tone. In person: there's only one. 😅 KeepItUp is open worldwide — early access in bio. #fourtones",
+      "hashtags": ["#ActingChallenge", "#FourTones", "#BehaviorOverBio", "#MeetThroughMovement", "#KeepItUp"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "audio": "Native trending \"four tones\" sound picked in TikTok's sound picker at record time.",
+      "idealTime": "Wed 2026-07-08, 18:30 Bucharest",
+      "videoNeeded": true,
+      "fullSpec": "content-queue/2026-07-batch-05.md P3"
+    }
+  },
+  {
+    "platform": "both",
+    "format": "reel",
+    "title": "P4 · Dreamy group-step dance trend",
+    "trend": "Viral late-'80s-style dreamy group-step dance trend; recreated format only, native trend audio, not our own commercial track.",
+    "hook": "This is what 'meeting someone' could feel like instead of a group chat that never finds a time.",
+    "body": {
+      "script": "0-3s: small mixed group doing a simple repeatable step in a park at golden hour (silhouette/wide shots ok). 3-8s: one person messes up the step, laughs, gets pulled back in — imperfect and warm. 8-12s: text overlay 'the group chat has been planning this for 3 weeks. we just did it.' 12-15s: end card — 'Meet through movement. KeepItUp — open worldwide, early access in bio.'",
+      "caption": "Nobody's profile mentions that they can't keep a beat. You only find out by showing up. 🌇 KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#DanceTrend", "#MeetThroughMovement", "#SocialSports", "#KeepItUp", "#Nostalgia"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "audio": "Native trending dreamy dance-trend audio via platform sound picker; not attached/owned by us.",
+      "idealTime": "Fri 2026-07-10, 20:00 Bucharest",
+      "videoNeeded": true,
+      "fullSpec": "content-queue/2026-07-batch-05.md P4"
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "P5 · Absurdist-escalation meme",
+    "trend": "2026 Gen-Alpha absurdist-humor meme structure; original text/panels, no copyrighted clip.",
+    "hook": "Him: 'send a pic'. Also him: hasn't left the house since March.",
+    "body": {
+      "panels": [
+        "Him: 'send a pic'. Also him: hasn't left the house since March.",
+        "Meanwhile, at a Tuesday 6-a-side game 400m away: 11 strangers who have already seen each other run, sweat, and lose gracefully. One of them is single. Anyway."
+      ],
+      "caption": "no notes. just a Tuesday. ⚽😐 KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#AbsurdHumor", "#MemesOfTikTok", "#MeetThroughMovement", "#KeepItUp"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "idealTime": "Thu 2026-07-09, 21:15 Bucharest",
+      "videoNeeded": false,
+      "fullSpec": "content-queue/2026-07-batch-05.md P5"
+    }
+  },
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "P6 · Human interest: the marathon assist",
+    "trend": "Verified 2026 wholesome marathon finish-line assist story; theme only, no names/footage/bib numbers.",
+    "hook": "Late in a big marathon this spring, a runner collapsed a few hundred metres from the finish.",
+    "body": {
+      "slides": [
+        "Late in a big marathon this spring, a runner collapsed a few hundred metres from the finish.",
+        "Two strangers — not teammates, not friends — stopped their own race to carry him the rest of the way.",
+        "Nobody asked them to. There was no prize for it. That's what happens when people move alongside each other long enough.",
+        "You don't need 26.2 miles for that. A weekly 5-a-side does the same thing, just slower.",
+        "Meet through movement. KeepItUp — open worldwide, early access in bio."
+      ],
+      "caption": "The best part of that viral marathon clip wasn't the finish line. It was two strangers deciding someone else's race mattered too. KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#HumanKindness", "#MeetThroughMovement", "#SocialSports", "#KeepItUp"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "idealTime": "Sun 2026-07-12, 09:30 Bucharest",
+      "videoNeeded": false,
+      "fullSpec": "content-queue/2026-07-batch-05.md P6"
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "carousel",
+    "title": "P7 · Micro-drama Episode 1: \"The Group Chat\"",
+    "trend": "2026 micro-drama/short-serial format; original fictional narrative, no real persons.",
+    "hook": "We should all do a run club. (Three weeks later: 47 unread messages, zero plans.)",
+    "body": {
+      "slides": [
+        "THE GROUP CHAT · Episode 1: 'We should all do a run club.'",
+        "Priya: we should all do a run club 🏃",
+        "Dev: yes!! who's free Saturday / Sam: I'm so down / Priya: perfect let's find a time",
+        "Three weeks later, same thread: 'Dev: still keen for that run club btw' — 47 unread messages, zero plans.",
+        "Episode 2: someone finally just books something. (Follow to see who — and what happens when a stranger shows up too.)"
+      ],
+      "caption": "Every friend group has this thread. Episode 2 next week — follow so you don't miss who finally breaks the loop. 👀 KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#MicroDrama", "#GroupChat", "#MeetThroughMovement", "#KeepItUp"],
+      "cta": "Follow for Episode 2 — open worldwide, early access in bio.",
+      "idealTime": "Tue 2026-07-14, 19:00 Bucharest",
+      "videoNeeded": false,
+      "fullSpec": "content-queue/2026-07-batch-05.md P7"
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "P8 · Cozy/authentic brand-values card (new experiment)",
+    "trend": "2026 cozy/calming + imperfect-authentic aesthetic trend; brand-values post, not a specific external trend moment.",
+    "hook": "we're not trying to be the most exciting app on your phone.",
+    "body": {
+      "cardText": "we're not trying to be the most exciting app on your phone. we just want your Tuesday evening to have an actual plan in it, with actual people, doing an actual thing. that's it. that's the whole app.",
+      "caption": "no countdown, no streaks, no 'she's typing…' anxiety. just: here's a game, here's who's coming, show up if you want to. KeepItUp is open worldwide — early access in bio.",
+      "hashtags": ["#MeetThroughMovement", "#KeepItUp", "#SlowSocial", "#SocialSports"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "idealTime": "Wed 2026-07-15, 12:30 Bucharest (new midday-slot test)",
+      "videoNeeded": false,
+      "fullSpec": "content-queue/2026-07-batch-05.md P8"
+    }
+  }
+]

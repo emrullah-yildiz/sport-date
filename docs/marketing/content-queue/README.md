@@ -30,3 +30,17 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
 ## Batches
 
 - `2026-07-batch-01.md` — first 6 posts (from the launch packet's briefs), status `draft`.
+- `2026-07-batch-02.md` — first growth-loop batch (cold-start hypotheses), status mixed.
+- `2026-07-batch-03.md` — TikTok photo-mode activation + IG week 2, CEO-approved.
+- `2026-07-batch-04.md` — global live-sport moments (theme-only), pending approval.
+- `2026-07-batch-05.md` — trend-forward batch: World Cup knockout/final, July viral acting
+  and dance-trend formats, absurdist meme, a verified human-interest moment, and a
+  micro-drama serial, status `draft`. See its intro for the trend sources and the one
+  trending story explicitly screened out and rejected (crime/scandal).
+- `2026-07-batch-06.md` — image-led batch built entirely on real photos (no text-only cards),
+  opening two new pillars: verified science facts and attributed life quotes, tied back to the
+  product. Mix of funny, deep, and trend-jacked (mid-year checkpoint) posts, status `draft`.
+- `2026-07-batch-07.md` — feature-led batch: 6 posts about what the KeepItUp product itself does
+  (location privacy, no open browsing of people, dating/friendship/group intent, a 4-step how-it-
+  works carousel, request-to-join capacity, and post-game feedback/"Movement Arc"), each traced to
+  an audit-verified implemented feature only. Real-photo image-led throughout, status `draft`.

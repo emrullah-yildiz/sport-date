@@ -93,7 +93,37 @@ follows-per-post matter more than raw likes for *growth*.
 
 Write to be *shared and saved*, because shares/saves are what pull new followers.
 Voice: warm, playful, a little cheeky, genuinely human — the friend who gets you
-off the couch. Rotate these formats and track which win:
+off the couch.
+
+**Plain, simple English (owner directive 2026-07-05).** Write the way people actually
+talk. No jargon, no niche sports slang, no clever coined phrases or hyphenated
+word-games. Say "a football game nearby," not "a 6-a-side"; "meet in person," not
+"IRL trend-jack"; "helped a runner finish," not "finish-line stranger-assist." If a
+9-year-old wouldn't understand a word, replace it. Keep the brand line "meet through
+movement." Prefer short, clear sentences over wordplay every time.
+
+**Image-led with REAL photos (owner directive 2026-07-05).** Posts must show real
+people and objects, not text-only cards. Source photos from free commercial-use
+libraries (**Pexels / Unsplash license**) — adults only, no minors, candid and
+diverse over polished studio stock. Download them into
+`apps/web/public/brand/social/photos/` and record each in that folder's
+`LICENSES.md` (never hotlink). Attach them to each seeded idea via `body.assets`
+(same-origin paths starting with `/brand/…`) so the finished image renders on the
+approval page — a text-only `imageConcept` is what made the page look empty before.
+Mix the treatments creatively: some posts a clean photo with the words in the
+caption (native/authentic), some a fact/quote **overlaid** on the photo (specify
+position + a dark scrim for legibility). Range matters: make some **funny**, some
+**deep**, all about real life so people *repost*. Quality over volume.
+
+**Two required pillars (owner directive 2026-07-05):**
+- **Science facts, tied to the product.** Real, verifiable, plainly cited (e.g.
+  runner's-high endocannabinoids; synchronous-movement bonding; loneliness–mortality
+  research). Confirm each with WebSearch; no fake stats, no medical advice.
+- **Life quotes, tied to the product.** Correctly attributed public quotes about
+  connection/showing up/movement, or original KeepItUp lines labeled as ours. Never
+  misattribute.
+
+Rotate these formats and track which win:
 
 - **Curiosity hooks / open loops** — Reel/Short scripts (hook in first 1.5s, pattern
   interrupt, payoff at the end). e.g. "The 3 things that happen when you meet
@@ -145,11 +175,15 @@ Owner authorized (2026-07-04) hands-off operation: **run every cycle by yourself
 the only thing you wait on is the owner's approval.** Follow
 `docs/marketing/social-autopilot-runbook.md` exactly. Each cycle, in order:
 
-1. **Fulfil approvals.** Scan `content-queue/` for posts marked `APPROVED` that
-   aren't yet `scheduled`. For each: produce the final creative, then **schedule it
-   in Buffer** (approved copy + the post's target time) and set its status to
-   `scheduled` with the Buffer id/date. Scheduling an already-approved post is
-   authorized — that's the whole point. **Never schedule anything not `APPROVED`.**
+1. **Fulfil approvals + improvement requests.** First, honour owner feedback: for any
+   idea/post that carries an **owner comment** (filed via the approval page's ✨ Improve
+   button or the "Done" go-signal), produce a **revised version that addresses the
+   comment**, and leave it `draft`/`pending` for re-approval — never publish a revision
+   unasked. Then scan `content-queue/` for posts marked `APPROVED` that aren't yet
+   `scheduled`. For each: produce the final creative, then **schedule it in Buffer**
+   (approved copy + the post's target time) and set its status to `scheduled` with the
+   Buffer id/date. Scheduling an already-approved post is authorized — that's the whole
+   point. **Never schedule anything not `APPROVED`.**
 2. **Make the creative.**
    - *Image formats* (memes, carousels, quote/stat cards, IG/TikTok photo-mode):
      produce end-to-end yourself from `apps/web/public/brand/` assets.

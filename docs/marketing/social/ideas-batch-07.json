@@ -1,0 +1,143 @@
+[
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "Your Exact Location Is Never Public",
+    "trend": null,
+    "hook": "We never show your exact location. Not even to someone you haven't met yet.",
+    "body": {
+      "caption": "Here's a feature we don't talk about enough: when you look at games on KeepItUp, you never see anyone's exact location. You see a rough area — close enough to know it's near you, not close enough to find someone's front door.\n\nThe exact place only shows up once the host says yes and lets you into the game. Until then, nobody can pin down exactly where you are, not even someone you're already talking to.\n\nWe built it this way on purpose. You should be able to look around before anyone can find you. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#Privacy",
+        "#SafetyFirst",
+        "#YourLocationYourRules",
+        "#MeetThroughMovement",
+        "#KeepItUp"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Quote/fact overlaid on the photo, dark scrim across the lower third for legibility. Overlay text: 'WE NEVER SHOW YOUR EXACT LOCATION. NOT EVEN TO SOMEONE YOU HAVEN'T MET YET.' Serious, trust-building tone. Finished composite baked at the asset path below; base photo is the moody seafront jog. (Composite baked: b7p1-location-privacy.png)",
+      "assets": [
+        "/brand/social/photos/b7p1-location-privacy.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "No Grid Of Faces. Just A Game.",
+    "trend": null,
+    "hook": "There's no list of people to scroll through here. You only see someone once you're in the same game.",
+    "body": {
+      "caption": "KeepItUp doesn't have a big list of people to scroll through. There's no grid of faces to swipe left or right on.\n\nHere's what you actually see: games near you. You ask to join one, or someone asks to join yours. Only then — once you're both in the same game — can you see each other's profile.\n\nWe match you over something you're both doing, not a photo you both liked. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#NotASwipingApp",
+        "#RealGamesRealPeople",
+        "#MeetThroughMovement",
+        "#KeepItUp",
+        "#NoGridOfFaces"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Bold manifesto-style overlay, centered, dark scrim behind the text. Overlay text: 'NO GRID OF FACES. NO ENDLESS SCROLLING. JUST A GAME.' Confident, not a dig at any specific app. Finished composite baked at the asset path below; base photo is golden-hour flag football. (Composite baked: b7p2-no-grid.png)",
+      "assets": [
+        "/brand/social/photos/b7p2-no-grid.png"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "You Don't Have To Be Looking For Love To Show Up",
+    "trend": null,
+    "hook": "Dating, friendship, or just a group to play with — you pick, and you can change your mind any time.",
+    "body": {
+      "caption": "When you join KeepItUp, we ask you one honest question: why are you here? Dating, making friends, or just wanting a group to play with — you pick, it shows on your profile, and you can change it whenever you want.\n\nNobody has to guess your reason for showing up, and none of the three is the 'real' one. Some people come for a date. Some come because they moved to a new place and want friends. Some just want a five-a-side on a Tuesday.\n\nAll of that is exactly what KeepItUp is for. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#MeetThroughMovement",
+        "#DatingOrFriendship",
+        "#ShowUpAnyway",
+        "#KeepItUp",
+        "#CommunityFirst"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Clean photo, no overlay — warm, inclusive caption-led treatment. Base photo: diverse group jogging together on a track.",
+      "assets": [
+        "/brand/social/photos/pexels-19146676-group-track-run.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "How KeepItUp Actually Works (4 Steps)",
+    "trend": null,
+    "hook": "Find a game, ask to join, host says yes, you're in — that's the whole process.",
+    "body": {
+      "slides": [
+        "1. Find a small local game near you — pick the sport, city, and language.",
+        "2. Ask to join.",
+        "3. The host says yes — now you're in, and you can see the exact spot.",
+        "4. Show up and play. KeepItUp is open worldwide — early access, link in bio."
+      ],
+      "caption": "How KeepItUp actually works, no fine print: you look for a small local game (any sport, any city you're in, whatever language works for you). You ask to join. The host says yes or no. If it's a yes, you get the exact place and time, plus a group chat with everyone else who's playing.\n\nThat's it. No long forms, no endless scrolling — just a real game with real people, near you. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#HowItWorks",
+        "#MeetThroughMovement",
+        "#KeepItUp",
+        "#SmallLocalGames",
+        "#RequestToJoin"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "4-slide carousel, one real photo per slide with a short bold step in the bottom third on a dark scrim; slide 4 adds the CTA. Slide photos in order: golden-hour flag football (find a game), park football pass (ask to join), laughing beach run (host accepts, you're in), group track run (show up and play). (All 4 step slides baked: b7p4-step1..step4)",
+      "assets": [
+        "/brand/social/photos/b7p4-step1-find.png",
+        "/brand/social/photos/b7p4-step2-ask.png",
+        "/brand/social/photos/b7p4-step3-accepted.png",
+        "/brand/social/photos/b7p4-step4-play.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "The Only Rejection Here Is A Full Game",
+    "trend": null,
+    "hook": "Asked to join a game and got turned down? It was probably just full.",
+    "body": {
+      "caption": "On KeepItUp, if a host says no, it's almost never about you — it's usually just math. Someone set the game at eight people, eight people already said yes, sorry.\n\nThe good part: there's always another game nearby. Try the next one. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#FullGame",
+        "#NotYouItsMath",
+        "#MeetThroughMovement",
+        "#KeepItUp",
+        "#Relatable"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Meme-style overlay: bold text top and bottom, a dark scrim box behind each line. Top: 'ASKED TO JOIN THE GAME. GOT TURNED DOWN.' Bottom: 'TURNS OUT IT WAS JUST FULL. TEN PEOPLE SIGNED UP FOR A TEN-PERSON GAME.' Finished composite baked at the asset path below; base photo is two men passing a football in a park. (Composite baked: b7p5-full-game-meme.png)",
+      "assets": [
+        "/brand/social/photos/b7p5-full-game-meme.png"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "The Game Doesn't End When The Game Ends",
+    "trend": null,
+    "hook": "After the game, you get to leave feedback, write a private note, and watch your own story build.",
+    "body": {
+      "caption": "Most apps stop caring the second you close them. KeepItUp keeps one thing going after the game ends: you can leave quick feedback about how it went, and write a private note to yourself — just for you, nobody else sees it.\n\nOver time that turns into your own 'Movement Arc' — basically a running story of the games you've played and how they went. Not a leaderboard, not a score. Just your own record of showing up.\n\nKeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#MovementArc",
+        "#AfterTheGame",
+        "#MeetThroughMovement",
+        "#KeepItUp",
+        "#YourStory"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Clean photo, no overlay — warm, reflective caption-led treatment. Base photo: people finishing a run together on a bridge.",
+      "assets": [
+        "/brand/social/photos/pexels-5319325-jog-bridge.jpg"
+      ]
+    }
+  }
+]

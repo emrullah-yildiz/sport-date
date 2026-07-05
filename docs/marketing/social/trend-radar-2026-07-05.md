@@ -6,9 +6,9 @@ art — never a copyrighted photo/video/audio or a real person's likeness/name, 
 `trend-jacking-playbook.md`. Six things worth riding right now, and why each maps
 to "meet through movement":
 
-## 1. World Cup 2026 finale week
-The tournament is in its final stretch this week (final around July 5), producing
-the year's biggest shared "everyone's watching, edge-of-seat" cultural moment —
+## 1. World Cup 2026 knockout rounds
+The tournament is in its round-of-16 stretch this week (the final is 19 July), producing
+one of the year's biggest shared "everyone's watching, edge-of-seat" cultural moments —
 extra time, penalty shootouts, watch-party culture. **Why it fits us:** the
 emotional metaphor is free and perfect — "extra time," "stoppage time," "penalties"
 map directly onto dating-app limbo (endless matching with no result) vs. showing
