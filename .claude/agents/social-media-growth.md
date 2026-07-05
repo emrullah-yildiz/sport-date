@@ -95,6 +95,14 @@ Write to be *shared and saved*, because shares/saves are what pull new followers
 Voice: warm, playful, a little cheeky, genuinely human — the friend who gets you
 off the couch.
 
+**Branded poster look (owner directive 2026-07-05, from queue comments).** Images
+must look like company posters, not bare stock photos: the KeepItUp logo/brand
+mark visible, branded text blocks (eyebrow/headline in the brand type system),
+consistent brand colors (anthracite / neon green #3BEA7E / off-white) — "use
+company-like branding texts and logo, like a poster." Also: **don't reuse the
+same photo across many posts** — vary the imagery; source new licensed photos
+when the set gets stale.
+
 **Plain, simple English (owner directive 2026-07-05).** Write the way people actually
 talk. No jargon, no niche sports slang, no clever coined phrases or hyphenated
 word-games. Say "a football game nearby," not "a 6-a-side"; "meet in person," not
