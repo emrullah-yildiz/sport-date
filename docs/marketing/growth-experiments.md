@@ -81,6 +81,25 @@ into follows (and, longer-term, site visits) better than pure-relatable/science/
 | H-FEATURE-aftergame | Post-game reflection features ("Movement Arc") drive saves as bookmark-worthy content | saves-per-post vs H-PILLAR-lifequote baseline (batch 06) |
 | H-CONTENT-featurevsrelatable | Feature-led content overall converts curiosity into follows/site-visits better than pure-relatable or pure-inspirational content | follows-per-post + link-in-bio click-through, batch 07 vs batches 02–06 combined |
 
+## Open hypotheses (from batch 08 — pain-led "why KeepItUp", added 2026-07-05)
+
+**Owner directive:** the posts must explain more WHY people should use KeepItUp. Built around two
+named real-life pains: (1) people organize games in a group chat and it turns into unread
+messages, dead polls, no venue, no game; (2) people pay for singles/mixer events to stand around
+with a drink. Each post answers "why KeepItUp" against one of these pains, or (P5) reframes both
+through a sourced science fact about doing vs. talking. No competitor or specific event company is
+named (WhatsApp named once, neutrally and kindly, per owner clearance).
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-PAIN-groupchat | Naming the exact group-chat-organizing chaos, then the fix, drives more follows than a general relatable joke | follows-per-post vs H-PILLAR-funnyphoto / H-FEATURE-funnyreject baselines |
+| H-PAIN-paidmingle | Cheekily naming the paid-mixer experience (without mocking it) out-converts a generic dating-app joke | follows-per-post vs H-FEATURE-notswiping baseline |
+| H-PAIN-costcompare | A plain, honest numbers comparison (ticket price vs. free) out-saves a joke or feature explainer | saves-per-post vs batch 06/07 average |
+| H-PAIN-orgsplit | A visual before/after ("there vs. here") of organizing a game beats a text-only explanation on saves | saves-per-post vs H-FEATURE-howitworks baseline (batch 07 P4) |
+| H-PAIN-doingvstalking | A sourced, honestly-framed "doing beats talking" fact, tied to both pains, wins saves as well as our pure science-fact posts | saves-per-post vs H-PILLAR-sciencefact baseline (batch 06) |
+| H-PAIN-freeexplainer | The plainest "here's what you get, for free" post beats a longer feature-by-feature explainer on shares | shares-per-post vs H-FEATURE-howitworks / H-CONTENT-featurevsrelatable baselines |
+| H-CONTENT-painvsfeature | Pain-based "why us" content converts curiosity into follows/saves/shares better than feature-led (batch 07) or pure relatable/science/quote content (batches 02–06) | follows-per-post + saves + shares, batch 08 vs batch 07 vs batches 02–06 combined |
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -154,3 +173,21 @@ into follows (and, longer-term, site visits) better than pure-relatable/science/
   umbrella H-CONTENT-featurevsrelatable above. Next review: once this batch has ~2 weeks of live
   data, compare follows-per-post and saves against batches 02–06 combined to test whether
   feature-led content out-converts relatable/inspirational content, and prune whichever loses.
+- _2026-07-05_ — **Pain-led "why KeepItUp" batch shipped** (`content-queue/2026-07-batch-08.md`,
+  `social/ideas-batch-08.json`, 6 drafts). Owner directive: stop assuming people already get why
+  KeepItUp is different — build directly around two named pains: (1) organizing games in a group
+  chat (unread messages, dead polls, no venue, no game — WhatsApp named once, neutrally and kindly,
+  as owner-cleared) and (2) paying for singles/mixer events to stand around with a drink. Five
+  posts answer one pain directly (P1, P4 → pain #1; P2, P3 → pain #2); P6 answers both at once with
+  a plain "it's free, here's what you get" explainer. P5 reframes both pains through a verified,
+  honestly-framed science citation (Aron et al. 2000, shared novel activity vs. talking — correctly
+  noted as originally studied in couples, mechanism generalized, not overclaimed as tested on
+  strangers). No competitor or specific event company named anywhere. Tone mix: funny (P1), cheeky
+  (P2), honest/plain (P3), satisfying-contrast carousel (P4), deep (P5), plain/warm (P6). Reused
+  the six existing Pexels photos; overlay posts (P1, P3, P4, P5) point `assets` at the **base
+  photo** with overlay text specified in `imageConcept` and marked "to be baked" — no composite
+  files invented, per the owner's 2026-07-05 instruction. Added H-PAIN-* and the umbrella
+  H-CONTENT-painvsfeature above. Next review: once this batch has ~2 weeks of live data, compare
+  follows-per-post, saves, and shares against batch 07 (feature-led) and batches 02–06
+  (relatable/science/quote/trend) combined to test whether pain-based positioning is the strongest
+  lever of the three, and prune whichever approach loses.

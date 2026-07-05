@@ -44,3 +44,7 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
   (location privacy, no open browsing of people, dating/friendship/group intent, a 4-step how-it-
   works carousel, request-to-join capacity, and post-game feedback/"Movement Arc"), each traced to
   an audit-verified implemented feature only. Real-photo image-led throughout, status `draft`.
+- `2026-07-batch-08.md` — pain-led "why KeepItUp" batch: 6 posts built directly around two named
+  owner pains (organizing games in a group chat vs. one real event; paying for singles/mixer
+  events vs. a free game), plus one science-tied "doing beats talking" post. No competitor named;
+  WhatsApp named once, neutrally. Real-photo image-led throughout, status `draft`.
