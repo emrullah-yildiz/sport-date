@@ -30,6 +30,14 @@
   .dbtn:disabled{ opacity:.45; cursor:default; }
   .dhint{ margin-top:9px; font-size:13px; color:var(--mut); text-align:center; }
   .dhint.ok{ color:var(--neon); } .dhint.err{ color:var(--red); }
+  /* agent status light — server truth, survives refresh */
+  .statusrow{ display:flex; align-items:center; gap:9px; margin-bottom:12px; font-size:13.5px; font-weight:800; }
+  .slight{ width:11px; height:11px; border-radius:50%; flex:none; }
+  .slight.green{ background:var(--neon); box-shadow:0 0 9px 2px rgba(59,234,126,.7); }
+  .slight.yellow{ background:var(--amber); box-shadow:0 0 9px 2px rgba(232,176,75,.7); animation:spulse 1.2s infinite; }
+  @keyframes spulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .statusrow.green{ color:var(--neon); } .statusrow.yellow{ color:var(--amber); }
+  .statusrow .when{ color:var(--mut); font-weight:600; font-size:12px; margin-left:auto; }
   .note{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--neon); border-radius:12px; padding:18px 20px; }
   .note p{ margin:0 0 10px; font-size:15px; } .note p:last-child{ margin:0; }
   /* filter bar */
@@ -134,9 +142,11 @@
   var current = "all";
   var ideas = [];               // full queue, bucketed client-side
   var approvedUnscheduled = 0;
-  var dispatchNotice = "";   // success line under the dispatch button
   var dispatchError = "";    // error line under the dispatch button
-  var dispatchDone = false;  // has the go-signal been sent this session view
+  // Server truth for the status light: the latest UNHANDLED go-signal, or null.
+  // Non-null = the agent has been signaled and hasn't finished = YELLOW.
+  // Null = nothing in flight = GREEN, ready for your review. Survives refresh.
+  var pendingDispatch = null;
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
     return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]; }); }
@@ -278,18 +288,30 @@
 
   function dispatchHtml(){
     var n = approvedUnscheduled;
+    var busy = !!pendingDispatch;
     var hasComments = ideas.some(function(i){ return i.ownerComment && String(i.ownerComment).trim(); });
-    var canSend = n > 0 || hasComments;
-    var label = dispatchDone
-      ? "✓ Sent — the agent is on it"
+    var canSend = (n > 0 || hasComments) && !busy;
+
+    var when = "";
+    if (busy && pendingDispatch.requestedAt){
+      var d = new Date(pendingDispatch.requestedAt);
+      if (!isNaN(d.getTime())) when = '<span class="when">sent ' + d.toLocaleString() + "</span>";
+    }
+    var light = busy
+      ? '<div class="statusrow yellow"><span class="slight yellow"></span>Agent is working on your approvals &amp; comments' + when + "</div>"
+      : '<div class="statusrow green"><span class="slight green"></span>Ready to review — nothing in flight</div>';
+
+    var label = busy
+      ? "⏳ Working — your go-signal is with the agent"
       : "✅ Done — send my approvals &amp; comments (" + n + ")";
     var hint;
     if (dispatchError) hint = '<div class="dhint err">' + esc(dispatchError) + "</div>";
-    else if (dispatchNotice) hint = '<div class="dhint ok">' + esc(dispatchNotice) + "</div>";
+    else if (busy) hint = '<div class="dhint">The light turns green when the agent finishes. Refresh any time — this is live server status.</div>';
     else if (!canSend) hint = '<div class="dhint">Approve a post or leave an improvement comment, then send.</div>';
     else hint = '<div class="dhint">Sends your approvals and improvement comments to the agent to schedule &amp; revise.</div>';
-    return '<div class="dispatch"><button class="dbtn' + (dispatchDone ? " done" : "") + '" id="dispatch-btn"' +
-      ((canSend && !dispatchDone) ? "" : " disabled") + ">" + label + "</button>" + hint + "</div>";
+
+    return '<div class="dispatch">' + light + '<button class="dbtn' + (busy ? " done" : "") + '" id="dispatch-btn"' +
+      (canSend ? "" : " disabled") + ">" + label + "</button>" + hint + "</div>";
   }
 
   function render(){
@@ -307,8 +329,8 @@
     Array.prototype.forEach.call(bar.querySelectorAll(".fbtn"), function(btn){
       btn.addEventListener("click", function(){
         current = btn.getAttribute("data-filter");
-        dispatchNotice = ""; dispatchError = ""; dispatchDone = false;
-        load();
+        dispatchError = "";
+        render(); // buckets are client-side; no refetch needed to switch tabs
       });
     });
   }
@@ -436,6 +458,14 @@
     return Promise.resolve();
   }
 
+  // Latest unhandled go-signal from the server — the source of the status light.
+  function refreshDispatchStatus(){
+    return fetch("/api/social/dispatch", { credentials:"same-origin", headers:{ "Accept":"application/json" } })
+      .then(function(res){ return res.ok ? res.json() : { request: null }; })
+      .then(function(d){ pendingDispatch = d && d.request ? d.request : null; })
+      .catch(function(){ pendingDispatch = null; });
+  }
+
   function dispatch(){
     var btn = document.getElementById("dispatch-btn");
     if (btn){ btn.disabled = true; btn.textContent = "Sending…"; }
@@ -449,13 +479,10 @@
       return res.json();
     }).then(function(data){
       if (!data) return;
-      dispatchDone = true;
-      dispatchNotice = "Sent — your CEO is scheduling approved posts and revising your commented ones now.";
-      // Reload the whole queue so every card reflects the server's truth
-      // (approved/denied states, anything newly posted moves to its tab).
+      // Reload queue + status from the server: the light goes YELLOW from
+      // server truth, so it survives a page refresh.
       load();
     }).catch(function(err){
-      dispatchDone = false;
       dispatchError = err.message || "Could not send the go-signal.";
       renderBar();
     });
@@ -469,7 +496,7 @@
     }).then(function(data){
       if (!data) return null;
       ideas = Array.isArray(data.ideas) ? data.ideas : [];
-      return refreshApprovedCount().then(function(){ render(); });
+      return Promise.all([refreshApprovedCount(), refreshDispatchStatus()]).then(function(){ render(); });
     }).catch(function(err){ errorView(err.message || "Could not load the queue."); });
   }
 

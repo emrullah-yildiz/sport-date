@@ -83,28 +83,41 @@ describe("POST /api/social/dispatch — owner-gated record", () => {
   });
 });
 
-describe("GET /api/social/dispatch — internal secret-guarded latest unhandled", () => {
+describe("GET /api/social/dispatch — agent secret or owner session", () => {
   it("returns the latest unhandled request for the correct secret", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
     const res = await GET(getReq("Bearer social-secret"));
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ request: REQUEST });
   });
 
   it("returns null when there is no unhandled request (handled ones hidden)", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
     mocks.latestUnhandledDispatch.mockResolvedValue(null);
     const res = await GET(getReq("Bearer social-secret"));
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ request: null });
   });
 
-  it("401s without the secret and never queries", async () => {
+  it("200s for the owner session without a secret (status light)", async () => {
+    mocks.getCurrentUser.mockResolvedValue(OWNER);
+    const res = await GET(getReq());
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ request: REQUEST });
+  });
+
+  it("401s signed-out, 403s non-owner, 401s wrong secret — never queries", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
     expect((await GET(getReq())).status).toBe(401);
     expect((await GET(getReq("Bearer wrong"))).status).toBe(401);
+    mocks.getCurrentUser.mockResolvedValue(MEMBER);
+    expect((await GET(getReq())).status).toBe(403);
     expect(mocks.latestUnhandledDispatch).not.toHaveBeenCalled();
   });
 
-  it("fails closed (401) when SOCIAL_AGENT_SECRET is unset", async () => {
+  it("fails closed on the agent path when SOCIAL_AGENT_SECRET is unset", async () => {
     delete process.env.SOCIAL_AGENT_SECRET;
+    mocks.getCurrentUser.mockResolvedValue(null);
     expect((await GET(getReq("Bearer anything"))).status).toBe(401);
     expect(mocks.latestUnhandledDispatch).not.toHaveBeenCalled();
   });

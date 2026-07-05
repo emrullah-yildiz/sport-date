@@ -15,9 +15,11 @@ import {
 // POST — OWNER-GATED. Records a "schedule my approved posts now" go-signal and
 //        returns the current approved-unscheduled count. Reuses the session
 //        helper (no new auth) + the OWNER_EMAILS allow-list.
-// GET  — INTERNAL, secret-guarded (SOCIAL_AGENT_SECRET). Returns the latest
-//        UNHANDLED request (or null) so the CEO loop can detect the click.
-//        Fails closed when the secret is unset (never an open read path).
+// GET  — INTERNAL (Bearer SOCIAL_AGENT_SECRET) or OWNER SESSION. Returns the
+//        latest UNHANDLED request (or null): the CEO loop uses it to detect the
+//        click; the owner page uses it as the status light (unhandled request =
+//        agent is working, none = ready to review). Fails closed for everyone
+//        else — never an open read path.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -47,7 +49,13 @@ export async function POST() {
 
 export async function GET(request: Request) {
   if (!isAuthorizedSocialAgent(request)) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: noStore });
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401, headers: noStore });
+    }
+    if (!isOwnerEmail(user.email)) {
+      return NextResponse.json({ error: "Owner access only." }, { status: 403, headers: noStore });
+    }
   }
 
   try {
