@@ -35,8 +35,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const payload = (body ?? {}) as { action?: unknown; comment?: unknown };
 
   const hasAction = payload.action !== undefined && payload.action !== null;
-  if (hasAction && payload.action !== "approve" && payload.action !== "deny") {
-    return NextResponse.json({ error: "action must be 'approve' or 'deny'." }, { status: 400, headers: noStore });
+  if (hasAction && payload.action !== "approve" && payload.action !== "deny" && payload.action !== "archive") {
+    return NextResponse.json({ error: "action must be 'approve', 'deny', or 'archive'." }, { status: 400, headers: noStore });
   }
 
   const hasComment = payload.comment !== undefined;
@@ -53,7 +53,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   const decision: SocialIdeaDecision = {
-    ...(hasAction ? { action: payload.action as "approve" | "deny" } : {}),
+    ...(hasAction ? { action: payload.action as "approve" | "deny" | "archive" } : {}),
     ...(hasComment ? { comment } : {}),
   };
 

@@ -9,7 +9,9 @@ import { getDatabase } from "@/lib/db";
 
 export const SOCIAL_PLATFORMS = ["instagram", "tiktok", "both"] as const;
 export const SOCIAL_FORMATS = ["carousel", "reel", "image", "story"] as const;
-export const SOCIAL_STATUSES = ["pending", "approved", "denied"] as const;
+// "denied" is surfaced as the Deleted bucket on the review page; "archived" is
+// an explicit tidy-away state; "posted" is derived from scheduled_ref, not a status.
+export const SOCIAL_STATUSES = ["pending", "approved", "denied", "archived"] as const;
 
 export type SocialPlatform = (typeof SOCIAL_PLATFORMS)[number];
 export type SocialFormat = (typeof SOCIAL_FORMATS)[number];
@@ -52,7 +54,7 @@ export type SocialIdeaInput = Readonly<{
 }>;
 
 export type SocialIdeaDecision = Readonly<{
-  action?: "approve" | "deny";
+  action?: "approve" | "deny" | "archive";
   comment?: string;
 }>;
 
@@ -243,7 +245,11 @@ export async function decideSocialIdea(id: string, decision: SocialIdeaDecision)
   if (!isValidSocialIdeaId(id)) return null;
   const sql = getDatabase();
 
-  const nextStatus = decision.action === "approve" ? "approved" : decision.action === "deny" ? "denied" : null;
+  const nextStatus =
+    decision.action === "approve" ? "approved"
+    : decision.action === "deny" ? "denied"
+    : decision.action === "archive" ? "archived"
+    : null;
   const hasComment = decision.comment !== undefined;
   const comment = hasComment ? (decision.comment ?? "") : null;
 

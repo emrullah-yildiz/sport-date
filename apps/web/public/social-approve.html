@@ -55,6 +55,8 @@
   .chip.status.approved{ color:var(--neon); border-color:rgba(59,234,126,.5); }
   .chip.status.denied{ color:var(--red); border-color:rgba(255,110,104,.5); }
   .chip.status.pending{ color:var(--amber); border-color:rgba(232,176,75,.5); }
+  .chip.status.posted{ color:var(--blue); border-color:rgba(67,198,245,.5); }
+  .chip.status.archived{ color:var(--mut); }
   .card h3{ margin:12px 0 2px; font-size:18px; }
   .card .titlerow{ font-size:12px; color:var(--mut); }
   .hook{ margin:12px 0; font-size:16px; font-weight:700; color:var(--ink); border-left:2px solid var(--neon); padding-left:12px; }
@@ -118,14 +120,19 @@
 (function(){
   "use strict";
   var app = document.getElementById("app");
+  // Lifecycle buckets (owner request 2026-07-05): posted = scheduled/published
+  // (scheduledRef set); denied ideas leave the working view into Deleted;
+  // Archived is the tidy-away shelf. "All" is the working set only.
   var FILTERS = [
-    { key:"all", label:"All", status:null },
-    { key:"pending", label:"Pending", status:"pending" },
-    { key:"approved", label:"Approved", status:"approved" },
-    { key:"denied", label:"Denied", status:"denied" }
+    { key:"all", label:"All" },
+    { key:"pending", label:"Pending" },
+    { key:"approved", label:"Approved" },
+    { key:"posted", label:"Posted" },
+    { key:"archived", label:"Archived" },
+    { key:"deleted", label:"Deleted" }
   ];
   var current = "all";
-  var ideas = [];
+  var ideas = [];               // full queue, bucketed client-side
   var approvedUnscheduled = 0;
   var dispatchNotice = "";   // success line under the dispatch button
   var dispatchError = "";    // error line under the dispatch button
@@ -134,10 +141,29 @@
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
     return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]; }); }
 
+  function bucketOf(idea){
+    if (idea.status === "denied") return "deleted";
+    if (idea.status === "archived") return "archived";
+    if (idea.scheduledRef) return "posted";
+    return idea.status; // pending | approved
+  }
+  function inCurrent(idea){
+    var b = bucketOf(idea);
+    if (current === "all") return b === "pending" || b === "approved" || b === "posted";
+    return b === current;
+  }
+  function counts(){
+    var c = { all:0, pending:0, approved:0, posted:0, archived:0, deleted:0 };
+    ideas.forEach(function(i){
+      var b = bucketOf(i);
+      c[b]++;
+      if (b === "pending" || b === "approved" || b === "posted") c.all++;
+    });
+    return c;
+  }
+
   function apiList(){
-    var f = FILTERS.filter(function(x){ return x.key === current; })[0];
-    var qs = f && f.status ? ("?status=" + encodeURIComponent(f.status)) : "";
-    return fetch("/api/social/ideas" + qs, { credentials:"same-origin", headers:{ "Accept":"application/json" } });
+    return fetch("/api/social/ideas", { credentials:"same-origin", headers:{ "Accept":"application/json" } });
   }
 
   function signedOutView(){
@@ -192,29 +218,36 @@
   // Decision buttons. Once a choice is made the OTHER button is locked (disabled)
   // so a click can't land on the wrong action; a "Change" link re-opens both.
   function actionsHtml(idea){
-    var s = idea.status;                 // pending | approved | denied
-    var locked = s !== "pending";
+    var b = bucketOf(idea);              // pending | approved | posted | archived | deleted
+    var locked = b !== "pending";
     var approve =
-      '<button class="abtn approve' + (s === "approved" ? " active" : "") + '" data-action="approve"' +
-        (locked && s !== "approved" ? " disabled" : "") +
-        ' aria-pressed="' + (s === "approved") + '">' + (s === "approved" ? "✓ Approved" : "Approve") + "</button>";
+      '<button class="abtn approve' + (b === "approved" || b === "posted" ? " active" : "") + '" data-action="approve"' +
+        (locked && b !== "approved" && b !== "deleted" && b !== "archived" ? " disabled" : "") +
+        ' aria-pressed="' + (b === "approved") + '">' +
+        (b === "approved" || b === "posted" ? "✓ Approved" : (b === "deleted" || b === "archived") ? "Restore (approve)" : "Approve") + "</button>";
     var deny =
-      '<button class="abtn deny' + (s === "denied" ? " active" : "") + '" data-action="deny"' +
-        (locked && s !== "denied" ? " disabled" : "") +
-        ' aria-pressed="' + (s === "denied") + '">' + (s === "denied" ? "✕ Denied" : "Deny") + "</button>";
-    var change = locked ? '<button class="change" data-role="change">Change</button>' : "";
-    return '<div class="actions">' + approve + deny + change + "</div>" +
-      (s === "approved" ? '<div class="decided approved">Approved — will be scheduled when you hit “Done”.</div>'
-       : s === "denied" ? '<div class="decided denied">Denied — the agent will skip this one.</div>' : "");
+      '<button class="abtn deny' + (b === "deleted" ? " active" : "") + '" data-action="deny"' +
+        (locked && b !== "deleted" ? " disabled" : "") +
+        ' aria-pressed="' + (b === "deleted") + '">' + (b === "deleted" ? "✕ Deleted" : "Deny (delete)") + "</button>";
+    var archive = (b === "approved" || b === "posted")
+      ? '<button class="abtn" data-action="archive" style="flex:0 0 auto;min-width:0;padding:0 16px">🗄 Archive</button>' : "";
+    var change = (b === "approved") ? '<button class="change" data-role="change">Change</button>' : "";
+    return '<div class="actions">' + approve + deny + archive + change + "</div>" +
+      (b === "approved" ? '<div class="decided approved">Approved — will be scheduled when you hit “Done”.</div>'
+       : b === "posted" ? '<div class="decided approved">Posted — scheduled/published (' + esc(idea.scheduledRef || "") + ').</div>'
+       : b === "deleted" ? '<div class="decided denied">Deleted — lives in the Deleted tab; Restore brings it back.</div>'
+       : b === "archived" ? '<div class="decided" style="color:var(--mut)">Archived — out of the working queue.</div>' : "");
   }
 
   function cardHtml(idea){
+    var b = bucketOf(idea);
+    var cardCls = b === "deleted" ? "denied" : b === "posted" ? "approved" : b === "archived" ? "denied" : idea.status;
     var trend = idea.trend ? '<span class="chip trend">' + esc(idea.trend) + "</span>" : "";
-    return '<article class="card ' + esc(idea.status) + '" data-id="' + esc(idea.id) + '">' +
+    return '<article class="card ' + esc(cardCls) + '" data-id="' + esc(idea.id) + '">' +
       '<div class="chips">' +
         '<span class="chip plat">' + esc(idea.platform) + "</span>" +
         '<span class="chip fmt">' + esc(idea.format) + "</span>" +
-        trend + statusChip(idea.status) +
+        trend + statusChip(b === "deleted" ? "denied" : b) +
       "</div>" +
       "<h3>" + esc(idea.title) + "</h3>" +
       '<div class="hook">' + esc(idea.hook) + "</div>" +
@@ -233,11 +266,14 @@
   }
 
   function filtersHtml(){
+    var c = counts();
+    var shown = ideas.filter(inCurrent).length;
     return '<div class="bar"><div class="filters">' +
       FILTERS.map(function(f){
-        return '<button class="fbtn" data-filter="' + f.key + '" aria-pressed="' + (f.key === current) + '">' + esc(f.label) + "</button>";
+        return '<button class="fbtn" data-filter="' + f.key + '" aria-pressed="' + (f.key === current) + '">' +
+          esc(f.label) + " (" + c[f.key] + ")</button>";
       }).join("") +
-      '</div><div class="count"><b>' + ideas.length + "</b> " + (ideas.length === 1 ? "idea" : "ideas") + "</div></div>";
+      '</div><div class="count"><b>' + shown + "</b> shown</div></div>";
   }
 
   function dispatchHtml(){
@@ -280,8 +316,9 @@
   function renderList(){
     var list = document.getElementById("list");
     if (!list) return;
-    list.innerHTML = ideas.length
-      ? '<div class="cards">' + ideas.map(cardHtml).join("") + "</div>"
+    var visible = ideas.filter(inCurrent);
+    list.innerHTML = visible.length
+      ? '<div class="cards">' + visible.map(cardHtml).join("") + "</div>"
       : '<div class="empty">No ideas in this view yet.</div>';
     Array.prototype.forEach.call(list.querySelectorAll(".card"), wireCard);
   }
@@ -328,7 +365,7 @@
     // preserve an unsaved comment the owner may have typed
     var typed = node ? (node.querySelector('[data-role="comment"]') || {}).value : undefined;
 
-    var droppedByFilter = current !== "all" && idea.status !== current;
+    var droppedByFilter = !inCurrent(idea);
     if (droppedByFilter){
       ideas = ideas.filter(function(x){ return x.id !== idea.id; });
       if (node){ node.style.opacity = "0"; setTimeout(renderList, 220); }
@@ -392,16 +429,11 @@
     });
   }
 
-  // N for the dispatch button: approved ideas not yet scheduled. Sourced from the
-  // owner-gated list so the page needs no extra owner-readable count endpoint.
+  // N for the dispatch button: approved ideas not yet scheduled — computed from
+  // the already-loaded full queue, no extra request.
   function refreshApprovedCount(){
-    return fetch("/api/social/ideas?status=approved", { credentials:"same-origin", headers:{ "Accept":"application/json" } })
-      .then(function(res){ return res.ok ? res.json() : { ideas: [] }; })
-      .then(function(d){
-        var arr = Array.isArray(d.ideas) ? d.ideas : [];
-        approvedUnscheduled = arr.filter(function(i){ return !i.scheduledRef; }).length;
-      })
-      .catch(function(){ approvedUnscheduled = 0; });
+    approvedUnscheduled = ideas.filter(function(i){ return i.status === "approved" && !i.scheduledRef; }).length;
+    return Promise.resolve();
   }
 
   function dispatch(){
@@ -419,7 +451,9 @@
       if (!data) return;
       dispatchDone = true;
       dispatchNotice = "Sent — your CEO is scheduling approved posts and revising your commented ones now.";
-      renderBar();
+      // Reload the whole queue so every card reflects the server's truth
+      // (approved/denied states, anything newly posted moves to its tab).
+      load();
     }).catch(function(err){
       dispatchDone = false;
       dispatchError = err.message || "Could not send the go-signal.";

@@ -55,6 +55,14 @@ describe("POST /api/social/ideas/[id] — owner decision", () => {
     await expect(res.json()).resolves.toMatchObject({ idea: { status: "denied" } });
   });
 
+  it("archives: passes the archive action through", async () => {
+    mocks.decideSocialIdea.mockResolvedValue({ id: ID, status: "archived" });
+    const res = await POST(...post({ action: "archive" }));
+    expect(res.status).toBe(200);
+    expect(mocks.decideSocialIdea).toHaveBeenCalledWith(ID, { action: "archive" });
+    await expect(res.json()).resolves.toMatchObject({ idea: { status: "archived" } });
+  });
+
   it("comment alone updates owner_comment without an action", async () => {
     const res = await POST(...post({ comment: "Punchier hook please." }));
     expect(res.status).toBe(200);
