@@ -3,12 +3,16 @@ import { notFound, redirect } from "next/navigation";
 
 import PrimaryNav from "@/components/PrimaryNav";
 import AcceptedMeetingPoint from "@/components/AcceptedMeetingPoint";
+import EventPosterShare from "@/components/EventPosterShare";
 import HostCancelEventControl from "@/components/HostCancelEventControl";
 import HostEditEventForm from "@/components/HostEditEventForm";
 import HostRequestDecision from "@/components/HostRequestDecision";
 import ReportSafetyControls from "@/components/ReportSafetyControls";
 import ShareEventLink from "@/components/ShareEventLink";
-import { getEventRoom, getHostEvent, getHostJoinRequests, type HostJoinRequest } from "@/lib/events";
+import { resolveAuthEmailOrigin } from "@/lib/auth-email-content";
+import { eventPosterViewFromInvite } from "@/lib/event-poster";
+import { buildEventShareText } from "@/lib/event-share";
+import { getEventRoom, getHostEvent, getHostJoinRequests, getPublicEventInvite, type HostJoinRequest } from "@/lib/events";
 import { getEventAttendanceBreakdown } from "@/lib/attendance-confirmations";
 import { isWithinReminderWindow } from "@/lib/attendance-confirmation";
 import { resolveHostEventView } from "@/lib/host-event-view";
@@ -117,6 +121,24 @@ export default async function HostEventPage({
     ? await getEventAttendanceBreakdown(eventId, host.id)
     : null;
 
+  // Poster + one-tap share (CX-20260705-event-poster-share). Deliberately built
+  // from the PUBLIC invite payload — the same allowlisted read as `/e/{id}` —
+  // never from the host's private event view, so nothing the host shares can
+  // carry the exact meeting point, an address, or any person. Published only.
+  const publicInvite = event.status === "published" ? await getPublicEventInvite(eventId) : null;
+  const origin = resolveAuthEmailOrigin();
+  const poster = publicInvite ? eventPosterViewFromInvite(publicInvite, origin) : null;
+  const share = publicInvite && poster
+    ? {
+        invitePath: view.shareInvitePath,
+        posterPath: `${view.shareInvitePath}/poster`,
+        shareTitle: poster.headline,
+        shareText: buildEventShareText(publicInvite),
+        posterAlt: poster.alt,
+        absoluteInviteUrl: origin ? `${origin}${view.shareInvitePath}` : null,
+      }
+    : null;
+
   return (
     <main className="host-event-page">
       <PrimaryNav
@@ -128,13 +150,13 @@ export default async function HostEventPage({
       {view.justPublished ? (
         <section className="host-published" role="status" aria-labelledby="host-published-heading">
           <p className="panel-label">It&apos;s live</p>
-          <h2 id="host-published-heading">Your event is published.</h2>
-          <p>Compatible members can now find it in discovery and request a place. The exact meeting point stays private until you accept a request.</p>
+          <h2 id="host-published-heading">Your event, ready to share.</h2>
+          <p>Compatible members can now find it in discovery and request a place. Here&apos;s the poster — one tap shares it anywhere. The exact meeting point stays private until you accept a request.</p>
           <div className="host-published-actions">
             <Link href={view.publicInvitationPath} className="host-published-primary">View the public invitation <span aria-hidden="true">→</span></Link>
             <Link href={view.managePath}>Manage your events</Link>
           </div>
-          <ShareEventLink path={view.shareInvitePath} />
+          {share ? <EventPosterShare {...share} /> : <ShareEventLink path={view.shareInvitePath} />}
         </section>
       ) : null}
 
@@ -179,11 +201,14 @@ export default async function HostEventPage({
           <p className="panel-label">Grow the group</p>
           <h2 id="host-share-heading">Share this invitation anywhere.</h2>
           <p>
-            The public link works without an account and previews with a rich card in chats
-            and social apps. It shows only the sport, level, approximate area, time, and
-            places left — never the exact meeting point, your name, or any address.
+            Your event has a ready-made poster and a public link that works without an
+            account and previews with a rich card in chats and social apps. Both show only
+            the sport, level, approximate area, time, and places left — never the exact
+            meeting point, your name, or any address.
           </p>
-          <ShareEventLink path={view.shareInvitePath} />
+          {share
+            ? <EventPosterShare {...share} showPreview={!view.justPublished} />
+            : <ShareEventLink path={view.shareInvitePath} />}
           <Link href={view.shareInvitePath} className="host-share-preview">See the public invite page →</Link>
         </section>
       ) : null}

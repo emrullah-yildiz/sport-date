@@ -3,8 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 
+import EventPosterShare from "@/components/EventPosterShare";
 import { BRAND_NAME, Wordmark } from "@/lib/brand";
 import { resolveAuthEmailOrigin } from "@/lib/auth-email-content";
+import { eventPosterViewFromInvite } from "@/lib/event-poster";
+import { buildEventShareText } from "@/lib/event-share";
 import { getPublicEventInvite } from "@/lib/events";
 import { describePublicInvite } from "@/lib/public-event-invite";
 import { getCurrentUser } from "@/lib/session";
@@ -66,6 +69,13 @@ export default async function PublicEventInvitePage({ params }: { params: Promis
   // No new data collection happens on this page.
   const user = await getCurrentUser();
   const memberInvitePath = `/discover/events/${invite.id}`;
+  // The CapCut-style poster + share control (CX-20260705-event-poster-share).
+  // Everything shared — poster, link, text — derives from the same allowlisted
+  // public payload as this page; the exact meeting point cannot appear.
+  const origin = resolveAuthEmailOrigin();
+  const invitePath = `/e/${invite.id}`;
+  const poster = eventPosterViewFromInvite(invite, origin);
+  const shareText = buildEventShareText(invite);
 
   return (
     <main className="public-invite-page">
@@ -176,6 +186,22 @@ export default async function PublicEventInvitePage({ params }: { params: Promis
               ) : null}
             </div>
           )}
+        </section>
+
+        <section className="public-invite-share" aria-labelledby="invite-share-heading">
+          <h2 id="invite-share-heading">Share this game</h2>
+          <p>
+            The ready-made poster and link show only the sport, time, places left, and the
+            approximate area — safe to post anywhere.
+          </p>
+          <EventPosterShare
+            invitePath={invitePath}
+            posterPath={`${invitePath}/poster`}
+            shareTitle={described.headline}
+            shareText={shareText}
+            posterAlt={poster.alt}
+            absoluteInviteUrl={origin ? `${origin}${invitePath}` : null}
+          />
         </section>
 
         <footer className="public-invite-footer">

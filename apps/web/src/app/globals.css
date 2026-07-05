@@ -1520,6 +1520,36 @@ button:disabled:hover, button[disabled]:hover {
 .host-share-preview { display: inline-flex; align-items: center; min-height: 44px; justify-self: start; color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
 .host-share-preview:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
 
+/* ---- Event poster + one-tap share (CX-20260705-event-poster-share): the poster
+   preview, native Share button, and download / copy / platform-intent fallbacks.
+   Used inside .host-published, .host-share-card, and .public-invite-share. */
+.event-poster-share { display: grid; gap: 12px; justify-items: start; margin-top: 6px; }
+.event-poster-share-preview { display: inline-flex; max-width: 100%; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-raised); }
+.event-poster-share-preview img { display: block; width: 270px; max-width: 100%; height: auto; }
+.event-poster-share-preview:hover { box-shadow: var(--glow-accent); }
+.event-poster-share-preview:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.event-poster-share-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.event-poster-share-button { min-height: 44px; padding: 11px 24px; border: 1.5px solid transparent; border-radius: 14px; background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; }
+.event-poster-share-button:hover { box-shadow: var(--glow-accent); }
+.event-poster-share-button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.event-poster-share-download,
+.event-poster-share-copy { display: inline-flex; align-items: center; min-height: 44px; padding: 11px 18px; border: 1.5px solid var(--accent); border-radius: 14px; background: transparent; color: var(--accent); font-weight: 900; cursor: pointer; text-decoration: none; }
+.event-poster-share-download:hover,
+.event-poster-share-copy:hover { background: rgba(59,234,126,.12); box-shadow: var(--glow-accent); }
+.event-poster-share-download:focus-visible,
+.event-poster-share-copy:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.event-poster-share-intents { display: flex; flex-wrap: wrap; gap: 10px; }
+.event-poster-share-intents a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-weight: 800; text-decoration: none; }
+.event-poster-share-intents a:hover { border-color: var(--accent); color: var(--accent); }
+.event-poster-share-intents a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.event-poster-share-status { margin: 0; max-width: 720px; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
+
+/* Public invite page: the share section is its own calm card below the invite. */
+.public-invite-share { max-width: 760px; display: grid; gap: 12px; padding: 30px 40px; border-radius: 26px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.public-invite-share h2 { margin: 0; font-size: var(--fs-h2); }
+.public-invite-share > p { max-width: 620px; margin: 0; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.55; }
+@media (max-width: 750px) { .public-invite-share { padding: 24px 22px; } }
+
 /* ---- Anonymous research survey (/research — CX-20260704). Mobile-first, calm,
    visibly a study: big tappable options (44px+), visible focus, no urgency. */
 .research-page { min-height: 100vh; background: linear-gradient(180deg, var(--bg) 0%, #0E1512 100%); }
