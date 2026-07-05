@@ -2,7 +2,10 @@ import sharp from "sharp";
 import { readFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
-const IDEAS = JSON.parse(readFileSync("docs/marketing/social/ideas-batch-01.json", "utf8"));
+// Usage: node docs/marketing/social/render-batch.mjs [ideasFile] [prefix]
+const INFILE = process.argv[2] || "docs/marketing/social/ideas-batch-01.json";
+const PREFIX = process.argv[3] || "b01";
+const IDEAS = JSON.parse(readFileSync(INFILE, "utf8"));
 const OUTDIR = "apps/web/public/brand/social";
 
 const BG = "#20262B", ACCENT = "#3BEA7E", TEXT = "#F1F5F3", MUTED = "#8A9BA0";
@@ -62,7 +65,7 @@ for (let idx = 0; idx < IDEAS.length; idx++) {
   const H = (idea.format === "carousel" || idea.format === "image") ? 1350 : 1920;
   const slides = slidesFor(idea);
   const total = slides.length;
-  const base = `b01-${String(idx + 1).padStart(2, "0")}-${slug(idea.title)}`;
+  const base = `${PREFIX}-${String(idx + 1).padStart(2, "0")}-${slug(idea.title)}`;
   const assets = [];
   mkdirSync(OUTDIR, { recursive: true });
   for (let s = 0; s < slides.length; s++) {
