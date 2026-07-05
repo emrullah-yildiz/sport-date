@@ -100,6 +100,26 @@ named (WhatsApp named once, neutrally and kindly, per owner clearance).
 | H-PAIN-freeexplainer | The plainest "here's what you get, for free" post beats a longer feature-by-feature explainer on shares | shares-per-post vs H-FEATURE-howitworks / H-CONTENT-featurevsrelatable baselines |
 | H-CONTENT-painvsfeature | Pain-based "why us" content converts curiosity into follows/saves/shares better than feature-led (batch 07) or pure relatable/science/quote content (batches 02–06) | follows-per-post + saves + shares, batch 08 vs batch 07 vs batches 02–06 combined |
 
+## Open hypotheses (from batch 09 — owner-review revisions + poster-look rule, added 2026-07-06)
+
+**Owner directive:** a full 2026-07-05 night review of the queue denied five posts (each with a
+specific fix) and praised two winners. Batch 09 answers every comment and introduces a new
+standing creative rule: **branded poster look** — every image must carry a visible KeepItUp logo
+mark + wordmark + branded text blocks (anthracite/`#3BEA7E`/off-white), not a bare photo with a
+caption. Four posts (P1-P4) are direct same-joke/same-pillar pairs against an already-shipped
+prior version specifically to isolate this variable.
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-BRAND-posterlook | Visible logo + full poster branding lifts saves and profile-visit/link clicks vs. our prior treatments (clean-photo caption-led, or overlay-with-scrim but no visible logo) | saves-per-post + profile-visit clicks, batch 09 P1-P4 vs. their exact prior versions (batch 06 P4/P5, batch 07 P3/P6) at the same time slot |
+| H-PILLAR-datinghistory | A verified, plain then-vs-now comparison (1965 computer dating vs. Gen Z today) beats an abstract guessing-game carousel on comprehension and saves | saves-per-post + qualitative comment clarity vs. the denied "Guess Which Era" concept (never shipped, so also compare vs. batch 02/03 carousel baseline) |
+| H-TREND-anonymized | A verified-but-unnamed World-Cup human-interest post (no real name/photo, per trend-jacking-playbook rule 2) performs comparably to our earlier team/theme-only World Cup posts | reach/shares/saves vs. H-TREND-worldcup baseline (batch 05 P1/P2) |
+
+Batch 09 also retests `H-PILLAR-sciencefact` (P9, a new citation — Cohen et al. 2009 "rowers'
+high" — with poster branding for the first time) and `H-FEATURE-howitworks` (P10, single-poster
+format vs. the praised 4-slide carousel, same content) as format/treatment mutations of two
+posts the owner explicitly praised, rather than pure repeats.
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -191,3 +211,26 @@ named (WhatsApp named once, neutrally and kindly, per owner clearance).
   follows-per-post, saves, and shares against batch 07 (feature-led) and batches 02–06
   (relatable/science/quote/trend) combined to test whether pain-based positioning is the strongest
   lever of the three, and prune whichever approach loses.
+- _2026-07-06_ — **Owner review revisions shipped** (`content-queue/2026-07-batch-09.md`,
+  `social/ideas-batch-09.json`, 10 drafts, 1 already-approved slide-spec for sign-off). The owner
+  reviewed the full queue the night of 2026-07-05 and denied five posts, each with a specific fix,
+  and praised two winners. Answered every comment: P1-P4 re-shot with fresh photos (never
+  reusing the same six again) and full poster branding (visible KeepItUp logo mark + wordmark —
+  the missing ingredient the owner called out on all four denials); P5 drops the "Guess Which Era"
+  abstract format entirely for a plain, verified then-vs-now history post (1965 computer dating vs.
+  Gen Z's real-life-group trend today, both facts checked via WebSearch); P6 fixes the "5 Stages"
+  carousel to count up from Step 1 instead of down from Stage 5; P7 answers the goalkeeper-story
+  request but hits a hard compliance wall — `trend-jacking-playbook.md` rule 2 bars using a real
+  player's name or photo without rights, so it rides the verified 2026 World Cup keeper
+  redemption-story theme with original illustrated art and no name, exactly matching the
+  playbook's own worked example; P8 delivers the full 5-slide chat-mockup spec for the
+  already-approved micro-drama Episode 1, held for the owner's explicit visual sign-off before
+  scheduling; P9 and P10 mutate the two posts the owner praised (a new science citation — Cohen
+  et al. 2009 "rowers' high" — and a single-poster remix of the praised 4-step carousel) instead
+  of just repeating them. Sourced 6 new Pexels photos (basketball, padel, volleyball, cyclists,
+  park fitness group, badminton) to end the photo reuse the owner flagged; not yet downloaded —
+  table is in the batch file for the next process step to fetch + license + bake composites, same
+  handoff pattern as batch 08. Added H-BRAND-posterlook, H-PILLAR-datinghistory, and
+  H-TREND-anonymized above. Next review: once P1-P4 have live data, compare directly against their
+  pre-poster-look prior versions (same joke/photo pillar, same time slot) to confirm or kill the
+  poster-branding hypothesis before applying it retroactively to older evergreen posts.

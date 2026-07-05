@@ -48,3 +48,10 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
   owner pains (organizing games in a group chat vs. one real event; paying for singles/mixer
   events vs. a free game), plus one science-tied "doing beats talking" post. No competitor named;
   WhatsApp named once, neutrally. Real-photo image-led throughout, status `draft`.
+- `2026-07-batch-09.md` — revision batch answering the owner's 2026-07-05 full-queue review:
+  5 denied posts fixed (new photos, full "branded poster look" — visible logo + wordmark + brand
+  type blocks, not just a caption), 1 denied post replaced outright (a confusing "guess the era"
+  format swapped for a plain, verified dating-history-vs-Gen-Z post), the exact 5-slide spec for
+  an already-approved micro-drama post delivered for visual sign-off, and 2 new posts mutating the
+  two posts the owner praised. Introduces the poster-look rule and 6 fresh Pexels photo candidates
+  to stop reusing the same 6. Status `draft` except one item held `approved` pending slide sign-off.
