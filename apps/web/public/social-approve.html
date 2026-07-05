@@ -20,6 +20,15 @@
   .top h1{ font-size:26px; margin:6px 0 0; }
   .who{ font-size:13px; color:var(--mut); margin-top:4px; }
   h2.sec{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); margin:28px 0 14px; }
+  /* dispatch trigger — "done reviewing, schedule now" */
+  .dispatch{ background:linear-gradient(180deg, rgba(59,234,126,.10), rgba(59,234,126,.04)); border:1px solid rgba(59,234,126,.35);
+    border-radius:14px; padding:16px 18px; margin:20px 0 6px; }
+  .dbtn{ width:100%; min-height:54px; border-radius:12px; border:1px solid var(--neon); background:rgba(59,234,126,.18);
+    color:var(--neon); font-size:16px; font-weight:800; cursor:pointer; letter-spacing:.01em; }
+  .dbtn:hover:not(:disabled){ background:rgba(59,234,126,.26); }
+  .dbtn:disabled{ opacity:.45; cursor:default; }
+  .dhint{ margin-top:9px; font-size:13px; color:var(--mut); text-align:center; }
+  .dhint.ok{ color:var(--neon); } .dhint.err{ color:var(--red); }
   .note{ background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--neon); border-radius:12px; padding:18px 20px; }
   .note p{ margin:0 0 10px; font-size:15px; } .note p:last-child{ margin:0; }
   /* filter bar */
@@ -109,6 +118,8 @@
   ];
   var current = "all";
   var ideas = [];
+  var approvedUnscheduled = 0;
+  var dispatchNotice = "";
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
     return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]; }); }
@@ -192,8 +203,22 @@
     "</article>";
   }
 
+  function dispatchHtml(){
+    var n = approvedUnscheduled;
+    var hint = dispatchNotice
+      ? '<div class="dhint ok" id="dispatch-msg">' + esc(dispatchNotice) + "</div>"
+      : (n === 0
+          ? '<div class="dhint" id="dispatch-msg">Approve at least one post, then send the go-signal here.</div>'
+          : '<div class="dhint" id="dispatch-msg">Sends a go-signal to your CEO to schedule your approved posts now.</div>');
+    return '<div class="dispatch">' +
+      '<button class="dbtn" id="dispatch-btn"' + (n === 0 ? " disabled" : "") + '>' +
+        "✅ Done reviewing — schedule my approved posts (" + n + ")" +
+      "</button>" + hint +
+    "</div>";
+  }
+
   function render(){
-    var barHtml = '<div class="bar"><div class="filters">' +
+    var barHtml = dispatchHtml() + '<div class="bar"><div class="filters">' +
       FILTERS.map(function(f){
         return '<button class="fbtn" data-filter="' + f.key + '" aria-pressed="' + (f.key === current) + '">' + esc(f.label) + "</button>";
       }).join("") +
@@ -208,8 +233,10 @@
   }
 
   function wire(){
+    var db = document.getElementById("dispatch-btn");
+    if (db) db.addEventListener("click", dispatch);
     Array.prototype.forEach.call(app.querySelectorAll(".fbtn"), function(btn){
-      btn.addEventListener("click", function(){ current = btn.getAttribute("data-filter"); load(); });
+      btn.addEventListener("click", function(){ current = btn.getAttribute("data-filter"); dispatchNotice = ""; load(); });
     });
     Array.prototype.forEach.call(app.querySelectorAll(".card"), function(card){
       var id = card.getAttribute("data-id");
@@ -255,15 +282,50 @@
     });
   }
 
+  // N for the dispatch button: approved ideas not yet scheduled. Sourced from the
+  // owner-gated list so the page needs no extra owner-readable count endpoint.
+  function refreshApprovedCount(){
+    return fetch("/api/social/ideas?status=approved", { credentials:"same-origin", headers:{ "Accept":"application/json" } })
+      .then(function(res){ return res.ok ? res.json() : { ideas: [] }; })
+      .then(function(d){
+        var arr = Array.isArray(d.ideas) ? d.ideas : [];
+        approvedUnscheduled = arr.filter(function(i){ return !i.scheduledRef; }).length;
+      })
+      .catch(function(){ approvedUnscheduled = 0; });
+  }
+
+  function dispatch(){
+    var btn = document.getElementById("dispatch-btn");
+    var msg = document.getElementById("dispatch-msg");
+    if (btn) btn.disabled = true;
+    if (msg){ msg.className = "dhint"; msg.textContent = "Sending…"; }
+    fetch("/api/social/dispatch", {
+      method:"POST", credentials:"same-origin",
+      headers:{ "Content-Type":"application/json", "Accept":"application/json" }
+    }).then(function(res){
+      if (res.status === 401 || res.status === 403){ signedOutView(); return null; }
+      if (!res.ok) throw new Error("Could not send the go-signal (" + res.status + ").");
+      return res.json();
+    }).then(function(data){
+      if (!data) return;
+      // Calm confirmation that survives the refresh below.
+      dispatchNotice = "Sent — your CEO is scheduling your approved posts now.";
+      load();
+    }).catch(function(err){
+      if (btn) btn.disabled = false;
+      if (msg){ msg.className = "dhint err"; msg.textContent = err.message || "Could not send the go-signal."; }
+    });
+  }
+
   function load(){
     apiList().then(function(res){
       if (res.status === 401 || res.status === 403){ signedOutView(); return null; }
       if (!res.ok) throw new Error("Could not load the queue (" + res.status + ").");
       return res.json();
     }).then(function(data){
-      if (!data) return;
+      if (!data) return null;
       ideas = Array.isArray(data.ideas) ? data.ideas : [];
-      render();
+      return refreshApprovedCount().then(function(){ render(); });
     }).catch(function(err){ errorView(err.message || "Could not load the queue."); });
   }
 
