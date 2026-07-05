@@ -1,0 +1,57 @@
+{
+  "day": "2026-07-05",
+  "generatedAt": "2026-07-05T10:45:00Z",
+  "headline": "First standup: creative pipeline fired & replaced, 21 posts awaiting your review, World Cup window is the play",
+  "summary": [
+    "Content engine rebuilt today on your three corrections: real photos instead of text cards, plain simple English, trend-first. Batches 05 (trends), 06 (science facts + life quotes), 07 (product features) are drafted — 21 posts awaiting your approve/deny on the posts page.",
+    "12 finished composites baked (real photography + brand overlay): science-fact cards, quote cards, memes, and a 4-step how-it-works carousel.",
+    "Approval page upgraded: instant approved/denied feedback, pick-one lock with a Change link, working Done button, and a new ✨ Improve button that turns your comment into a revision brief.",
+    "Agent performance reviewed for the first time — one pipeline fired, one agent rehired on a tightened contract, one new hire (this standup). Scorecards live in docs/operations/agent-performance.md.",
+    "Still blocked on you (unchanged): AI-video tool (5+ video posts waiting), giveaway prize, image-moderation provider."
+  ],
+  "agents": [
+    { "name": "social-media-growth", "status": "rehired-v2", "metric": "owner corrections per batch: 3 → target 0; % drafts approved unedited", "note": "Contract v2: photo-led, plain English, science/quote/feature pillars, improve-on-comment duty." },
+    { "name": "Text-card creative pipeline", "status": "fired", "metric": "0 approved posts from final batches", "note": "Replaced by real-photo + baked-composite pipeline (licensed Pexels photography)." },
+    { "name": "Builder (experience loop)", "status": "keep", "metric": "tickets shipped w/ full DoD; 0 broken deploys", "note": "Strongest performer: safety bundle, invites, survey, onboarding, Gmail delivery." },
+    { "name": "Tester / User-sim", "status": "probation", "metric": "0 false-passes; no build collisions", "note": "Must run in isolated worktree; next collision → contract rewrite." },
+    { "name": "photo-moderator", "status": "idle-blocked", "metric": "queue cleared <24h once live", "note": "Waiting on MODERATION_AGENT_SECRET from you." },
+    { "name": "standup-scribe", "status": "hired", "metric": "standup live on HQ by 06:15 daily", "note": "Cloud routine, first unattended run next 06:00." }
+  ],
+  "directions": [
+    {
+      "id": "SD-20260705-fire-rehire",
+      "priority": "high",
+      "title": "Ratify the fire/rehire slate",
+      "detail": "Fired: the text-card creative pipeline (you rejected its output). Rehired: social-media-growth on contract v2 (photo-led, plain English, new pillars). Hired: standup-scribe (this 06:00 report). Tester on probation with mandatory worktree isolation.",
+      "recommendation": "Approve — already reflected in the agent definitions; your denial reverts the contracts."
+    },
+    {
+      "id": "SD-20260705-worldcup-push",
+      "priority": "high",
+      "title": "Make the World Cup window (now → Jul 19) the primary growth push",
+      "detail": "The knockout stage is running and the final lands Jul 19 — the single biggest attention wave a sports-meetup brand will get this year. Batch 05 has two dated World Cup posts; more variants ship while the window is open, other experiments yield priority.",
+      "recommendation": "Approve — costs nothing extra; time-sensitive posts are dated so nothing goes stale."
+    },
+    {
+      "id": "SD-20260705-feature-pillar",
+      "priority": "medium",
+      "title": "Adopt product-feature posts as a recurring weekly pillar",
+      "detail": "Batch 07 tests feature-led content (location privacy, no-grid-of-faces, how-it-works, dating/friendship/group). If its follows-per-post holds up against the relatable pillars after ~2 weeks, one feature post ships every week.",
+      "recommendation": "Approve — feature posts double as honest product education."
+    },
+    {
+      "id": "SD-20260705-park-textcards",
+      "priority": "medium",
+      "title": "Park the remaining unapproved text-card drafts (batches 02–04)",
+      "detail": "The fired pipeline's leftover drafts are text-only cards in the style you rejected. Parking them clears the queue for photo-led content; anything worth keeping gets remade with real photos.",
+      "recommendation": "Approve — nothing already approved or scheduled is touched."
+    },
+    {
+      "id": "SD-20260705-video-tool",
+      "priority": "high",
+      "title": "Re-raising the AI-video tool decision (existing HQ card #1)",
+      "detail": "Short-form video is the top reach format; 5+ approved-or-drafted video posts sit awaiting-asset. This stays the biggest blocked growth lever and only you can provision a paid tool (~€20–30/mo).",
+      "recommendation": "Approve = you'll provision one this week; deny = video stays parked and the mix stays photo-only."
+    }
+  ]
+}

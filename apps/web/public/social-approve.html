@@ -20,12 +20,13 @@
   .top h1{ font-size:26px; margin:6px 0 0; }
   .who{ font-size:13px; color:var(--mut); margin-top:4px; }
   h2.sec{ font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); margin:28px 0 14px; }
-  /* dispatch trigger — "done reviewing, schedule now" */
+  /* dispatch trigger — "done reviewing, send to the agent" */
   .dispatch{ background:linear-gradient(180deg, rgba(59,234,126,.10), rgba(59,234,126,.04)); border:1px solid rgba(59,234,126,.35);
     border-radius:14px; padding:16px 18px; margin:20px 0 6px; }
   .dbtn{ width:100%; min-height:54px; border-radius:12px; border:1px solid var(--neon); background:rgba(59,234,126,.18);
-    color:var(--neon); font-size:16px; font-weight:800; cursor:pointer; letter-spacing:.01em; }
+    color:var(--neon); font-size:16px; font-weight:800; cursor:pointer; letter-spacing:.01em; transition:background .15s, opacity .15s; }
   .dbtn:hover:not(:disabled){ background:rgba(59,234,126,.26); }
+  .dbtn.done{ background:var(--neon); color:#0b1410; border-color:var(--neon); }
   .dbtn:disabled{ opacity:.45; cursor:default; }
   .dhint{ margin-top:9px; font-size:13px; color:var(--mut); text-align:center; }
   .dhint.ok{ color:var(--neon); } .dhint.err{ color:var(--red); }
@@ -41,7 +42,7 @@
   .count b{ color:var(--ink); }
   /* cards */
   .cards{ display:grid; gap:14px; }
-  .card{ min-width:0; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; border-left:3px solid var(--mut); }
+  .card{ min-width:0; overflow-wrap:anywhere; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; border-left:3px solid var(--mut); transition:border-color .2s, opacity .25s; }
   .card.approved{ border-left-color:var(--neon); }
   .card.denied{ border-left-color:var(--red); opacity:.72; }
   .card.pending{ border-left-color:var(--amber); }
@@ -66,23 +67,30 @@
   .shots img{ height:260px; width:auto; max-width:none; border-radius:16px; border:1px solid var(--line); display:block; background:var(--panel2); }
   .shots .shot:hover img{ border-color:rgba(59,234,126,.5); }
   .tags{ display:flex; flex-wrap:wrap; gap:6px; } .tag{ font-size:12px; color:var(--blue); background:rgba(67,198,245,.10); border-radius:6px; padding:2px 7px; }
-  .actions{ display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; }
+  /* decision actions */
+  .actions{ display:flex; flex-wrap:wrap; gap:9px; margin-top:14px; align-items:center; }
   .abtn{ min-height:44px; flex:1 1 auto; min-width:120px; display:inline-flex; align-items:center; justify-content:center; gap:6px;
-    border:1px solid var(--line); border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:var(--panel2); color:var(--ink); }
+    border:1px solid var(--line); border-radius:10px; font-size:14px; font-weight:800; cursor:pointer; background:var(--panel2); color:var(--ink); transition:background .15s, color .15s, border-color .15s, opacity .15s; }
   .abtn.approve{ color:var(--neon); border-color:rgba(59,234,126,.45); }
-  .abtn.approve[aria-pressed="true"]{ background:rgba(59,234,126,.16); }
+  .abtn.approve.active{ background:var(--neon); color:#0b1410; border-color:var(--neon); }
   .abtn.deny{ color:var(--red); border-color:rgba(255,110,104,.40); }
-  .abtn.deny[aria-pressed="true"]{ background:rgba(255,110,104,.14); }
-  .abtn:disabled{ opacity:.5; cursor:default; }
+  .abtn.deny.active{ background:var(--red); color:#180a0a; border-color:var(--red); }
+  .abtn:disabled{ opacity:.4; cursor:not-allowed; }
+  .abtn.improve{ color:var(--blue); border-color:rgba(67,198,245,.45); flex:0 0 auto; min-width:0; padding:0 16px; }
+  .change{ background:none; border:none; color:var(--mut); font-size:13px; font-weight:800; text-decoration:underline; cursor:pointer; padding:0 8px; min-height:44px; }
+  .change:hover{ color:var(--ink); }
+  .decided{ font-size:12.5px; font-weight:800; margin-top:8px; letter-spacing:.02em; }
+  .decided.approved{ color:var(--neon); } .decided.denied{ color:var(--red); }
+  .decided.improve{ color:var(--blue); }
   .commentbox{ margin-top:12px; }
   textarea{ width:100%; min-height:64px; resize:vertical; background:var(--bg); color:var(--ink); border:1px solid var(--line);
     border-radius:10px; padding:10px 12px; font:inherit; font-size:14px; }
   textarea:focus{ outline:none; border-color:var(--neon); }
-  .saverow{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .saverow{ display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top:8px; }
   .savebtn{ min-height:44px; padding:0 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel2); color:var(--neon);
     font-size:13px; font-weight:800; cursor:pointer; }
-  .msg{ font-size:12px; color:var(--mut); }
-  .msg.ok{ color:var(--neon); } .msg.err{ color:var(--red); }
+  .msg{ font-size:12.5px; color:var(--mut); flex:1 1 100%; }
+  .msg.ok{ color:var(--neon); } .msg.err{ color:var(--red); } .msg.busy{ color:var(--blue); }
   .empty{ text-align:center; color:var(--mut); padding:40px 10px; font-size:15px; }
   .foot{ margin-top:34px; font-size:12px; color:var(--mut); line-height:1.7; border-top:1px solid var(--line); padding-top:16px; }
 </style>
@@ -119,7 +127,9 @@
   var current = "all";
   var ideas = [];
   var approvedUnscheduled = 0;
-  var dispatchNotice = "";
+  var dispatchNotice = "";   // success line under the dispatch button
+  var dispatchError = "";    // error line under the dispatch button
+  var dispatchDone = false;  // has the go-signal been sent this session view
 
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
     return ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" })[c]; }); }
@@ -179,6 +189,25 @@
     return html;
   }
 
+  // Decision buttons. Once a choice is made the OTHER button is locked (disabled)
+  // so a click can't land on the wrong action; a "Change" link re-opens both.
+  function actionsHtml(idea){
+    var s = idea.status;                 // pending | approved | denied
+    var locked = s !== "pending";
+    var approve =
+      '<button class="abtn approve' + (s === "approved" ? " active" : "") + '" data-action="approve"' +
+        (locked && s !== "approved" ? " disabled" : "") +
+        ' aria-pressed="' + (s === "approved") + '">' + (s === "approved" ? "✓ Approved" : "Approve") + "</button>";
+    var deny =
+      '<button class="abtn deny' + (s === "denied" ? " active" : "") + '" data-action="deny"' +
+        (locked && s !== "denied" ? " disabled" : "") +
+        ' aria-pressed="' + (s === "denied") + '">' + (s === "denied" ? "✕ Denied" : "Deny") + "</button>";
+    var change = locked ? '<button class="change" data-role="change">Change</button>' : "";
+    return '<div class="actions">' + approve + deny + change + "</div>" +
+      (s === "approved" ? '<div class="decided approved">Approved — will be scheduled when you hit “Done”.</div>'
+       : s === "denied" ? '<div class="decided denied">Denied — the agent will skip this one.</div>' : "");
+  }
+
   function cardHtml(idea){
     var trend = idea.trend ? '<span class="chip trend">' + esc(idea.trend) + "</span>" : "";
     return '<article class="card ' + esc(idea.status) + '" data-id="' + esc(idea.id) + '">' +
@@ -190,78 +219,144 @@
       "<h3>" + esc(idea.title) + "</h3>" +
       '<div class="hook">' + esc(idea.hook) + "</div>" +
       renderBody(idea.body) +
-      '<div class="actions">' +
-        '<button class="abtn approve" data-action="approve" aria-pressed="' + (idea.status === "approved") + '">Approve</button>' +
-        '<button class="abtn deny" data-action="deny" aria-pressed="' + (idea.status === "denied") + '">Deny</button>' +
-      "</div>" +
+      actionsHtml(idea) +
       '<div class="commentbox">' +
-        '<label class="lbl" style="display:block;margin-bottom:4px">Owner comment</label>' +
-        '<textarea data-role="comment" placeholder="Notes for the growth agent…">' + esc(idea.ownerComment || "") + "</textarea>" +
-        '<div class="saverow"><button class="savebtn" data-role="save">Save comment</button>' +
-        '<span class="msg" data-role="msg"></span></div>' +
+        '<label class="lbl" style="display:block;margin-bottom:4px">Owner comment — what to change</label>' +
+        '<textarea data-role="comment" placeholder="e.g. Make the caption shorter and punchier; swap the photo for the beach one…">' + esc(idea.ownerComment || "") + "</textarea>" +
+        '<div class="saverow">' +
+          '<button class="savebtn" data-role="save">Save comment</button>' +
+          '<button class="abtn improve" data-role="improve">✨ Improve with my comment</button>' +
+          '<span class="msg" data-role="msg"></span>' +
+        "</div>" +
       "</div>" +
     "</article>";
   }
 
-  function dispatchHtml(){
-    var n = approvedUnscheduled;
-    var hint = dispatchNotice
-      ? '<div class="dhint ok" id="dispatch-msg">' + esc(dispatchNotice) + "</div>"
-      : (n === 0
-          ? '<div class="dhint" id="dispatch-msg">Approve at least one post, then send the go-signal here.</div>'
-          : '<div class="dhint" id="dispatch-msg">Sends a go-signal to your CEO to schedule your approved posts now.</div>');
-    return '<div class="dispatch">' +
-      '<button class="dbtn" id="dispatch-btn"' + (n === 0 ? " disabled" : "") + '>' +
-        "✅ Done reviewing — schedule my approved posts (" + n + ")" +
-      "</button>" + hint +
-    "</div>";
-  }
-
-  function render(){
-    var barHtml = dispatchHtml() + '<div class="bar"><div class="filters">' +
+  function filtersHtml(){
+    return '<div class="bar"><div class="filters">' +
       FILTERS.map(function(f){
         return '<button class="fbtn" data-filter="' + f.key + '" aria-pressed="' + (f.key === current) + '">' + esc(f.label) + "</button>";
       }).join("") +
       '</div><div class="count"><b>' + ideas.length + "</b> " + (ideas.length === 1 ? "idea" : "ideas") + "</div></div>";
-
-    var listHtml = ideas.length
-      ? '<div class="cards">' + ideas.map(cardHtml).join("") + "</div>"
-      : '<div class="empty">No ideas in this view yet.</div>';
-
-    app.innerHTML = barHtml + listHtml;
-    wire();
   }
 
-  function wire(){
-    var db = document.getElementById("dispatch-btn");
+  function dispatchHtml(){
+    var n = approvedUnscheduled;
+    var hasComments = ideas.some(function(i){ return i.ownerComment && String(i.ownerComment).trim(); });
+    var canSend = n > 0 || hasComments;
+    var label = dispatchDone
+      ? "✓ Sent — the agent is on it"
+      : "✅ Done — send my approvals &amp; comments (" + n + ")";
+    var hint;
+    if (dispatchError) hint = '<div class="dhint err">' + esc(dispatchError) + "</div>";
+    else if (dispatchNotice) hint = '<div class="dhint ok">' + esc(dispatchNotice) + "</div>";
+    else if (!canSend) hint = '<div class="dhint">Approve a post or leave an improvement comment, then send.</div>';
+    else hint = '<div class="dhint">Sends your approvals and improvement comments to the agent to schedule &amp; revise.</div>';
+    return '<div class="dispatch"><button class="dbtn' + (dispatchDone ? " done" : "") + '" id="dispatch-btn"' +
+      ((canSend && !dispatchDone) ? "" : " disabled") + ">" + label + "</button>" + hint + "</div>";
+  }
+
+  function render(){
+    app.innerHTML = '<div id="bar"></div><div id="list"></div>';
+    renderBar();
+    renderList();
+  }
+
+  function renderBar(){
+    var bar = document.getElementById("bar");
+    if (!bar) return;
+    bar.innerHTML = dispatchHtml() + filtersHtml();
+    var db = bar.querySelector("#dispatch-btn");
     if (db) db.addEventListener("click", dispatch);
-    Array.prototype.forEach.call(app.querySelectorAll(".fbtn"), function(btn){
-      btn.addEventListener("click", function(){ current = btn.getAttribute("data-filter"); dispatchNotice = ""; load(); });
-    });
-    Array.prototype.forEach.call(app.querySelectorAll(".card"), function(card){
-      var id = card.getAttribute("data-id");
-      Array.prototype.forEach.call(card.querySelectorAll(".abtn"), function(btn){
-        btn.addEventListener("click", function(){ decide(card, id, { action: btn.getAttribute("data-action") }); });
-      });
-      var save = card.querySelector('[data-role="save"]');
-      save.addEventListener("click", function(){
-        var ta = card.querySelector('[data-role="comment"]');
-        decide(card, id, { comment: ta.value });
+    Array.prototype.forEach.call(bar.querySelectorAll(".fbtn"), function(btn){
+      btn.addEventListener("click", function(){
+        current = btn.getAttribute("data-filter");
+        dispatchNotice = ""; dispatchError = ""; dispatchDone = false;
+        load();
       });
     });
+  }
+
+  function renderList(){
+    var list = document.getElementById("list");
+    if (!list) return;
+    list.innerHTML = ideas.length
+      ? '<div class="cards">' + ideas.map(cardHtml).join("") + "</div>"
+      : '<div class="empty">No ideas in this view yet.</div>';
+    Array.prototype.forEach.call(list.querySelectorAll(".card"), wireCard);
+  }
+
+  function wireCard(card){
+    var id = card.getAttribute("data-id");
+    Array.prototype.forEach.call(card.querySelectorAll(".abtn[data-action]"), function(btn){
+      btn.addEventListener("click", function(){
+        if (btn.disabled) return;
+        decide(card, id, { action: btn.getAttribute("data-action") });
+      });
+    });
+    var change = card.querySelector('[data-role="change"]');
+    if (change) change.addEventListener("click", function(){
+      // Re-open both actions without touching the server — lets the owner
+      // deliberately switch a choice, while still guarding accidental clicks.
+      Array.prototype.forEach.call(card.querySelectorAll(".abtn[data-action]"), function(b){ b.disabled = false; });
+      change.style.display = "none";
+    });
+    var save = card.querySelector('[data-role="save"]');
+    if (save) save.addEventListener("click", function(){
+      var ta = card.querySelector('[data-role="comment"]');
+      decide(card, id, { comment: ta.value }, { savingMsg: "Saving comment…", okMsg: "Comment saved." });
+    });
+    var improve = card.querySelector('[data-role="improve"]');
+    if (improve) improve.addEventListener("click", function(){ improvePost(card, id); });
   }
 
   function setMsg(card, text, cls){
     var m = card.querySelector('[data-role="msg"]');
     if (!m) return;
     m.className = "msg" + (cls ? " " + cls : "");
-    m.textContent = text || "";
+    m.innerHTML = text || "";
   }
 
-  function decide(card, id, payload){
+  // Replace one card in place with the server's truth (no full-page reload, so
+  // feedback is immediate and the rest of the queue doesn't flash/scroll).
+  function applyServerIdea(idea, afterMsg){
+    var found = false;
+    ideas = ideas.map(function(x){ if (x.id === idea.id){ found = true; return idea; } return x; });
+    if (!found) ideas.push(idea);
+
+    var node = document.querySelector('.card[data-id="' + idea.id + '"]');
+    // preserve an unsaved comment the owner may have typed
+    var typed = node ? (node.querySelector('[data-role="comment"]') || {}).value : undefined;
+
+    var droppedByFilter = current !== "all" && idea.status !== current;
+    if (droppedByFilter){
+      ideas = ideas.filter(function(x){ return x.id !== idea.id; });
+      if (node){ node.style.opacity = "0"; setTimeout(renderList, 220); }
+      else renderList();
+    } else if (node){
+      var tmp = document.createElement("div");
+      tmp.innerHTML = cardHtml(idea);
+      var fresh = tmp.firstChild;
+      node.parentNode.replaceChild(fresh, node);
+      var freshTa = fresh.querySelector('[data-role="comment"]');
+      if (freshTa && typed && typed !== (idea.ownerComment || "")) freshTa.value = typed;
+      wireCard(fresh);
+      if (afterMsg) setMsg(fresh, afterMsg.text, afterMsg.cls);
+    }
+    refreshApprovedCount().then(renderBar);
+  }
+
+  function decide(card, id, payload, opts){
+    opts = opts || {};
     var buttons = card.querySelectorAll("button");
     Array.prototype.forEach.call(buttons, function(b){ b.disabled = true; });
-    setMsg(card, "Saving…");
+    // optimistic highlight so approve/deny feels instant, before the network returns
+    if (payload.action){
+      var a = card.querySelector(".abtn.approve"), d = card.querySelector(".abtn.deny");
+      if (a) a.classList.toggle("active", payload.action === "approve");
+      if (d) d.classList.toggle("active", payload.action === "deny");
+    }
+    setMsg(card, opts.savingMsg || "Saving…", "busy");
     fetch("/api/social/ideas/" + encodeURIComponent(id), {
       method:"POST",
       credentials:"same-origin",
@@ -272,13 +367,28 @@
       if (!res.ok) throw new Error("Save failed (" + res.status + ")");
       return res.json();
     }).then(function(data){
-      if (!data) return;
-      setMsg(card, "Saved.", "ok");
-      // Re-fetch to stay honest with the server's truth.
-      load();
+      if (!data || !data.idea) return;
+      applyServerIdea(data.idea, opts.okMsg ? { text: opts.okMsg, cls: "ok" } : null);
     }).catch(function(err){
       Array.prototype.forEach.call(buttons, function(b){ b.disabled = false; });
       setMsg(card, err.message || "Save failed.", "err");
+    });
+  }
+
+  // Improve = save the owner's comment as a revise-this instruction, then flag it.
+  // The comment is the brief; hitting "Done" sends the go-signal so the agent
+  // revises every commented post next cycle.
+  function improvePost(card, id){
+    var ta = card.querySelector('[data-role="comment"]');
+    var text = (ta.value || "").trim();
+    if (!text){
+      setMsg(card, "Add a comment first — that's the instruction the agent improves from.", "err");
+      ta.focus();
+      return;
+    }
+    decide(card, id, { comment: text }, {
+      savingMsg: "Sending to the agent…",
+      okMsg: "✨ Improvement requested — the agent will revise this from your note. Hit “Done” to send it now."
     });
   }
 
@@ -296,9 +406,8 @@
 
   function dispatch(){
     var btn = document.getElementById("dispatch-btn");
-    var msg = document.getElementById("dispatch-msg");
-    if (btn) btn.disabled = true;
-    if (msg){ msg.className = "dhint"; msg.textContent = "Sending…"; }
+    if (btn){ btn.disabled = true; btn.textContent = "Sending…"; }
+    dispatchError = "";
     fetch("/api/social/dispatch", {
       method:"POST", credentials:"same-origin",
       headers:{ "Content-Type":"application/json", "Accept":"application/json" }
@@ -308,12 +417,13 @@
       return res.json();
     }).then(function(data){
       if (!data) return;
-      // Calm confirmation that survives the refresh below.
-      dispatchNotice = "Sent — your CEO is scheduling your approved posts now.";
-      load();
+      dispatchDone = true;
+      dispatchNotice = "Sent — your CEO is scheduling approved posts and revising your commented ones now.";
+      renderBar();
     }).catch(function(err){
-      if (btn) btn.disabled = false;
-      if (msg){ msg.className = "dhint err"; msg.textContent = err.message || "Could not send the go-signal."; }
+      dispatchDone = false;
+      dispatchError = err.message || "Could not send the go-signal.";
+      renderBar();
     });
   }
 

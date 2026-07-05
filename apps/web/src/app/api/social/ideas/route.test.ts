@@ -135,4 +135,22 @@ describe("POST /api/social/ideas — internal secret-guarded seed", () => {
     expect(missingCaption.status).toBe(400);
     expect(mocks.insertSocialIdeas).not.toHaveBeenCalled();
   });
+
+  it("accepts and trims same-origin body.assets (real image paths)", async () => {
+    const withAssets = { ...validIdea, body: { ...validIdea.body, assets: ["/brand/social/photos/padel-01.jpg", " /brand/social/photos/quote-01.jpg "] } };
+    const res = await POST(seedReq(withAssets, "Bearer social-secret"));
+    expect(res.status).toBe(201);
+    const input = mocks.insertSocialIdeas.mock.calls[0][0][0] as { body: { assets?: string[] } };
+    expect(input.body.assets).toEqual(["/brand/social/photos/padel-01.jpg", "/brand/social/photos/quote-01.jpg"]);
+  });
+
+  it("400s external or path-traversal assets without inserting", async () => {
+    const external = { ...validIdea, body: { ...validIdea.body, assets: ["https://evil.example/x.jpg"] } };
+    expect((await POST(seedReq(external, "Bearer social-secret"))).status).toBe(400);
+    const protocolRel = { ...validIdea, body: { ...validIdea.body, assets: ["//evil.example/x.jpg"] } };
+    expect((await POST(seedReq(protocolRel, "Bearer social-secret"))).status).toBe(400);
+    const traversal = { ...validIdea, body: { ...validIdea.body, assets: ["/brand/../../etc/passwd"] } };
+    expect((await POST(seedReq(traversal, "Bearer social-secret"))).status).toBe(400);
+    expect(mocks.insertSocialIdeas).not.toHaveBeenCalled();
+  });
 });

@@ -17,6 +17,9 @@ export type SocialIdeaStatus = (typeof SOCIAL_STATUSES)[number];
 
 export type SocialIdeaBody = Readonly<{
   slides?: string[];
+  // Finished creative images shown in the approval queue (real photos, not just
+  // a text description). Same-origin repo paths under /brand/… — see asAssetPaths.
+  assets?: string[];
   script?: string;
   caption: string;
   hashtags: string[];
@@ -115,6 +118,26 @@ function asStringArray(value: unknown): string[] | null {
   return out;
 }
 
+// Image assets are rendered straight into an <img src> on the owner's approval
+// page, so constrain them to same-origin repo paths (start with "/", no "//"
+// protocol-relative, no "..", no backslashes). This keeps a bad/hostile seed
+// from injecting a cross-origin or path-traversal resource into the page.
+const MAX_ASSETS = 10;
+function asAssetPaths(value: unknown): { paths: string[] } | { error: string } {
+  if (!Array.isArray(value)) return { error: "body.assets must be an array of strings." };
+  if (value.length > MAX_ASSETS) return { error: `body.assets allows at most ${MAX_ASSETS} images.` };
+  const paths: string[] = [];
+  for (const item of value) {
+    if (typeof item !== "string") return { error: "body.assets must be an array of strings." };
+    const path = item.trim();
+    if (!path.startsWith("/") || path.startsWith("//") || path.includes("..") || path.includes("\\")) {
+      return { error: "body.assets entries must be same-origin paths starting with '/'." };
+    }
+    paths.push(path);
+  }
+  return { paths };
+}
+
 /**
  * Validate + normalise a single raw idea from the seed payload. Returns the
  * clean input, or a string error describing the first problem. Enforces the
@@ -159,7 +182,13 @@ export function normalizeSocialIdeaInput(raw: unknown): SocialIdeaInput | { erro
     return { error: "body.slides must be an array of strings." };
   }
   const script = asTrimmedString(bodyValue.script);
-  const finalBody: SocialIdeaBody = script ? { ...withSlides, script } : withSlides;
+  let finalBody: SocialIdeaBody = script ? { ...withSlides, script } : withSlides;
+
+  if (bodyValue.assets !== undefined) {
+    const parsed = asAssetPaths(bodyValue.assets);
+    if ("error" in parsed) return { error: parsed.error };
+    finalBody = { ...finalBody, assets: parsed.paths };
+  }
 
   return { platform: platform as SocialPlatform, format: format as SocialFormat, title, trend, hook, body: finalBody };
 }

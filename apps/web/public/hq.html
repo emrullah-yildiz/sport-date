@@ -87,6 +87,37 @@
   .st.c-run{ color:var(--neon); } .st.c-idle{ color:var(--mut); } .st.c-done{ color:var(--blue); } .st.c-wait{ color:var(--amber); }
   .btnrow{ margin-top:14px; }
   .btn{ display:inline-block; border:1px solid var(--line); border-radius:10px; padding:9px 14px; font-size:13px; font-weight:700; color:var(--neon); margin-right:8px; }
+  /* primary hub CTA — the one place to go for reviews */
+  .cta-big{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-top:16px;
+    background:linear-gradient(180deg, rgba(59,234,126,.14), rgba(59,234,126,.05)); border:1px solid rgba(59,234,126,.45);
+    border-radius:14px; padding:16px 20px; }
+  .cta-big .t{ font-size:16px; font-weight:800; }
+  .cta-big .s{ font-size:13px; color:var(--mut); margin-top:2px; }
+  .cta-big a{ flex:none; min-height:50px; display:inline-flex; align-items:center; padding:0 22px; border-radius:12px;
+    background:var(--neon); color:#0b1410; font-size:15px; font-weight:800; }
+  .cta-big a:hover{ filter:brightness(1.08); }
+  /* standup directions */
+  .sd-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; align-items:center; }
+  .sd-btn{ min-height:42px; flex:1 1 auto; min-width:110px; display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid var(--line); border-radius:10px; font-size:13.5px; font-weight:800; cursor:pointer; background:var(--panel2); color:var(--ink);
+    transition:background .15s, color .15s, opacity .15s; }
+  .sd-btn.ap{ color:var(--neon); border-color:rgba(59,234,126,.45); }
+  .sd-btn.ap.active{ background:var(--neon); color:#0b1410; border-color:var(--neon); }
+  .sd-btn.de{ color:var(--red); border-color:rgba(255,110,104,.4); }
+  .sd-btn.de.active{ background:var(--red); color:#180a0a; border-color:var(--red); }
+  .sd-btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .sd-change{ background:none; border:none; color:var(--mut); font-size:12.5px; font-weight:800; text-decoration:underline; cursor:pointer; min-height:42px; padding:0 8px; }
+  .sd-msg{ font-size:12.5px; margin-top:7px; color:var(--mut); font-weight:700; }
+  .sd-msg.ok{ color:var(--neon); } .sd-msg.err{ color:var(--red); }
+  .sd-note{ font-size:12.5px; color:var(--mut); margin-top:8px; }
+  .sd-agents{ font-size:13px; color:#c8d3d0; line-height:1.75; }
+  .sd-agents b{ color:var(--ink); }
+  .sd-tag{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:800; padding:2px 8px; border-radius:6px; background:var(--panel2); border:1px solid var(--line); }
+  .sd-tag.fired{ color:var(--red); } .sd-tag.hired,.sd-tag.keep,.sd-tag.rehired-v2{ color:var(--neon); }
+  .sd-tag.probation{ color:var(--amber); } .sd-tag.idle-blocked{ color:var(--mut); }
+  textarea.sd-comment{ width:100%; min-height:48px; resize:vertical; background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    border-radius:10px; padding:8px 11px; font:inherit; font-size:13px; margin-top:8px; }
+  textarea.sd-comment:focus{ outline:none; border-color:var(--neon); }
   /* visible agent board (each agent + what it's working on right now) */
   .aboard{ border:1px solid var(--line); border-radius:14px; background:var(--panel); overflow:hidden; }
   .aboard .r{ display:flex; gap:11px; align-items:flex-start; padding:13px 18px; border-bottom:1px solid var(--line); }
@@ -108,7 +139,16 @@
     <div class="badge" id="badge" role="button" aria-expanded="false" title="Click to see every agent's status"><span class="led"></span>Agents live · updated 2026-07-05 ▾</div>
   </div>
 
-  <div class="btnrow"><a class="btn" href="/social-approve.html">▸ Approve social content queue →</a></div>
+  <div class="cta-big">
+    <div>
+      <div class="t">Posts waiting for your review</div>
+      <div class="s">Approve, deny, improve-with-a-comment — then hit Done. This page is your hub; that one is your queue.</div>
+    </div>
+    <a href="/social-approve.html">Review &amp; approve posts →</a>
+  </div>
+
+  <h2 class="sec">▸ Daily standup — <span id="sd-day">loading…</span></h2>
+  <div id="standup"><div class="note"><p>Loading the standup report…</p></div></div>
 
   <div id="roster" aria-label="Agent roster">
     <h4>Agent roster — as of the last CEO cycle (2026-07-04, off-style fix pass)</h4>
@@ -360,6 +400,108 @@ document.addEventListener("click",e=>{
   else if(lb.classList.contains("open")){ lb.classList.remove("open"); lbImg.src=""; }
 });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remove("open"); lbImg.src=""; } });
+
+// ── Daily standup: report + owner-approvable directions ─────────────────────
+(function(){
+  "use strict";
+  var box=document.getElementById("standup"), dayEl=document.getElementById("sd-day");
+  var esc=function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); };
+  var decisions={}; // directionId -> {action, comment}
+
+  function dirCard(d){
+    var dec=decisions[d.id]||null;
+    var st=dec?dec.action:null; // 'approve'|'deny'|null
+    var pri=d.priority==="high"?"":(d.priority==="medium"?" low":" low");
+    var cls=d.priority==="high"?"dec hi":"dec low";
+    var apBtn='<button class="sd-btn ap'+(st==="approve"?" active":"")+'" data-act="approve"'+(st&&st!=="approve"?" disabled":"")+'>'+(st==="approve"?"✓ Approved":"Approve")+"</button>";
+    var deBtn='<button class="sd-btn de'+(st==="deny"?" active":"")+'" data-act="deny"'+(st&&st!=="deny"?" disabled":"")+'>'+(st==="deny"?"✕ Denied":"Deny")+"</button>";
+    var change=st?'<button class="sd-change" data-act="change">Change</button>':"";
+    return '<div class="'+cls+'" data-dir="'+esc(d.id)+'">'+
+      '<div class="pri">Direction · '+esc(d.priority)+'</div>'+
+      "<h3>"+esc(d.title)+"</h3>"+
+      "<p>"+esc(d.detail)+"</p>"+
+      '<div class="rec">My call: <b>'+esc(d.recommendation)+"</b></div>"+
+      '<div class="sd-actions">'+apBtn+deBtn+change+"</div>"+
+      '<textarea class="sd-comment" placeholder="Optional note with your call…">'+esc(dec&&dec.comment?dec.comment:"")+"</textarea>"+
+      '<div class="sd-msg"></div>'+
+    "</div>";
+  }
+
+  function render(data){
+    dayEl.textContent=data.day+" · 06:00 agent standup";
+    var html='<div class="note"><p><b>'+esc(data.headline)+"</b></p>"+
+      (data.summary||[]).map(function(s){ return "<p>"+esc(s)+"</p>"; }).join("")+"</div>";
+    if (Array.isArray(data.agents)&&data.agents.length){
+      html+='<div class="note" style="margin-top:12px"><p style="margin-bottom:8px"><b>Agent scorecard</b> (full history: docs/operations/agent-performance.md)</p><div class="sd-agents">'+
+        data.agents.map(function(a){
+          return '<span class="sd-tag '+esc(a.status)+'">'+esc(a.status)+"</span> <b>"+esc(a.name)+"</b> — "+esc(a.note)+" <i style=\"color:var(--mut)\">(metric: "+esc(a.metric)+")</i>";
+        }).join("<br>")+"</div></div>";
+    }
+    if (Array.isArray(data.directions)&&data.directions.length){
+      html+='<div class="sd-note">Your call on each direction — approve or deny; your note travels with it. Decisions land instantly; the agents pick them up next cycle.</div>'+
+        '<div class="decisions" style="margin-top:10px">'+data.directions.map(dirCard).join("")+"</div>";
+    }
+    box.innerHTML=html;
+    wire(data);
+  }
+
+  function setMsg(card,text,cls){
+    var m=card.querySelector(".sd-msg");
+    if(m){ m.className="sd-msg"+(cls?" "+cls:""); m.textContent=text||""; }
+  }
+
+  function wire(data){
+    Array.prototype.forEach.call(box.querySelectorAll("[data-dir]"),function(card){
+      var id=card.getAttribute("data-dir");
+      Array.prototype.forEach.call(card.querySelectorAll(".sd-btn"),function(btn){
+        btn.addEventListener("click",function(){
+          if(btn.disabled) return;
+          var action=btn.getAttribute("data-act");
+          var comment=(card.querySelector(".sd-comment").value||"").trim();
+          Array.prototype.forEach.call(card.querySelectorAll("button"),function(b){ b.disabled=true; });
+          setMsg(card,"Saving…");
+          fetch("/api/standup/directions",{method:"POST",credentials:"same-origin",
+            headers:{"Content-Type":"application/json","Accept":"application/json"},
+            body:JSON.stringify({id:id,action:action,comment:comment||undefined})
+          }).then(function(res){
+            if(res.status===401||res.status===403) throw new Error("Sign in as the owner to decide.");
+            if(!res.ok) throw new Error("Save failed ("+res.status+")");
+            return res.json();
+          }).then(function(){
+            decisions[id]={action:action,comment:comment||null};
+            render(data); // re-render keeps every card's state honest
+          }).catch(function(err){
+            Array.prototype.forEach.call(card.querySelectorAll("button"),function(b){ b.disabled=false; });
+            setMsg(card,err.message||"Save failed.","err");
+          });
+        });
+      });
+      var change=card.querySelector('[data-act="change"]');
+      if(change) change.addEventListener("click",function(){
+        Array.prototype.forEach.call(card.querySelectorAll(".sd-btn"),function(b){ b.disabled=false; });
+        change.style.display="none";
+      });
+    });
+  }
+
+  fetch("/standup/latest.json",{cache:"no-store"}).then(function(r){
+    if(!r.ok) throw new Error("no standup yet");
+    return r.json();
+  }).then(function(data){
+    // overlay any saved decisions, then render (decisions need owner session; ignore errors)
+    return fetch("/api/standup/directions",{credentials:"same-origin",headers:{Accept:"application/json"}})
+      .then(function(r){ return r.ok?r.json():{decisions:[]}; })
+      .catch(function(){ return {decisions:[]}; })
+      .then(function(d){
+        (d.decisions||[]).forEach(function(x){ decisions[x.directionId]={action:x.action,comment:x.comment}; });
+        render(data);
+      });
+  }).catch(function(){
+    dayEl.textContent="none yet";
+    box.innerHTML='<div class="note"><p>No standup report published yet. The first one lands at 06:00.</p></div>';
+  });
+})();
 </script>
 </body>
 </html>
