@@ -11,6 +11,7 @@ const result = spawnSync(
     "run",
     "src/lib/auth-email.integration.test.ts",
     "src/lib/audit-erasure.integration.test.ts",
+    "src/lib/account-deletion.integration.test.ts",
   ],
   {
     stdio: "inherit",
