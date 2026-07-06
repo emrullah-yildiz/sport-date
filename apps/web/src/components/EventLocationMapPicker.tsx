@@ -73,9 +73,9 @@ export default function EventLocationMapPicker({ latitude, longitude, onPick }: 
       const map = leaflet.map(target, {
         center: [initial.latitude, initial.longitude],
         zoom: PICK_ZOOM,
-        // Keep page scrolling calm on desktop; +/- buttons, double-click, and
-        // pinch still zoom.
-        scrollWheelZoom: false,
+        // Mouse-wheel zoom on, per owner request (2026-07-06) — alongside the
+        // +/- buttons, double-click, and pinch.
+        scrollWheelZoom: true,
       });
       leaflet.tileLayer(OSM_TILE_URL_TEMPLATE, { attribution: OSM_ATTRIBUTION, maxZoom: 19 }).addTo(map);
 
