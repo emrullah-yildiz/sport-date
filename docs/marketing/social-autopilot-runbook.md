@@ -19,6 +19,14 @@ run. Owner authorized hands-off operation on **2026-07-04**.
 ## Each cycle, in order
 
 ### 1. Fulfil approvals + improvement requests (highest priority)
+- **Approved WITH a comment — two kinds (owner protocol, 2026-07-06):**
+  - **Instructional comment** ("add a slide…", "change the photo…"): IMPLEMENT
+    the comment, then set the post back to **pending** for the owner's re-check.
+    Never schedule it directly. Mark the comment `[IMPLEMENTED → back in Pending]`.
+  - **Positive/praise comment** ("amazing, keep making these", "make this the
+    next post"): schedule directly (honoring any timing instruction) AND record
+    the praise as a standing rule in `docs/marketing/owner-taste-rules.md` so
+    future batches repeat what worked. No re-pending.
 - **Improvement requests come from the approval page.** When the owner writes an
   owner comment on an idea and hits **✨ Improve** (or sends the "Done" go-signal),
   that comment is a *revise-this* brief. For every idea/post carrying an owner
