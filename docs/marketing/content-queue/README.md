@@ -61,3 +61,8 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
   subscription") plus 2 supporting posts (a scam/fake-profile fact card, a cheeky "have a good
   time" post). Drafted during a WebSearch/WebFetch outage — 3 factual slides carry a `[VERIFY]`
   numbers-check gate (see the file's intro) that must clear before scheduling. Status `draft`.
+- `2026-07-batch-11.md` — the product-breadth batch: an 8-slide flagship carousel reframing
+  KeepItUp as one place for dating, finding a regular crew, organizing any free-text small-group
+  activity, seeing every hosted/joined game in one list, and the core "post a plan, let strangers
+  ask to join" loop, plus a supporting checklist post. Scheduled as the opening-week anchor
+  (2026-07-10). No payment/ticketing claim anywhere. Status `draft`.

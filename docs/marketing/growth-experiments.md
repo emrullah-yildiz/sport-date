@@ -143,6 +143,19 @@ revenue), but exact digits were deliberately left unstated rather than guessed. 
 P1/P2 until someone re-runs those searches and confirms or corrects the wording** — this is a
 harder gate than the normal draft→approve flow for this batch specifically.
 
+## Open hypotheses (batch 11 — "what you can actually DO with KeepItUp", added 2026-07-06)
+
+**Owner directive:** stop letting people assume "dating app" is the whole story. Flagship 8-slide
+carousel reframes KeepItUp as one place for dating, finding a regular crew, organizing any small
+group activity (free-text, not a fixed sport list), keeping every hosted/joined game in one list,
+and the core "outside the box" loop — post a plan you already have, let people nearby ask to join,
+you decide who comes. Plus one supporting checklist post. Scheduled to anchor opening week
+(2026-07-10).
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-ANGLE-usecases | Naming the full breadth of use cases (dating + friendship + organize-anything + your-week-in-one-place + post-and-let-strangers-ask) widens who follows/shares vs. our single-feature or single-pain posts | follows-per-post + shares vs. batch 07 (feature-led) and batch 08 (pain-led) averages |
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -275,3 +288,19 @@ harder gate than the normal draft→approve flow for this batch specifically.
   outage clears, re-run the three flagged searches, correct/confirm the wording, then treat this
   batch like any other pending the owner's approval; once live, compare shares+saves+follows
   against the batch 06-09 warm/funny baseline to test whether daring tone out-shares warmth.
+- _2026-07-06_ — **"What you can actually do" batch shipped** (`content-queue/2026-07-batch-11.md`,
+  `social/ideas-batch-11.json`, 2 drafts). Owner directive: stop letting people assume "dating app"
+  is the whole story — show the breadth: dating, finding a regular crew, organizing any small group
+  activity (activity is free text, sport is the heart of it but not the limit — verified against
+  `CreateEventForm.tsx`'s plain-text sport field and `StepSports.tsx`'s "add your own"), every
+  hosted/joined game in one list (`/hosting`, framed honestly, not a general calendar-sync claim),
+  and the "outside the box" superpower: publish a plan you already have, people nearby ask to join,
+  you decide who comes. Flagship 8-slide carousel (all real-photo, poster-branded, no two slides
+  reusing a photo) plus a supporting checklist card. Explicitly excluded any payment/ticketing
+  claim — group-event payment links are a real backlog item (`CX-20260706-group-event-payment-
+  links`) waiting on Stripe, not implemented, so the concert/gig slide organizes only the meetup (a
+  walk, a pre-show run), never a ticket. P1 is scheduled as the opening-week anchor post
+  (2026-07-10, the company's opening day). Added `H-ANGLE-usecases` above. Next review: once this
+  batch has live data, compare follows-per-post + shares against batch 07 (feature-led) and batch
+  08 (pain-led) to test whether breadth-of-use-cases content converts better than single-feature or
+  single-pain content.

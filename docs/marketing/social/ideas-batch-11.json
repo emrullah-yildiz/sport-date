@@ -1,0 +1,63 @@
+[
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "The Reframe",
+    "trend": null,
+    "hook": "You think it's a dating app. It's your whole social calendar.",
+    "body": {
+      "slides": [
+        "WAIT, WHAT IS THIS APP AGAIN? YOU THINK IT'S A DATING APP. IT'S YOUR WHOLE SOCIAL CALENDAR. One place for every way you like to meet people.",
+        "USE IT TO... MEET SOMEONE. SET YOUR PROFILE TO DATING. SHOW UP TO A SMALL GAME. SEE WHAT HAPPENS. No profile-swiping. Just a real game with a person you might like.",
+        "USE IT TO... FIND YOUR PEOPLE. SET YOUR PROFILE TO FRIENDSHIP. FIND THE SAME FEW PEOPLE FOR YOUR SUNDAY RIDE, EVERY WEEK. Not looking for a date? Say so. It's just as welcome here.",
+        "USE IT TO... ORGANIZE ANYTHING. SPORT IS THE HEART OF IT. BUT THE ACTIVITY BOX IS BLANK ON PURPOSE. Chess night. A hike. A dance class. Type it in, invite 2 to 20 people.",
+        "USE IT TO... SEE YOUR WEEK AT A GLANCE. EVERY GAME YOU'RE HOSTING. EVERY GAME YOU'VE JOINED. ONE LIST. Not ten group chats. Not a wall of unread messages. Just your games.",
+        "THE PART MOST PEOPLE MISS. GOING BOULDERING SATURDAY ANYWAY? POST IT. SEE WHO SHOWS UP. People nearby can ask to join. You decide who comes.",
+        "USE IT TO... TURN A NIGHT OUT INTO A MEETUP. GOING TO A SHOW FRIDAY? MAKE AN EVENT FOR THE WALK OVER, OR A QUICK RUN BEFORE DOORS OPEN. Same app, same idea — just a different plan.",
+        "ONE APP. EVERY REASON TO SHOW UP. KeepItUp — open worldwide, early access, link in bio."
+      ],
+      "caption": "Quick honesty check: if you thought KeepItUp was just a dating app, you're not wrong, you're just early. Dating is one reason people use it — set your profile to dating and see what happens at a small local game. But it's also how people find their regular crew (set your profile to friendship, same five people, same Sunday ride). Sport is the heart of it, but the activity box when you make an event is blank on purpose — chess night, a hike, a dance class, a run before a show all count. Invite 2 to 20 people. And every game you're hosting or joined shows up in one list, not ten group chats. Here's the part people miss: you can post a plan you already have — going bouldering Saturday anyway — and people near you can ask to join. You decide who comes. One app, every reason to show up. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#NotJustDating",
+        "#OrganizeAnything",
+        "#OpenWorldwide"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "FLAGSHIP 8-slide carousel, poster-branded throughout (KeepItUp mark on every slide, wordmark on the close). All 8 slides are REAL PHOTOS with overlay text on a dark anthracite scrim (lower third unless noted). Slide 1 (hook): pexels-8795115-badminton-sunset.jpg. Slide 2 (dating): pexels-12169344-volleyball-laugh.jpg. Slide 3 (friendship): pexels-5807872-cyclists-roadside-chat.jpg. Slide 4 (organize anything, free-text activity): pexels-5384620-basketball-friends.jpg. Slide 5 (hosted+joined list, honest framing not general calendar-sync): pexels-19146676-group-track-run.jpg. Slide 6 (core loop / superpower, emphasis eyebrow with neon-green rule): pexels-8381743-friends-beach-run.jpg. Slide 7 (night-out/concert meetup angle, NO ticketing/venue claim, only organizing the walk/run around a plan): pexels-5319325-jog-bridge.jpg. Slide 8 (final CTA, full poster close, mark+wordmark+footer band): pexels-5319397-three-adults-jog.jpg. Exact overlay text per slide is in the `slides` array above. No two slides reuse the same photo; 4 of 8 photos (cyclists-chat, basketball-friends, track-run-group's pairing, badminton-sunset) are fresh to this batch. Composites to be baked: b11p1-slide1.png through b11p1-slide8.png. Assets below point at the base real photos (already downloaded) pending that bake step, per the batch-08 handoff pattern. (All 8 composites baked: b11p1-slide1..8.png)",
+      "assets": [
+        "/brand/social/photos/b11p1-slide1.png",
+        "/brand/social/photos/b11p1-slide2.png",
+        "/brand/social/photos/b11p1-slide3.png",
+        "/brand/social/photos/b11p1-slide4.png",
+        "/brand/social/photos/b11p1-slide5.png",
+        "/brand/social/photos/b11p1-slide6.png",
+        "/brand/social/photos/b11p1-slide7.png",
+        "/brand/social/photos/b11p1-slide8.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "Everything You Can Do On KeepItUp",
+    "trend": null,
+    "hook": "KeepItUp isn't just for dates. Screenshot this list.",
+    "body": {
+      "caption": "Screenshot this one. KeepItUp isn't just for dates — it's dating, friends, and any small group activity you can think of, all in one free app. Sport is the heart of it, but the activity box is blank on purpose: chess night, a hike, a run before a show, anything for 2 to 20 people. Save this for the next time someone asks 'wait, what's the app actually for?' KeepItUp — open worldwide, early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#SaveThis",
+        "#NotJustDating",
+        "#OrganizeAnything"
+      ],
+      "cta": "Save this. Open worldwide — early access, link in bio.",
+      "imageConcept": "Supporting save-me checklist post. Full poster treatment: KeepItUp mark top-left, eyebrow 'EVERYTHING YOU CAN DO ON KEEPITUP', body block lower two-thirds (off-white on anthracite scrim) with six short lines: 'MEET A DATE.' / 'FIND YOUR CREW.' / 'RUN A CHESS NIGHT.' / 'HOST A HIKE.' / 'BUILD A WEEKLY GAME.' / 'WALK TO A SHOW TOGETHER.' Footer band: KeepItUp wordmark + 'keepitup.social · open worldwide, early access.' Base photo: pexels-31293814-park-fitness-group.jpg (adults doing an outdoor fitness session in a park — energetic, reads as 'lots of activity'). Composite to be baked: b11p2-checklist.png. Asset below points at the base real photo pending that bake step. (Composite baked: b11p2-checklist.png)",
+      "assets": [
+        "/brand/social/photos/b11p2-checklist.png"
+      ]
+    }
+  }
+]
