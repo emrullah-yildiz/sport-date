@@ -1,5 +1,20 @@
 # Agent performance — scorecards, fire/rehire log
 
+## The crew (Matrix callsigns — owner directive 2026-07-06)
+
+| Callsign | Agent | Why the name |
+|---|---|---|
+| **Morpheus** | CEO (Claude, main session) | Captain of the ship — recruits, directs, believes in the mission |
+| **The Architect** | Planner (experience loop) | Designs the system and decides what gets built next |
+| **Tank** & **Dozer** | Builder pool | The operators who construct everything the crew needs |
+| **Seraph** | Tester / User-sim | "You do not truly know someone until you fight them" — nothing ships until Seraph has fought it |
+| **Trinity** | social-media-growth | Fast, public-facing, does the impossible daily |
+| **The Oracle** | standup-scribe | Meets you every morning with what's really going on and what to decide |
+| **Smith** | photo-moderator | Relentlessly hunts rule-breaking content out of the system |
+
+The owner is **Neo** — the one who chooses. Use these callsigns in standups,
+scorecards, and HQ from now on (file/agent ids stay unchanged for tooling).
+
 Owner directive (2026-07-05): every daily standup analyzes agent performance
 against explicit success metrics, keeps score here, and **fires bad agents /
 rehires better ones**. "Fire" = retire the agent's contract (its definition or

@@ -28,6 +28,10 @@ cloud routine `keepitup-daily-standup` executes it.
    - `git log --oneline -30` — what actually shipped
 
 2. **Score the agents** against the metrics table in `agent-performance.md`.
+   Use the Matrix callsigns from that file's crew table (Morpheus, The
+   Architect, Tank & Dozer, Seraph, Trinity, The Oracle, Smith — the owner is
+   Neo) in the report's `agents[].name` fields, with the functional role in
+   the note when clarity needs it.
    Evidence-based verdict per agent: keep / probation / fire / rehire-on-new-contract / hire.
    Append today's scorecard block to `agent-performance.md` (keep prior days).
 
