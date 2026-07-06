@@ -9,6 +9,13 @@ Owner-gated items are marked; everything else the agents execute.
 North-star metrics: (1) IG+TikTok followers (standing goal: 1,000),
 (2) beta signups, (3) events created + join requests (real usage).
 
+**Owner mandate update (2026-07-06):** the CEO's one target is **income**.
+Company opens **Friday 2026-07-10**; Stripe arrives the week after. Beta
+operating target: **≥5 new registered users per week**, owned by Niobe
+(Growth PM, hired 2026-07-06). Owner has offered to execute outreach
+(messages/follows from brand accounts) — agents prepare ready-to-send drafts
+in `docs/marketing/outreach/`. CEO operating standard: `docs/operations/ceo-charter.md`.
+
 ## What's proven for exactly this product
 
 | # | Tactic | Proof it works | Status |
