@@ -17,15 +17,16 @@ function render() {
  * are user-organized, availability depends on hosts.
  */
 describe("TrustPage — where can I use KeepItUp", () => {
-  it("answers with the worldwide-usable, Europe-first-as-standard framing", () => {
+  it("answers with the worldwide-usable, GDPR-for-everyone framing", () => {
     const html = render();
 
     expect(html).toContain("Where can I use KeepItUp?");
     expect(html).toContain("can be used worldwide to organize and join sports events");
     expect(html).toContain("participation is not geographically restricted");
     // Europe-first is preserved as the standard/approach, explicitly not a location limit.
-    expect(html).toContain("Europe-first in privacy, safety standards, and community building");
-    expect(html).toMatch(/not a limit on where you can play/);
+    expect(html).toContain("GDPR-grade privacy, safety standards, and community care");
+    expect(html).not.toMatch(/Europe[- ]first/i);
+    expect(html).toContain("wherever you play");
     // No overclaim of operating everywhere: events are member-organized.
     expect(html).toContain("Events are organized by members");
     expect(html).toContain("Local availability depends on hosts");

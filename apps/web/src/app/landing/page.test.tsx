@@ -140,8 +140,8 @@ describe("LandingPage worldwide-usable, Europe-first-as-approach messaging", () 
     expect(html).toContain("usable worldwide");
     expect(html).toContain("use it worldwide to organize sports events");
     expect(html).toContain("use KeepItUp worldwide to organize sports events");
-    // Europe-first is preserved as our privacy/community APPROACH, not a location limit.
-    expect(html).toMatch(/Europe-first/);
+    // Owner rule (2026-07-06): "Europe-first" removed everywhere; GDPR-grade privacy for everyone.
+    expect(html).not.toMatch(/Europe[- ]first/i);
     expect(html).toContain("local availability depends on hosts near you");
 
     // The prior "Europe-only" location-limit phrasings are gone everywhere on the page.

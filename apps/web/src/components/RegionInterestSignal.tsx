@@ -63,7 +63,7 @@ export default function RegionInterestSignal({ area }: { area?: string }) {
         {trimmedArea
           ? `No ${BRAND_NAME} games near ${trimmedArea} yet — you're here early.`
           : `No ${BRAND_NAME} games in your area yet — you're here early.`}{" "}
-        We&apos;re opening city by city, Europe first, so new events show up here as hosts create them.
+        We&apos;re opening city by city, so new events show up here as hosts create them.
       </p>
 
       {state === "done" && trimmedArea ? (

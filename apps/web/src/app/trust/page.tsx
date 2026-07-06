@@ -24,7 +24,7 @@ export default function TrustPage() {
           <h2>Where can I use {BRAND_NAME}?</h2>
           <ul className="legal-list">
             <li>{BRAND_NAME} can be used worldwide to organize and join sports events — participation is not geographically restricted.</li>
-            <li>We are Europe-first in privacy, safety standards, and community building. That is our standard and approach, not a limit on where you can play.</li>
+            <li>Everyone gets the same GDPR-grade privacy, safety standards, and community care — wherever you play.</li>
             <li>Events are organized by members, not by us — we do not host, supervise, or provide support in every location. Local availability depends on hosts in each area.</li>
             <li>Everyone gets EU-grade (GDPR) privacy protection from the start, wherever they are.</li>
           </ul>

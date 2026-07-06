@@ -19,8 +19,8 @@ describe("RegionInterestSignal — honest region empty state + demand capture", 
     // Honest: no games near YOUR area *yet*, you're here early — never a fake event.
     expect(html).toContain("near Bucharest yet");
     expect(html).toMatch(/here early/i);
-    // Consistent with "Europe first" without claiming other regions are unsupported forever.
-    expect(html).toMatch(/Europe first/i);
+    // Owner rule (2026-07-06): no "Europe first" anywhere in member copy.
+    expect(html).not.toMatch(/Europe[- ]first/i);
   });
 
   it("offers a one-tap demand signal for the member's area, plus host / how-it-works paths", () => {

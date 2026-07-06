@@ -64,10 +64,11 @@ describe("BetaTermExplainer panel", () => {
     expect(html).toMatch(/data-term-close/);
   });
 
-  it("states only true, non-alarming preview facts (adults/Europe, free, open access)", () => {
+  it("states only true, non-alarming preview facts (adults/worldwide, free, open access)", () => {
     const joined = PRIVATE_BETA_POINTS.join(" ");
     expect(joined).toMatch(/adults/i);
-    expect(joined).toMatch(/Europe/i);
+    expect(joined).toMatch(/GDPR/i);
+    expect(joined).not.toMatch(/Europe[- ]first/i);
     expect(joined).toMatch(/free/i);
     // Access is open today — the copy must say so and must NOT claim invite-only.
     expect(joined).toMatch(/no invite is required/i);

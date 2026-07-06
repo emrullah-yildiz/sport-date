@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   // brand title).
   title: { absolute: BRAND_TITLE },
   description:
-    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults 18+; usable worldwide, Europe-first on privacy.",
+    "Meet compatible people through small, local sports — from running and padel to chess. Request a place, and let a real game carry the first encounter. Adults 18+; open worldwide · GDPR-grade privacy for everyone.",
   // The marketing home is the indexable entry point (the root 307s here).
   alternates: { canonical: "/landing" },
 };
@@ -78,7 +78,7 @@ const safety = [
     badge: "GDPR",
     title: "Privacy-first, from day one",
     description:
-      "Everyone gets EU-grade (GDPR) privacy protection from the start — we're Europe-first in privacy and safety standards, not in where you can play. Anyone 18+ can use KeepItUp worldwide to organize sports events; local availability depends on hosts near you.",
+      "Everyone gets GDPR-grade privacy protection from the start, wherever you are. Anyone 18+ can use KeepItUp worldwide to organize sports events; local availability depends on hosts near you.",
   },
 ];
 
@@ -302,8 +302,8 @@ export default async function LandingPage() {
             <h2 id="beta-title" className="section-title">Free for everyone, right now.</h2>
             <p className="section-lede">
               {BRAND_NAME} is in open beta — no invite, no payment, open to any adult (18+).
-              You can use it worldwide to organize sports events; we&apos;re Europe-first in privacy
-              and community building — an approach, not a location limit. Local availability depends
+              You can use it worldwide to organize sports events, with the same GDPR-grade privacy
+              and community standards for everyone. Local availability depends
               on hosts near you, and we&apos;re building in the open; your input steers what comes next.
             </p>
           </div>
@@ -318,7 +318,7 @@ export default async function LandingPage() {
         <div className="landing-footer-shell">
           <div className="landing-footer-brand">
             <Wordmark variant="footer" />
-            <p>Meet through movement. Adults 18+ · usable worldwide, Europe-first on privacy.</p>
+            <p>Meet through movement. Adults 18+ · open worldwide · GDPR-grade privacy for everyone.</p>
           </div>
           <nav aria-label="Legal and trust links">
             <Link href="/trust">Trust</Link>
