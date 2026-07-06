@@ -298,3 +298,45 @@ export function isPastLocalDateTime(value: string, now: Date = new Date()): bool
 /** Calm host-voice message for a start time chosen in the past. */
 export const PAST_START_TIME_MESSAGE =
   "That start time has already passed — choose a time in the future so people can still join.";
+
+/**
+ * The subset of `ValidityState` + input facts needed to explain WHY a field is
+ * invalid. Kept as a plain object (not the DOM interface) so the message rules
+ * are unit-testable without a browser.
+ */
+export type FieldValidityInfo = Readonly<{
+  valueMissing?: boolean;
+  tooShort?: boolean;
+  rangeUnderflow?: boolean;
+  rangeOverflow?: boolean;
+  badInput?: boolean;
+  /** Current trimmed-length of the value (for the tooShort progress hint). */
+  valueLength?: number;
+  /** The input's own constraint attributes, when present. */
+  minLength?: number;
+  min?: string | number;
+  max?: string | number;
+}>;
+
+/**
+ * Calm, ACCURATE host-voice message for an invalid field.
+ *
+ * Previously every native validity failure was reported as "X is required." —
+ * which is wrong (and confusing) when the field HAS content but fails another
+ * constraint, e.g. a 15-character description against `minLength={20}` claimed
+ * "Description is required." (owner report, 2026-07-06). Each failure mode now
+ * says what is actually wrong and how to fix it; `valueMissing` keeps the
+ * original required wording.
+ */
+export function invalidFieldMessage(field: EventFieldName, info: FieldValidityInfo): string {
+  const label = eventFieldLabel(field);
+  if (info.valueMissing) return `${label} is required.`;
+  if (info.tooShort && typeof info.minLength === "number") {
+    const have = typeof info.valueLength === "number" ? ` — you have ${info.valueLength} so far` : "";
+    return `${label} needs at least ${info.minLength} characters${have}.`;
+  }
+  if (info.rangeUnderflow && info.min !== undefined) return `${label} must be at least ${info.min}.`;
+  if (info.rangeOverflow && info.max !== undefined) return `${label} can be at most ${info.max}.`;
+  if (info.badInput) return `${label} doesn't look like a valid value — please re-enter it.`;
+  return `${label} needs attention — please check it.`;
+}

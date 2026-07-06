@@ -8,6 +8,7 @@ import {
   EXPERIENCE_LEVELS_REQUIRED_MESSAGE,
   experienceLevelsIssue,
   fieldForServerMessage,
+  invalidFieldMessage,
   isPastLocalDateTime,
   issuesFromServerErrors,
   PAST_START_TIME_MESSAGE,
@@ -203,5 +204,35 @@ describe("form sections (structure + progress orientation)", () => {
 
   it("returns no flagged sections when there are no issues", () => {
     expect(sectionsNeedingAttention([])).toEqual([]);
+  });
+});
+
+describe("invalidFieldMessage (accurate reasons, owner report 2026-07-06)", () => {
+  it("says 'required' only for a truly empty field", () => {
+    expect(invalidFieldMessage("description", { valueMissing: true })).toBe("Description is required.");
+  });
+
+  it("explains a too-short description with the minimum and current length — never 'required'", () => {
+    const message = invalidFieldMessage("description", {
+      tooShort: true,
+      minLength: 20,
+      valueLength: 15,
+    });
+    expect(message).toBe("Description needs at least 20 characters — you have 15 so far.");
+    expect(message).not.toMatch(/required/i);
+  });
+
+  it("explains number range violations with the actual bounds", () => {
+    expect(invalidFieldMessage("capacity", { rangeUnderflow: true, min: 2 })).toBe(
+      "Places for others must be at least 2.",
+    );
+    expect(invalidFieldMessage("capacity", { rangeOverflow: true, max: 20 })).toBe(
+      "Places for others can be at most 20.",
+    );
+  });
+
+  it("falls back to a calm check-it message for other validity failures", () => {
+    expect(invalidFieldMessage("startsAt", { badInput: true })).toMatch(/valid value/i);
+    expect(invalidFieldMessage("language", {})).toMatch(/needs attention/i);
   });
 });

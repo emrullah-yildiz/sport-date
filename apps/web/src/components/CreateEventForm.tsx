@@ -8,8 +8,8 @@ import AddressAutocomplete from "@/components/AddressAutocomplete";
 import {
   datetimeLocalMin,
   EVENT_FIELD_ORDER,
-  eventFieldLabel,
   experienceLevelsIssue,
+  invalidFieldMessage,
   isPastLocalDateTime,
   issuesFromServerErrors,
   PAST_START_TIME_MESSAGE,
@@ -135,9 +135,22 @@ export default function CreateEventForm() {
         if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
           if (!element.checkValidity()) {
             const past = field === "startsAt" && isPastLocalDateTime(element.value);
+            // Say what is actually wrong: "required" only when empty; a
+            // too-short description reports the minimum + current length, etc.
+            const v = element.validity;
             emptyIssues.push({
               field,
-              message: past ? PAST_START_TIME_MESSAGE : `${eventFieldLabel(field)} is required.`,
+              message: past ? PAST_START_TIME_MESSAGE : invalidFieldMessage(field, {
+                valueMissing: v.valueMissing,
+                tooShort: v.tooShort,
+                rangeUnderflow: v.rangeUnderflow,
+                rangeOverflow: v.rangeOverflow,
+                badInput: v.badInput,
+                valueLength: element.value.length,
+                minLength: element.minLength > 0 ? element.minLength : undefined,
+                min: element instanceof HTMLInputElement && element.min !== "" ? element.min : undefined,
+                max: element instanceof HTMLInputElement && element.max !== "" ? element.max : undefined,
+              }),
             });
           }
         }
