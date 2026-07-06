@@ -1,9 +1,10 @@
 "use client";
 
 import type { ExperienceLevel } from "@sport-date/domain";
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import AddressAutocomplete from "@/components/AddressAutocomplete";
+import { trackClick } from "@/lib/track-click";
 
 import {
   datetimeLocalMin,
@@ -39,6 +40,16 @@ export default function CreateEventForm() {
 
   const formRef = useRef<HTMLFormElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
+
+  // Anonymous funnel counter (CX-20260706): one tick when the publish form is
+  // opened, once per mount (ref-guarded against StrictMode's dev double-effect).
+  // Fire-and-forget — never affects the form.
+  const startedTracked = useRef(false);
+  useEffect(() => {
+    if (startedTracked.current) return;
+    startedTracked.current = true;
+    trackClick("event_publish_started");
+  }, []);
 
   // `min` only exists to stop a clearly-past time from being picked; the server
   // stays the authoritative check. `datetimeLocalMin()` reads the wall clock, so
@@ -207,6 +218,9 @@ export default function CreateEventForm() {
         focusFirstIssue(serverIssues);
         return;
       }
+      // Anonymous funnel counter — an event was published. sendBeacon survives
+      // the navigation below; the redirect never waits on it.
+      trackClick("event_published");
       window.location.assign(`/events/${result.eventId}?published=1`);
     } catch (submissionError) {
       const message = submissionError instanceof Error ? submissionError.message : "Event creation failed.";

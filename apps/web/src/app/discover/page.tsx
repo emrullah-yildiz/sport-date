@@ -6,6 +6,7 @@ import { applyAdvancedFilters, ALL_RADIUS_OPTIONS_KM, resolveAdvancedFilters, SC
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPTIONS_KM, resolveDiscoveryCentre } from "@/lib/discovery-geo";
 import { isPlus } from "@/lib/entitlements";
 import { joinRequestStateHeadline } from "@/lib/join-request-policy";
+import ClickTracking from "@/components/ClickTracking";
 import PrimaryNav from "@/components/PrimaryNav";
 import RegionInterestSignal from "@/components/RegionInterestSignal";
 import SiteFooter from "@/components/SiteFooter";
@@ -116,6 +117,9 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
 
   return (
     <main className="discover-page">
+      {/* Anonymous funnel counter (CX-20260706): one "discover_viewed" tick per
+          visit — no identity, no filters/query recorded, day granularity only. */}
+      <ClickTracking pageEvent="discover_viewed" />
       <PrimaryNav
         firstName={user.firstName}
         current="discover"

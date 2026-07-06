@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import BetaTermExplainer from "@/components/BetaTermExplainer";
+import ClickTracking from "@/components/ClickTracking";
 import WarmUpGame from "@/components/WarmUpGame";
 import { BRAND_NAME, BRAND_TITLE, Wordmark } from "@/lib/brand";
 import { sportEmoji } from "@/lib/sports";
@@ -91,6 +92,9 @@ export default async function LandingPage() {
 
   return (
     <main className="landing-page">
+      {/* Anonymous CTA counters (CX-20260706): counts clicks on the data-track
+          CTAs below — allowlisted event names only, no identity, first-party. */}
+      <ClickTracking />
       <header className="navbar">
         <div className="nav-container">
           <Link className="logo" href={user ? "/discover" : "/landing"} aria-label={`${BRAND_NAME} home`}>
@@ -112,7 +116,7 @@ export default async function LandingPage() {
             ) : (
               <>
                 <Link href="/login" className="nav-signin nav-signin--guest">Sign in</Link>
-                <Link href="/signup" className="btn btn--accent">Create a profile</Link>
+                <Link href="/signup" className="btn btn--accent" data-track="landing_cta_join">Create a profile</Link>
               </>
             )}
           </div>
@@ -142,7 +146,7 @@ export default async function LandingPage() {
                 </>
               ) : (
                 <>
-                  <Link href="/signup" className="btn btn--primary btn--lg">Create a profile</Link>
+                  <Link href="/signup" className="btn btn--primary btn--lg" data-track="landing_cta_join">Create a profile</Link>
                   <a href="#how-it-works" className="btn btn--secondary btn--lg">See how it works</a>
                 </>
               )}
@@ -291,7 +295,7 @@ export default async function LandingPage() {
         {user ? (
           <Link href="/discover" className="btn btn--accent btn--lg">Enter {BRAND_NAME}</Link>
         ) : (
-          <Link href="/signup" className="btn btn--accent btn--lg">Create a profile</Link>
+          <Link href="/signup" className="btn btn--accent btn--lg" data-track="landing_cta_join">Create a profile</Link>
         )}
       </section>
 
@@ -308,7 +312,7 @@ export default async function LandingPage() {
             </p>
           </div>
           <div className="hero-cta">
-            <Link href="/research" className="btn btn--secondary btn--lg">Take the 2-min survey</Link>
+            <Link href="/research" className="btn btn--secondary btn--lg" data-track="landing_cta_survey">Take the 2-min survey</Link>
             <Link href="/feedback" className="btn btn--secondary btn--lg">Share feedback</Link>
           </div>
         </div>

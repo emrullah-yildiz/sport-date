@@ -183,6 +183,9 @@
     <div class="kpi"><div class="v">€0</div><div class="l">spent on marketing</div></div>
   </div>
 
+  <h2 class="sec">▸ Click funnel — anonymous, first-party (last 14 days)</h2>
+  <div id="funnel"><div class="note"><p>Loading click metrics…</p></div></div>
+
   <h2 class="sec">▸ Blocked — needs you (owner-gated)</h2>
   <div class="decisions">
     <div class="dec hi">
@@ -400,6 +403,58 @@ document.addEventListener("click",e=>{
   else if(lb.classList.contains("open")){ lb.classList.remove("open"); lbImg.src=""; }
 });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remove("open"); lbImg.src=""; } });
+
+// ── Click funnel: anonymous first-party CTA counters (CX-20260706) ──────────
+// Owner-gated aggregates only: daily counts per allowlisted event — no user,
+// session, IP, UA, or per-visit record exists anywhere to show.
+(function(){
+  "use strict";
+  var box=document.getElementById("funnel");
+  var esc=function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+    return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); };
+  // The funnels, in reading order. Every allowlisted event appears exactly once.
+  var CHAINS=[
+    {name:"Visitor → member", steps:["landing_cta_join","signup_started","signup_completed"]},
+    {name:"Member → join",    steps:["discover_viewed","join_requested"]},
+    {name:"Host → publish",   steps:["event_publish_started","event_published"]},
+    {name:"Sharing",          steps:["share_opened","share_platform_click","poster_downloaded"]},
+    {name:"Survey",           steps:["landing_cta_survey","survey_started","survey_completed"]}
+  ];
+  var LABELS={
+    landing_cta_join:"Landing “join” CTA", signup_started:"Signup started", signup_completed:"Signup completed",
+    discover_viewed:"Discover viewed", join_requested:"Join requested",
+    event_publish_started:"Publish form opened", event_published:"Event published",
+    share_opened:"Share opened", share_platform_click:"Platform picked", poster_downloaded:"Poster downloaded",
+    landing_cta_survey:"Landing “survey” CTA", survey_started:"Survey started", survey_completed:"Survey completed"
+  };
+  function render(rows){
+    var totals={}; rows.forEach(function(r){ totals[r.event]=(totals[r.event]||0)+r.count; });
+    var any=rows.length>0;
+    var html='<div class="log">'+CHAINS.map(function(chain){
+      var prev=null;
+      var t=chain.steps.map(function(ev){
+        var n=totals[ev]||0;
+        var pct=(prev!==null&&prev>0)?" <span style=\"color:var(--mut)\">("+Math.round(100*n/prev)+"%)</span>":"";
+        prev=n;
+        return esc(LABELS[ev]||ev)+" <b style=\"color:var(--neon)\">"+n+"</b>"+pct;
+      }).join(' <span style="color:var(--mut)">→</span> ');
+      return '<div class="item"><div class="d">'+esc(chain.name)+'</div><div class="t">'+t+"</div></div>";
+    }).join("")+"</div>"+
+    '<div class="sd-note">'+(any?"Counts are 14-day totals of anonymous, first-party CTA beacons — aggregate counters only (no user/session/IP/UA, day granularity). Percentages are step-over-step."
+      :"No clicks recorded yet — counters start ticking as visitors use the instrumented CTAs.")+"</div>";
+    box.innerHTML=html;
+  }
+  fetch("/api/metrics/summary?days=14",{credentials:"same-origin",headers:{Accept:"application/json"}})
+    .then(function(r){
+      if(r.status===401||r.status===403) throw new Error("Sign in as the owner to see the click funnel.");
+      if(!r.ok) throw new Error("Click metrics unavailable right now ("+r.status+").");
+      return r.json();
+    })
+    .then(function(d){ render(Array.isArray(d.rows)?d.rows:[]); })
+    .catch(function(err){
+      box.innerHTML='<div class="note"><p>'+esc(err&&err.message?err.message:"Click metrics unavailable right now.")+"</p></div>";
+    });
+})();
 
 // ── Daily standup: report + owner-approvable directions ─────────────────────
 (function(){

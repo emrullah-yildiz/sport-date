@@ -221,6 +221,21 @@ not built:
   messaging is held until staffed human safety operations exist
   (`docs/operations/decision-log.md`).
 
+### 3.8 Anonymous aggregate usage statistics (operational note, 2026-07-06)
+
+To understand which parts of the product are used (for example, how often the
+"Create a profile" button is clicked), we count clicks on a fixed, short list of
+our own buttons and pages, first-party only. What is stored is **only a daily
+counter per button name and coarse page group** (`click_metrics_daily`): no user
+id, no session id, no IP address, no device or browser information, no cookies,
+and no timestamp finer than the calendar day — the table structurally cannot
+hold an identifier, so a stored row can never describe a person. No third-party
+analytics service is involved and nothing is sent anywhere but our own servers.
+Because these counters contain no personal data, they are not tied to your
+account, are unaffected by account deletion, and require no consent banner.
+`[The "anonymous, therefore outside GDPR scope" characterisation is
+counsel-confirmable, like every legal position in this notice.]`
+
 ## 4. Who can see your data
 
 - **Other members:** see only what discovery and the event flow expose — your

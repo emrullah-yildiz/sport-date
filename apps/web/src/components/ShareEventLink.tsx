@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { trackClick } from "@/lib/track-click";
+
 /**
  * Copies the public (approximate-only) invitation link so a host can share their
  * event. The link points at the discovery view, which never exposes the precise
@@ -12,6 +14,9 @@ export default function ShareEventLink({ path }: { path: string }) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
   async function copy() {
+    // Anonymous counter (CX-20260706): counts only that sharing was opened —
+    // never which event or member. Fire-and-forget.
+    trackClick("share_opened");
     const url = typeof window === "undefined" ? path : new URL(path, window.location.origin).toString();
     try {
       if (navigator.clipboard?.writeText) {

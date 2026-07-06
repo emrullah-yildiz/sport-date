@@ -8,6 +8,7 @@ import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
 import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline, showsFullJoinState } from "@/lib/join-request-policy";
+import { trackClick } from "@/lib/track-click";
 
 type Status = DiscoveryRequest["status"];
 
@@ -151,6 +152,9 @@ export default function JoinRequestControls({
         return;
       }
       if (!response.ok) throw new Error(result.error || "Request failed.");
+      // Anonymous funnel counter (CX-20260706) — a join request was sent. No
+      // event id, no member: just a daily count. Fire-and-forget.
+      trackClick("join_requested");
       const nextStatus = result.status ?? "pending";
       setStatus(nextStatus);
       setRequestId(result.requestId ?? null);

@@ -406,6 +406,22 @@ export function researchSurveyRateLimitRules(request: Request): readonly RateLim
   ];
 }
 
+/**
+ * Anonymous click-metric beacons (CX-20260706). IP-keyed only — the beacon
+ * stores no identity, so the IP is the sole abuse handle. As everywhere in this
+ * module the key is HASHED into a transient counter and the IP itself is never
+ * written to any metrics row. Generous limits: a real visitor emits at most a
+ * couple of dozen events per session, but shared household/campus NATs must
+ * never lose analytics-free UX (the endpoint fails soft anyway).
+ */
+export function clickMetricRateLimitRules(request: Request): readonly RateLimitRule[] {
+  const ip = getRequestIp(request);
+  return [
+    { name: "click-metric-ip", limit: 60, windowMs: 10 * 60 * 1000, key: `ip:${ip}` },
+    { name: "click-metric-ip-day", limit: 600, windowMs: 24 * 60 * 60 * 1000, key: `ip:${ip}` },
+  ];
+}
+
 export async function resetRateLimitStoreForTests(): Promise<void> {
   await store.clear();
   mutationCount = 0;

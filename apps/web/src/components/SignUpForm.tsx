@@ -3,11 +3,12 @@
 import { validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { type ComponentType, useState } from "react";
+import { type ComponentType, useRef, useState } from "react";
 
 import { BRAND_NAME } from "@/lib/brand";
 import { SIGN_UP_STEP_ORDER, signUpStepError } from "@/lib/sign-up-steps";
 import { useSignUpStore } from "@/lib/sign-up-store";
+import { trackClick } from "@/lib/track-click";
 import StepName from "./steps/StepName";
 import StepGender from "./steps/StepGender";
 import StepOrientation from "./steps/StepOrientation";
@@ -59,9 +60,18 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
   const [error, setError] = useState("");
   const CurrentStep = steps[step - 1];
 
+  // Anonymous funnel counter (CX-20260706): fired once per form lifetime on the
+  // first successful "Next" — the moment someone actually begins the wizard.
+  // Fire-and-forget; never affects the step flow.
+  const startedTracked = useRef(false);
+
   const handleNext = () => {
     const message = signUpStepError(step, useSignUpStore.getState());
     if (message) return setError(message);
+    if (!startedTracked.current) {
+      startedTracked.current = true;
+      trackClick("signup_started");
+    }
     setError("");
     if (step < steps.length) setStep(step + 1);
   };
@@ -105,6 +115,8 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
       const selectedPhotos = [...state.additionalPhotos];
       if (selectedPhotos.length > 0) await uploadSelectedPhotos(selectedPhotos);
       reset();
+      // Anonymous funnel counter — a signup finished (no identity attached).
+      trackClick("signup_completed");
       setIsComplete(true);
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : "Registration failed.");

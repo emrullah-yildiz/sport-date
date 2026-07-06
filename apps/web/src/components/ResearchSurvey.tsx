@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { SUPPORT_EMAIL } from "@/lib/brand";
+import { trackClick } from "@/lib/track-click";
 import {
   Q11_FACTORS,
   SURVEY_ONE_QUESTIONS,
@@ -249,6 +250,17 @@ export default function ResearchSurvey() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  // Anonymous funnel counters (CX-20260706): one tick when the survey opens and
+  // one when the core answers land — counts only, no answers, no identity, and
+  // completely separate from the survey's own anonymous storage. Ref-guarded so
+  // StrictMode's dev double-effect can't double-count.
+  const startTracked = useRef(false);
+  useEffect(() => {
+    if (startTracked.current) return;
+    startTracked.current = true;
+    trackClick("survey_started");
+  }, []);
+
   const setOne = (id: string, value: AnswerMap[string] | undefined) =>
     setAnswersOne((current) => {
       const next = { ...current };
@@ -283,6 +295,8 @@ export default function ResearchSurvey() {
 
   const submitSurveyOne = () =>
     submit({ action: "answers", answers: answersOne }, (body) => {
+      // The core survey was completed (a count, nothing about the answers).
+      trackClick("survey_completed");
       setResponseId(typeof body.responseId === "string" ? body.responseId : null);
       setStage("offerMore");
     });

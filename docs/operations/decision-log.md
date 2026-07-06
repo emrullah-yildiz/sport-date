@@ -1,5 +1,9 @@
 # Decision log
 
+## 2026-07-06 - Click analytics are first-party, aggregate-only, and structurally anonymous
+
+The owner asked to see what visitors click. Rejected third-party analytics (consent banner + data sharing — wrong for an EU-first dating product) in favour of an in-house beacon: allowlisted event names and coarse page classes only, counted into one daily row per (day, event, path_class) in `click_metrics_daily`. The schema physically cannot hold a user id, session id, IP, user agent, or sub-day timestamp; the write path drops every extra payload field and reads no identity header (tripwire-tested). Rate limiting reuses the hashed-key limiter without storing IPs, the endpoint fails soft so analytics can never break member UX, and the summary is owner-gated (owner session or the internal agent secret). Read surface: the click-funnel section on /hq.html.
+
 ## 2026-07-04 - Join-request decisions notify the requester without exposing host behavior or location
 
 Approved and finally declined join requests now produce one best-effort transactional email through the shared fail-closed Gmail delivery gate. The notification is triggered only after the database transition succeeds and is shared by browser and mobile host actions. Delivery failure never rolls back or falsely reports the host's completed decision; the in-app request state remains authoritative.

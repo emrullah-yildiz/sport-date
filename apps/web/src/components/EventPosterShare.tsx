@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 
 import { POSTER_FILE_NAME, STORY_FILE_NAME } from "@/lib/event-poster";
 import { buildEventShareIntentLinks } from "@/lib/event-share";
+import { trackClick } from "@/lib/track-click";
 
 // CapCut-style "Share" control for an event's poster + public invite link
 // (CX-20260705-event-poster-share, extended by CX-20260706-poster-share-v2),
@@ -90,6 +91,9 @@ export default function EventPosterShare({
   }
 
   async function share() {
+    // Anonymous counters (CX-20260706): counts only that sharing was opened —
+    // never which event, member, or platform. Fire-and-forget.
+    trackClick("share_opened");
     const url = resolveShareUrl();
     if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
       // No native sheet here (most desktops) — point at the always-visible fallbacks.
@@ -129,6 +133,9 @@ export default function EventPosterShare({
   // that (the primary mobile path), otherwise download the story and tell the
   // member exactly what to do next. Never a fake "posting…" state.
   async function shareStory(app: "instagram" | "tiktok") {
+    // ONE shared event for every platform button — the platform itself is
+    // deliberately NOT recorded (anonymity/cardinality rule, CX-20260706).
+    trackClick("share_platform_click");
     if (
       typeof navigator !== "undefined" &&
       typeof navigator.share === "function" &&
@@ -160,6 +167,7 @@ export default function EventPosterShare({
   }
 
   async function copyLink() {
+    trackClick("share_platform_click");
     const url = resolveShareUrl();
     try {
       if (navigator.clipboard?.writeText) {
@@ -199,6 +207,7 @@ export default function EventPosterShare({
             href={`${posterPath}?download=1`}
             download={POSTER_FILE_NAME}
             aria-label="Download the event poster image"
+            onClick={() => trackClick("poster_downloaded")}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
               <path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 18.5h16" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -226,8 +235,8 @@ export default function EventPosterShare({
         >
           Instagram
         </button>
-        {intents ? <a href={intents.whatsapp} target="_blank" rel="noopener noreferrer">WhatsApp</a> : null}
-        {intents ? <a href={intents.facebook} target="_blank" rel="noopener noreferrer">Facebook</a> : null}
+        {intents ? <a href={intents.whatsapp} target="_blank" rel="noopener noreferrer" onClick={() => trackClick("share_platform_click")}>WhatsApp</a> : null}
+        {intents ? <a href={intents.facebook} target="_blank" rel="noopener noreferrer" onClick={() => trackClick("share_platform_click")}>Facebook</a> : null}
         <button
           type="button"
           onClick={() => void shareStory("tiktok")}
@@ -235,7 +244,7 @@ export default function EventPosterShare({
         >
           TikTok
         </button>
-        {intents ? <a href={intents.x} target="_blank" rel="noopener noreferrer">X</a> : null}
+        {intents ? <a href={intents.x} target="_blank" rel="noopener noreferrer" onClick={() => trackClick("share_platform_click")}>X</a> : null}
         <button
           type="button"
           onClick={() => void copyLink()}
