@@ -41,5 +41,14 @@ metrics), never vibes.
 | 2026-07-05 | **Hired** | standup-scribe | Owner wants a daily 06:00 standup + approvable directions on HQ | Cloud routine (see `docs/operations/standup-runbook.md`) |
 | 2026-07-05 | **Probation** | Tester / User-sim | Build collision with Builder WIP; session-limit stalls | Worktree isolation mandatory; next failure → rewrite |
 
+## Scorecard — standup 2026-07-06 (published by CEO; scribe delivery failed)
+
+| Agent | Evidence | Verdict |
+|---|---|---|
+| **standup-scribe** | Fired on time (06:01), wrote its report, push refused with 403 — the cloud environment has read-only repo access; the report died in the sandbox and the owner got nothing. Not a judgment failure, but delivery IS the job. | **PROBATION.** Mitigations shipped: runbook now mandates printing the full report JSON in the run log when a push is refused (no more silent misses); owner direction SD-20260706-cloud-write requests write access. Two consecutive silent misses → contract rewrite (API-seed delivery). |
+| **Builder pool** | 4 full-DoD builds in 24h: poster/share v1+v2, location map picker, click analytics — 1141 tests green, zero deploy breakage, strong judgment calls (ImageResponse over sharp; dark-ink contrast; QR decode verification). | **KEEP** — best performers on the roster. |
+| **social-media-growth v2** | Batch 09 answered all 13 owner comments (incl. compliance pushback on the real-player-photo ask); batch 10 manifesto drafting with verified-stats discipline. | **KEEP.** Corrections trending down under contract v2. |
+| **CEO** | Found the canonical-domain root cause (stale env vars); enforced no-defamation + rights lines under pressure; published this standup when the scribe couldn't. Miss: didn't verify the scribe's delivery path end-to-end before its first unattended run. | **KEEP**, with the miss logged. |
+
 Review cadence: every daily standup re-scores; fire/rehire proposals ship as
 directions the owner approves on `/hq.html`.

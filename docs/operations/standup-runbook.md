@@ -55,6 +55,12 @@ cloud routine `keepitup-daily-standup` executes it.
    `ops: daily standup YYYY-MM-DD (standup-scribe)`. Only the allowed files may
    be in the commit. The site auto-deploys; the report then renders on
    `/hq.html` where the owner approves/denies each direction.
+   - **If the push is refused (403 / read-only checkout): do NOT stop silently.**
+     Print the COMPLETE report JSON as your final message, prefixed with the
+     line `STANDUP-REPORT-FALLBACK (push denied):` — the run log then carries
+     the report so the CEO can publish it manually. This happened on
+     2026-07-06 (the cloud environment lacked write access); a silent failure
+     here means the owner gets no standup, which is the one unacceptable outcome.
 
 ## How decisions flow back
 The owner's approve/deny + notes are stored via `POST /api/standup/directions`
