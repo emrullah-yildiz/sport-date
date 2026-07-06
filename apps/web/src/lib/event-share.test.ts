@@ -66,10 +66,10 @@ describe("buildEventShareIntentLinks", () => {
   const url = "https://keepitup.social/e/" + EVENT_ID;
   const text = "🎾 Tennis in Floreasca, Bucharest — Fri 10 Jul, 19:00. 3 places left. Come play?";
 
-  it("builds WhatsApp / Telegram / X intents with the text and link fully encoded", () => {
+  it("builds WhatsApp / Facebook / X intents with the text and link fully encoded", () => {
     const links = buildEventShareIntentLinks(url, text);
     expect(links.whatsapp).toBe(`https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`);
-    expect(links.telegram).toBe(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+    expect(links.facebook).toBe(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
     expect(links.x).toBe(`https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`);
   });
 
@@ -83,8 +83,8 @@ describe("buildEventShareIntentLinks", () => {
   it("carries the invite URL into every platform intent", () => {
     const links = buildEventShareIntentLinks(url, text);
     const encodedUrl = encodeURIComponent(url);
-    expect(links.whatsapp).toContain(encodeURIComponent(url));
-    expect(links.telegram).toContain(`url=${encodedUrl}`);
+    expect(links.whatsapp).toContain(encodedUrl);
+    expect(links.facebook).toContain(`u=${encodedUrl}`);
     expect(links.x).toContain(`url=${encodedUrl}`);
   });
 });

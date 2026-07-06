@@ -40,6 +40,63 @@ export function derivePublicAreaFromSuggestion(suggestion: LocationSuggestion): 
   };
 }
 
+// ——— Map-pick / reverse-geocode helpers (CX-20260706-event-location-map-picker) ———
+
+/**
+ * Decimals kept on a map-picked coordinate (6 ≈ 0.1 m). A raw Leaflet tap yields
+ * float noise like 44.42683719482421 — rounding normalises what we store and what
+ * we send to the reverse geocoder without losing any usable precision.
+ */
+export const PIN_COORDINATE_DECIMALS = 6;
+
+/** Round a map-picked coordinate to the canonical pin precision. */
+export function roundPinCoordinate(value: number): number {
+  const factor = 10 ** PIN_COORDINATE_DECIMALS;
+  return Math.round(value * factor) / factor;
+}
+
+/**
+ * Parse and validate a latitude/longitude query-parameter pair. Returns null for
+ * anything missing, non-numeric, or out of range — the reverse proxy rejects those
+ * before any provider call. Values are rounded to the canonical pin precision.
+ */
+export function parseCoordinatePair(
+  latitudeRaw: string | null,
+  longitudeRaw: string | null,
+): { latitude: number; longitude: number } | null {
+  if (!latitudeRaw?.trim() || !longitudeRaw?.trim()) return null;
+  const latitude = Number(latitudeRaw);
+  const longitude = Number(longitudeRaw);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) return null;
+  if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) return null;
+  return { latitude: roundPinCoordinate(latitude), longitude: roundPinCoordinate(longitude) };
+}
+
+/**
+ * Re-anchor a suggestion on the exact spot the host picked on the map. The
+ * reverse geocoder describes the NEAREST known object, whose own coordinates can
+ * sit metres away from the tapped point — but the host's tap is the intent
+ * (fine-tuning "which entrance / which court"), so the pin keeps the tapped
+ * coordinates and only the address text/coarse fields come from the geocoder.
+ */
+export function pinnedSuggestion(
+  suggestion: LocationSuggestion,
+  latitude: number,
+  longitude: number,
+): LocationSuggestion {
+  return { ...suggestion, id: `pin:${latitude}:${longitude}`, latitude, longitude };
+}
+
+/**
+ * Parse a Photon /reverse payload (same GeoJSON shape as forward search) into the
+ * single best data-minimized suggestion, or null when the point resolves to
+ * nothing addressable (open field, mid-lake…). Reuses `parsePhotonSuggestions`,
+ * so the projection drops every provider extra exactly like the forward path.
+ */
+export function parsePhotonReverseSuggestion(payload: unknown): LocationSuggestion | null {
+  return parsePhotonSuggestions(payload)[0] ?? null;
+}
+
 type PhotonFeature = {
   geometry?: { coordinates?: unknown[] };
   properties?: Record<string, unknown>;

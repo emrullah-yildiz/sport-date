@@ -13,7 +13,9 @@ function buildContentSecurityPolicy(nodeEnv: string): string {
     "default-src 'self'",
     `script-src ${scriptSrc.join(" ")}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
+    // tile.openstreetmap.org: map tiles for the host-only event location map
+    // picker (CX-20260706). Tiles are images only — no script/connect access.
+    "img-src 'self' data: blob: https://tile.openstreetmap.org",
     "font-src 'self' data:",
     `connect-src ${connectSrc.join(" ")}`,
     "media-src 'self' blob:",

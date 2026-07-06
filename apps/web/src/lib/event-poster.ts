@@ -32,8 +32,29 @@ import { sportEmoji } from "@/lib/sports";
 export const POSTER_WIDTH = 1080;
 export const POSTER_HEIGHT = 1350;
 
-/** Download filename — deliberately generic: no event id, area, or person in it. */
+/** Instagram/TikTok story size (9:16) — CX-20260706-poster-share-v2. */
+export const STORY_WIDTH = 1080;
+export const STORY_HEIGHT = 1920;
+
+/** Download filenames — deliberately generic: no event id, area, or person in them. */
 export const POSTER_FILE_NAME = "keepitup-event-poster.png";
+export const STORY_FILE_NAME = "keepitup-event-story.png";
+
+/** The two poster variants: the 4:5 feed post and the 9:16 story. */
+export type EventPosterFormat = "post" | "story";
+
+/** `?format=story` → "story"; anything else (missing, junk) → the 4:5 default. */
+export function posterFormatFromParam(value: string | null): EventPosterFormat {
+  return value === "story" ? "story" : "post";
+}
+
+export function posterDimensions(format: EventPosterFormat): { width: number; height: number } {
+  return format === "story" ? { width: STORY_WIDTH, height: STORY_HEIGHT } : { width: POSTER_WIDTH, height: POSTER_HEIGHT };
+}
+
+export function posterFileName(format: EventPosterFormat): string {
+  return format === "story" ? STORY_FILE_NAME : POSTER_FILE_NAME;
+}
 
 /**
  * Fallback link label when no public origin is configured (e.g. local dev).
@@ -60,6 +81,11 @@ export type EventPosterView = Readonly<{
   privacyLine: string;
   /** Brand link label, e.g. "keepitup.social" — host only, never a full event URL. */
   linkLabel: string;
+  /**
+   * The public invite URL, `{canonical origin}/e/{id}` — the ONLY thing the QR
+   * code encodes. The event id is already public (it IS the invite link).
+   */
+  inviteUrl: string;
   /** Accessible description of the poster for previews/downloads. */
   alt: string;
 }>;
@@ -72,6 +98,28 @@ export function posterLinkLabel(origin: string | null): string {
   } catch {
     return POSTER_FALLBACK_LINK_LABEL;
   }
+}
+
+/**
+ * The public invite URL the QR code encodes — `{origin}/e/{id}` and NOTHING
+ * else (no query, no tracking, no extra path). `origin` must already be the
+ * canonical configured origin (request host only as the caller's last resort);
+ * an unusable/missing origin falls back to the brand host so a broken config
+ * can never put a deployment alias inside a printed QR.
+ */
+export function posterInviteUrl(origin: string | null, eventId: string): string {
+  const base = (() => {
+    if (origin) {
+      try {
+        const url = new URL(origin);
+        if (url.protocol === "https:" || url.protocol === "http:") return url.origin;
+      } catch {
+        // fall through to the brand fallback
+      }
+    }
+    return `https://${POSTER_FALLBACK_LINK_LABEL}`;
+  })();
+  return `${base}/e/${eventId}`;
 }
 
 /**
@@ -97,6 +145,7 @@ export function eventPosterViewFromInvite(
     availabilityLine: described.availability.label,
     privacyLine: "Approximate area only — the exact meeting point is shared after the host accepts.",
     linkLabel: posterLinkLabel(origin),
+    inviteUrl: posterInviteUrl(origin, invite.id),
     alt: `${headline}${whenLine ? ` — ${whenLine}` : ""}. ${described.availability.label}. Event poster with the approximate area only; the exact meeting point stays private until the host accepts.`,
   };
 }

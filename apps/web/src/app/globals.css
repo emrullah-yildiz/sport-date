@@ -1520,29 +1520,55 @@ button:disabled:hover, button[disabled]:hover {
 .host-share-preview { display: inline-flex; align-items: center; min-height: 44px; justify-self: start; color: var(--accent-info); font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
 .host-share-preview:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
 
-/* ---- Event poster + one-tap share (CX-20260705-event-poster-share): the poster
-   preview, native Share button, and download / copy / platform-intent fallbacks.
-   Used inside .host-published, .host-share-card, and .public-invite-share. */
+/* ---- Event poster + one-tap share (CX-20260705-event-poster-share, extended by
+   CX-20260706-poster-share-v2): the poster preview with its overlay download
+   icon, native Share button, and the platform row (Instagram/WhatsApp/Facebook/
+   TikTok/X/copy). Used inside .host-published, .host-share-card, and
+   .public-invite-share. */
 .event-poster-share { display: grid; gap: 12px; justify-items: start; margin-top: 6px; }
+.event-poster-share-figure { position: relative; display: inline-flex; max-width: 100%; }
 .event-poster-share-preview { display: inline-flex; max-width: 100%; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: var(--surface-raised); }
 .event-poster-share-preview img { display: block; width: 270px; max-width: 100%; height: auto; }
 .event-poster-share-preview:hover { box-shadow: var(--glow-accent); }
 .event-poster-share-preview:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+/* The one and only download control (CX-20260706-poster-share-v2): a 44px icon
+   pinned to the poster's top-right corner. Always visible by default (touch
+   devices have no hover); on pointer devices it fades in on hover or when
+   anything inside the figure holds focus. */
+.event-poster-share-download-icon { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: rgba(11,15,13,.78); border: 1px solid rgba(241,245,243,.35); color: var(--text); }
+.event-poster-share-download-icon:hover { background: rgba(11,15,13,.92); color: var(--accent); }
+.event-poster-share-download-icon:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+@media (hover: hover) and (pointer: fine) {
+  .event-poster-share-figure .event-poster-share-download-icon { opacity: 0; transition: opacity .15s ease; }
+  .event-poster-share-figure:hover .event-poster-share-download-icon,
+  .event-poster-share-figure:focus-within .event-poster-share-download-icon { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .event-poster-share-figure .event-poster-share-download-icon { transition: none; } }
 .event-poster-share-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .event-poster-share-button { min-height: 44px; padding: 11px 24px; border: 1.5px solid transparent; border-radius: 14px; background: var(--accent); color: var(--bg); font-weight: 900; cursor: pointer; }
 .event-poster-share-button:hover { box-shadow: var(--glow-accent); }
 .event-poster-share-button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.event-poster-share-download,
-.event-poster-share-copy { display: inline-flex; align-items: center; min-height: 44px; padding: 11px 18px; border: 1.5px solid var(--accent); border-radius: 14px; background: transparent; color: var(--accent); font-weight: 900; cursor: pointer; text-decoration: none; }
-.event-poster-share-download:hover,
-.event-poster-share-copy:hover { background: rgba(59,234,126,.12); box-shadow: var(--glow-accent); }
-.event-poster-share-download:focus-visible,
-.event-poster-share-copy:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .event-poster-share-intents { display: flex; flex-wrap: wrap; gap: 10px; }
-.event-poster-share-intents a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-weight: 800; text-decoration: none; }
-.event-poster-share-intents a:hover { border-color: var(--accent); color: var(--accent); }
-.event-poster-share-intents a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.event-poster-share-intents a,
+.event-poster-share-intents button { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-raised); color: var(--text); font-weight: 800; font-size: inherit; font-family: inherit; text-decoration: none; cursor: pointer; }
+.event-poster-share-intents a:hover,
+.event-poster-share-intents button:hover { border-color: var(--accent); color: var(--accent); }
+.event-poster-share-intents a:focus-visible,
+.event-poster-share-intents button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .event-poster-share-status { margin: 0; max-width: 720px; color: var(--text-muted); font-size: var(--fs-small); line-height: 1.5; }
+/* On the lime "It's live" panel (.host-published) this component sits on NEON
+   GREEN (#3BEA7E): the muted-gray status text was unreadable there (owner
+   report 2026-07-06). White fails contrast on that green (~1.6:1); dark ink
+   passes (rgba(11,15,13,.78) ≈ 7:1) and matches .share-event-status on the
+   same panel — so dark ink it is. Same treatment for the accent-on-green
+   button and chips. */
+.host-published .event-poster-share-status { color: rgba(11,15,13,.78); }
+.host-published .event-poster-share-button { background: var(--bg); color: var(--text); }
+.host-published .event-poster-share-intents a,
+.host-published .event-poster-share-intents button { background: transparent; border: 1.5px solid rgba(11,15,13,.75); color: var(--bg); }
+.host-published .event-poster-share-intents a:hover,
+.host-published .event-poster-share-intents button:hover { background: rgba(11,15,13,.12); border-color: var(--bg); color: var(--bg); }
+.host-published .event-poster-share-preview { border-color: rgba(11,15,13,.4); }
 
 /* Public invite page: the share section is its own calm card below the invite. */
 .public-invite-share { max-width: 760px; display: grid; gap: 12px; padding: 30px 40px; border-radius: 26px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
@@ -1744,3 +1770,18 @@ button:disabled:hover, button[disabled]:hover {
 @media (max-width: 700px) { .location-coarse-fields { grid-template-columns: 1fr; } }
 .location-section .location-trust-note { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--surface-raised); color: var(--text-muted); font-size: 13px; line-height: 1.55; }
 .location-section .location-trust-note strong { color: var(--lime); }
+
+/* Host-only inline map preview + pick-on-map for the PRIVATE event pin (CX-20260706).
+   Lives only in the create/edit location section; never on a public surface. */
+.event-location-map { display: grid; gap: 6px; }
+.event-location-map-canvas { position: relative; z-index: 0; display: grid; place-items: center; height: 280px; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-raised); }
+.event-location-map-placeholder { margin: 0; color: var(--muted); font-size: 12px; }
+.event-location-map-hint { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+/* The CSS-drawn brand pin (Leaflet divIcon) — a neon-green teardrop on an
+   anthracite ring, so no default marker PNGs are needed. */
+.event-map-pin { background: transparent; border: 0; }
+.event-map-pin-dot { display: block; width: 24px; height: 24px; border: 3px solid var(--bg); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); background: var(--lime); box-shadow: 0 4px 12px rgba(0, 0, 0, .5); cursor: grab; }
+/* Leaflet initialises INTO the canvas div (it becomes .leaflet-container):
+   keep the rounded clip and the app font, and let the canvas's own z-index: 0
+   keep Leaflet's internally-stacked panes below the app's overlays. */
+.event-location-map-canvas.leaflet-container { border-radius: 13px; font-family: var(--font-sans); }

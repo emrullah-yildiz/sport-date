@@ -36,4 +36,15 @@ describe("security headers", () => {
     const headers = headerMap("development");
     expect(headers["Content-Security-Policy"]).toContain("'unsafe-eval'");
   });
+
+  it("allows OSM map tiles as IMAGES only (host map picker, CX-20260706) — no script or connect access", () => {
+    const csp = headerMap("production")["Content-Security-Policy"];
+    const directives = Object.fromEntries(csp.split("; ").map((directive) => {
+      const [name, ...values] = directive.split(" ");
+      return [name, values.join(" ")];
+    }));
+    expect(directives["img-src"]).toContain("https://tile.openstreetmap.org");
+    expect(directives["script-src"]).not.toContain("openstreetmap");
+    expect(directives["connect-src"]).not.toContain("openstreetmap");
+  });
 });

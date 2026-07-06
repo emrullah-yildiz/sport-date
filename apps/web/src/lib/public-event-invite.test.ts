@@ -81,6 +81,17 @@ describe("publicEventInviteFromRow — the unauthenticated allowlist choke point
     expect(serialized).not.toContain("longitude");
   });
 
+  it("a map-fine-tuned high-precision pin (CX-20260706) can never surface on the public invite", () => {
+    // The map picker stores tap-precision coordinates (6 decimals). Even if a
+    // widened row carried them, the allowlist choke point must drop them.
+    const polluted = inviteRow({ ...PRIVATE_STRINGS, precise_latitude: 44.426837, precise_longitude: 26.102513 });
+    const serialized = JSON.stringify(publicEventInviteFromRow(polluted));
+    expect(serialized).not.toContain("44.426837");
+    expect(serialized).not.toContain("26.102513");
+    expect(serialized).not.toContain("latitude");
+    expect(serialized).not.toContain("longitude");
+  });
+
   it("carries no host-authored free text at all (title/description are a location-leak vector)", () => {
     const invite = publicEventInviteFromRow(inviteRow(PRIVATE_STRINGS));
     expect(invite).not.toHaveProperty("title");

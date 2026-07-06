@@ -26,11 +26,12 @@ export function buildEventShareText(invite: PublicEventInvite, now: Date = new D
   return `${sportEmoji(invite.sport)} ${described.headline}${when}. ${described.availability.label}. Come play?`;
 }
 
-/** Web intent links for platforms that accept prefilled text (Instagram has no
- * web prefill — the flow there is download-poster + post from the app). */
+/** Web intent links for platforms that accept a prefilled link/text (Instagram
+ * and TikTok have no web prefill — the flow there is download-story + post from
+ * the app, handled in EventPosterShare). */
 export type EventShareIntentLinks = Readonly<{
   whatsapp: string;
-  telegram: string;
+  facebook: string;
   x: string;
 }>;
 
@@ -43,7 +44,8 @@ export function buildEventShareIntentLinks(url: string, text: string): EventShar
   return {
     // wa.me only accepts a single text parameter; the link goes on its own line.
     whatsapp: `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+    // Facebook's sharer takes only the URL — the OG card supplies the preview.
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
     x: `https://x.com/intent/post?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
   };
 }

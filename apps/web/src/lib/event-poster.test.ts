@@ -6,7 +6,14 @@ import {
   POSTER_FILE_NAME,
   POSTER_HEIGHT,
   POSTER_WIDTH,
+  posterDimensions,
+  posterFileName,
+  posterFormatFromParam,
+  posterInviteUrl,
   posterLinkLabel,
+  STORY_FILE_NAME,
+  STORY_HEIGHT,
+  STORY_WIDTH,
 } from "./event-poster";
 import type { PublicEventInvite } from "./public-event-invite";
 
@@ -46,6 +53,7 @@ describe("eventPosterViewFromInvite — the invite → poster choke point", () =
     expect(view.durationLine).toBe("90 min");
     expect(view.availabilityLine).toBe("3 places left");
     expect(view.linkLabel).toBe("keepitup.social");
+    expect(view.inviteUrl).toBe(`https://keepitup.social/e/${EVENT_ID}`);
     expect(view.privacyLine).toContain("Approximate area only");
     expect(view.alt).toContain("Tennis in Floreasca, Bucharest");
     expect(view.alt).toContain("approximate area");
@@ -80,6 +88,7 @@ describe("eventPosterViewFromInvite — the invite → poster choke point", () =
       "emoji",
       "eyebrow",
       "headline",
+      "inviteUrl",
       "linkLabel",
       "privacyLine",
       "whenLine",
@@ -103,7 +112,11 @@ describe("eventPosterViewFromInvite — the invite → poster choke point", () =
       arrivalInstructions: "Ring Ana at the gate",
     } as unknown as PublicEventInvite;
 
-    const serialized = JSON.stringify(eventPosterViewFromInvite(polluted, "https://keepitup.social"));
+    const view = eventPosterViewFromInvite(polluted, "https://keepitup.social");
+    // The QR target is EXACTLY the public invite URL — no query, no extra path,
+    // nothing from the widened object can ride inside it.
+    expect(view.inviteUrl).toBe(`https://keepitup.social/e/${EVENT_ID}`);
+    const serialized = JSON.stringify(view);
     expect(serialized).not.toContain("Voinicelul");
     expect(serialized).not.toContain("Coravu");
     expect(serialized).not.toContain("021976");
@@ -116,6 +129,19 @@ describe("eventPosterViewFromInvite — the invite → poster choke point", () =
     expect(serialized).toContain("Floreasca");
     expect(serialized).toContain("Bucharest");
   });
+
+  it("a map-fine-tuned high-precision pin (CX-20260706) can never reach the poster", () => {
+    const polluted = {
+      ...invite(),
+      latitude: 44.426837, // tap-precision coordinates from the map picker
+      longitude: 26.102513,
+    } as unknown as PublicEventInvite;
+    const serialized = JSON.stringify(eventPosterViewFromInvite(polluted, null));
+    expect(serialized).not.toContain("44.426837");
+    expect(serialized).not.toContain("26.102513");
+    expect(serialized).not.toContain("latitude");
+    expect(serialized).not.toContain("longitude");
+  });
 });
 
 describe("posterLinkLabel", () => {
@@ -127,11 +153,42 @@ describe("posterLinkLabel", () => {
   });
 });
 
-describe("poster constants", () => {
-  it("is the 1080×1350 portrait social size with a generic filename (no event data in the name)", () => {
+describe("posterInviteUrl — the QR target (CX-20260706-poster-share-v2)", () => {
+  it("is exactly {canonical origin}/e/{id} — nothing else", () => {
+    expect(posterInviteUrl("https://keepitup.social", EVENT_ID)).toBe(`https://keepitup.social/e/${EVENT_ID}`);
+    // Path/query/hash on a misconfigured origin are stripped down to the origin.
+    expect(posterInviteUrl("https://www.keepitup.social/some/path?x=1", EVENT_ID)).toBe(
+      `https://www.keepitup.social/e/${EVENT_ID}`,
+    );
+  });
+
+  it("falls back to the brand host — a broken config can never print a bad QR", () => {
+    expect(posterInviteUrl(null, EVENT_ID)).toBe(`https://keepitup.social/e/${EVENT_ID}`);
+    expect(posterInviteUrl("not a url", EVENT_ID)).toBe(`https://keepitup.social/e/${EVENT_ID}`);
+    expect(posterInviteUrl("mailto:x@example.com", EVENT_ID)).toBe(`https://keepitup.social/e/${EVENT_ID}`);
+  });
+});
+
+describe("poster formats (CX-20260706-poster-share-v2)", () => {
+  it("is the 1080×1350 post by default and the 1080×1920 story on ?format=story", () => {
     expect(POSTER_WIDTH).toBe(1080);
     expect(POSTER_HEIGHT).toBe(1350);
+    expect(STORY_WIDTH).toBe(1080);
+    expect(STORY_HEIGHT).toBe(1920);
+    expect(posterFormatFromParam(null)).toBe("post");
+    expect(posterFormatFromParam("story")).toBe("story");
+    expect(posterFormatFromParam("STORY")).toBe("post"); // junk → the safe default
+    expect(posterFormatFromParam("4k")).toBe("post");
+    expect(posterDimensions("post")).toEqual({ width: 1080, height: 1350 });
+    expect(posterDimensions("story")).toEqual({ width: 1080, height: 1920 });
+  });
+
+  it("uses generic filenames for both formats (no event data in the name)", () => {
     expect(POSTER_FILE_NAME).toBe("keepitup-event-poster.png");
+    expect(STORY_FILE_NAME).toBe("keepitup-event-story.png");
+    expect(posterFileName("post")).toBe(POSTER_FILE_NAME);
+    expect(posterFileName("story")).toBe(STORY_FILE_NAME);
     expect(POSTER_FILE_NAME).not.toContain(EVENT_ID);
+    expect(STORY_FILE_NAME).not.toContain(EVENT_ID);
   });
 });

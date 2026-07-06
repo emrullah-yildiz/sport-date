@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 
-import { derivePublicAreaFromSuggestion, type LocationSuggestion } from "@/lib/location-search";
+import EventLocationMapPicker from "@/components/EventLocationMapPicker";
+import { derivePublicAreaFromSuggestion, pinnedSuggestion, roundPinCoordinate, type LocationSuggestion } from "@/lib/location-search";
 
 // The precise pin plus the coarse public fields derived from it. On edit these are
 // prefilled from the stored event so the happy path (a pin already set) renders the
@@ -47,6 +48,9 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
   // fallback — a geocoder outage must never block event creation).
   const [providerUnavailable, setProviderUnavailable] = useState(false);
   const requestNumber = useRef(0);
+  // Separate race counter for map-pick reverse lookups (a host can tap/drag
+  // quickly); only the latest pick may write the address fields.
+  const reverseRequestNumber = useRef(0);
   const listId = useId();
 
   useEffect(() => {
@@ -91,6 +95,51 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
     setActiveIndex(-1);
     setProviderUnavailable(false);
     setStatus(`Pin set at ${suggestion.label}.`);
+  }
+
+  // The host tapped the map or dragged the marker (CX-20260706). The tapped
+  // coordinates become the pin IMMEDIATELY — they are the host's intent and must
+  // survive even if the address lookup below fails — then the reverse-geocode
+  // proxy (same data-minimization as the forward search) refreshes the address
+  // text and the coarse public area. The typed venue name lives in a separate
+  // field and is never touched.
+  async function applyMapPick(pickedLatitude: number, pickedLongitude: number) {
+    const latitude = roundPinCoordinate(pickedLatitude);
+    const longitude = roundPinCoordinate(pickedLongitude);
+    setSelected((current) => (current ? pinnedSuggestion(current, latitude, longitude) : current));
+    setStatus("Exact spot updated. Looking up the address…");
+    const current = ++reverseRequestNumber.current;
+    try {
+      const params = new URLSearchParams({ latitude: String(latitude), longitude: String(longitude) });
+      const response = await fetch(`/api/locations/reverse?${params}`);
+      const result = await response.json() as { suggestion?: LocationSuggestion | null; error?: string };
+      if (current !== reverseRequestNumber.current) return;
+      if (!response.ok) throw new Error(result.error || "Address lookup failed.");
+      if (!result.suggestion) {
+        setStatus("Exact spot updated. No address found right there — the address text stays as typed.");
+        return;
+      }
+      const suggestion = pinnedSuggestion(result.suggestion, latitude, longitude);
+      setSelected(suggestion);
+      setQuery(suggestion.address);
+      // Refresh the coarse public area from the new spot, but never let a sparse
+      // reverse result WIPE a coarse field the host already has — a missing city
+      // would otherwise drop the hidden inputs and block publishing.
+      setArea((currentArea) => {
+        const derived = derivePublicAreaFromSuggestion(suggestion);
+        return {
+          city: derived.city || currentArea.city,
+          countryCode: derived.countryCode || currentArea.countryCode,
+          areaLabel: derived.areaLabel || currentArea.areaLabel,
+          postalCode: derived.postalCode || currentArea.postalCode,
+        };
+      });
+      setStatus(`Pin moved to ${suggestion.label}.`);
+    } catch (caught) {
+      if (current !== reverseRequestNumber.current) return;
+      const message = caught instanceof Error ? caught.message : "Address lookup failed.";
+      setStatus(`Exact spot updated. ${message} The address text stays as typed.`);
+    }
   }
 
   function clearSelection() {
@@ -162,6 +211,10 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
         <button type="button" className={index === activeIndex ? "is-active" : undefined} tabIndex={-1} onMouseDown={(mouseEvent) => mouseEvent.preventDefault()} onClick={() => choose(suggestion)}><span aria-hidden="true">●</span><span>{suggestion.label}</span></button>
       </li>)}
     </ul> : null}
+    {/* Host-only map preview + fine-tune of the PRIVATE pin. Rendered only once a
+        pin exists (a chosen suggestion, or the stored pin on edit); Leaflet and
+        the first tile load lazily when the map scrolls into view. */}
+    {selected ? <EventLocationMapPicker latitude={selected.latitude} longitude={selected.longitude} onPick={applyMapPick} /> : null}
     <p id={`${listId}-status`} className={`address-search-status${selected ? " pin-set" : ""}`} role="status" aria-live="polite">{status || "Choose a result to set the exact map pin — the city and area fill in automatically."}</p>
     {areaComplete
       ? <p className="address-derived-area">Discovery will show <strong>{areaLabelValue}{area.countryCode ? `, ${area.countryCode}` : ""}</strong> — the approximate area only. Your exact pin stays private until you accept someone.</p>

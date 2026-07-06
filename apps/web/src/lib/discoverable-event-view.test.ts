@@ -202,6 +202,16 @@ describe("getDiscoverableEvents — the FEED keeps every gate EXCEPT the profile
     expect(lastQuery).toContain("user_blocks");
   });
 
+  it("never selects the precise pin either — the feed stays pin-free even after map fine-tuning (CX-20260706)", async () => {
+    mockDb([]);
+    await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "", language: "", withinDays: 7 });
+    // The map picker writes tap-precision coordinates to the PRIVATE location
+    // record; the discovery feed query must never join or select any of it.
+    expect(lastQuery).not.toContain("event_private_locations");
+    expect(lastQuery).not.toContain("precise_");
+    expect(lastQuery).not.toContain("venue_name");
+  });
+
   it("keeps a FULL event visible only to a member with a LIVE request, not a cancelled/declined one (item 4)", async () => {
     mockDb([]);
     await getDiscoverableEvents({ id: HOST_ID, age: 30 }, { city: "", sport: "", language: "", withinDays: 7 });
