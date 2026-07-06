@@ -55,3 +55,9 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
   an already-approved micro-drama post delivered for visual sign-off, and 2 new posts mutating the
   two posts the owner praised. Introduces the poster-look rule and 6 fresh Pexels photo candidates
   to stop reusing the same 6. Status `draft` except one item held `approved` pending slide sign-off.
+- `2026-07-batch-10.md` — THE MANIFESTO: a daring, society-challenging batch, openly critical of the
+  dating-app industry as a category (no competitor named). Flagship 9-slide manifesto carousel
+  (romance scams, fake profiles, pay-to-match economics, the origin story, "free, not a
+  subscription") plus 2 supporting posts (a scam/fake-profile fact card, a cheeky "have a good
+  time" post). Drafted during a WebSearch/WebFetch outage — 3 factual slides carry a `[VERIFY]`
+  numbers-check gate (see the file's intro) that must clear before scheduling. Status `draft`.

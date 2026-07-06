@@ -120,6 +120,29 @@ high" — with poster branding for the first time) and `H-FEATURE-howitworks` (P
 format vs. the praised 4-slide carousel, same content) as format/treatment mutations of two
 posts the owner explicitly praised, rather than pure repeats.
 
+## Open hypotheses (from batch 10 — the manifesto, added 2026-07-06)
+
+**Owner directive:** a daring, society-challenging batch, openly critical of the dating-app
+industry as a category (no competitor named). Flagship: a 9-slide manifesto carousel on romance
+scams, fake profiles, pay-to-match economics, and engagement-optimized dating, carrying the
+origin story (built by someone fed up with the apps) and closing on "free, not a subscription."
+Two supporting posts: a serious scam/fake-profile fact card, and a cheeky "have a good time" post
+as a control point for tone.
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-TONE-daring | Confrontational, industry-critical manifesto content out-shares (not just out-likes) our warm/funny baseline | shares+saves+follows-per-post vs. batch 06-09 average at a comparable evening slot |
+
+**Tooling caveat logged here, not just in the batch file:** batch 10 was drafted during a sustained
+WebSearch/WebFetch outage (repeated 529 errors, including on a trivial test query). Three
+factual slides in P1 and the citation in P2 are marked `[VERIFY]` in
+`content-queue/2026-07-batch-10.md` and `social/ideas-batch-10.json` — the qualitative claims are
+well-established (FTC names romance scams its costliest tracked fraud category; fake/bot dating
+profiles are a documented problem; the largest dating companies report billions in yearly
+revenue), but exact digits were deliberately left unstated rather than guessed. **Do not schedule
+P1/P2 until someone re-runs those searches and confirms or corrects the wording** — this is a
+harder gate than the normal draft→approve flow for this batch specifically.
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -234,3 +257,21 @@ posts the owner explicitly praised, rather than pure repeats.
   H-TREND-anonymized above. Next review: once P1-P4 have live data, compare directly against their
   pre-poster-look prior versions (same joke/photo pillar, same time slot) to confirm or kill the
   poster-branding hypothesis before applying it retroactively to older evergreen posts.
+- _2026-07-06_ — **Manifesto batch shipped** (`content-queue/2026-07-batch-10.md`,
+  `social/ideas-batch-10.json`, 3 drafts). Owner directive: a daring, society-challenging batch,
+  openly critical of the dating-app industry as a category (no competitor named or defamed) —
+  romance scams, fake profiles, pay-to-match economics, and engagement-optimized dating, plus the
+  origin story (KeepItUp built by someone fed up with the apps, not a funded trend-chase) and a
+  "free, not a subscription" close. Flagship is a 9-slide manifesto carousel (6 text-card slides +
+  3 real-photo slides — padel for the origin story, a bridge-jog for the "crossing over to free"
+  beat, laughing beach-volleyball for the final CTA); two supporting posts: a serious scam/
+  fake-profile fact card, and a cheeky "45-minute profile photo" post as a tone control point.
+  Used one correctly-attributed public quote (bell hooks, *All About Love*, 2000) and one original
+  KeepItUp line, clearly labeled. **Drafted during a sustained WebSearch/WebFetch outage** (~20
+  retries, all 529 errors, including a trivial test query) — three factual slides are marked
+  `[VERIFY]` rather than stating a guessed digit; qualitative claims are well-established, exact
+  numbers are gated behind a live source-check before scheduling (see the new hypothesis section
+  above and the batch file's "numbers-check gate"). Added `H-TONE-daring`. Next review: once the
+  outage clears, re-run the three flagged searches, correct/confirm the wording, then treat this
+  batch like any other pending the owner's approval; once live, compare shares+saves+follows
+  against the batch 06-09 warm/funny baseline to test whether daring tone out-shares warmth.

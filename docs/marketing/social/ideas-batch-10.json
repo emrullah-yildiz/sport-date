@@ -1,0 +1,85 @@
+[
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "The Manifesto",
+    "trend": null,
+    "hook": "We're done paying to be lonely. A manifesto — romance scams, fake profiles, pay-to-match economics, and why we built something else.",
+    "body": {
+      "slides": [
+        "A MANIFESTO. WE'RE DONE PAYING TO BE LONELY. Read this before you open another dating app.",
+        "FACT ONE. Romance scams are the most expensive fraud the U.S. government tracks. Year after year, the FTC names romance scams the costliest fraud people report — real savings, lost to a profile that was never a real person. (Source: FTC Consumer Sentinel reporting — qualitative claim, no digits asserted.)",
+        "FACT TWO. A 'match' isn't proof a person is real. Fake, inactive, and bot-run profiles are a widely documented problem. You've probably matched with one.",
+        "FACT THREE. The biggest dating apps make more money the longer you're single. The largest dating companies report billions a year, mostly from subscriptions. A business like that grows when you keep paying — not when you stop needing it. (Source: public company revenue filings — category-level.)",
+        "THE TURN. An app that keeps you swiping is doing its job. An app that gets you outside is doing ours. Quote: 'The moment we choose to love we begin to move against domination, against oppression.' — bell hooks (author-only attribution; essay title intentionally omitted)",
+        "WHY WE EXIST. We didn't get funded to build another swipe app. We got fed up and built something else. Started by someone who used the apps like everyone else — and had enough.",
+        "THE PROMISE. Meeting people shouldn't be a subscription. Finding a game, asking to join, showing up — all free. Not 'free until you want to see who liked you back.' Free.",
+        "OUR LINE, NOT SOMEONE ELSE'S. You don't fall for someone's bio. You fall for how they show up. — KeepItUp",
+        "PLAY. DON'T PAY. KeepItUp — open worldwide, early access, link in bio."
+      ],
+      "caption": "A manifesto, not a complaint. Romance scams are the costliest fraud the FTC tracks, year after year. A 'match' isn't proof someone's real — fake and bot accounts are a documented industry problem. And the biggest dating companies make billions mostly from subscriptions that pay off more the longer you're single. We're not naming names. We're naming the pattern. KeepItUp started because one of us got fed up using the apps like everyone else, and built something else instead: a way to meet people by doing something real — a game, a run, a rally — for free. Not a free trial. Free. 'The moment we choose to love we begin to move against domination, against oppression.' — bell hooks. We think that applies to an industry too. Play. Don't pay. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#Manifesto",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#PlayDontPay",
+        "#DatingAppFatigue"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "FLAGSHIP 9-slide manifesto carousel, poster-branded throughout (KeepItUp mark on every slide, wordmark on the reveal). Slides 1,2,3,4,5,8 are text-cards on the anthracite background (owner-cleared for this batch); slides 6, 7, 9 use REAL photos: slide 6 (origin story) pexels-34079998-padel-match.jpg (two women mid-padel rally), slide 7 (\"free\" slide) pexels-5319325-jog-bridge.jpg (people jogging across a bridge — deliberate \"crossing over\" visual), slide 9 (final CTA) pexels-12169344-volleyball-laugh.jpg (two friends laughing mid beach-volleyball game). No competitor named anywhere. VERIFY GATE RESOLVED 2026-07-06 by CEO: all factual slides kept strictly qualitative (zero digits asserted), bell hooks quote attributed author-only. Exact figures may be added in a future pass once web search is available. All 9 composites baked (b10p1-manifesto-1..9.png).",
+      "assets": [
+        "/brand/social/photos/b10p1-manifesto-1.png",
+        "/brand/social/photos/b10p1-manifesto-2.png",
+        "/brand/social/photos/b10p1-manifesto-3.png",
+        "/brand/social/photos/b10p1-manifesto-4.png",
+        "/brand/social/photos/b10p1-manifesto-5.png",
+        "/brand/social/photos/b10p1-manifesto-6.png",
+        "/brand/social/photos/b10p1-manifesto-7.png",
+        "/brand/social/photos/b10p1-manifesto-8.png",
+        "/brand/social/photos/b10p1-manifesto-9.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "The Match That Wasn't",
+    "trend": null,
+    "hook": "Romance scams cost people more money than any other fraud the FTC tracks. Most of it starts with a profile that felt real.",
+    "body": {
+      "caption": "This isn't a scare story, it's a government statistic: romance scams have been the single costliest type of fraud the FTC tracks, for years running. Most of it starts the same way — a profile that feels real, on an app built to keep you talking to strangers. We built KeepItUp around something scammers can't fake as easily: an actual game, at an actual time and place, with people who actually show up. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KnowTheFacts",
+        "#RealPeopleRealGames",
+        "#KeepItUp",
+        "#MeetThroughMovement"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Supporting fact-card post. Full poster treatment: KeepItUp mark top-right, eyebrow 'A FACT, NOT A GUESS', headline block lower third ('ROMANCE SCAMS COST PEOPLE MORE MONEY THAN ANY OTHER FRAUD THE FTC TRACKS'), small citation subtext ('Source: FTC Consumer Sentinel Data Book.'), footer band with wordmark. Base photo: pexels-5553089-friends-football.jpg (two adult men passing a football in a park — real people, deliberate contrast to a fake profile). Serious, respectful tone — never mocking scam victims. (Composite to be baked: b10p2-scam-fact.png) (VERIFY gate resolved: qualitative claim only, no digits. Composite baked: b10p2-scam-fact.png)",
+      "assets": [
+        "/brand/social/photos/b10p2-scam-fact.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "Your Profile Picture Took 45 Minutes. This Took Zero.",
+    "trend": null,
+    "hook": "45 minutes, 6 selfies, 1 ring light for a dating app photo. This one took zero effort and they're already having a better time.",
+    "body": {
+      "caption": "No judgment — we've all done the 45-minute photo shoot for a profile picture. This one took zero effort because nobody was posing. That's kind of the whole pitch: skip the photoshoot, go find a game. KeepItUp is open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#NoFilterNeeded",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#HaveAGoodTime"
+      ],
+      "cta": "Tag the friend who takes 45 minutes to pick a profile picture.",
+      "imageConcept": "Supporting cheeky/funny post, the batch's palate-cleanser. Full poster treatment: KeepItUp mark top-left, meme-style overlay top ('YOUR DATING APP PHOTO: 45 MINUTES, 6 SELFIES, 1 RING LIGHT') and bottom ('THIS PHOTO: ZERO EFFORT. ALREADY HAVING A BETTER TIME'), neon-green rule between, footer band with wordmark. Base photo: pexels-33920366-flag-football.jpg (adults playing flag football at golden hour, mid-laugh). (Composite to be baked: b10p3-good-time.png) (Composite baked: b10p3-good-time.png)",
+      "assets": [
+        "/brand/social/photos/b10p3-good-time.png"
+      ]
+    }
+  }
+]
