@@ -1,5 +1,15 @@
 # Agent state
 
+## External positioning feedback + queue purge - 2026-07-06 (Morpheus, owner-relayed)
+
+A warm lead (contacted by the owner, saw the IG follow request + deck) gave first outside feedback: **"it's not clear what KeepItUp is"** — not from the Instagram presence, not from the pitch deck ("I assume you have a novel way to fix how dating apps work but I didn't quite understand"). Owner directive: review all pending posts, remove where necessary.
+
+**Actions taken (same day):**
+- New standing rule in `docs/marketing/owner-taste-rules.md`: **the stranger test** — every post must teach a first-time viewer what KeepItUp is. Trinity reads this before every batch.
+- Audited all 13 scheduled Buffer posts + 34 approved queue ideas. Pulled 4 scheduled posts that fail the stranger test (Algorithm vs Real Life, Rate My Date, 9am Sunday Padel, Silent Rally Cam) — archived in the queue DB with reason, creative preserved for later re-use.
+- Scheduled the two batch-11 identity anchors into the freed slots: **The Reframe** (8-slide "what is this app" carousel) IG 07-07 10:00 EEST + TikTok 07-08, **Everything You Can Do On KeepItUp** IG 07-08 18:00 EEST. Kept: Manifesto (owner-mandated next), How-It-Works 4 Steps, There-vs-Here, No Grid Of Faces, safety checklist, Stanford synchrony, mid-year, Swipe Fatigue (its slide 5 explains the product).
+- **Open P1 follow-up: the pitch deck fails the same test.** The deck (pitch.html + /KeepItUp-Pitch-Deck.pdf) needs a plain "what it is / how it works" slide up front (the 4-step mechanic, screenshot-level concrete) before any investor sees it again. Not yet done — needs a deck revision pass.
+
 ## User-sim daily pass - 2026-07-06 (Seraph, first daily user's-eyes pass)
 
 Walked the live public pages as a stranger + member flows from code; filed 11 tickets in `.agents/customer-feedback/tickets/`, nothing committed (tree left for Morpheus).
