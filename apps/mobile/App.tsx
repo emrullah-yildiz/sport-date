@@ -200,7 +200,7 @@ export default function App() {
       <StatusBar style="dark" />
       <View style={styles.appShell}>
         <ScrollView contentContainerStyle={styles.screen}>
-          <View style={[styles.prototypeBanner, authState === "signed_in" && styles.liveBanner]}><Text style={[styles.prototypeText, authState === "signed_in" && styles.liveBannerText]}>{authState === "signed_in" ? "LIVE PRIVATE BETA DATA" : "INTERACTION PROTOTYPE · NOT SYNCED"}</Text></View>
+          <View style={[styles.prototypeBanner, authState === "signed_in" && styles.liveBanner]}><Text style={[styles.prototypeText, authState === "signed_in" && styles.liveBannerText]}>{authState === "signed_in" ? "LIVE OPEN BETA DATA" : "INTERACTION PROTOTYPE · NOT SYNCED"}</Text></View>
           {authState === "signed_in" ? <View style={styles.sessionRow}><Text style={styles.sessionText}>Signed in as {memberName}</Text><View style={styles.sessionActions}><DeviceManager /><Pressable accessibilityRole="button" onPress={() => logoutMobile().finally(() => { setMemberName(""); setAuthState("signed_out"); })}><Text style={styles.sessionAction}>Sign out</Text></Pressable></View></View> : null}
           <View style={styles.header}>
             <View><Text style={styles.overline}>SPORT DATE</Text><Text style={styles.title}>{tab === "discover" ? "Move. Meet. Repeat." : tab === "event" ? "After the movement." : tab === "arc" ? "Your Movement Arc." : "Help us find the rough edges."}</Text></View>

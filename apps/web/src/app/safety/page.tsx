@@ -115,7 +115,12 @@ export default async function SafetyCenterPage() {
           <p className="eyebrow">Reporting &amp; your cases</p>
           <h2 id="safety-guest-report-title">Your reports stay private to you.</h2>
           <p>Filing a report and tracking its status needs an account, so that a case is only ever visible to the member who raised it — never to a signed-out visitor. If you already have an account, <Link href="/login">sign in</Link> to see your reports.</p>
-          <p className="safety-guest-report-emergency">If anyone is in immediate danger, contact local emergency services first — this service is not an emergency responder.</p>
+          {/* CX-20260706-safety-center-emergency-line-duplicated: no emergency
+              note here — the standalone `.safety-emergency-card` from
+              <SafetyGuidelines /> renders directly below this aside, and saying
+              the identical sentence twice back-to-back read as a paste bug on the
+              page whose whole job is earning trust. The guidance lives exactly
+              once, in that card. */}
         </aside>
       )}
 

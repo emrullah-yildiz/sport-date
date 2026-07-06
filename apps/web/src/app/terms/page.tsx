@@ -15,7 +15,7 @@ export default function TermsPage() {
         <p className="eyebrow">Terms preview</p>
         <h1>Use expectations before launch</h1>
         <p>
-          This is not the final contract. It is the current truthful product boundary for the private preview until launch-country legal review is complete.
+          This is not the final contract. It is the current truthful product boundary for the open beta until launch-country legal review is complete.
         </p>
       </section>
 
@@ -24,7 +24,7 @@ export default function TermsPage() {
           <h2>Who this preview is for</h2>
           <ul className="legal-list">
             <li>Adults only. Members must be 18 or older.</li>
-            <li>The current experience is a private beta, not a generally available public service.</li>
+            <li>The current experience is an open beta — no invite or payment is required, and any eligible adult can create a profile, worldwide. It is still an early product, not a finished service.</li>
             <li>Profiles, events, and exact meeting details remain intentionally limited while launch controls are still being completed.</li>
           </ul>
         </article>
@@ -49,7 +49,7 @@ export default function TermsPage() {
         </article>
 
         <article className="legal-card">
-          <h2>Private beta boundaries</h2>
+          <h2>Open beta boundaries</h2>
           <ul className="legal-list">
             <li>No promise of uninterrupted availability, launch timing, or market coverage is made in this preview.</li>
             <li>Gamification remains private and bounded. There are no public scores, streaks, or rewards for rejection or screen time.</li>

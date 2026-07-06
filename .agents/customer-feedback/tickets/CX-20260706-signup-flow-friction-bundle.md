@@ -1,6 +1,6 @@
 # CX-20260706-signup-flow-friction-bundle
 
-- Status: `ready`
+- Status: `ready` — finding 3 (success copy) `implemented` 2026-07-06; findings 1, 2, 4 remain open
 - Severity: `high`
 - Priority: `P1` — the first-session flow asks the most intimate question third, ends on a legalese wall, and greets the new member with copy that sounds broken
 - Customer journey: first-time visitor → 10-step signup → account created
@@ -21,10 +21,11 @@
 
 - [ ] Sensitive steps (gender/orientation) appear only after the member has established basic profile context; both remain optional, skippable, consent-stamped; back-nav retains data.
 - [ ] The final consent step reads as one short sentence + scannable links; consent remains a single explicit, unticked action.
-- [ ] Post-signup success copy contains no internal flag/ops language; states what happens next truthfully.
+- [x] Post-signup success copy contains no internal flag/ops language; states what happens next truthfully. *(done 2026-07-06)*
 - [ ] Review rows align consistently at 390px and desktop.
 - [ ] Existing signup tests updated; typecheck / lint / tests / prod build green.
 
 ## Handoff and retest log
 
 - `2026-07-06` - Filed by Seraph (user-sim daily pass); status `ready`.
+- `2026-07-06` - Finding 3 ONLY implemented by Tank (Builder) — deliberately scoped: step reordering (finding 1), consent-wall split (finding 2), and review alignment (finding 4) are a separate change. `SignUpForm.tsx` success copy replaced for BOTH branches: the live branch (production runs Gmail delivery since 2026-07-04; verification links are sent on request from account security, not auto-sent at signup) now reads "You're in — your profile stays private until you choose what to share. One quick step when you're ready: verify your email from account security on your profile, and the link will be in your inbox moments later."; the non-live (dev) branch drops the "delivery isn't switched on yet" ops language. Source tripwire added in `SignUpForm.test.tsx` (no flag language may return; warm copy + `/profile` CTA pinned). Typecheck/lint/full vitest/prod build green. Ticket stays `ready` for the remaining findings.

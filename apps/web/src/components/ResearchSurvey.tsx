@@ -325,6 +325,15 @@ export default function ResearchSurvey() {
             <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
           </p>
         ) : null}
+        {/* CX-20260706-research-page-denies-product-exists: one quiet invitation,
+            shown only AFTER all answers are in so it can never bias a response.
+            The product genuinely exists (open beta), so the survey must not send
+            warm visitors away believing there is nothing to join. */}
+        <p className="research-postscript">
+          Separately from this research: KeepItUp itself is live in open beta — free for adults
+          (18+), no invite needed. If you&rsquo;d like to try it,{" "}
+          <a href="/signup">create a profile</a>.
+        </p>
       </section>
     );
   }

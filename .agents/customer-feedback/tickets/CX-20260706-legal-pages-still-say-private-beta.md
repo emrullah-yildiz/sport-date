@@ -1,6 +1,6 @@
 # CX-20260706-legal-pages-still-say-private-beta
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — direct contradiction of the standing owner correction (public copy = open worldwide / early access, NEVER "private beta"), live on the public site today
 - Customer journey: a cautious visitor reads the landing ("Open beta — no invite, no payment, open to any adult") → clicks Terms/Trust to verify before signing up → the Terms page tells them the opposite
@@ -48,12 +48,13 @@ Trust/credibility damage at the exact moment a careful adult is verifying us; al
 
 ## Acceptance criteria
 
-- [ ] Live `/terms` contains no "private beta" or "private preview" phrasing; the open-beta/early-preview framing matches the landing (open worldwide, adults 18+, no invite).
-- [ ] `/trust`, `/privacy`, `/safety-guidelines` re-checked for the same phrase family; all consistent.
-- [ ] Nothing untrue is added — preview limits (no final legal review, constrained features) remain stated plainly.
-- [ ] Tripwire test extended: public pages must not contain "private beta" (mirroring the existing worldwide-framing tripwires).
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Live `/terms` contains no "private beta" or "private preview" phrasing; the open-beta/early-preview framing matches the landing (open worldwide, adults 18+, no invite). *(pending deploy)*
+- [x] `/trust`, `/privacy`, `/safety-guidelines` re-checked for the same phrase family; all consistent (no occurrences existed outside `/terms`; now tripwired).
+- [x] Nothing untrue is added — preview limits (no final legal review, constrained features) remain stated plainly.
+- [x] Tripwire test extended: public pages must not contain "private beta" (mirroring the existing worldwide-framing tripwires).
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-07-06` - Filed by Seraph (user-sim daily pass, live-site fetch); status `ready`.
+- `2026-07-06` - Implemented by Tank (Builder). `/terms` reworded: intro "private preview" → "open beta", "Who this preview is for" bullet now states the open beta honestly (no invite/payment, worldwide, adults, early product not a finished service), "Private beta boundaries" → "Open beta boundaries". Swept `/trust`, `/privacy`, `SafetyGuidelines` — clean. New tripwire `apps/web/src/app/terms/page.test.tsx` renders all four surfaces and fails on `private beta`/`private preview`/"not a generally available public service", plus pins the open-beta terms framing. Repo-wide sweep also caught the mobile app's signed-in banner ("LIVE PRIVATE BETA DATA" → "LIVE OPEN BETA DATA" in `apps/mobile/App.tsx`; mobile typecheck green). Web typecheck/lint/full vitest (1162 passed)/prod build green. Status `ready` → `implemented`; live-site AC verifiable after next deploy.

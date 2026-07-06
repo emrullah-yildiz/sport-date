@@ -21,10 +21,15 @@
 // unit-testable in the node test environment.
 
 /** Shown before the questions — verbatim from the kit ("Intro (show before questions)"). */
+// CX-20260706-research-page-denies-product-exists: the intro used to say "there
+// is no service to join yet", which was true when the survey shipped and is now
+// false (KeepItUp is in open beta). The survey stays methodologically honest —
+// answering is not a sign-up, everything is skippable and anonymous — without
+// denying the product exists.
 export const RESEARCH_SURVEY_INTRO = [
   "This is a short, anonymous research survey about how adults currently find people to be active with.",
-  "It is not a sign-up and there is no service to join yet. Skip any question. We publish no answer or",
-  "identity without separate permission.",
+  "It is separate from the KeepItUp open beta — answering is not a sign-up. Skip any question. We publish",
+  "no answer or identity without separate permission.",
 ].join(" ");
 
 export const RESEARCH_SURVEY_ID = "meeting-through-activity-v1" as const;

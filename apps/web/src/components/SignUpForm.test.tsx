@@ -105,6 +105,37 @@ describe("SignUpForm step order — credentials are not the first ask", () => {
  * ethical-energy guardrail — we assert on the source that the gate is present.
  * This fails the build if the signup wizard ever animates unconditionally again.
  */
+/**
+ * Tripwire for CX-20260706-signup-flow-friction-bundle (fix 3).
+ *
+ * The account-created welcome used to read "Email verification delivery isn't
+ * switched on yet — you'll be able to prepare it from account security as soon
+ * as it is." — internal delivery-flag status that made a brand-new member ask
+ * "is the product broken?". The success moment must stay warm, truthful for the
+ * live config (Gmail delivery has been live since 2026-07-04; links are sent on
+ * request from account security), and free of ops language. The success screen
+ * is internal state (post-submit), so — like the reduced-motion guardrail — we
+ * assert on the source.
+ */
+describe("SignUpForm success copy — warm welcome, no internal flag language", () => {
+  const source = readFileSync(
+    path.resolve(path.dirname(fileURLToPath(import.meta.url)), "SignUpForm.tsx"),
+    "utf8",
+  );
+
+  it("never tells a new member that delivery is switched off", () => {
+    expect(source).not.toMatch(/isn'?t switched on/i);
+    expect(source).not.toMatch(/delivery (?:is )?(?:not|disabled|off)\b/i);
+  });
+
+  it("welcomes the member and states the one next step (verify from account security)", () => {
+    expect(source).toContain("You're in — your profile stays private until you choose what to share.");
+    expect(source).toMatch(/verify your email from account security/i);
+    // The success CTA still routes to the profile, where the verification controls live.
+    expect(source).toContain('href="/profile"');
+  });
+});
+
 describe("SignUpForm reduced-motion parity", () => {
   const source = readFileSync(
     path.resolve(path.dirname(fileURLToPath(import.meta.url)), "SignUpForm.tsx"),

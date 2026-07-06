@@ -68,6 +68,30 @@ describe("SafetyCenterPage guidance legibility", () => {
     expect(html).not.toContain("Your reports, without the black box.");
   });
 
+  // Tripwire for CX-20260706-safety-center-emergency-line-duplicated: the guest
+  // reporting aside used to repeat the emergency sentence directly above the
+  // standalone emergency card, so the identical guidance rendered twice
+  // back-to-back and read as a paste bug. The guidance must appear exactly once
+  // — in the emergency card — for signed-out visitors and members alike.
+  it("renders the emergency guidance exactly once for a signed-out visitor", async () => {
+    mocks.getCurrentUser.mockResolvedValue(null);
+
+    const html = await render();
+
+    expect(html.match(/not an emergency responder/g) ?? []).toHaveLength(1);
+    expect(html).toContain('class="safety-emergency-card"');
+    expect(html).not.toContain("safety-guest-report-emergency");
+  });
+
+  it("renders the emergency guidance exactly once for a signed-in member too", async () => {
+    mocks.getCurrentUser.mockResolvedValue(member);
+    mocks.getMemberSafetyCases.mockResolvedValue([memberCase]);
+
+    const html = await render();
+
+    expect(html.match(/not an emergency responder/g) ?? []).toHaveLength(1);
+  });
+
   it("shows the report tracker plus the guidance to a signed-in member", async () => {
     mocks.getCurrentUser.mockResolvedValue(member);
     mocks.getMemberSafetyCases.mockResolvedValue([memberCase]);

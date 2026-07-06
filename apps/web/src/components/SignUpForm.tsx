@@ -131,10 +131,16 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
         <div className="signup-card signup-success">
           <p className="step-indicator">Account created</p>
           <h1>Welcome to {BRAND_NAME}.</h1>
+          {/* Warm, working-product welcome (CX-20260706-signup-flow-friction-bundle,
+              fix 3): one truthful next step, no internal delivery-flag language.
+              Verification links are sent on request from account security (they are
+              not auto-sent at signup), so both branches point there — the live
+              branch promises the inbox delivery that production (Gmail sender,
+              2026-07-04) actually performs. */}
           <p>
             {emailDeliveryLive
-              ? "Your profile stays private. Whenever you're ready, you can verify your email from account security — request a link and we'll send it to your inbox."
-              : "Your profile stays private. Email verification delivery isn't switched on yet — you'll be able to prepare it from account security as soon as it is."}
+              ? "You're in — your profile stays private until you choose what to share. One quick step when you're ready: verify your email from account security on your profile, and the link will be in your inbox moments later."
+              : "You're in — your profile stays private until you choose what to share. When you're ready, verify your email from account security on your profile."}
           </p>
           <a className="btn-primary success-link" href="/profile">View your private profile</a>
         </div>

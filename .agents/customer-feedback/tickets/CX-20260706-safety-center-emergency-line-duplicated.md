@@ -1,6 +1,6 @@
 # CX-20260706-safety-center-emergency-line-duplicated
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `medium`
 - Priority: `P2` — polish on a safety-critical page; the duplicated sentence reads as a rendering bug exactly where the product is trying to earn trust
 - Customer journey: a signed-out visitor opens the Safety center to judge whether this product takes safety seriously → the same emergency sentence appears twice back-to-back → the page reads broken/careless
@@ -45,11 +45,12 @@ Credibility polish on the highest-trust page; no functional or safety informatio
 
 ## Acceptance criteria
 
-- [ ] The signed-out Safety center shows the emergency guidance exactly once (content unchanged in substance).
-- [ ] The signed-in variant re-checked for the same duplication.
-- [ ] A test pins that the emergency guidance renders once on the page.
-- [ ] Relevant automated tests and repository checks pass.
+- [x] The signed-out Safety center shows the emergency guidance exactly once (content unchanged in substance). *(pending deploy)*
+- [x] The signed-in variant re-checked for the same duplication (it never duplicated — the guest aside was signed-out-only — and is now pinned once by test).
+- [x] A test pins that the emergency guidance renders once on the page.
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-07-06` - Filed by Seraph (user-sim daily pass, live-site fetch); status `ready`.
+- `2026-07-06` - Implemented by Tank (Builder). Removed the duplicated `safety-guest-report-emergency` paragraph from the guest reporting aside in `apps/web/src/app/safety/page.tsx` (the standalone `.safety-emergency-card` from `SafetyGuidelines`, which renders directly below it, keeps the guidance — content unchanged, now exactly once) and dropped the now-unused CSS rule. `safety/page.test.tsx` gained exactly-once assertions for BOTH signed-out and signed-in renders. Note: the `/safety` error boundary (`error.tsx`) intentionally keeps its own emergency note inside the failure alert card — different surface, degraded state, not back-to-back with the card in the same reading flow. Typecheck/lint/full vitest/prod build green. Status `ready` → `implemented`.

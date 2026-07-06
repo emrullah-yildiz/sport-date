@@ -1,6 +1,6 @@
 # CX-20260706-research-page-denies-product-exists
 
-- Status: `ready`
+- Status: `implemented`
 - Severity: `high`
 - Priority: `P1` — the live survey page tells interested people there is nothing to join, while the product is in open beta; every survey visitor is a lost signup
 - Customer journey: an interested person lands on `/research` (from the landing "Take the 2-min survey" CTA or a shared link) → reads the intro → is told "there is no service to join yet" → leaves believing KeepItUp doesn't exist yet
@@ -45,11 +45,12 @@ Direct conversion loss (survey visitors told nothing exists) and a credibility c
 
 ## Acceptance criteria
 
-- [ ] Live `/research` no longer claims "there is no service to join yet" (or any equivalent).
-- [ ] The survey's honesty properties are preserved: clearly not a sign-up, anonymous, skippable, no answer used as demand/traction, contact consent unchanged.
-- [ ] Copy reviewed against the survey-kit intent (research not biased toward the product; any product link appears only after submission, if at all).
-- [ ] Relevant automated tests and repository checks pass.
+- [x] Live `/research` no longer claims "there is no service to join yet" (or any equivalent). *(pending deploy)*
+- [x] The survey's honesty properties are preserved: clearly not a sign-up, anonymous, skippable, no answer used as demand/traction, contact consent unchanged.
+- [x] Copy reviewed against the survey-kit intent (research not biased toward the product; the one signup link appears only on the final thank-you screen, after all answers are in).
+- [x] Relevant automated tests and repository checks pass.
 
 ## Handoff and retest log
 
 - `2026-07-06` - Filed by Seraph (user-sim daily pass, live-site fetch); status `ready`.
+- `2026-07-06` - Implemented by Tank (Builder). Intro now reads "It is separate from the KeepItUp open beta — answering is not a sign-up." (updated in `apps/web/src/lib/research-survey.ts` AND the kit `docs/marketing/member-survey-and-forum-kit.md`, keeping the verbatim tripwire honest; the kit's Variant-1 forum copy also dropped "there's no service to join"). Added a quiet post-submission note on the survey's final thank-you screen only (`ResearchSurvey.tsx` `done` stage): open beta exists, free for adults 18+, link to `/signup` — never shown before answers are submitted, so responses stay unbiased. New tripwire in `research-survey.test.ts` fails if the intro ever denies the product again while pinning "not a sign-up" + "anonymous". Typecheck/lint/full vitest/prod build green. Status `ready` → `implemented`.

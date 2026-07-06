@@ -36,6 +36,16 @@ describe("survey wording is verbatim from the kit (non-leading by design)", () =
     expect(normalizedKit).toContain(RESEARCH_SURVEY_INTRO);
   });
 
+  // Tripwire for CX-20260706-research-page-denies-product-exists: the product is
+  // live (open beta), so the intro must never again tell survey visitors there is
+  // nothing to join — while staying honest that answering is not a sign-up.
+  it("does not deny the product exists, yet stays a non-recruiting research notice", () => {
+    expect(RESEARCH_SURVEY_INTRO).not.toMatch(/no service to join/i);
+    expect(RESEARCH_SURVEY_INTRO).not.toMatch(/no (?:app|product|service) (?:yet|exists)/i);
+    expect(RESEARCH_SURVEY_INTRO).toContain("not a sign-up");
+    expect(RESEARCH_SURVEY_INTRO).toContain("anonymous");
+  });
+
   it("keeps every Survey 1 and Survey 2 question text word-for-word", () => {
     for (const question of [...SURVEY_ONE_QUESTIONS, ...SURVEY_TWO_QUESTIONS]) {
       expect(normalizedKit, `question ${question.id} drifted from the kit`).toContain(question.text);

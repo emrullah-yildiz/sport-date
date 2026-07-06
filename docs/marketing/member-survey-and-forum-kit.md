@@ -29,8 +29,8 @@ answer-neutral and don't presuppose our product.
 
 Intro (show before questions):
 > This is a short, anonymous research survey about how adults currently find people to be active with.
-> It is not a sign-up and there is no service to join yet. Skip any question. We publish no answer or
-> identity without separate permission.
+> It is separate from the KeepItUp open beta — answering is not a sign-up. Skip any question. We publish
+> no answer or identity without separate permission.
 
 1. In the last 3 months, how often did you do a social/physical activity (run, gym class, padel,
    climbing, team sport, walk-and-talk, etc.) *with other people*?
@@ -92,7 +92,7 @@ require mod permission for surveys.
 **Variant 1 — short, survey-forward (general/activity communities)**
 > Quick research question for people who like being active with others: how do you currently find
 > people to run/play/train with, and what makes it hard? I'm researching this (not selling anything —
-> there's no service to join). If you're up for a 2-minute anonymous survey, link's here: [SURVEY LINK].
+> the survey is anonymous and separate from any product). If you're up for a 2-minute anonymous survey, link's here: [SURVEY LINK].
 > Happy to share what I learn back with the community.
 
 **Variant 2 — discussion-forward (no link, for link-averse subs)**
