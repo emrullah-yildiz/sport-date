@@ -1,6 +1,6 @@
 # CX-20260706-poster-share-v2 — Story format, QR join link, platform buttons, hover download
 
-**Priority:** P1 (owner report + direction, 2026-07-06) · **Status:** ready · **Owner-gate:** none
+**Priority:** P1 (owner report + direction, 2026-07-06) · **Status:** `implemented` (commit 2155201: canonical-origin fix + vercel-alias test, 9:16 story format, decode-verified QR, IG/WhatsApp/FB/TikTok/X share row, hover/touch download icon) · **Owner-gate:** none
 Follow-up to CX-20260705-event-poster-share (shipped).
 
 ## Owner report / direction (verbatim intent)

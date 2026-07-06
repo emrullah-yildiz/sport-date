@@ -23,6 +23,8 @@ const ACCOUNT_ROW = {
 
 const ATTENDANCE_ROW = { event_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", status: "confirmed", reminded_at: "2026-07-01T09:00:00.000Z", responded_at: "2026-07-01T09:05:00.000Z", created_at: "2026-07-01T09:00:00.000Z" };
 
+const SENT_MESSAGE_ROW = { id: "cccccccc-cccc-4ccc-8ccc-cccccccccccc", event_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", body: "See you at the north gate!", created_at: "2026-07-01T10:00:00.000Z" };
+
 // A sequential sql mock that answers each query by matching its text, so we don't
 // depend on call ordering: the account SELECT, the attendance-confirmations SELECT,
 // and [] for everything else.
@@ -31,6 +33,7 @@ function mockDb() {
     const text = strings.join("?");
     if (text.includes("user_sports") && text.includes("FROM users")) return Promise.resolve([ACCOUNT_ROW]);
     if (text.includes("event_attendance_confirmations")) return Promise.resolve([ATTENDANCE_ROW]);
+    if (text.includes("event_messages")) return Promise.resolve([SENT_MESSAGE_ROW]);
     void values;
     return Promise.resolve([]);
   });
@@ -61,5 +64,21 @@ describe("GET /api/account/export — GDPR Art. 15 completeness (CX-20260704 ite
       lateCancellationStreakStartedAt: "2026-06-01T00:00:00.000Z",
       pausedUntil: null,
     });
+  });
+
+  it("includes the member's own sent event-room messages and only theirs (roadmap: message export coverage)", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ id: "202", firstName: "Ana" } as never);
+    const response = await GET();
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    // The member's own coordination messages are part of their export…
+    expect(body.eventRoomMessagesSent).toEqual([SENT_MESSAGE_ROW]);
+    // …and the query is scoped to messages THEY sent (other members' room
+    // messages are other people's data and must not be exported).
+    const sql = vi.mocked(getDatabase).mock.results[0]?.value as ReturnType<typeof vi.fn>;
+    const messagesQuery = sql.mock.calls
+      .map((call) => (call[0] as TemplateStringsArray).join("?"))
+      .find((text) => text.includes("FROM event_messages"));
+    expect(messagesQuery).toContain("sender_user_id");
   });
 });

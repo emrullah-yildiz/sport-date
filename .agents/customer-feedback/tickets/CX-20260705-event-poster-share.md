@@ -1,6 +1,6 @@
 # CX-20260705-event-poster-share — Event poster image + one-tap social share
 
-**Priority:** P1 (growth surface) · **Status:** ready · **Owner-gate:** none
+**Priority:** P1 (growth surface) · **Status:** `implemented` (commit 31b586b; extended by CX-20260706-poster-share-v2) · **Owner-gate:** none
 **Filed by:** CEO on owner direction (2026-07-05): "when people organize an event,
 create a poster image about the event with the activity and make it possible for
 users to click on share and post it on social media platforms like it happens in

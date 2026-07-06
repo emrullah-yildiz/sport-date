@@ -1,6 +1,6 @@
 # CX-20260706-event-location-map-picker — Pick the meeting spot on a map + map preview
 
-**Priority:** P1 (host UX / owner request) · **Status:** ready · **Owner-gate:** none
+**Priority:** P1 (host UX / owner request) · **Status:** `implemented` (commits 2155201 + bddad1e: lazy Leaflet map, drag/tap pin, identity-stripping `/api/locations/reverse` proxy, pin-privacy boundary tests) · **Owner-gate:** none
 **Filed by:** CEO on owner direction (2026-07-06): "For the location, add a feature
 to pick a spot from the map or when users select a location, show it on the map too."
 

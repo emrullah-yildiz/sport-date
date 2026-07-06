@@ -25,7 +25,7 @@
 - [x] Add server-authorized event rooms for hosts and accepted participants without open messaging.
 - [x] Extend access/export/deletion coverage to events, join requests, accepted seats, and disclosed meeting details.
 - [x] Extend access/export coverage to reporter-visible moderation decisions and appeals.
-- [ ] Extend access/export/deletion coverage again when messages are introduced.
+- [x] Extend access/export/deletion coverage again when messages are introduced. Account export returns the member's own sent event-room messages (`eventRoomMessagesSent`, scoped to `sender_user_id` — never other members' messages) and the deletion request deletes all messages the member sent; both are now pinned by hermetic route tests (`api/account/export/route.test.ts`, new `api/account/deletion/route.test.ts`).
 
 ## Then: safety and local launch
 
