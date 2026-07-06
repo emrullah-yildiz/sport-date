@@ -4,7 +4,7 @@ Autonomous QA owner verdict (after a full end-to-end pass + a retest): **a real
 customer can use the product end-to-end.** All core workflows complete, with 0
 console/page/server errors on every page (desktop + mobile 390px) and 0 regressions.
 
-Live: `https://sport-date-gray.vercel.app`.
+Live: `https://www.keepitup.social` (canonical — never link the vercel.app alias).
 
 ## Verified workflows (completed end-to-end by the QA agent, not just viewed)
 1. **Signup** — 5 steps incl. chess + a custom sport; underage DOB blocked inline at step 1; account created; profile shows the chosen sports.
