@@ -48,7 +48,7 @@ For each: sign up with the brand email, set the handle + display name, paste the
 ## 4. Bio (paste-ready; refined from the launch packet)
 
 > KeepItUp — meet through movement. Small local sports meetups for adults who want dating,
-> friendship, or community, without the endless swiping. Private beta in Europe. 🏃🎾🧗
+> friendship, or community, without the endless swiping. Open worldwide — early access. 🏃🎾🧗
 
 - Link: use the site once a real domain is live; until then, a simple beta/waitlist link.
   (Domain is still an owner decision — the app currently runs on the Vercel URL.)

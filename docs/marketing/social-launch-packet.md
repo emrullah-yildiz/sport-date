@@ -17,7 +17,7 @@ Reserve matching handles on major platforms once the final brand and trademark s
 
 Name: Sport Date — working name
 
-Bio: Meet through movement. Small local sports experiences for adults who want dating, friendship, or community without the endless swiping. Private beta in Europe.
+Bio: Meet through movement. Small local sports experiences for adults who want dating, friendship, or community without the endless swiping. Open worldwide — early access.
 
 Do not state a launch city until selected.
 
