@@ -55,16 +55,36 @@ cloud routine `keepitup-daily-standup` executes it.
    - Re-raise any still-unhandled owner blocker (video tool, prizes, keys) as a
      direction at most once per week — don't nag daily.
 
-4. **Commit and push to `main`** with message
-   `ops: daily standup YYYY-MM-DD (standup-scribe)`. Only the allowed files may
-   be in the commit. The site auto-deploys; the report then renders on
-   `/hq.html` where the owner approves/denies each direction.
-   - **If the push is refused (403 / read-only checkout): do NOT stop silently.**
+4. **Publish to HQ immediately** (owner directive 2026-07-07: the report must
+   be on `/hq.html` the moment the standup finishes — no git push, no deploy
+   wait). POST the report JSON to the production API:
+
+   ```
+   curl -sS -X POST https://keepitup.social/api/standup/report \
+     -H "Authorization: Bearer $STANDUP_AGENT_SECRET" \
+     -H "Content-Type: application/json" \
+     --data @apps/web/public/standup/YYYY-MM-DD.json
+   ```
+
+   A `200 {"ok":true,...}` means the report is LIVE on `/hq.html` right now —
+   the page reads the API first (table `standup_reports`, migration 044). The
+   API validates the shape strictly (same contract as above) and 400s with the
+   exact problem; fix and re-POST. Re-POSTing the same day replaces that day's
+   report.
+
+5. **Commit and push to `main`** with message
+   `ops: daily standup YYYY-MM-DD (standup-scribe)` — the static JSON files
+   are history + fallback (the page uses them if the API is ever down). Only
+   the allowed files may be in the commit. If the push is refused (403 /
+   read-only checkout), that is fine and expected — the API publish in step 4
+   already delivered the report; the CEO loop commits the files later.
+   - **If the API publish in step 4 ALSO failed: do NOT stop silently.**
      Print the COMPLETE report JSON as your final message, prefixed with the
-     line `STANDUP-REPORT-FALLBACK (push denied):` — the run log then carries
-     the report so the CEO can publish it manually. This happened on
-     2026-07-06 (the cloud environment lacked write access); a silent failure
-     here means the owner gets no standup, which is the one unacceptable outcome.
+     line `STANDUP-REPORT-FALLBACK (publish failed):` — the run log then
+     carries the report so the CEO can publish it manually (the CEO loop can
+     POST it with Bearer `SOCIAL_AGENT_SECRET`, which the endpoint also
+     accepts). A silent failure means the owner gets no standup, which is the
+     one unacceptable outcome (it happened on 2026-07-06, pre-API).
 
 ## How decisions flow back
 The owner's approve/deny + notes are stored via `POST /api/standup/directions`
@@ -72,10 +92,16 @@ The owner's approve/deny + notes are stored via `POST /api/standup/directions`
 CEO loop** reads them back with `GET /api/standup/directions` (Bearer
 `SOCIAL_AGENT_SECRET`) and executes approved directions; outcomes land in
 `agent-state.md` / the HQ log, which the next standup reads — closing the loop.
-The cloud scribe itself holds no secrets and never reads the DB.
+The cloud scribe holds exactly one secret: `STANDUP_AGENT_SECRET`, which can
+only publish a standup report to the internal HQ page (nothing member-facing).
+It never reads the DB.
 
 ## Ownership
 - Routine: `keepitup-daily-standup`, cron `0 3 * * *` UTC (= 06:00 Bucharest in
   summer; 05:00 in winter — owner accepted; adjust the cron seasonally if it matters).
+- Secret: `STANDUP_AGENT_SECRET` must be set in BOTH the web app's production
+  env (Vercel) and the cloud routine's environment (owner action, one-time).
+  The endpoint fails closed until it is set; until then step 4 falls back to
+  the run-log print and the CEO loop publishes with `SOCIAL_AGENT_SECRET`.
 - Scribe's own success metric (tracked in `agent-performance.md`): report live
   on HQ by 06:15, zero invented data, ≥1 owner-approved direction per week.

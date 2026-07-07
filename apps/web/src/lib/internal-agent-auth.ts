@@ -40,3 +40,20 @@ export function isAuthorizedSocialAgent(request: Request): boolean {
   const header = request.headers.get("authorization");
   return header === `Bearer ${secret}`;
 }
+
+/**
+ * Fail-closed guard for publishing the daily standup report (owner request
+ * 2026-07-07: the report must land on /hq.html as soon as the routine
+ * finishes, without a git push). Accepts the dedicated `STANDUP_AGENT_SECRET`
+ * (held only by the cloud standup routine — its blast radius is one internal
+ * ops page, nothing member-facing) OR `SOCIAL_AGENT_SECRET` so the local CEO
+ * loop can publish a fallback report without new configuration. Refuses when
+ * neither secret is set.
+ */
+export function isAuthorizedStandupPublisher(request: Request): boolean {
+  const header = request.headers.get("authorization");
+  if (!header) return false;
+  const standup = process.env.STANDUP_AGENT_SECRET;
+  if (standup && header === `Bearer ${standup}`) return true;
+  return isAuthorizedSocialAgent(request);
+}

@@ -542,10 +542,17 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
     });
   }
 
-  fetch("/standup/latest.json",{cache:"no-store"}).then(function(r){
-    if(!r.ok) throw new Error("no standup yet");
-    return r.json();
-  }).then(function(data){
+  // The routine publishes straight to the API the moment it finishes — that's
+  // the live source. The static repo file is history + fallback.
+  fetch("/api/standup/report",{cache:"no-store",headers:{Accept:"application/json"}})
+    .then(function(r){ if(!r.ok) throw new Error("no api report"); return r.json(); })
+    .then(function(d){ if(!d||!d.report) throw new Error("no api report"); return d.report; })
+    .catch(function(){
+      return fetch("/standup/latest.json",{cache:"no-store"}).then(function(r){
+        if(!r.ok) throw new Error("no standup yet");
+        return r.json();
+      });
+    }).then(function(data){
     // overlay any saved decisions, then render (decisions need owner session; ignore errors)
     return fetch("/api/standup/directions",{credentials:"same-origin",headers:{Accept:"application/json"}})
       .then(function(r){ return r.ok?r.json():{decisions:[]}; })
