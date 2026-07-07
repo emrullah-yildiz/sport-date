@@ -156,6 +156,36 @@ you decide who comes. Plus one supporting checklist post. Scheduled to anchor op
 |----|-----------|--------------------|
 | H-ANGLE-usecases | Naming the full breadth of use cases (dating + friendship + organize-anything + your-week-in-one-place + post-and-let-strangers-ask) widens who follows/shares vs. our single-feature or single-pain posts | follows-per-post + shares vs. batch 07 (feature-led) and batch 08 (pain-led) averages |
 
+## Open hypotheses (batch 12 — opening week + World Cup semifinal window, added 2026-07-08)
+
+**Context:** the approval queue was empty (67 prior ideas decided: 30 approved, 33 denied) so this
+batch is 10 fresh drafts, no owner comments to answer. Two World Cup trend posts (semifinal week
+July 14-15, post-final Monday July 20 — dates verified 2026-07-08), two opening-day posts for
+Friday 2026-07-10 (honest "we just opened," no invented traction, no launch city), one new
+science-fact citation (Blue Zones/Okinawan moai), one new life-quote attribution (Nelson Mandela,
+Laureus 2000), a why-us pain mutation of the approved "The Match That Wasn't" pattern, a second
+manifesto ("Vol. 2," a new angle — paradox of choice — per the owner's "one per week, new angle"
+instruction), a funny-with-identity post built on the pattern the owner has approved twice (state
+the product before the joke), and one new-bet engagement mechanic ("finish the sentence").
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-TREND-fanfriendship | A verified wholesome fan-connection theme (strangers across colors becoming friends, framed generically with no real names/countries) out-shares our earlier theme-only "edge of your seat" World Cup posts | shares+saves vs. batch 02/05 World Cup posts at a comparable slot |
+| H-TIME-mondaymorning | The "Monday after the trend ends" slot (08:00) is a viable posting window that sustains reach after the trend itself has peaked | reach by post hour, new datapoint vs. existing morning/evening slots |
+| H-ANGLE-honestlaunch | A plain, no-hype "we opened today" announcement out-performs our identity-anchor carousels that don't reference the launch moment, on follows + saves | follows-per-post + saves vs. batch 11 P1 (The Reframe) |
+| H-MECHANIC-finishsentence | An open-ended "finish the sentence" comment prompt out-comments our comment-to-win and tag-a-friend mechanics and surfaces useful demand signal (cities/sports/blockers named in answers) | comment count + qualitative signal vs. H-MECHANIC-commenttowin / H-MECHANIC-tagafriend baselines |
+
+This batch also retests `H-TREND-worldcup` (semifinal + post-final window, now with two live
+comparison batches already shipped), `H-FEATURE-howitworks` (third format test — single-poster,
+opening-day framed), `H-PILLAR-sciencefact` (new citation, friendship-use-case angle instead of
+pain-tolerance/bonding-hormone), `H-PILLAR-lifequote` (new attribution, a historically weighty
+public figure instead of the softer Helen Keller/bell hooks quotes already used), `H-PAIN-
+groupchat` (narrative mutation of the approved "Match That Wasn't" pattern, applied to group plans
+instead of dating), `H-TONE-daring` (Vol. 2 of the manifesto pillar — tests whether Vol. 1's
+performance was the pillar working or a novelty effect), and `H-PILLAR-funnyphoto` (does the
+identity-first funny pattern the owner has approved twice keep winning over the thin-meme pattern
+denied twice).
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -304,3 +334,31 @@ you decide who comes. Plus one supporting checklist post. Scheduled to anchor op
   batch has live data, compare follows-per-post + shares against batch 07 (feature-led) and batch
   08 (pain-led) to test whether breadth-of-use-cases content converts better than single-feature or
   single-pain content.
+- _2026-07-08_ — **Opening-week + World Cup semifinal batch shipped**
+  (`content-queue/2026-07-batch-12.md`, `social/ideas-batch-12.json`, 10 drafts). Queue was empty
+  (67 prior ideas decided: 30 approved, 33 denied) so this batch has no owner comments to answer —
+  it's a fresh readout of the pillars that have already won (identity/manifesto/use-case-breadth/
+  narrative-pain content) plus two live moments: the World Cup semifinal window (July 14-15) and
+  post-final Monday (July 20), both dates verified 2026-07-08 against ESPN/Olympics.com/Al
+  Jazeera/Sky Sports, both riding the wholesome fan-connection theme only (no real names, photos,
+  countries, teams, or crests, per the trend-jacking playbook); and opening day itself, Friday
+  2026-07-10 — an honest "we just opened" announcement plus a how-it-works poster, no invented
+  traction, no launch city. Added one new science-fact citation (Blue Zones/Okinawan moai
+  longevity research, tied to the friendship use case) and one new life-quote attribution (Nelson
+  Mandela, Laureus World Sports Awards, 2000) to keep those two pillars from going stale on repeat
+  citations. P7 mutates the owner-approved "The Match That Wasn't" pattern onto a group-plan pain
+  instead of a dating match; P8 is "The Manifesto, Vol. 2" — a genuinely new angle (Barry
+  Schwartz's paradox of choice, verified 2026-07-08, honestly caveated as having mixed replication)
+  rather than a repeat of Vol. 1's scam/fake-profile critique, per the owner's "one manifesto per
+  week, new angle" instruction; P9 follows the identity-first funny pattern the owner has approved
+  twice (state the product, then land the joke) rather than the thin-meme pattern denied twice; P10
+  is the batch's ~20% new-bet slot, a "finish the sentence" comment mechanic not yet run in this
+  queue. Added H-TREND-fanfriendship, H-TIME-mondaymorning, H-ANGLE-honestlaunch, and
+  H-MECHANIC-finishsentence above; also retests H-TREND-worldcup, H-FEATURE-howitworks,
+  H-PILLAR-sciencefact, H-PILLAR-lifequote, H-PAIN-groupchat, H-TONE-daring, and
+  H-PILLAR-funnyphoto. Flagged: the 12-photo library is now reused hard across four consecutive
+  batches (one photo, basketball-friends, repeats within this batch) — recommend sourcing 4-6 new
+  Pexels photos before batch 13. Next review: once this batch has live data, compare the two World
+  Cup posts against batches 02/05's earlier World Cup posts, and compare the two opening-day posts
+  against batch 11 P1 (the pre-opening identity anchor) to see whether the actual launch moment
+  outperforms a generic identity post.
