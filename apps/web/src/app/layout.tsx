@@ -55,6 +55,13 @@ export const metadata: Metadata = {
       "Meet compatible people through small, local sports. Adults 18+, privacy-first — open worldwide · GDPR-grade privacy for everyone.",
     images: ["/brand/keepitup-banner-social.png"],
   },
+  // Google Search Console ownership proof (HTML-tag method). The token is the
+  // `content` value from the Search Console meta tag; set it in the Vercel env
+  // as GOOGLE_SITE_VERIFICATION and the tag renders on every page. Absent env
+  // → no tag, so non-production deploys stay clean.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
