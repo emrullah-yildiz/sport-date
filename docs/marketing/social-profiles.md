@@ -21,7 +21,7 @@ each field optimized to that platform's character limits. Assets are in
   ```
   Meet through movement 🏃🎾🧗
   Local sports meetups for dating, friends & community — not endless swiping.
-  Private beta in Europe ⬇️
+  Open worldwide · early access ⬇️
   ```
 - **Link:** `https://keepitup.social`
 - **Contact email:** `support@keepitup.social`
@@ -53,13 +53,13 @@ each field optimized to that platform's character limits. Assets are in
   or community, without the endless swiping.
 
   Expect short, honest videos on activity-led connection, meeting safely, and
-  building KeepItUp in the open. Private beta in Europe.
+  building KeepItUp in the open. Open worldwide — early access.
 
   ▶ Learn more / join: https://keepitup.social
   ✉ support@keepitup.social
   ```
 - **Links** (add on the channel): Website `keepitup.social`, Instagram, TikTok.
-- **Channel keywords:** social sports, meet people, dating, friendship, community, run club, tennis, padel, climbing, Europe, meetups.
+- **Channel keywords:** social sports, meet people, dating, friendship, community, run club, tennis, padel, climbing, worldwide, meetups.
 
 ---
 
