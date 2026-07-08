@@ -186,6 +186,48 @@ performance was the pillar working or a novelty effect), and `H-PILLAR-funnyphot
 identity-first funny pattern the owner has approved twice keep winning over the thin-meme pattern
 denied twice).
 
+## Open hypotheses (batch 13 — identity-substance, no trend-jacks, added 2026-07-08)
+
+**Context:** the owner decided the full batch-12 queue the morning of 2026-07-08: 7 approved
+(Manifesto Vol. 2, We Just Opened, How KeepItUp Works opening-day poster, Sport Has The Power To
+Unite/Mandela, The Longest-Living People/Blue Zones moai, We Replaced Small Talk With A Small
+Game, Finish The Sentence), 3 denied (both World Cup trend-jacks, and The Plan That Wasn't). This
+batch reads that signal literally: zero event/news trend-jacks, full weight on identity-first
+product explainers, verified science/quotes, and manifesto tone — the four things that just won.
+Also formally adopts two owner-standing phrases into copy going forward: "organize or join games
+near you" (not just "find"), and "you're in an environment with people who enjoy doing the same
+activity."
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-FEATURE-intentpicker | Naming the intent picker (dating/friends/crew, one tap) as its own concrete explainer wins more saves/follows than the broader "use-case breadth" carousel (batch 11) | saves+follows vs. batch 11 P1 |
+| H-FEATURE-privacyplain | A plainer, opening-week-anchored version of the location-privacy explainer out-saves the original "serious explainer" tone | saves-per-post vs. batch 07 P1 |
+| H-MECHANIC-thisorthat | A binary "this or that" comment prompt out-comments the open-ended "finish the sentence" format and gives a cleaner signal on which pain point resonates more | comment count + qualitative signal vs. H-MECHANIC-finishsentence (batch 12 P10) |
+| H-MECHANIC-ugcinvite | A no-prize, ToS-compliant UGC invite ("show us your first game") generates real reposts/tags during opening week, and opening-weekend timing specifically lifts participation | repost/tag count, follows-per-post, vs. a control run with no launch-moment framing |
+| H-TIME-sundayevening | Sunday 18:00 is a viable posting window for product-explainer content | reach by post hour, new datapoint |
+| H-TIME-satafternoon | Saturday 15:00 is a viable posting window | reach by post hour, new datapoint |
+| H-TIME-sundaymidday | Sunday 12:00 is a viable posting window for opening-weekend/UGC content | reach by post hour, new datapoint |
+
+This batch also retests `H-TONE-daring` (Manifesto Vol. 3 — third install, new angle: the Harvard
+Study of Adult Development vs. the attention economy, rather than Vol. 1's industry critique or
+Vol. 2's paradox of choice), `H-PILLAR-sciencefact` (new citation — Kraus, Huang & Keltner 2010 NBA
+touch/cooperation study, a trust-building angle rather than longevity or pain-tolerance),
+`H-PILLAR-lifequote` (new attribution — JFK's 1960 "physical fitness" line, verified genuine; the
+popular "Plato" exercise quote was checked this session and rejected as an untraceable modern
+paraphrase, so it was not used), and `H-PILLAR-funnyphoto` (third test of the identity-first funny
+pattern, now three-for-three owner-approved, at a new 18:00 Tuesday slot to test the "funny peaks
+earlier" theory from batch 12).
+
+**Pruned this round:** `H-TREND-worldcup` and its batch-12 children `H-TREND-fanfriendship` /
+`H-TIME-mondaymorning` — both World Cup trend-jack posts were denied by the owner before ever going
+live, 2 for 2 across their only real test (batch 12). This is a taste signal, not performance data
+(the posts never ran), but it's a strong and explicit one: event/news trend-jacking is off the menu
+until further notice. No trend-jack posts are in batch 13, and none are planned until the owner
+signals otherwise. `H-PAIN-groupchat`'s narrative-pain mutation ("The Plan That Wasn't") was also
+denied — logged as a data point against that specific framing (group-chat-pain-as-narrative), not
+against the pain pillar overall, since earlier "why KeepItUp" pain posts (batch 08) were never
+denied.
+
 ## Scorecard (fill after batch 02 goes live)
 
 | Post | Platform | Format | Posted (day/time) | Reach | Saves | Shares | Comments | New follows | Verdict |
@@ -362,3 +404,37 @@ denied twice).
   Cup posts against batches 02/05's earlier World Cup posts, and compare the two opening-day posts
   against batch 11 P1 (the pre-opening identity anchor) to see whether the actual launch moment
   outperforms a generic identity post.
+- _2026-07-08_ — **Owner decided the full batch-12 queue.** 7 approved: The Manifesto Vol. 2
+  (paradox of choice), We Just Opened, How KeepItUp Works (opening-day poster), Sport Has The Power
+  To Unite (Mandela), The Longest-Living People (Blue Zones moai), We Replaced Small Talk With A
+  Small Game, Finish The Sentence. 3 denied: both World Cup trend-jacks ("Strangers, Different
+  Colors, Same Game" and "Monday, The World Stops Watching Together") and "The Plan That Wasn't."
+  Read plainly: identity-first substance, verified science/quotes, plain product explainers, and
+  manifesto tone won; event trend-jacks lost 2 for 2 on their only real test. **Pruned:**
+  event/news trend-jacking (`H-TREND-worldcup` and children) — no trend-jack posts until the owner
+  signals otherwise. Two owner edit-comments adopted as standing style: say "organize or join games
+  near you" (not just "find"), and lean on "you're in an environment with people who enjoy doing
+  the same activity."
+- _2026-07-08_ — **Identity-substance batch shipped, no trend-jacks**
+  (`content-queue/2026-07-batch-13.md`, `social/ideas-batch-13.json`, 8 drafts). Direct response to
+  the same-day owner decisions above: 2 product explainers on new angles (the intent picker —
+  dating/friends/crew, one tap; location privacy in plain, opening-week-anchored words), 1
+  manifesto Vol. 3 (new verified angle — the Harvard Study of Adult Development vs. the attention
+  economy, replacing Vol. 1's industry critique and Vol. 2's paradox of choice), 1 new science-fact
+  citation (Kraus, Huang & Keltner 2010, NBA touch/cooperation study — trust-building angle,
+  distinct from every prior science citation used in batches 06-12), 1 new life-quote attribution
+  (JFK, "The Soft American," Sports Illustrated, 1960 — verified genuine; the popular "Plato"
+  exercise quote was checked this session and rejected as an untraceable modern paraphrase, so a
+  misattribution was avoided), 1 funny-with-identity post (third test of the pattern the owner has
+  now approved three times), 1 new comment mechanic ("this or that," binary, distinct from
+  comment-to-win/tag-a-friend/finish-the-sentence), and 1 new-bet UGC invite for opening weekend
+  ("show us your first game," no prize, fully clear of the still-blocked P7 giveaway mechanic).
+  Reused the existing 12-photo library (no new sourcing this round) but deliberately skipped
+  `basketball-friends` (used twice in batch 12) and `padel-match` (venue branding visible); flagged
+  again that the library needs a refresh before batch 14. Added H-FEATURE-intentpicker,
+  H-FEATURE-privacyplain, H-MECHANIC-thisorthat, H-MECHANIC-ugcinvite, H-TIME-sundayevening,
+  H-TIME-satafternoon, and H-TIME-sundaymidday above; retests H-TONE-daring, H-PILLAR-sciencefact,
+  H-PILLAR-lifequote, and H-PILLAR-funnyphoto. Next review: once this batch has live data, compare
+  the two product explainers against batch 07 (feature-led) and batch 11 (breadth) baselines, and
+  check whether Manifesto Vol. 3 sustains the shares/saves/follows lift of Vol. 1 and Vol. 2 or
+  whether the pillar is starting to flatten on its third install.

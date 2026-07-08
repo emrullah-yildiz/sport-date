@@ -111,12 +111,17 @@ function layoutBlock(block, width) {
     case 'eyebrow': {
       const size = block.size || 30;
       const ls = 4;
+      // opt-in wrap for long identity eyebrows (default: single line, as before)
+      const lines = block.wrap ? wrap(block.text, size, 'sans', width, ls) : [block.text];
+      const lh = size * 1.5;
       return {
-        height: size * 1.2,
+        height: size * 1.2 + (lines.length - 1) * lh,
         svg(x, y, a) {
           const anchor = a === 'center' ? 'middle' : 'start';
           const tx = a === 'center' ? x + width / 2 : x;
-          return `<text x="${tx}" y="${y + size}" font-family="${SANS}" font-size="${size}" font-weight="bold" letter-spacing="${ls}" fill="${GREEN}" text-anchor="${anchor}">${esc(block.text)}</text>`;
+          return lines
+            .map((l, i) => `<text x="${tx}" y="${y + size + i * lh}" font-family="${SANS}" font-size="${size}" font-weight="bold" letter-spacing="${ls}" fill="${GREEN}" text-anchor="${anchor}">${esc(l)}</text>`)
+            .join('\n');
         },
       };
     }
@@ -589,10 +594,183 @@ export const BATCH12 = [
   },
 ];
 
+// ------------------------------------------------------------- batch 13 spec
+// Spec source: docs/marketing/content-queue/2026-07-batch-13.md +
+// docs/marketing/social/ideas-batch-13.json (body.assets → out paths).
+export const BATCH13 = [
+  {
+    // P1 — "Pick Why You're Here" (intent picker explainer)
+    out: 'b13p1-pick-why-youre-here.png',
+    photo: 'pexels-31293814-park-fitness-group.jpg',
+    mark: 'tl',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', text: 'KEEPITUP: ORGANIZE OR JOIN GAMES NEAR YOU.' },
+        { type: 'headline', startSize: 56, maxLines: 4, text: 'When you join, you tell us why you’re here. Dating. Friends. Or just a crew.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'Same app. Same games. You pick the reason.' },
+      ],
+    }],
+  },
+  {
+    // P2 — "We Don't Show Anyone Where You Live" (privacy explainer)
+    out: 'b13p2-we-dont-show-your-location.png',
+    photo: 'pexels-5319397-three-adults-jog.jpg',
+    mark: 'tr',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', text: 'IN PLAIN WORDS: HOW WE PROTECT YOU.' },
+        { type: 'headline', startSize: 56, maxLines: 4, text: 'We never show your exact location. Not even to the host — until you say yes.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'You see games near you. Nobody sees your address.' },
+      ],
+    }],
+  },
+  {
+    // P3 — Manifesto Vol. 3, slide 1 (text-card cover)
+    out: 'b13p3-slide1.png',
+    photo: null,
+    mark: 'tl',
+    sections: [{
+      anchor: 'center',
+      align: 'center',
+      blocks: [
+        { type: 'eyebrow', text: 'PART 3 OF THE MANIFESTO.' },
+        { type: 'headline', text: 'The longest study on happiness ever run never once measured your follower count.' },
+        { type: 'rule' },
+      ],
+    }],
+  },
+  {
+    // P3 slide 2 (text card + citation)
+    out: 'b13p3-slide2.png',
+    photo: null,
+    mark: 'tl',
+    sections: [{
+      anchor: 'center',
+      align: 'center',
+      blocks: [
+        { type: 'headline', startSize: 50, maxLines: 8, text: 'Harvard has followed the same people since 1938 — now into a second generation. The single biggest predictor of a long, healthy, happy life wasn’t money or fame. It was the quality of people’s close relationships.' },
+        { type: 'rule' },
+        { type: 'cite', text: 'Harvard Study of Adult Development; Waldinger & Schulz, The Good Life, 2023.' },
+      ],
+    }],
+  },
+  {
+    // P3 slide 3 (photo: jog-bridge)
+    out: 'b13p3-slide3.png',
+    photo: 'pexels-5319325-jog-bridge.jpg',
+    mark: 'tl',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'headline', startSize: 56, maxLines: 4, text: 'Your feed is designed to hold your attention. It was never designed to give you a close relationship.' },
+        { type: 'rule' },
+      ],
+    }],
+  },
+  {
+    // P3 slide 4 (reveal / CTA close, photo: friends-beach-run)
+    out: 'b13p3-slide4.png',
+    photo: 'pexels-8381743-friends-beach-run.jpg',
+    mark: 'none',
+    sections: [{
+      anchor: 'center',
+      align: 'center',
+      blocks: [
+        { type: 'brandlock', width: 460 },
+        { type: 'headline', startSize: 56, maxLines: 4, text: 'So we built a way back to the thing the study actually found.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'Organize or join games near you. Open worldwide — early access, link in bio.' },
+      ],
+    }],
+  },
+  {
+    // P4 — "Teams That Touch More, Win More" (science fact, NBA touch study)
+    out: 'b13p4-teams-that-touch-more.png',
+    photo: 'pexels-12169344-volleyball-laugh.jpg',
+    mark: 'tl',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', text: 'THE SCIENCE OF SHOWING UP.' },
+        { type: 'headline', startSize: 54, maxLines: 6, text: 'Researchers watched an entire NBA season. The teams that high-fived most, trusted each other most — and won more.' },
+        { type: 'rule' },
+        { type: 'cite', text: 'Kraus, Huang & Keltner, Emotion, 2010.' },
+      ],
+    }],
+  },
+  {
+    // P5 — JFK life quote
+    out: 'b13p5-jfk-quote.png',
+    photo: 'pexels-19146676-group-track-run.jpg',
+    mark: 'br',
+    sections: [{
+      anchor: 'upper',
+      blocks: [
+        { type: 'quotemark' },
+        { type: 'headline', startSize: 60, maxLines: 5, text: 'Physical fitness is the basis of dynamic and creative activity.”' },
+        { type: 'rule' },
+        { type: 'sub', text: '— John F. Kennedy, 1960.' },
+      ],
+    }],
+  },
+  {
+    // P6 — "Nobody Reads Your Bio Here" (funny, identity-first)
+    out: 'b13p6-no-bio-needed.png',
+    photo: 'pexels-33920366-flag-football.jpg',
+    mark: 'tr',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', size: 26, wrap: true, text: 'KEEPITUP: A FREE APP TO ORGANIZE OR JOIN GAMES NEAR YOU.' },
+        { type: 'headline', startSize: 56, maxLines: 4, text: 'Nobody reads your bio here. They just play next to you for an hour.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'Turns out that tells you more anyway.' },
+      ],
+    }],
+  },
+  {
+    // P7 — "This Or That" (binary comment mechanic, neon OR divider)
+    out: 'b13p7-this-or-that.png',
+    photo: 'pexels-5807872-cyclists-roadside-chat.jpg',
+    mark: 'tl',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', text: 'THIS OR THAT.' },
+        { type: 'headline', startSize: 46, maxLines: 3, text: 'A) Swipe all night and match with nobody you’ll actually meet.' },
+        { type: 'headline', startSize: 34, maxLines: 1, color: GREEN, text: 'OR' },
+        { type: 'headline', startSize: 46, maxLines: 3, text: 'B) Play one real game this week and meet the people who show up.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'Comment A or B.' },
+      ],
+    }],
+  },
+  {
+    // P8 — "Show Us Your First Game" (UGC invite, opening weekend)
+    out: 'b13p8-first-game-ugc.png',
+    photo: 'pexels-8795115-badminton-sunset.jpg',
+    mark: 'tl',
+    sections: [{
+      anchor: 'bottom',
+      blocks: [
+        { type: 'eyebrow', text: 'WE JUST OPENED THIS WEEKEND.' },
+        { type: 'headline', startSize: 56, maxLines: 3, text: 'If you played your first game already — show us.' },
+        { type: 'rule' },
+        { type: 'sub', text: 'Post a clip, tag us. We repost our favorites. No prize, no entry fee, just showing off that you actually went.' },
+      ],
+    }],
+  },
+];
+
 // ------------------------------------------------------------------- main
 const isMain = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isMain) {
-  bakeBatch(BATCH12)
+  // BATCH12 stays exported above for reference/re-bakes; current bake target is BATCH13.
+  bakeBatch(BATCH13)
     .then((files) => console.log(`done: ${files.length} files`))
     .catch((err) => { console.error(err); process.exit(1); });
 }

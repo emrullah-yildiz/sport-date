@@ -1,0 +1,186 @@
+[
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "Pick Why You're Here",
+    "trend": null,
+    "hook": "Before you join a game, you tell us why you're here. Dating. Friends. Or just a crew. One tap.",
+    "body": {
+      "caption": "Here's a small thing in KeepItUp that changes a lot: before you join a game, you pick why you're here. Dating. Friends. Or just a crew for your sport. That's it — one tap.\n\nIt's not three different apps pretending to be one. It's the same small local games, the same real people, but now everyone in the group knows why everyone else showed up. No guessing, no awkward 'wait, is this a date?' moment. You're in an environment with people who enjoy doing the same activity — and you already know what they're looking for.\n\nKeepItUp is a free app to organize or join games near you. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#HowItWorks",
+        "#OpenWorldwide",
+        "#NoGuessing"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Product-explainer poster, real photo. Photo: pexels-31293814-park-fitness-group.jpg (a diverse group of adults doing an outdoor fitness session together). KeepItUp mark top-left. Eyebrow (neon-green): 'KEEPITUP: ORGANIZE OR JOIN GAMES NEAR YOU.' Headline block (off-white on anthracite scrim, lower third): 'WHEN YOU JOIN, YOU TELL US WHY YOU'RE HERE. DATING. FRIENDS. OR JUST A CREW.' Subhead: 'Same app. Same games. You pick the reason.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p1-pick-why-youre-here.png.",
+      "assets": [
+        "/brand/social/photos/b13p1-pick-why-youre-here.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "We Don't Show Anyone Where You Live",
+    "trend": null,
+    "hook": "We never show your exact location. Not even to the host — until you both say yes to a game.",
+    "body": {
+      "caption": "We just opened, so here's something worth explaining in plain words: how KeepItUp handles your location.\n\nYou see small games and activities near you — but your exact spot stays fuzzy on the map, not a pin on your house. The host only gets your real meeting point after you both say yes to a game, and only for that one game. Nobody can scroll through a list of people near them. You have to actually ask to join first.\n\nWe built it this way on purpose. Meeting people should feel easy, not like you're handing your address to a stranger. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#Privacy",
+        "#MeetThroughMovement",
+        "#OpenWorldwide",
+        "#BuiltOnTrust"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Product-explainer poster, plain-language privacy angle, real photo. Photo: pexels-5319397-three-adults-jog.jpg (three adults jogging along a seafront, calm and approachable). KeepItUp mark top-right. Eyebrow (neon-green): 'IN PLAIN WORDS: HOW WE PROTECT YOU.' Headline block (off-white on anthracite scrim, lower third): 'WE NEVER SHOW YOUR EXACT LOCATION. NOT EVEN TO THE HOST — UNTIL YOU SAY YES.' Subhead: 'You see games near you. Nobody sees your address.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p2-we-dont-show-your-location.png.",
+      "assets": [
+        "/brand/social/photos/b13p2-we-dont-show-your-location.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "carousel",
+    "title": "The Manifesto, Vol. 3: The Longest Study On Happiness Never Measured Your Follower Count",
+    "trend": null,
+    "hook": "Harvard's 87-year happiness study found the answer, and it was never in your notifications.",
+    "body": {
+      "slides": [
+        "PART 3 OF THE MANIFESTO. THE LONGEST STUDY ON HAPPINESS EVER RUN NEVER ONCE MEASURED YOUR FOLLOWER COUNT.",
+        "HARVARD HAS FOLLOWED THE SAME PEOPLE SINCE 1938 — NOW INTO A SECOND GENERATION. THE SINGLE BIGGEST PREDICTOR OF A LONG, HEALTHY, HAPPY LIFE WASN'T MONEY OR FAME. IT WAS THE QUALITY OF PEOPLE'S CLOSE RELATIONSHIPS. Harvard Study of Adult Development; Waldinger & Schulz, The Good Life, 2023.",
+        "YOUR FEED IS DESIGNED TO HOLD YOUR ATTENTION. IT WAS NEVER DESIGNED TO GIVE YOU A CLOSE RELATIONSHIP.",
+        "SO WE BUILT A WAY BACK TO THE THING THE STUDY ACTUALLY FOUND. KEEPITUP — ORGANIZE OR JOIN GAMES NEAR YOU. OPEN WORLDWIDE, EARLY ACCESS, LINK IN BIO."
+      ],
+      "caption": "Harvard has been running the same study since 1938 — the longest study on happiness and health ever conducted, now tracking a second generation of the original families. The finding that keeps showing up, decade after decade: the single biggest predictor of a long, happy, healthy life wasn't money, fame, or career success. It was the quality of people's close relationships (Harvard Study of Adult Development; Waldinger & Schulz, 'The Good Life,' 2023).\n\nNobody's feed is built for that. It's built to hold your attention, not to give you a close relationship. So we built the opposite: KeepItUp is a free app to organize or join small local games near you, with real people, in real time. Fewer notifications. More actual relationships. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#TheManifesto",
+        "#HarvardStudy",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#RealRelationships"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "4-slide manifesto carousel, poster-branded throughout, mixing text-only cards (slides 1-2) with real-photo overlay slides (3-4). Slide 1: text card, anthracite background, no photo, KeepItUp mark visible. Slide 2: text card, anthracite background, citation subtext. Slide 3 (photo: pexels-5319325-jog-bridge.jpg, people jogging together across a bridge): dark scrim overlay. Slide 4 (photo: pexels-8381743-friends-beach-run.jpg, four adult friends laughing on a beach run): full poster close, KeepItUp mark + wordmark centered. Exact overlay text per slide is in the `slides` array above. Planned composites: b13p3-slide1.png through b13p3-slide4.png.",
+      "assets": [
+        "/brand/social/photos/b13p3-slide1.png",
+        "/brand/social/photos/b13p3-slide2.png",
+        "/brand/social/photos/b13p3-slide3.png",
+        "/brand/social/photos/b13p3-slide4.png"
+      ]
+    }
+  },
+  {
+    "platform": "both",
+    "format": "image",
+    "title": "Teams That Touch More, Win More",
+    "trend": null,
+    "hook": "Researchers watched a full NBA season. The teams that touched each other most trusted each other most, and won more.",
+    "body": {
+      "caption": "In 2010, researchers at UC Berkeley coded every high-five, fist-bump, and chest-bump across an entire NBA season. The finding: players and teams who touched each other more early in the season cooperated better and performed better later on (Kraus, Huang & Keltner, 'Tactile Communication, Cooperation, and Performance: An Ethological Study of the NBA,' Emotion, 2010). Physical contact during a shared activity builds trust fast — faster than words usually do.\n\nYou don't need to be a pro to get that. A five-a-side game, a doubles match, a group run — any small shared activity puts you shoulder to shoulder with people, and trust builds in minutes, not months. KeepItUp is a free app to organize or join a game like that near you. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#ScienceOfMovement",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#TrustBuildsFast",
+        "#OpenWorldwide"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Science-fact pillar post, poster-branded, real photo. Fact verified 2026-07-08 (Kraus, Huang & Keltner, 2010, Emotion — NBA touch/cooperation study, see caption for citation). Photo: pexels-12169344-volleyball-laugh.jpg (two adult friends laughing mid beach-volleyball game). KeepItUp mark top-left. Eyebrow (neon-green): 'THE SCIENCE OF SHOWING UP.' Headline block (off-white on anthracite scrim): 'RESEARCHERS WATCHED AN ENTIRE NBA SEASON. THE TEAMS THAT HIGH-FIVED MOST, TRUSTED EACH OTHER MOST — AND WON MORE.' Citation subtext: 'Kraus, Huang & Keltner, Emotion, 2010.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p4-teams-that-touch-more.png.",
+      "assets": [
+        "/brand/social/photos/b13p4-teams-that-touch-more.png"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "Physical Fitness Is The Basis Of...",
+    "trend": null,
+    "hook": "\"Physical fitness is the basis of dynamic and creative activity.\" — John F. Kennedy, 1960.",
+    "body": {
+      "caption": "In 1960, President-elect John F. Kennedy wrote an essay for Sports Illustrated called 'The Soft American.' One line has outlived the rest: 'Physical fitness is not only one of the most important keys to a healthy body, it is the basis of dynamic and creative intellectual activity' (Kennedy, Sports Illustrated, December 26, 1960).\n\nHe was making the case for moving your body. We'd add one line to it: move your body with other people, and you don't just get a sharper mind — you get a wider circle, too. KeepItUp is a free app to organize or join a small local game near you. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#JFK",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#OpenWorldwide",
+        "#MoveTogether"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Life-quote pillar post, poster-branded, real photo. Quote verified 2026-07-08 (John F. Kennedy, 'The Soft American,' Sports Illustrated, December 26, 1960 — confirmed genuine via JFK Library coverage and full-text sources; the alternative 'Plato' exercise quote was checked and rejected as an untraceable modern paraphrase). Photo: pexels-19146676-group-track-run.jpg (a diverse group jogging together on a track, energetic and welcoming). KeepItUp mark bottom-right, small. Headline block (upper two-thirds, off-white on anthracite scrim, neon-green quote marks): '\"PHYSICAL FITNESS IS THE BASIS OF DYNAMIC AND CREATIVE ACTIVITY.\"' Subtext beneath: '— John F. Kennedy, 1960.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p5-jfk-quote.png.",
+      "assets": [
+        "/brand/social/photos/b13p5-jfk-quote.png"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "Nobody Reads Your Bio Here",
+    "trend": null,
+    "hook": "Nobody reads your bio here. They just play next to you for an hour. Turns out that tells you more anyway.",
+    "body": {
+      "caption": "KeepItUp is a free app to organize or join a small local game near you and meet the people who show up. Funny thing we noticed: almost nobody reads a bio here. You just turn up, play for an hour, and you already know if you get along — if they're patient when you miss a shot, if they laugh easily, if they actually pass the ball.\n\nYou're standing in an environment with people who enjoy doing the same activity as you. That tells you more in twenty minutes than a paragraph about hobbies ever could. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#NoBioNeeded",
+        "#OpenWorldwide",
+        "#FreeApp"
+      ],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Funny, identity-first post (product named before the joke lands, per the standing stranger-test rule, and the pattern the owner has approved three times). Poster-branded, real photo. Photo: pexels-33920366-flag-football.jpg (adults playing flag football at golden hour, high energy). KeepItUp mark top-right, small. Eyebrow (neon-green): 'KEEPITUP: A FREE APP TO ORGANIZE OR JOIN GAMES NEAR YOU.' Headline block (off-white on anthracite scrim, lower third): 'NOBODY READS YOUR BIO HERE. THEY JUST PLAY NEXT TO YOU FOR AN HOUR.' Subhead: 'Turns out that tells you more anyway.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p6-no-bio-needed.png.",
+      "assets": [
+        "/brand/social/photos/b13p6-no-bio-needed.png"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "This Or That",
+    "trend": null,
+    "hook": "This or that: swipe all night and match with nobody, or play one real game this week? Comment A or B.",
+    "body": {
+      "caption": "This or that: A) swipe all night and match with people you'll probably never meet, or B) play one real game this week with people who actually show up. Comment A or B — we're curious which one people even have to think about.\n\nFor anyone new here: KeepItUp is a free app to organize or join a small local game or activity near you — for dating, friends, or just a crew. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#ThisOrThat",
+        "#KeepItUp",
+        "#MeetThroughMovement",
+        "#OpenWorldwide"
+      ],
+      "cta": "Comment A or B.",
+      "imageConcept": "New-bet engagement mechanic: a binary 'this or that' comment prompt, identity stated before the prompt per the stranger-test rule. Poster-branded, real photo. Photo: pexels-5807872-cyclists-roadside-chat.jpg (three adult cyclists pausing to chat on a forest road). KeepItUp mark top-left, small. Eyebrow (neon-green): 'THIS OR THAT.' Headline block (off-white on anthracite scrim, lower third, split into two lines with a neon-green 'OR' divider): 'A) SWIPE ALL NIGHT AND MATCH WITH NOBODY YOU'LL ACTUALLY MEET. OR B) PLAY ONE REAL GAME THIS WEEK AND MEET THE PEOPLE WHO SHOW UP.' Subhead: 'Comment A or B.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p7-this-or-that.png.",
+      "assets": [
+        "/brand/social/photos/b13p7-this-or-that.png"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "Show Us Your First Game",
+    "trend": null,
+    "hook": "We just opened. If you've already played your first game, show us — no prize, just a repost.",
+    "body": {
+      "caption": "We just opened. If you've already played your first KeepItUp game this weekend, we want to see it. Post a clip or a photo, tag us, and we'll repost our favorites on our page.\n\nNo prize, no contest — just a place to show off the fact that you went and did the thing instead of scrolling. KeepItUp is a free app to organize or join a small local game near you. Open worldwide — early access, link in bio.",
+      "hashtags": [
+        "#KeepItUp",
+        "#MyFirstGame",
+        "#MeetThroughMovement",
+        "#OpenWorldwide",
+        "#WeJustOpened"
+      ],
+      "cta": "Post your clip, tag us, we'll repost our favorites.",
+      "imageConcept": "New-bet UGC/duet-style invite for opening weekend, no prize (fully clear of the still-blocked giveaway mechanic), conditional honest framing ('if you've already,' no assertion of unverified traction). Poster-branded, real photo. Photo: pexels-8795115-badminton-sunset.jpg (two adults playing badminton on grass at golden hour). KeepItUp mark top-left, small. Eyebrow (neon-green): 'WE JUST OPENED THIS WEEKEND.' Headline block (off-white on anthracite scrim, lower third): 'IF YOU PLAYED YOUR FIRST GAME ALREADY — SHOW US.' Subhead: 'Post a clip, tag us. We repost our favorites. No prize, no entry fee, just showing off that you actually went.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b13p8-first-game-ugc.png.",
+      "assets": [
+        "/brand/social/photos/b13p8-first-game-ugc.png"
+      ]
+    }
+  }
+]
