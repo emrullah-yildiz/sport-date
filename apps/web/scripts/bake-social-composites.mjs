@@ -375,7 +375,7 @@ export async function bakeBatch(slides) {
 // ------------------------------------------------------------- batch 12 spec
 const EYEBROW_ID = 'KEEPITUP: FREE LOCAL GAMES TO MEET PEOPLE.';
 
-const BATCH12 = [
+export const BATCH12 = [
   {
     out: 'b12p1-strangers-same-game.png',
     photo: 'pexels-33920366-flag-football.jpg',
@@ -410,7 +410,7 @@ const BATCH12 = [
       anchor: 'bottom',
       blocks: [
         { type: 'eyebrow', text: 'TODAY, WE OPEN.' },
-        { type: 'headline', text: 'One app. Find a small game near you. Meet the people who show up.' },
+        { type: 'headline', text: 'One app. Organize or join games near you. Meet the people who show up.' },
         { type: 'rule' },
         { type: 'sub', text: 'For dating, friends, or a crew — free, worldwide, starting today.' },
       ],
