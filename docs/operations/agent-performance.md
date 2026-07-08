@@ -67,3 +67,12 @@ metrics), never vibes.
 
 Review cadence: every daily standup re-scores; fire/rehire proposals ship as
 directions the owner approves on `/hq.html`.
+
+## Scorecard — standup 2026-07-08 (published by CEO; scribe delivery missed again)
+
+| Agent | Evidence | Verdict |
+|---|---|---|
+| **The Oracle (standup-scribe)** | 06:07 run fired; report reached neither HQ nor git — second consecutive miss. Root cause is owner-side config (STANDUP_AGENT_SECRET not yet in the cloud env), not judgment: the API delivery path shipped 07-08 and is proven (CEO published through it twice). | **PROBATION continues.** Self-delivery expected the morning after SD-20260708-cloud-secret is done; a miss AFTER the secret lands → contract rewrite. |
+| **Trinity (social-media-growth)** | Queue ran completely dry (owner found 0 pending on 07-08) — a miss against the never-empty mandate. Recovered same night: batch 12 (10 drafts, verified World Cup dates, fresh citations, no invented stats) seeded as pending. | **KEEP**, with the dry-queue miss logged; queue depth is now a watched metric. |
+| **Niobe (growth-pm)** | First deliverable: 20/20 organizer DMs with every target double-verified against live second sources; two unverifiable candidates disclosed instead of guessed. | **KEEP.** Strong evidence discipline on the first assignment. |
+| **Morpheus (CEO)** | Overnight loop: standup API shipped+proven in prod, honest marketing report (2 users / 0 followers) published, Google indexing structurally unblocked (domain flip + verification hook), both owner asks delivered, HQ kept current all night. Guardrail violations: 0. | **KEEP.** |
