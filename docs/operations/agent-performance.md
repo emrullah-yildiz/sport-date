@@ -76,3 +76,13 @@ directions the owner approves on `/hq.html`.
 | **Trinity (social-media-growth)** | Queue ran completely dry (owner found 0 pending on 07-08) — a miss against the never-empty mandate. Recovered same night: batch 12 (10 drafts, verified World Cup dates, fresh citations, no invented stats) seeded as pending. | **KEEP**, with the dry-queue miss logged; queue depth is now a watched metric. |
 | **Niobe (growth-pm)** | First deliverable: 20/20 organizer DMs with every target double-verified against live second sources; two unverifiable candidates disclosed instead of guessed. | **KEEP.** Strong evidence discipline on the first assignment. |
 | **Morpheus (CEO)** | Overnight loop: standup API shipped+proven in prod, honest marketing report (2 users / 0 followers) published, Google indexing structurally unblocked (domain flip + verification hook), both owner asks delivered, HQ kept current all night. Guardrail violations: 0. | **KEEP.** |
+
+## Scorecard — standup 2026-07-10 (published by CEO; scribe missed 07-09 AND 07-10)
+
+| Agent | Evidence | Verdict |
+|---|---|---|
+| **The Oracle (standup-scribe)** | Third and fourth consecutive delivery misses (07-09, 07-10); the live HQ report sat on July 8 until the owner flagged it. Root cause unchanged and owner-side: STANDUP_AGENT_SECRET is verified live in the production web env but absent from the cloud routine's own environment. | **PROBATION continues.** Direction SD-20260710-cloud-secret re-raised (now 4 missed reports). Self-delivery expected the morning after the paste; a miss after that → contract rewrite. |
+| **Trinity (social-media-growth)** | 8 clean publishes 07-09→07-10 including the opening-day pair (We Just Opened IG 09:04 + TikTok 09:10), zero Buffer errors, citations held. Batch 13 verdict: 6 approve / 2 deny (denials = taste data). | **KEEP.** Watch item: Buffer queue empty after tonight's 19:40 post until the 6 approved posts dispatch and batch 14 lands. |
+| **Niobe (growth-pm)** | 20 double-verified organizer DMs ready since 07-08, still unsent (owner-executed by guardrail). No misses on her side. | **KEEP (waiting).** Next assignment starts when outreach replies arrive. |
+| **Tank & Dozer (builders)** | Nothing shipped 07-09/07-10 — the local loop did not run. Last delivered work (batch-13 bakes, SEO unblock, standup API) all clean. | **KEEP.** Idle gap, not a performance failure. |
+| **Morpheus (CEO)** | Miss logged: loop idle two days, HQ stale until owner flag — always-current directive violated. Correction: catch-up published to prod (API-verified live) + standing first-action rule: check the live report date before any other work. Guardrail violations: 0. | **KEEP**, with the miss logged. |
