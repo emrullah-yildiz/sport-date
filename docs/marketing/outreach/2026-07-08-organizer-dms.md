@@ -1,3 +1,60 @@
+## EXECUTE TODAY — 2026-07-14 sprint header
+
+**Status: unsent 6 days. This is the single highest-leverage action of the
+acquisition sprint (see `docs/marketing/sprint-2026-07-14.md`). Do this
+before anything else marketing-related today.**
+
+**Freshness re-check (2026-07-14):** spot-checked 5 of 20 targets via live
+search — London Frontrunners, Social Sports Dublin, Padel Berlin, Rookie Run
+Club Lisbon, Edinburgh University Sports Union. All 5 accounts are live,
+active, and match the original verification (follower counts drifted
+normally, no dead links, no closures). **No targets removed — all 20 are
+still valid.** The 2 originally-excluded candidates (Dublin Padel Group,
+Warsaw Running Club) stay excluded; they were never part of the 20.
+
+**Platform:** Instagram, from **@keepitup.social**, direct message.
+
+**Order:** send in the numbered order below (1→20) — it's already
+sequenced for variety (mixes cities/sports so it doesn't look automated if
+anyone compares notes). Don't skip around.
+
+**30-minute session plan (today):**
+1. (2 min) Open Instagram as @keepitup.social, open DMs.
+2. (25 min) Send **targets 1–5 only today** — about 5 minutes each,
+   including a 60-second look at their profile first so the message reads
+   as genuinely personal, not pasted. Paste the draft under each target
+   below, change nothing unless it reads unnatural for that profile.
+3. (3 min) Log each send in the tracking table at the bottom: date sent =
+   today, leave Replied/Outcome blank.
+4. Repeat with targets 6–10 tomorrow, 11–15 the day after, 16–20 the day
+   after that — same ~25-30 min/day, per the "how to send" pacing rule
+   below (never all 20 in one sitting).
+
+**Tense check before you paste:** we've now opened (July 10 has passed) —
+every draft below already says "we just opened KeepItUp." If you see any
+draft that still says "we're opening," change it to "we just opened"
+before sending.
+
+**What to do with replies (reply-to-signup handoff):**
+- **Any positive reply** (curious, "tell me more," "sounds interesting"):
+  reply once, warmly, then send this exact handoff line:
+  > "Awesome — easiest way to see it is to just try it: keepitup.social
+  > (free, takes 2 minutes, no app download needed). If you post one event
+  > there this week I'd love to hear what you think."
+  Do not over-explain in DM — the goal is one click to keepitup.social,
+  not a full sales pitch in the chat.
+- **A question you can't answer confidently** (pricing, data, safety):
+  don't guess — reply "great question, let me check and get back to you,"
+  then flag it to Niobe (leave a note in the tracking table Outcome column)
+  so it's routed correctly, not answered wrong.
+- **"Not interested" or no reply after 5-7 days:** use the follow-up nudge
+  below once, then stop. Never send a third message.
+- **Log every outcome** (posted an event / clicked through / asked a
+  question / not interested / no reply) in the tracking table — this feeds
+  Friday's kill/keep review in `sprint-2026-07-14.md`.
+
+---
+
 # Organizer DMs — batch 1 (2026-07-08)
 
 Ready-to-send, individually personalized DMs to real, verified sports-community

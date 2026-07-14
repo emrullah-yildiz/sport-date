@@ -66,3 +66,12 @@ Agents pick up approved posts, produce the final creative to spec, and schedule 
   activity, seeing every hosted/joined game in one list, and the core "post a plan, let strangers
   ask to join" loop, plus a supporting checklist post. Scheduled as the opening-week anchor
   (2026-07-10). No payment/ticketing claim anywhere. Status `draft`.
+- `2026-07-batch-12.md` — opening week + World Cup semifinal window, 10 drafts, status mixed
+  (7 approved, 3 denied — see `growth-experiments.md`).
+- `2026-07-batch-13.md` — identity-substance batch, no trend-jacks, 8 drafts, status `draft`.
+- `2026-07-batch-14.md` — **contract v3 (distribution-first)** batch: 8 drafts (4 IG + 4 TikTok)
+  closing the 07-16→07-22 scheduling gap at the new ~4-posts-per-channel-per-week cap. Every post
+  carries a required Distribution line (niche hashtags or a named community/outreach tie-in).
+  Engagement-prompt mechanics and event trend-jacks are excluded (both paused/pruned). Science/
+  quote pillars capped at 1 combined; 1 manifesto (Vol. 4, new verified angle). P1/P2 are a
+  designed native-vs-Buffer A/B pair (P1 marked POST NATIVELY). Status `draft`.

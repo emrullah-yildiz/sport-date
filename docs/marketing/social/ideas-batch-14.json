@@ -1,0 +1,145 @@
+[
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "Your Bio Says You Love Hiking",
+    "trend": null,
+    "hook": "Your dating app bio says you love hiking. You wrote that after one hike, three years ago.",
+    "distribution": "POST NATIVELY (owner) — native leg of the native-vs-Buffer A/B test, twin to P2. Owner cross-shares into 2-3 small hiking/walking-group communities they're already a member of (manual, native, no scraping/cold DMs). Niche tags: #TrailFriends #SmallGroupHikes #WeekendHikeCrew.",
+    "body": {
+      "caption": "KeepItUp is a free app to organize or join a small local game or activity near you. Funny thing about most dating apps: your bio says you love hiking, or football, or yoga — sometimes because you did it once, three years ago.\n\nHere you don't write a bio like that. You just show up to the hike, the run, the five-a-side, and everyone finds out together if you're actually into it. No exaggerating, no guessing. You're in an environment with people who enjoy doing the same activity — because they're doing it right next to you.\n\nOpen worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide", "#NoBioNeeded", "#ShowUpAnyway"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Funny identity-first poster, real photo. Photo: pexels-5553089-friends-football.jpg (two adult men passing a football in a park). KeepItUp mark top-left, small. Eyebrow (neon-green): 'KEEPITUP: A FREE APP TO ORGANIZE OR JOIN GAMES NEAR YOU.' Headline block (off-white on anthracite scrim, lower third): 'YOUR DATING APP BIO SAYS YOU LOVE HIKING. YOU WROTE THAT AFTER ONE HIKE, THREE YEARS AGO.' Subhead: 'Here, you just go on the hike. Everyone finds out together if it's still true.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p1-your-bio-says.png (not yet baked — no build tool this session).",
+      "assets": [
+        "/brand/social/photos/pexels-5553089-friends-football.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "Nobody Asks Your Star Sign Here",
+    "trend": null,
+    "hook": "Nobody asks your star sign here. They ask if you're free Saturday at 10.",
+    "distribution": "Buffer-scheduled twin of P1 (same pattern, format, time-of-day; only the publish channel differs) for the native-vs-Buffer A/B test. Niche tags: #ParkrunFamily #RunClubFriends #SaturdayRunners.",
+    "body": {
+      "caption": "KeepItUp is a free app to organize or join a small local game or activity near you. Nobody here asks your star sign, your love language, or your top five bands. They ask if you're free Saturday at 10 for a run.\n\nThat's the whole pitch, really: less talking about yourself, more actually doing something with people and finding out if you get along. You're in an environment with people who enjoy doing the same activity — that tells you more in twenty minutes than a profile ever could.\n\nOpen worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide", "#NoSmallTalk", "#ShowUpAnyway"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Funny identity-first poster, real photo, Buffer-twin of P1. Photo: pexels-5319397-three-adults-jog.jpg (three adults jogging along a seafront). KeepItUp mark top-right, small. Eyebrow (neon-green): 'KEEPITUP: A FREE APP TO ORGANIZE OR JOIN GAMES NEAR YOU.' Headline block (off-white on anthracite scrim, lower third): 'NOBODY ASKS YOUR STAR SIGN HERE. THEY ASK IF YOU'RE FREE SATURDAY AT 10.' Subhead: 'Less talking about yourself. More finding out for real.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p2-nobody-asks-star-sign.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-5319397-three-adults-jog.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "image",
+    "title": "Why You Like The Regulars Before You've Even Talked",
+    "trend": null,
+    "hook": "See the same people at the same Saturday game a few weeks running, and you start liking them more — before you've even talked.",
+    "distribution": "Owner shares the fact card natively into an 'adult friendship' community thread they're part of (e.g. a weekly make-friends-as-an-adult megathread). Niche tags: #MakeFriendsAsAnAdult #AdultFriendship #ShowUpWeekly.",
+    "body": {
+      "caption": "In 1968, psychologist Robert Zajonc ran a simple experiment: show people the same unfamiliar image a few times, and they start rating it more positively — no interaction needed, just repeated exposure. It's called the mere-exposure effect, and it's one of the most-replicated findings in psychology, confirmed again and again over 200+ follow-up studies since (Zajonc, 'Attitudinal Effects of Mere Exposure,' 1968).\n\nIt works on people too. Show up to the same small game a few weekends running, and the regulars start feeling familiar — friendly, even — before you've had a real conversation. KeepItUp is a free app to organize or join a small local game near you, the kind you can actually keep showing up to. Open worldwide — early access, link in bio.",
+      "hashtags": ["#ScienceOfMovement", "#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide", "#ShowUpWeekly"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Science-fact pillar post, poster-branded, real photo. Fact verified 2026-07-14 (Zajonc, 'Attitudinal Effects of Mere Exposure,' Journal of Personality and Social Psychology, 1968 — replicated in 200+ studies since; not a repeat of any prior science citation used in batches 06-13). Photo: pexels-19146676-group-track-run.jpg (a diverse group jogging together on a track). KeepItUp mark top-left. Eyebrow (neon-green): 'THE SCIENCE OF SHOWING UP.' Headline block (off-white on anthracite scrim): 'SEE THE SAME PEOPLE AT THE SAME SATURDAY GAME A FEW WEEKS RUNNING, AND YOU START LIKING THEM MORE — BEFORE YOU'VE EVEN TALKED.' Citation subtext: 'Zajonc, Journal of Personality and Social Psychology, 1968.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p3-why-you-like-the-regulars.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-19146676-group-track-run.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "instagram",
+    "format": "carousel",
+    "title": "The Manifesto, Vol. 4: The Best Places To Meet People Are Disappearing",
+    "trend": null,
+    "hook": "Sociologist Ray Oldenburg called them 'third places.' Fewer of them exist now than a generation ago.",
+    "distribution": "Owner shares the carousel natively into a 'third places'/local-community-interest thread they follow (e.g. an urbanism or Strong Towns-adjacent community). Niche tags: #ThirdPlaces #CommunitySpaces #LocalGathering.",
+    "body": {
+      "slides": [
+        "PART 4 OF THE MANIFESTO. THE PLACES WHERE STRANGERS USED TO BECOME FRIENDS ARE DISAPPEARING.",
+        "SOCIOLOGIST RAY OLDENBURG CALLED THEM 'THIRD PLACES' — NOT HOME, NOT WORK, JUST SOMEWHERE YOU COULD SHOW UP AND BE AMONG PEOPLE. CAFES. PARKS. LOCAL CLUBS. FEWER OF THEM EXIST NOW THAN A GENERATION AGO. Ray Oldenburg, The Great Good Place, 1989.",
+        "YOUR PHONE PROMISED TO REPLACE THEM. IT MOSTLY JUST GAVE YOU MORE FEEDS TO SCROLL ALONE.",
+        "SO WE BUILT A SMALL ONE. KEEPITUP — ORGANIZE OR JOIN GAMES NEAR YOU. OPEN WORLDWIDE, EARLY ACCESS, LINK IN BIO."
+      ],
+      "caption": "In 1989, sociologist Ray Oldenburg wrote a book about what he called 'third places' — not home, not work, just somewhere neutral and cheap where people showed up and community happened. Cafes. Parks. Local clubs. His argument, which still holds up: those places declined fast after WWII, and the decline tracks with rising isolation (Ray Oldenburg, The Great Good Place, 1989).\n\nYour phone promised to replace them. Mostly it just gave you more feeds to scroll alone. So we built a small third place of our own: KeepItUp is a free app to organize or join small local games near you, with real people, in person. Open worldwide — early access, link in bio.",
+      "hashtags": ["#TheManifesto", "#ThirdPlace", "#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "4-slide manifesto carousel, poster-branded throughout, mixing text-only cards (slides 1-2) with real-photo overlay slides (3-4). Concept verified 2026-07-14 via WebSearch (Ray Oldenburg, The Great Good Place, 1989 — 'third place' framework, presented as a sociological concept, not a scientific study; distinct from Vol.1's industry critique, Vol.2's paradox of choice, Vol.3's Harvard Study of Adult Development). Slide 3 photo: pexels-5319325-jog-bridge.jpg (people jogging together across a bridge). Slide 4 photo: pexels-33920366-flag-football.jpg (adults playing flag football at golden hour), KeepItUp mark + wordmark centered. Planned composites: b14p4-slide1.png through b14p4-slide4.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-5319325-jog-bridge.jpg",
+        "/brand/social/photos/pexels-33920366-flag-football.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "We Don't Do 'U Up?' Texts",
+    "trend": null,
+    "hook": "We don't do 'u up?' texts. We do 'game at 6, you in?' texts.",
+    "distribution": "Niche tags chosen for small pickup-sport communities: #PickupGameFriends #FiveASideFriends #SmallGroupSport.",
+    "body": {
+      "caption": "KeepItUp is a free app to organize or join a small local game or activity near you. We don't really do 'u up?' texts here. It's more like 'game at 6, you in?' — same energy, better odds you actually leave the house.\n\nYou're in an environment with people who enjoy doing the same activity, at an actual time, in an actual place. Open worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide", "#GameAt6", "#ActualPlans"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Funny identity-first poster, real photo, TikTok photo-mode. Photo: pexels-12169344-volleyball-laugh.jpg (two adult friends laughing mid beach-volleyball game). KeepItUp mark top-right, small. Eyebrow (neon-green): 'KEEPITUP: A FREE APP TO ORGANIZE OR JOIN GAMES NEAR YOU.' Headline block (off-white on anthracite scrim, lower third): 'WE DON'T DO \"U UP?\" TEXTS. WE DO \"GAME AT 6, YOU IN?\" TEXTS.' Subhead: 'Less scrolling, more actual plans.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p5-u-up-texts.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-12169344-volleyball-laugh.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "How KeepItUp Actually Works, In One Line",
+    "trend": null,
+    "hook": "Post what you're doing. People nearby ask to join. You pick who comes. That's the whole app.",
+    "distribution": "Owner posts this natively into a local sports-social Discord or Meetup organizer forum they're a member of. Niche tags: #MeetupOrganizers #SmallGroupPlans #LocalGameNight.",
+    "body": {
+      "caption": "Here's KeepItUp in one line: post what you're doing, people nearby ask to join, you pick who comes. That's it.\n\nA run, a five-a-side, a bike ride, a board-game night — whatever you're already planning. Post it, and instead of chasing a group chat for RSVPs, people who actually want to do that thing with you ask to join. It's free, and it's open worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#HowItWorks", "#MeetThroughMovement", "#OpenWorldwide", "#OrganizeOrJoin"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Plain product explainer, single-sentence poster mutation, real photo, TikTok photo-mode. Photo: pexels-5807872-cyclists-roadside-chat.jpg (three adult cyclists pausing to chat on a forest road). KeepItUp mark top-left, small. Headline block (upper two-thirds, off-white on anthracite scrim): 'POST WHAT YOU'RE DOING. PEOPLE NEARBY ASK TO JOIN. YOU PICK WHO COMES.' Subhead: 'That's the whole app.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p6-how-it-works-one-line.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-5807872-cyclists-roadside-chat.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "It's Free. That's It.",
+    "trend": null,
+    "hook": "It's free. No subscription. No hidden tier to 'actually get seen.'",
+    "distribution": "Niche tags: #NoSubscription #FreeLocalSport #PlayForFree.",
+    "body": {
+      "caption": "It's free. No subscription, no hidden tier you have to pay for to 'actually get seen.' Just a place to organize or join a small local game or activity near you.\n\nWe built it this way on purpose — the point was never to keep you paying to keep scrolling. It's to get you off your phone and onto a court, a track, or a trail with people. Open worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#FreeApp", "#MeetThroughMovement", "#OpenWorldwide", "#NoSubscription"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "Plain product explainer, short mutation of the batch-08 'free, here's what you get' post, real photo, TikTok photo-mode. Photo: pexels-8795115-badminton-sunset.jpg (two adults playing badminton at golden hour). KeepItUp mark top-right, small. Headline block (lower third, off-white on anthracite scrim): 'IT'S FREE. NO SUBSCRIPTION. NO HIDDEN TIER TO \"ACTUALLY GET SEEN.\"' Subhead: 'Just a place to organize or join games near you.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p7-its-free-thats-it.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-8795115-badminton-sunset.jpg"
+      ]
+    }
+  },
+  {
+    "platform": "tiktok",
+    "format": "image",
+    "title": "You Don't Need The Perfect Opening Line",
+    "trend": null,
+    "hook": "You don't need the perfect opening line. You need one game this week.",
+    "distribution": "Niche tags: #JustShowUp #OneGameThisWeek #SmallGroupPlans.",
+    "body": {
+      "caption": "You don't need the perfect opening line. You don't need a clever bio, or a good photo, or the right joke to break the ice. You need one game, this week, with people who actually show up.\n\nKeepItUp is a free app to organize or join a small local game or activity near you. Open worldwide — early access, link in bio.",
+      "hashtags": ["#KeepItUp", "#MeetThroughMovement", "#OpenWorldwide", "#JustShowUp", "#OneGameThisWeek"],
+      "cta": "Open worldwide — early access, link in bio.",
+      "imageConcept": "New-experiment hook style: plain, joke-free direct address (no punchline, no prompt) — the ~20% new-bet slot for batch 14, testing H-ANGLE-directaddress. Real photo, TikTok photo-mode. Photo: pexels-8381743-friends-beach-run.jpg (four adult friends laughing on a beach run). KeepItUp mark top-left, small. Headline block (lower third, off-white on anthracite scrim): 'YOU DON'T NEED THE PERFECT OPENING LINE. YOU NEED ONE GAME THIS WEEK.' Subhead: 'KeepItUp — a free app to organize or join games near you.' Footer band: wordmark + 'open worldwide, early access.' Planned composite: b14p8-perfect-opening-line.png (not yet baked).",
+      "assets": [
+        "/brand/social/photos/pexels-8381743-friends-beach-run.jpg"
+      ]
+    }
+  }
+]

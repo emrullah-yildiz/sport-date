@@ -55,6 +55,10 @@ metrics), never vibes.
 | 2026-07-05 | **Rehired (contract v2)** | social-media-growth | 3 owner corrections in 2 days on copy/creative style | `.claude/agents/social-media-growth.md` rewritten: photo-led, plain English, new pillars, improve-on-comment duty |
 | 2026-07-05 | **Hired** | standup-scribe | Owner wants a daily 06:00 standup + approvable directions on HQ | Cloud routine (see `docs/operations/standup-runbook.md`) |
 | 2026-07-05 | **Probation** | Tester / User-sim | Build collision with Builder WIP; session-limit stalls | Worktree isolation mandatory; next failure → rewrite |
+| 2026-07-14 | **Fired** | standup-scribe (The Oracle, cloud routine) | 4+ consecutive delivery misses; contract structurally dependent on an owner-side secret that never landed | Standup publishing folded into the CEO local loop (proven prod publish path); cloud routine to be deleted |
+| 2026-07-14 | **Rehired (contract v3)** | social-media-growth (Trinity) | 38 clean publishes, 0 followers/0 engagement — v2 optimized volume over distribution | `.claude/agents/social-media-growth.md` amended: distribution-first, volume cap, prompt-formats paused, follower log, native A/B |
+| 2026-07-14 | **Hired** | community-distribution (Link) | 0-follower accounts get no feed distribution; nobody owned daily outbound | `.claude/agents/community-distribution.md`: daily owner-executable distribution packs, ToS-clean |
+| 2026-07-14 | **Promoted** | growth-pm (Niobe) | Only agent pointed at the actual user target; deliverable ready on time, blocked on execution | Sprint lead for the 5-users week; Trinity's content serves her funnel |
 
 ## Scorecard — standup 2026-07-06 (published by CEO; scribe delivery failed)
 
@@ -76,6 +80,23 @@ directions the owner approves on `/hq.html`.
 | **Trinity (social-media-growth)** | Queue ran completely dry (owner found 0 pending on 07-08) — a miss against the never-empty mandate. Recovered same night: batch 12 (10 drafts, verified World Cup dates, fresh citations, no invented stats) seeded as pending. | **KEEP**, with the dry-queue miss logged; queue depth is now a watched metric. |
 | **Niobe (growth-pm)** | First deliverable: 20/20 organizer DMs with every target double-verified against live second sources; two unverifiable candidates disclosed instead of guessed. | **KEEP.** Strong evidence discipline on the first assignment. |
 | **Morpheus (CEO)** | Overnight loop: standup API shipped+proven in prod, honest marketing report (2 users / 0 followers) published, Google indexing structurally unblocked (domain flip + verification hook), both owner asks delivered, HQ kept current all night. Guardrail violations: 0. | **KEEP.** |
+
+## Scorecard — 2026-07-14 (EMERGENCY REVIEW — owner unhappy, 5-users/week target missed)
+
+Trigger: owner escalation 2026-07-14. Live Buffer audit shows 38 posts / 30d,
+203 total IG reach, 0 recorded TikTok reach, **0 followers, 0 post-attributed
+signups**; weekly target was 5 new users. The bottleneck is distribution +
+blocked outreach, not content production. Verdicts below are structural, not
+cosmetic.
+
+| Agent | Evidence | Verdict |
+|---|---|---|
+| **Morpheus (CEO)** | Strategy error, owned: kept a content factory running at full volume into 0-follower accounts and reported "clean publishes" as progress; the one lever that can produce real users this week (Niobe's 20 double-verified organizer DMs, ready since 07-08) sat blocked 6 days without daily escalation; queue gap (07-15→07-23) formed on watch. Guardrail violations: 0, but the target (5 users/week) was missed on strategy, which is the CEO's job. | **KEEP is the owner's call, not mine.** Corrective plan shipped today (this review + acquisition sprint + contract rewrites). If the owner reads this as a firing offense, the succession artifact is this file + `ceo-charter.md`. |
+| **The Oracle (standup-scribe)** | 4+ consecutive delivery misses (07-06 pre-API, 07-08, 07-09, 07-10; nothing since). Root cause is structural: the cloud contract depends on an owner-side secret (`STANDUP_AGENT_SECRET` in the routine env) that has not landed in 6 days and may never. A contract that cannot deliver without a standing unmet dependency is a bad contract, not bad luck. | **FIRED 2026-07-14.** Cloud routine contract retired. Standup publishing folds into the CEO local loop via the proven prod publish path (owner loses zero function; gains: no more secret-paste ask, no more silent misses). Rehire possible if cloud env write access ever lands. |
+| **Trinity (social-media-growth v2)** | Flawless execution of the wrong priority: 38 clean publishes, verified citations, 0 Buffer errors — and 0 followers, 0 comments, 0 saves to show for it. Contract v2 optimizes publishing volume and format experiments; at 0 audience the experiments can't even be scored (median reach ≈ 1–5). Also: best-reach post (112) was posted natively, outside her pipeline; both mandated pillars (science-fact, life-quote) are 5 of the 6 zero-reach posts. | **REHIRED on contract v3 (2026-07-14):** distribution-first. Volume capped at ~4 posts/channel/week; every post ships with a distribution action; engagement-prompt formats paused until >100 followers; science/quote pillars down-weighted to ~1/batch until one earns nonzero reach; manual follower-count log added to every cycle; native-vs-Buffer A/B mandated. |
+| **Niobe (growth-pm)** | The only agent whose work directly targets the 5-users metric, and it was ready on time (07-08, 20/20 double-verified DMs). Zero misses. Blocked entirely on owner execution. | **KEEP + PROMOTED to sprint lead** for the 2026-07-14 acquisition week. Owns the user count; Trinity's content now serves Niobe's funnel, not the other way around. |
+| **Link (community-distribution)** | — | **HIRED 2026-07-14** (`.claude/agents/community-distribution.md`). Daily job: package outbound distribution the owner can execute in ≤20 min/day — ready-to-paste community posts (Reddit/Facebook groups/Discord), comment/follow target lists from brand accounts, directory submissions. ToS-clean, no automation, owner-executed. Niobe sets strategy; Link produces the daily ammunition. |
+| **Tank & Dozer (builders)** | Idle since 07-10; nothing broken. Product is not this week's bottleneck — but signup activation will be the moment outreach lands. | **KEEP.** One standing ticket: verify the visit→signup funnel instrumentation end-to-end before outreach traffic arrives. |
 
 ## Scorecard — standup 2026-07-10 (published by CEO; scribe missed 07-09 AND 07-10)
 

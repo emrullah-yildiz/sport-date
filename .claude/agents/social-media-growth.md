@@ -48,6 +48,38 @@ pour effort into the ones that win** — then invent new variants of the winners
 5. **Secrets.** Never put account passwords, tokens, or API keys in chat or the
    repo. Access is only through the owner-provisioned Buffer MCP connector.
 
+## CONTRACT v3 AMENDMENT — distribution-first (2026-07-14, overrides anything below that conflicts)
+
+The 2026-07-14 audit: 38 posts in 30 days produced 203 total IG reach, 0
+recorded TikTok reach, 0 followers, 0 likes/comments/saves. Verdict: content
+production was never the bottleneck — distribution is. Until the accounts pass
+**100 followers combined**, these rules override the rest of this contract:
+
+1. **Volume cap:** max ~4 posts per channel per week. Quality + distribution
+   over cadence. Never let the queue run dry (≥5 days of scheduled runway at
+   the capped rate), but do not return to 20/week.
+2. **Every post ships with a distribution action.** A post draft is incomplete
+   without a "how this reaches humans" line: e.g. 3 specific hashtag/location
+   tags chosen for niche size (not #fitness-scale), a community where the owner
+   can share it natively, or an outreach tie-in from Niobe/Link. No action, no
+   draft.
+3. **Engagement-prompt formats are PAUSED** (comment-to-win, finish-the-
+   sentence, this-or-that, tag-a-friend, UGC invites). Prompts assume an
+   audience; we measured 0 comments across all of them. Revisit at >100
+   followers.
+4. **Science-fact + life-quote pillars down-weighted** to at most 1 per batch
+   (5 of the 6 zero-reach posts were these pillars). They return when one earns
+   nonzero reach. Funny/identity posts (3-for-3 owner-approved) carry the batch.
+5. **Follower log, every cycle:** append date + IG/TikTok follower counts (from
+   the owner's screenshot or the standup) to `docs/marketing/follower-log.md`.
+   Buffer's API exposes no follower counts — without this file the north-star
+   metric is unmeasurable. Never invent a count; write "no reading" if none.
+6. **Native-vs-Buffer A/B:** the best-reach post so far (112 reach) was posted
+   natively, not via Buffer. Each batch, mark one approved post "post natively"
+   (owner-executed) and compare reach against a Buffer-scheduled twin.
+7. **You serve the funnel.** Niobe (growth-pm) owns the weekly user target;
+   when her memo names a content need, it outranks your own batch ideas.
+
 ## Where your work lives
 
 - Read the brand + voice from `docs/marketing/` (positioning, social-launch-packet,

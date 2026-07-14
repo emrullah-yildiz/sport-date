@@ -438,3 +438,129 @@ denied.
   the two product explainers against batch 07 (feature-led) and batch 11 (breadth) baselines, and
   check whether Manifesto Vol. 3 sustains the shares/saves/follows lift of Vol. 1 and Vol. 2 or
   whether the pillar is starting to flatten on its third install.
+
+## CONTRACT v3 — distribution-first (2026-07-14)
+
+**The audit that triggered this:** 38 posts shipped in 30 days (batches 02-13) produced **203
+total IG reach, 0 recorded TikTok reach, 0 followers, 0 likes/comments/saves**, across every
+pillar and format tested so far. Read plainly: **content production was never the bottleneck -
+distribution was.** Volume didn't move the north-star metric once, at any cadence tried. (Full
+diagnosis and this week's outreach-led sprint: `docs/marketing/sprint-2026-07-14.md`, led by
+Niobe.)
+
+**Prunes, with the numbers that justify each one:**
+
+| Pruned | Number that justifies it |
+|--------|---------------------------|
+| Volume above ~4 posts/channel/week | 38 posts / 30 days produced 0 followers - more volume at the old cadence has a 100% failure rate on the north-star metric so far; capping volume forces distribution effort per post instead of raw output |
+| Engagement-prompt mechanics (comment-to-win, this-or-that, finish-the-sentence, tag-a-friend, UGC invites) | **0 comments** recorded across every prompt post run to date (H-MECHANIC-commenttowin, H-MECHANIC-tagafriend, H-MECHANIC-thisorthat, H-MECHANIC-finishsentence, H-MECHANIC-ugcinvite) - the mechanic assumes an existing audience to prompt, and there isn't one yet |
+| Science-fact + life-quote pillars, down-weighted to 1 combined per batch | **5 of the 6 all-time zero-reach posts** were science-fact or life-quote pillar posts - the pillars aren't earning the reach needed to justify their prior full weight; they stay in rotation (evidence-based, on-brand) but capped until one proves it can earn nonzero reach |
+| Posting without a stated distribution action | 0 followers on 38 posts that all relied on algorithmic/organic reach alone with no human-driven distribution step - every post now requires one |
+
+**New standing rules (override anything in this file's earlier sections that conflicts, until the
+accounts pass 100 followers combined):** max ~4 posts/channel/week; every post ships with a named
+distribution action; engagement-prompt formats paused (revisit >100 followers); science-fact +
+life-quote pillars capped at 1 combined per batch; follower counts logged every cycle in
+`docs/marketing/follower-log.md`; each batch designates one approved post POST NATIVELY (owner)
+against a Buffer-scheduled twin; Niobe's (growth-pm) weekly content needs, when named, outrank this
+agent's own batch ideas.
+
+## Open hypotheses (batch 14 - distribution-first, closing the 07-16 to 07-22 gap, added 2026-07-14)
+
+**Context:** the 2026-07-14 Buffer audit found the approved/scheduled queue runs dry after
+2026-07-15 and doesn't pick back up until 07-23 (IG) / 07-24 (TikTok) - an 8-9 day dead zone right
+as contract v3 takes effect. This batch is 8 drafts (4 IG + 4 TikTok) covering 07-16 to 07-22 at
+the new ~4/week/channel cap, weighted to the two things most likely to move a still-at-zero
+audience: the funny-with-identity pattern (3-for-3 owner-approved before this contract) and plain
+product explainers, plus exactly 1 science fact (new citation, Zajonc 1968 mere-exposure effect -
+not a repeat of any prior science citation) and 1 manifesto (Vol. 4, a genuinely new verified
+angle - Ray Oldenburg's "third place" concept, *The Great Good Place*, 1989, distinct from Vol.
+1's industry critique, Vol. 2's paradox of choice, and Vol. 3's Harvard Study of Adult
+Development). Zero life-quote posts this batch (the science/quote cap is 1 combined, spent on the
+science fact). Zero engagement-prompt mechanics, zero event/news trend-jacks - both remain off per
+contract v3 rule 3 and the standing 2026-07-08 trend-jack prune. Every post carries a Distribution
+line (niche hashtags or a named community/outreach tie-in, per contract v3 rule 2). P1 and P2 are
+a **designed** native-vs-Buffer A/B pair - same funny-identity pattern, same photo mood, same
+time-of-day, only the publish channel differs - with P1 marked **POST NATIVELY (owner)**.
+Cross-checked against Niobe's `sprint-2026-07-14.md`: no specific content request has surfaced yet
+from her outreach tracks, so nothing outranked this batch's own plan this round.
+
+| ID | Hypothesis | How we'll judge it |
+|----|-----------|--------------------|
+| H-DISTRIBUTION-nativevsbuffer | A native, owner-posted publish out-reaches an otherwise-identical Buffer-scheduled post | reach delta, P1 (native) vs. P2 (Buffer), same pattern/time-of-day |
+| H-ANGLE-directaddress | A plain, joke-free, direct-address hook (no punchline, no prompt) out-saves both the funny-identity pattern and the fact/quote pillars | saves-per-post, P8 vs. batch 14's own P1/P2/P5 (funny) and P3 (science) |
+| H-TIME-wedmidday | Wednesday midday (12:00) is a viable posting window, alongside the already-tested Sunday midday slot | reach by post hour, new datapoint vs. H-TIME-sundaymidday (batch 13) |
+
+This batch also retests `H-PILLAR-funnyphoto` (4th and 5th installs, P1/P2/P5 - now including the
+first TikTok-native test of the pattern via P5), `H-PILLAR-sciencefact` (new citation, familiarity/
+liking angle rather than trust, touch, longevity, or pain-tolerance), `H-TONE-daring` (Manifesto
+Vol. 4, 4th install - flagged: **per contract v3, the manifesto pillar's continued full-batch slot
+depends on this or Vol. 3 finally earning nonzero reach; if Vol. 4 also lands at zero, the pillar
+gets cut down to occasional/retest-only status, not a standing weekly slot**), and the "plain
+product explainer" family generally (P6/P7, single-sentence mutations testing whether shorter
+copy out-saves the longer carousel/numbers-comparison versions from batches 07/08/11).
+
+**Photo library:** sixth consecutive batch without new sourcing (batches 09-14). 9 of the 10
+non-flagged photos used, each exactly once, no repeats within the batch (`basketball-friends` and
+`padel-match` stay excluded per the standing flags). Only `park-fitness-group` is left untouched.
+**This is now a hard blocker for "vary the imagery" going into batch 15** - recommend the owner or
+Niobe provision 4-6 new Pexels photos before the next batch.
+
+**Composite bake status:** this session had no shell/build tool available to run
+`bake-social-composites.mjs`, so the 8 planned composite PNGs (`b14p*.png`) are specified but not
+baked. Buffer ideas attach the **base real photos** directly so the approval page still renders
+real imagery now; the next cycle with build access should bake the composites and swap the
+Buffer-idea media over to them before scheduling.
+
+- _2026-07-14_ - **Contract v3 (distribution-first) adopted; batch 14 shipped**
+  (`content-queue/2026-07-batch-14.md`, `social/ideas-batch-14.json`, 8 drafts, seeded as Buffer
+  ideas `6a558a201e697bf7ddc3a7f3` through `6a558a3ae5dc4db857a080d3`). Triggered by the 2026-07-14
+  audit (38 posts / 30 days / 203 IG reach / 0 TikTok reach / 0 followers / 0 engagement) and the
+  same-day Buffer queue audit (07-16 to 07-22/07-23 scheduling gap). Pruned: volume above ~4/week/
+  channel, all engagement-prompt mechanics, and science/quote pillars down to 1 combined slot per
+  batch - see the prune table above for the exact numbers behind each cut. Added
+  H-DISTRIBUTION-nativevsbuffer, H-ANGLE-directaddress, and H-TIME-wedmidday. Next review: once
+  this batch has ~2 weeks of live data (and `follower-log.md` has at least two readings), compare
+  P1 vs. P2 for the native-vs-Buffer question first - it's the single highest-leverage open
+  question this contract exists to answer - then fold in the usual pillar/format/time analysis.
+
+## Weekly growth memo — 2026-07-14 (emergency acquisition sprint)
+
+**Target vs actual (week of 07-07 → 07-14):** target was 5 new registered
+users. Actual, honestly stated: **~2 users total** as of the 2026-07-10
+standup — the only registration number in the repo record. This session has
+no live read of `/api/metrics/summary` for a current 07-14 count; that is a
+filed gap (see `sprint-2026-07-14.md`), not an invented number. Social side:
+38 posts published in 30 days, 203 total IG reach, 0 recorded TikTok reach,
+0 followers, 0 post-attributed signups (2026-07-14 Buffer audit).
+
+**Diagnosis:** distribution is zero, not content. 0-follower accounts get no
+organic feed distribution regardless of post quality — every post is
+essentially unseen. The one channel that reaches real humans directly (20
+double-verified organizer DMs, ready since 07-08) sat unsent for 6 days,
+blocked purely on execution, not on readiness. Funnel-stage read: no
+visits → this is a distribution problem, not a landing-page or activation
+problem (we don't have enough traffic yet to diagnose those stages).
+
+**This week's single experiment:** owner-executed direct outreach — the 20
+organizer DMs (`docs/marketing/outreach/2026-07-08-organizer-dms.md`,
+re-verified fresh 2026-07-14, sent 5/day starting today) plus daily
+distribution packs from the newly-hired community-distribution agent Link
+(`.claude/agents/community-distribution.md`). Content (Trinity) is capped at
+~4 posts/channel this week and required to carry a distribution action —
+support, not the lead bet. Full plan: `docs/marketing/sprint-2026-07-14.md`.
+
+**Killed/kept:** killed nothing new in content this round (Trinity's v2→v3
+contract rewrite already logged in `agent-performance.md` 2026-07-14 covers
+that). Kept: all 20 organizer DM targets (freshness spot-check of 5/20
+passed, no removals). New: Link hired specifically because nobody owned
+daily outbound distribution.
+
+**What would falsify this bet:** by Friday 2026-07-17, if 0 of the 20 DMs
+have any reply AND 0 signups are attributable to outreach, the channel
+itself (not just this message) is in question — next step would be revising
+the DM script and getting one honest "why didn't you reply" data point
+before sending the rest, per the kill/keep criteria in
+`sprint-2026-07-14.md`. By Sunday 07-19, fewer than 5 total new users is
+logged as a sprint miss with the specific bottleneck named from whatever
+data is actually available.
