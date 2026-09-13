@@ -1,5 +1,11 @@
 # Agent state
 
+## Approved release live and recurring worker active - 2026-09-14
+
+Exact reviewed release is live at keepitup.social: commit d7064b7, deployment dpl_EjVfwK7QgEFbmeuAyL3RXxEVkzTc. Candidate passed 1,419 tests, workspace typechecks, lint and remote build. Landing, HQ, host-pilot packet, health and database readiness passed. See release-2026-09-14.md for scope and evidence: the attempted build override did not suppress the existing migration hook; zero new migrations applied. Later isolated app changes remain undeployed.
+
+Recurring worker restarted at 2026-09-13T23:02:46Z with a fresh heartbeat at 23:06:37Z; current cycle completion remains pending. Decision-email changes committed as 6c9089e passed 16 notification/reporting tests, 37 runtime checks and web typecheck. Both interactive sends have confirmed private receipts. Local Gmail OAuth setup remains the current HQ access card; unattended email is not active. Owner executes the approved host inquiries using the now-public packet.
+
 ## Decision email authorization and approved work - 2026-09-14
 
 Owner requested emails whenever a business decision is needed and selected a connected sender. Recipient/sender are stored only in ignored configuration. Two actual Gmail sends were confirmed: the initial two-decision digest and a subsequent narrow local-mail access setup request. Private receipts prevent duplicates. The live HQ decisions now approve the host pilot and exact reviewed framework/HQ release; a dedicated release worktree is being verified and deployed within that scope. Host outreach remains assigned to the owner by the approved card.
