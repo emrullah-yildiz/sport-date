@@ -3,7 +3,7 @@
 import { validateRegistration } from "@sport-date/domain";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
-import { type ComponentType, useRef, useState } from "react";
+import { type ComponentType, useEffect, useRef, useState } from "react";
 
 import { BRAND_NAME } from "@/lib/brand";
 import { SIGN_UP_STEP_ORDER, signUpStepError } from "@/lib/sign-up-steps";
@@ -41,6 +41,19 @@ const stepComponents: Record<(typeof SIGN_UP_STEP_ORDER)[number], ComponentType>
 };
 const steps = SIGN_UP_STEP_ORDER.map((id) => stepComponents[id]);
 
+function SignUpQuestion({ component: Question, focusHeading }: { component: ComponentType; focusHeading: boolean }) {
+  const container = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!focusHeading) return;
+    const heading = container.current?.querySelector("h1");
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus();
+    }
+  }, [focusHeading]);
+  return <div ref={container}><Question /></div>;
+}
+
 export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliveryLive?: boolean } = {}) {
   const step = useSignUpStore((state) => state.step);
   const setStep = useSignUpStore((state) => state.setStep);
@@ -64,6 +77,7 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
   // first successful "Next" — the moment someone actually begins the wizard.
   // Fire-and-forget; never affects the step flow.
   const startedTracked = useRef(false);
+  const [navigated, setNavigated] = useState(false);
 
   const handleNext = () => {
     const message = signUpStepError(step, useSignUpStore.getState());
@@ -73,11 +87,13 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
       trackClick("signup_started");
     }
     setError("");
+    setNavigated(true);
     if (step < steps.length) setStep(step + 1);
   };
 
   const handlePrev = () => {
     setError("");
+    setNavigated(true);
     if (step > 1) setStep(step - 1);
   };
 
@@ -98,6 +114,7 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     setError("");
     const state = useSignUpStore.getState();
     const validation = validateRegistration(state);
@@ -157,26 +174,33 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
           <div className="progress-bar"><div style={{ width: `${(step / steps.length) * 100}%` }} /></div>
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={snapTransition}>
-            <CurrentStep />
-          </motion.div>
-        </AnimatePresence>
+        <form noValidate onSubmit={(event) => {
+          event.preventDefault();
+          if (isSubmitting) return;
+          if (step < steps.length) handleNext();
+          else void handleSubmit();
+        }}>
+          <AnimatePresence mode="wait">
+            <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={snapTransition}>
+              <SignUpQuestion component={CurrentStep} focusHeading={navigated} />
+            </motion.div>
+          </AnimatePresence>
 
-        {error ? <div className="error-message" role="alert">{error}</div> : null}
+          {error ? <div className="error-message" role="alert">{error}</div> : null}
 
-        <div className={`signup-actions${step === 1 ? " single" : ""}`}>
-          {step > 1 ? (
-            <button className="btn-secondary" type="button" onClick={handlePrev}>Back</button>
-          ) : null}
-          {step < steps.length ? (
-            <button className="btn-primary" type="button" onClick={handleNext}>Next</button>
-          ) : (
-            <button className="btn-primary" type="button" onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? "Creating account…" : "Create account"}
-            </button>
-          )}
-        </div>
+          <div className={`signup-actions${step === 1 ? " single" : ""}`}>
+            {step > 1 ? (
+              <button className="btn-secondary" type="button" onClick={handlePrev} disabled={isSubmitting}>Back</button>
+            ) : null}
+            {step < steps.length ? (
+              <button className="btn-primary" type="submit">Next</button>
+            ) : (
+              <button className="btn-primary" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Creating account…" : "Create account"}
+              </button>
+            )}
+          </div>
+        </form>
 
         {/* Reciprocal path back to sign-in — mirrors the login form's
             "New here? Create a profile" cross-link so a returning member who

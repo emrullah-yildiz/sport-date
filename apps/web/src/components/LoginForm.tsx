@@ -81,7 +81,7 @@ export default function LoginForm() {
       <div>
         <p className="eyebrow">Welcome back</p>
         <h1>Pick up where the movement left you.</h1>
-        <p className="auth-intro">Sign in to see your private profile. Events arrive in the next product slice.</p>
+        <p className="auth-intro">Sign in to manage your profile and find your next sports session.</p>
       </div>
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">
