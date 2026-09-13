@@ -16,6 +16,10 @@ Assert-Equal (Get-ResultDisposition $ok 0 $true) 'fault' 'Uncommitted changes'
 Assert-Equal (Get-ResultDisposition $null 0 $false) 'fault' 'Missing result'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 0 $false) 'fault' 'Unpublished report'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 0 $false $true) 'completed' 'Verified local fallback permits product work'
+Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 0 $false $false $true) 'completed' 'Verified superseded report permits cycle success without claiming mirror or publication'
+Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 0 $true $false $true) 'fault' 'Superseded report cannot bypass dirty worktree'
+Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 1 $false $false $true) 'fault' 'Superseded report cannot bypass failed cycle'
+Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='owner_blocked';hqPublished=$false}) 0 $false $false $true) 'owner_blocked' 'Superseded report preserves owner hold'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='invalid';hqPublished=$true}) 0 $false) 'fault' 'Invalid result'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='owner_blocked';hqPublished=$true}) 0 $false) 'owner_blocked' 'Owner hold'
 $runnerSource=Get-Content -Raw (Join-Path $PSScriptRoot 'runner.ps1')
@@ -80,7 +84,7 @@ try {
         [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens,[ref]$parseErrors) | Out-Null
         Assert-Equal $parseErrors.Count 0 "Syntax $script"
     }
-    Write-Output '37 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic rename and concurrent-reader recovery, bounded persistent-lock failure, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
+    Write-Output '41 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/superseded-report/dirty-tree guards, atomic rename and concurrent-reader recovery, bounded persistent-lock failure, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
 } finally {
     # Delete only the explicit test files in the verified unique test directory; never recursive cleanup.
     foreach ($file in @('status.json','lock','reader-ready')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }

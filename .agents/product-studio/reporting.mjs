@@ -68,7 +68,12 @@ export function mirrorReport(worktree, sourceRoot, startedAt) {
   if (!validReport(committedReport,startedAt)) throw new Error('Malformed committed report');
   if (existsSync(target)) {
     const previous=JSON.parse(readFileSync(target,'utf8').replace(/^\uFEFF/,''));
-    if (Date.parse(previous.generatedAt) > Date.parse(report.generatedAt)) throw new Error('Refusing to replace a newer HQ report');
+    if (Date.parse(previous.generatedAt) > Date.parse(report.generatedAt)) {
+      if (!validReport(previous,startedAt)) throw new Error('Malformed newer HQ report');
+      // A coordinator can publish a newer report while verification runs. Retain it
+      // without treating this verified committed cycle as a runtime failure.
+      return {mirrored:false, committedReportVerified:true, skipped:'newer-source-report', generatedAt:report.generatedAt, sourceGeneratedAt:previous.generatedAt};
+    }
   }
   const temp=target+'.studio-'+process.pid+'.tmp';
   try { writeFileSync(temp,committed,{flag:'wx'}); renameSync(temp,target); }

@@ -7,11 +7,11 @@ function Get-CycleDisposition($Previous, [bool]$ResumeRequested) {
     return 'run'
 }
 
-function Get-ResultDisposition($Result, [int]$ExitCode, [bool]$Dirty, [bool]$LocalReportVerified = $false) {
+function Get-ResultDisposition($Result, [int]$ExitCode, [bool]$Dirty, [bool]$LocalReportVerified = $false, [bool]$ReportSuperseded = $false) {
     if ($ExitCode -ne 0) { return 'fault' }
     if ($Dirty) { return 'fault' }
     if (-not $Result -or $Result.status -notin @('completed', 'owner_blocked', 'fault')) { return 'fault' }
-    if ($Result.hqPublished -ne $true -and -not $LocalReportVerified) { return 'fault' }
+    if ($Result.hqPublished -ne $true -and -not $LocalReportVerified -and -not $ReportSuperseded) { return 'fault' }
     return $Result.status
 }
 
@@ -188,11 +188,14 @@ try {
     $dirty = & git -C $worktree status --porcelain
     $gitFailed=$LASTEXITCODE -ne 0
     $localReportVerified=$false
+    $reportSuperseded=$false
     if ($result -and $result.localReportSaved -eq $true -and $result.status -in @('completed','owner_blocked') -and $exitCode -eq 0 -and -not $dirty -and -not $gitFailed) {
         # Sole main-checkout write exception: exact committed, schema-validated, fresh HQ report.
         $mirroredRaw=& node (Join-Path $PSScriptRoot 'reporting.mjs') mirror $worktree $config.sourceRoot $state.startedAt | Out-String
         if ($LASTEXITCODE -ne 0) { throw 'Local HQ mirror refused report' }
-        $localReportVerified=($mirroredRaw | ConvertFrom-Json).mirrored -eq $true
+        $mirrorResult=$mirroredRaw | ConvertFrom-Json
+        $localReportVerified=$mirrorResult.mirrored -eq $true
+        $reportSuperseded=($mirrorResult.mirrored -eq $false -and $mirrorResult.committedReportVerified -eq $true -and $mirrorResult.skipped -eq 'newer-source-report')
     }
     $liveVerified=$false
     if ($result -and $result.hqPublished -eq $true -and $exitCode -eq 0 -and -not $dirty -and -not $gitFailed) {
@@ -200,13 +203,15 @@ try {
         if ($LASTEXITCODE -eq 0) { $liveVerified=($liveRaw | ConvertFrom-Json).verified -eq $true }
     }
     if ($result) { $result.hqPublished=$liveVerified }
-    $state.state=Get-ResultDisposition $result $exitCode ([bool]$dirty -or $gitFailed) $localReportVerified
+    $state.state=Get-ResultDisposition $result $exitCode ([bool]$dirty -or $gitFailed) $localReportVerified $reportSuperseded
     $state.note=if ($state.state -eq 'fault') { 'Cycle or verification/publication failed; inspect retained local run logs and worktree before explicit resume' } else { $result.summary }
     if ($localReportVerified -and -not $liveVerified) { $state.note += ' HQ report is local-only; independent live readback was not verified.' }
+    if ($reportSuperseded) { $state.note += ' Committed cycle report verified; a newer source HQ report was preserved. This cycle report was not mirrored.' }
     $state['completedAt']=[DateTime]::UtcNow.ToString('o')
     $state['exitCode']=$exitCode
     $state['hqPublished']=$liveVerified
     $state['localReportVerified']=$localReportVerified
+    $state['reportSuperseded']=$reportSuperseded
     $state['decisionEmail']=Get-DecisionEmailStatus $config
     Write-JsonAtomic $statusPath $state
 } catch {

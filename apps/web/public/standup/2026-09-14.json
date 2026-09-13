@@ -1,46 +1,36 @@
 {
   "day": "2026-09-14",
-  "generatedAt": "2026-09-13T23:07:24.234Z",
-  "headline": "Approved release live; autonomous work continues with decision emails tracked.",
+  "generatedAt": "2026-09-13T23:37:05.389Z",
+  "headline": "Signup keyboard flow improved; next iteration tackles chat safety reporting.",
   "summary": [
-    "Owner decision emails supplement HQ. Two Gmail sends are confirmed: initial decisions and the local sender setup request. Host pilot and exact release approvals were received. Release is now live; host outreach remains assigned to the owner within the approved five-organization scope.",
-    "Live 30-day metrics showed 11 discovery events, one signup start and one signup completion before release. These anonymous counters are not verified people or conversion rates; staff/test exclusions remain unknown. Local database account rows are not production traction. Actual attendance, returning customers and settled revenue remain unknown.",
-    "Initial planning scenarios are preserved for comparison: 25 new registrations by September 21; 200 base / 1,000 stretch by October 14. These are revisable assumptions, not fixed commitments or permission to buy empty growth. The dates become evidence-review checkpoints. No measured channel or verified production baseline supports a growth forecast yet. Set acquisition scale from real host capacity and compatible places; report missed assumptions and revisions openly.",
-    "Current business hypothesis: help a small real group attend something worthwhile, choose to return, and eventually make a voluntary settled payment for an implemented optional benefit at an owner-approved price. One payment would be an early signal, not proof of profitability. Existing Plus is a candidate offer that can be changed or rejected. Purchase intent is not revenue; no spending, pricing or payment activation is newly authorized.",
-    "Approved release d7064b7 is live at keepitup.social: Vercel dpl_EjVfwK7QgEFbmeuAyL3RXxEVkzTc is READY. Scope is d58c0e5 plus approved patch files from 98ac494. Later isolated joining/discovery changes were excluded. Landing, HQ, host-pilot packet, health and database readiness checks passed.",
-    "Completed a bounded dependency exposure review instead of assuming the 26 remaining npm findings require another broad upgrade. Fresh registry audit: 0 critical, 11 high, 15 moderate package findings. Tool returned exit 1 for findings, not a network failure. Image-size/Metro, PostCSS, js-yaml, fast-uri, xmldom and Vitest map to build/test tooling in reviewed paths. Undici 6.27.0 is runtime-reachable through Vercel Blob photo storage. Maintainer guidance and installed call sites did not establish an applicable exploit path: Blob uses fetch, not the advisory-specific duck-typed dispatcher path; no retry interceptor/cookie helper use found. This is bounded triage, not proof of safety. No dependency or product changes made.",
-    "Changed assumption: continuing small local improvements is no longer the best next use of a cycle after the concrete join/discovery repairs. No fresh customer evidence or additional verified core-flow blocker emerged. The host inquiry/session checklist is already prepared. Further interface work, repeated research or broad build-tool upgrades would not resolve the dominant commercial uncertainty. Defer speculative work; retain remaining dependency findings for evidence-triggered review.",
-    "Next evidence: owner executes the exact host-pilot card after approval, producing a real host commitment with format/date/capacity/responsibility, then worthwhile attendance and return. Establish deployment identity plus staff/test exclusions before calling aggregate account rows traction. An unsent inquiry is blocked execution, not channel failure. Preserve September 21/October 14 checkpoints and prior scenarios; no missed target is reset. Optional paid value follows actual usage and separate owner-approved pricing/payment scope.",
-    "Release passed 1,419 tests, workspace typechecks, lint and remote Next.js 16.3.5 build. Existing migration hook ran despite requested override; zero new migrations applied. Notification/reporting tests (16), runtime checks (37) and web typecheck passed. Cron, Redis and unattended email remain unverified. Worker started at 23:02:46Z with fresh heartbeat; completion is not yet claimed.",
-    "Interactive Gmail decision alerts work and both sends have private receipts. Recurring adapter and duplicate suppression are installed, but local OAuth access is missing; the setup card was also emailed. Enabled local product schedule continues while access is pending. Computer must remain awake, logged in and connected with valid existing ChatGPT access."
+    "Owner renewed autonomous product, design, UX and UI iteration. Business decisions block only dependent workstreams. The team now has a concrete code-reviewed experience queue and will continue independent improvements around host, email and release decisions.",
+    "Completed locally in main commit 3679cbf: signup focuses each new question, Enter advances text steps through existing validation, Back preserves answers, and submission locks navigation while retaining recovery after failure. Login copy now describes available sports sessions. This is an accessibility and comprehension repair, not a measured conversion claim.",
+    "Verification passed: 1,190 web tests, 32 focused tests, web typecheck, lint with zero errors and 11 existing warnings, and production build. A ten-step 390px browser walkthrough passed under normal and reduced motion, covering age/password/terms gates, custom sport entry, optional steps and failed submission. All browser API mutations were intercepted; no accounts or emails were created.",
+    "Worker recovery: cycle 665ef2b completed full checks and committed, then stopped because its older report could not replace a newer coordinator report. The repair validates both artifacts, preserves the newer report, and records superseded status without falsely claiming mirroring or live publication. Sixteen reporting/notification tests and 41 runtime checks pass. Restart is being performed after this verified handoff.",
+    "Next independent work: repair chat safety reporting. The chat dialog accepts 2,000 characters before prepending message evidence, exceeding the server combined limit; report-plus-block also omits the shared-event warning and optional safety exit used elsewhere. Reproduce with mocks and reuse existing safety behavior without weakening authorization or silently discarding evidence.",
+    "Following iterations: host edit recovery and timezone preservation, then stale-connection and failed-delete feedback in event chat. These are code-review findings with concrete acceptance criteria, not completed fixes or human research. See the maintained experience queue in the repository.",
+    "Production remains the approved release d7064b7 on deployment dpl_EjVfwK7QgEFbmeuAyL3RXxEVkzTc. Later signup and isolated joining/discovery changes are local. No new production deployment, outreach, spending or database mutation was performed in this cycle.",
+    "Personal-sender OAuth setup is paused while support sending access is clarified. The obsolete token-request card is withdrawn, not approved. Support identity is required for any separately authorized outreach. HQ reporting continues; missing email access does not block product iteration. Earlier anonymous counters are not verified real users, attendance or revenue."
   ],
   "agents": [
     {
-      "name": "Product coordinator",
-      "status": "idle-blocked",
-      "metric": "Real host commitment, worthwhile attendance and return",
-      "note": "Bounded evidence and risk review complete. Next material commercial action awaits existing scoped owner decisions; no filler implementation commissioned."
+      "name": "Product and UX coordinator",
+      "status": "keep",
+      "metric": "Clear first-use flow and prioritized core journeys",
+      "note": "Verified signup changes; queued chat safety, host editing and event-day recovery."
     },
     {
-      "name": "Dependency reviewer",
+      "name": "First-use designer and engineer",
       "status": "keep",
-      "metric": "Distinguish runtime exposure from build/test findings",
-      "note": "Read-only independent review complete; no files changed. Undici runtime dependency retained explicitly as a residual risk."
+      "metric": "Keyboard continuity without bypassing account rules",
+      "note": "Ten-step mobile and reduced-motion checks passed; local commit 3679cbf."
     },
     {
-      "name": "Supervisor handoff",
+      "name": "Runtime reviewer",
       "status": "keep",
-      "metric": "Verified cycle and restored HQ access",
-      "note": "Independent full checks and commit completed; live decision reads work with the rotated key. Awaiting scoped business decisions."
+      "metric": "Verified cycles survive newer HQ snapshots",
+      "note": "Repair tested against retained artifact; restart follows coordinator handoff."
     }
   ],
-  "directions": [
-    {
-      "id": "SD-20260914-unattended-decision-email",
-      "priority": "medium",
-      "title": "Enable the selected sender for unattended decision emails",
-      "detail": "The first owner decision digest was sent through the connected Gmail account, and the selected sender/recipient are saved privately. The Windows scheduler cannot access the chat connector. A tested local Gmail adapter and duplicate-suppression queue are prepared; no local OAuth client ID, client secret or refresh token is available. HQ updates and product work continue.",
-      "recommendation": "Place the selected sender account's owner-authorized Gmail send-only OAuth credentials directly in ignored .env.studio.local: GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN; set GMAIL_SENDER_EMAIL to the selected sender, EMAIL_DELIVERY_PROVIDER=gmail and EMAIL_DELIVERY_ENABLED=true. STUDIO_OWNER_EMAIL and STUDIO_OWNER_EMAIL_FROM are already configured privately. Never paste secrets into HQ or chat. Existing authorization covers sending these decision alerts after configuration. Alternative: use HQ and interactive Gmail alerts until local access is configured; unattended delivery is not active yet. No paid service or production change is required."
-    }
-  ]
+  "directions": []
 }

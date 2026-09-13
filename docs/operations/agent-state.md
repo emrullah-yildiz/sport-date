@@ -1,5 +1,16 @@
 # Agent state
 
+## Continued UX iteration and reporting recovery - 2026-09-14
+
+Owner renewed ongoing product/design/UX/UI iteration and explicitly instructed the team to continue independent tasks around decisions. Current source contract, cycle prompt and concrete experience queue reflect this. Personal-sender OAuth setup is paused while the support identity is clarified; it is not a product blocker.
+
+Completed main commit 3679cbf: signup now moves keyboard focus to each new question, supports Enter through existing validation, preserves Back answers and locks navigation during account submission. Login copy describes available sessions. Verified 1,190 web tests, 32 focused tests, web typecheck, lint (0 errors/11 existing warnings), production build, and ten-step mobile browser checks in normal/reduced motion. Browser API mutations intercepted; no accounts, reports, emails or deployment. Later local application changes remain separate from live release d7064b7.
+
+Recovered latest runtime fault: cycle 665ef2b passed full verification and committed, but its older report collided with a newer coordinator snapshot. Newer validated source reports now remain intact with explicit reportSuperseded state; no false mirror/live claim. 16 notification/reporting tests and 41 PowerShell checks pass, including real retained-artifact safe skip. Runtime restart follows this verified handoff.
+
+Next independent slice: chat safety report combined text limits and shared-event warning/optional exit, followed by host-edit validation/timezone preservation and event-day connection recovery. Read docs/design/autonomous-ux-queue-2026-09-14.md from the source checkout; do not repeat completed signup work or wait for host/email decisions to fix these confirmed product gaps.
+
+
 ## Approved release live and recurring worker active - 2026-09-14
 
 Exact reviewed release is live at keepitup.social: commit d7064b7, deployment dpl_EjVfwK7QgEFbmeuAyL3RXxEVkzTc. Candidate passed 1,419 tests, workspace typechecks, lint and remote build. Landing, HQ, host-pilot packet, health and database readiness passed. See release-2026-09-14.md for scope and evidence: the attempted build override did not suppress the existing migration hook; zero new migrations applied. Later isolated app changes remain undeployed.

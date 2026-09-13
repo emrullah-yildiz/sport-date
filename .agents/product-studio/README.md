@@ -40,8 +40,14 @@ Validation: authenticated read-only CLI smoke returned `RUNTIME_SMOKE_OK` on 202
 
 ## Owner decision emails
 
+September 14 steering: the personal-sender OAuth setup is paused while the support sending identity is clarified. Mail access is not a prerequisite for independent product work. The current source operating contract and experience queue govern future cycles.
+
 Owner-authorized alerts supplement HQ. The supervisor runs `decision-email.mjs monitor` at each scheduler check (including owner-blocked checks) and after a verified cycle. It reads live HQ and authenticated decisions, queues only unresolved cards, and deduplicates exact decision content using private delivery receipts. Report timestamp changes do not resend an alert. `runtime/decision-email-status.json` distinguishes missing provider, queued, confirmed send and uncertain delivery; an outbox is never evidence of sending.
 
 Configure the selected recipient/sender privately in ignored `.env.studio.local` as `STUDIO_OWNER_EMAIL` and `STUDIO_OWNER_EMAIL_FROM`. Local Gmail delivery additionally requires `EMAIL_DELIVERY_ENABLED=true`, `EMAIL_DELIVERY_PROVIDER=gmail`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, and `GMAIL_SENDER_EMAIL` equal to the selected sender. This uses Gmail send-only OAuth through fixed Google endpoints. No credentials or personal addresses belong in committed files or public HQ. The chat Gmail connector is separate from local runtime access.
 
 After a real interactive connector send of the exact current queued digest, record its provider ID with `node .agents/product-studio/decision-email.mjs record-receipt . <message-id>`. Never record a draft or a different digest as sent. If a send times out after dispatch begins, automatic resend is suppressed; reconcile the provider receipt privately before clearing that exact uncertain entry. Routine model cycles must not send their own duplicates. The owner authorization covers decision alerts only, not recruitment or other account messaging.
+
+## Newer HQ report during verification
+
+When a coordinator publishes a newer valid source snapshot while a cycle is being verified, the supervisor preserves that snapshot. It still verifies the older cycle artifact against its clean commit, then records `reportSuperseded=true`, `localReportVerified=false`, and no live-publication claim unless independently matched. This normal concurrency case no longer stops the worker. Invalid, future-dated, dirty or uncommitted reports still fail verification.

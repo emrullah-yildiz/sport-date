@@ -18,6 +18,12 @@ The CEO agent owns commercial strategy, sequencing, assignments, acceptance crit
 
 Success means people completing worthwhile sports encounters and a viable path to paid value. Code volume, content volume, agent activity and registered accounts alone are not success. Follow `growth-plan-2026-09-14.md` for the current targets and funnel assumptions. The 1,000-user ambition is a target to test, not a promised outcome or permission to fabricate users.
 
+## Continued product iteration - owner steering, 14 September 2026
+
+The owner explicitly renewed autonomous product, design, UX and UI iteration. A pending business decision blocks only its dependent workstream. Continue the highest-value independent improvement and keep a concrete next-work queue. Before declaring all work owner-blocked, inspect actual usability gaps across onboarding, discovery, host creation, event coordination, profile editing and safety/recovery; missing recruitment evidence or mail credentials alone do not exhaust product work. Each cycle should inspect a journey, implement a supported improvement, verify it, and identify the next useful test. Avoid repeating finished audits or manufacturing features simply to consume time.
+
+Support replies and any separately authorized outreach must use the support identity; personal Gmail is not an outreach sender. The earlier personal-sender OAuth setup is paused while the support sending arrangement is clarified. Do not solicit those tokens again as a product-work prerequisite. No new outreach or production-release scope follows from this iteration mandate. Continue local verified improvements and report prepared releases in HQ.
+
 ## Operating rhythm and team
 
 One coordinator runs a bounded cycle on a recurring local schedule. A cycle selects a useful outcome, assigns at most three parallel specialists with separate file ownership, integrates, verifies, commits locally and reports. Do not keep agents busy merely to show activity. Prefer a small completed slice over a growing pile of plans.

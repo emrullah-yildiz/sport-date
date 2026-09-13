@@ -1,5 +1,9 @@
 # Outcome roadmap
 
+## Active autonomous experience queue - September 14
+
+Continue independent product improvements while business decisions are pending. Current slice: signup keyboard focus and text-step submission. Next: chat safety report limits/shared-event warning; host edit validation/timezone preservation; event-day connectivity recovery. Evidence and acceptance criteria: `docs/design/autonomous-ux-queue-2026-09-14.md`. Personal-sender OAuth setup is paused; it does not block this queue.
+
 ## Current strategic question — owner clarification, 2026-09-14
 
 Can we create a small, repeatable local sports experience that people choose again and eventually pay to improve? Prioritize the next decisive evidence: a real host commitment, actual attendance, return, then a voluntary paid-value test under approved pricing. Fix material safety/core-flow risks and measure this path; do not expand the backlog to keep agents occupied. The first user-count/date scenarios are revisable reference points. Team structure, tactics and product bets can change without asking the owner to assign tasks; explain material changes in HQ and preserve approval boundaries.
@@ -13,7 +17,7 @@ Can we create a small, repeatable local sports experience that people choose aga
 - [x] Activate and verify the recurring local runner, isolated worktree and report delivery (successful independently verified cycles; live HQ readback September 14).
 - [x] Restore live HQ publishing and decision access after owner credential rotation/redeployment.
 - [ ] Establish a verified production user/activation/revenue baseline with staff/test exclusions.
-- [ ] Complete unattended owner decision email delivery; initial connector alert sent, local provider access still required.
+- [ ] Revisit unattended decision email delivery after the support sender arrangement is verified; personal-sender OAuth setup paused.
 - [ ] Validate host supply and first attended sessions before pursuing the 1,000-registration stretch target.
 
 ## Owner-requested design concept — 2026-09-14
