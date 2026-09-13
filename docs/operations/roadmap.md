@@ -1,5 +1,15 @@
 # Outcome roadmap
 
+## Autonomous commercial operation — 2026-09-14
+
+- [x] Adopt owner-delegated CEO contract, bounded parallel team and evidence-based 7/30-day targets.
+- [x] Replace stale HQ activity claims with fresh-source reporting and a small authenticated owner decision queue.
+- [x] Prepare five freshly verified organization contact routes and a complete host-validation packet; outreach awaits its scoped business decision.
+- [x] Add anonymous main landing page-load counts without a migration or tracking demo choices.
+- [ ] Activate and verify the recurring local runner, isolated worktree and report delivery.
+- [ ] Restore live HQ publishing/decision access and establish a verified production user/activation/revenue baseline.
+- [ ] Validate host supply and first attended sessions before pursuing the 1,000-registration stretch target.
+
 ## Owner-requested design concept — 2026-09-14
 
 - [x] Parallel product/UX evaluation and an interactive, responsive `/concept` preview: “Less small talk. More good company.” Existing KeepItUp identity; clearly fictional activity selection and host-request walkthrough. See `docs/design/2026-09-14-concept-review.md` for evidence and scope.

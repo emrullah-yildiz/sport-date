@@ -17,7 +17,13 @@ try {
   const mutations = [];
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", request => {
-    if (!['GET', 'HEAD'].includes(request.method()) && new URL(request.url()).pathname.startsWith('/api/')) mutations.push(request.url());
+    if (!['GET', 'HEAD'].includes(request.method()) && new URL(request.url()).pathname.startsWith('/api/')) {
+      // Main landing now has the existing anonymous page-load counter. Demo
+      // choices must never add metadata or call any mutation endpoint.
+      const body = request.postDataJSON();
+      if (landing && new URL(request.url()).pathname === '/api/metrics/click' && body?.event === 'landing_viewed' && Object.keys(body).every(key => ['event', 'path'].includes(key))) return;
+      mutations.push(request.url());
+    }
   });
   await page.goto(`http://localhost:3000${landing ? "/" : route}`, { waitUntil: "networkidle" });
   if (landing) {

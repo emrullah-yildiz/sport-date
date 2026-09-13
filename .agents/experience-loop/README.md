@@ -1,5 +1,7 @@
 # Experience loop (continuous plan → build → test → use)
 
+> Historical July workflow. Runtime audit on 2026-09-14 found no active project scheduler and a stale July heartbeat. New autonomous operation uses `.agents/product-studio/` and `docs/operations/autonomous-operating-contract.md`; old push/social directives below are not current authorization.
+
 A never-ending studio loop that drives Sport Date toward the best possible modern,
 human, trustworthy experience. **Four agents, one queue.**
 

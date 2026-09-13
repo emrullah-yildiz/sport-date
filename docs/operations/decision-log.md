@@ -1,5 +1,13 @@
 # Decision log
 
+## 2026-09-14 — Autonomous CEO execution with evidence and bounded authority
+
+The owner delegated routine prioritization, targets and agent allocation, with business-only decisions surfaced in HQ. Adopted `autonomous-operating-contract.md`. The new coordinator uses a retained isolated branch, no overlapping cycles, a 25-minute maximum, heartbeat/failure states, and cheap monitoring of changed scoped owner decisions. Local verified code commits are routine; production release, spending, external outreach and final business choices remain explicit owner decisions. Internal HQ report publication is authorized by the current mandate.
+
+Prepared authenticated fail-closed HQ helper and a supervisor that mirrors only a fresh, committed, schema-validated public report into the source checkout. All other work stays isolated. No credential values enter reports. Missing live reporting credentials permit honest local fallback; no failed publish is represented as live. Existing account auth/usage is reused without paid API fallback or billing changes. Local execution requires awake/logged-in Windows and connectivity; schedule registration/CLI smoke alone are not proof of completed cycles.
+
+Current commercial targets are 25 real registrations in seven days, 200 base / 1,000 stretch in 30 days, with explicit attendance/supply/repeat/value gates. The local database's 111 account rows are not verified production traction. Added anonymous landing-page-load counts using existing aggregate semantics; repeated loads/bots/staff and pre-instrumentation gaps preclude interpreting counts as unique visitors or cohort conversion. Host-pilot packet is prepared, not sent. Live HQ access restoration is the immediate owner blocker.
+
 ## 2026-09-14 — Promote the approved concept to the main landing
 
 Following the owner's “Looks good. Update the main”, the main `/landing` route now renders the approved experience. `/` retains its permanent redirect to `/landing`. Presentation, scoped CSS and fictional demo rules live in `src/components/landing/`, shared by the main route and `/concept`; preview-only metadata and banner stay on `/concept`.

@@ -14,7 +14,7 @@ export default async function LandingPage() {
   const user = await getCurrentUser();
   // Only the display name crosses the client boundary, never the session or profile.
   return <>
-    <ClickTracking />
+    <ClickTracking pageEvent="landing_viewed" />
     <LandingExperience memberName={user?.firstName ?? null} />
   </>;
 }

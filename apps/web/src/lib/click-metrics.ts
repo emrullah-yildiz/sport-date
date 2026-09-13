@@ -20,6 +20,8 @@ import { getDatabase } from "@/lib/db";
  * cardinality (and its anonymity) is bounded by this list.
  */
 export const CLICK_METRIC_EVENTS = [
+  // Client-mounted main landing loads, including repeat loads; not unique visitors.
+  "landing_viewed",
   "landing_cta_join",
   "landing_cta_survey",
   "signup_started",

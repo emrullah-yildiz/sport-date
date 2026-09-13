@@ -2,6 +2,8 @@
 
 ## Mission
 
+The owner delegated autonomous CEO operation on 2026-09-14. Use `docs/operations/autonomous-operating-contract.md` for ongoing prioritization, bounded parallel agent work, recurring execution and HQ decision reporting. The agent team chooses routine priorities and targets; owner input is reserved for the escalation boundaries below. HQ progress/decision publication through the existing authenticated report endpoint is authorized. Historical loop documents do not authorize new production pushes, deployments, spending or external outreach.
+
 Build a safe, Europe-first sports dating product for adults. Work autonomously from the prioritized roadmap, keep changes reviewable, and leave the repository in a verified state.
 
 Use `$run-product-studio` for ongoing product work. Continue through the highest-value unblocked roadmap outcomes; ask the owner only when the escalation policy in that skill requires it.

@@ -126,6 +126,11 @@
   .aboard .rn{ font-size:14px; font-weight:700; }
   .aboard .rs{ font-size:13px; color:#c8d3d0; margin-top:2px; line-height:1.5; }
   .aboard .st{ font-size:10px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; margin-left:auto; flex:none; padding-top:4px; }
+  .archive { margin-top:32px; border-top:1px solid var(--line); padding-top:20px; }
+  .archive summary { cursor:pointer; color:var(--mut); }
+  .decisions { grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); }
+  button:focus-visible,a:focus-visible,summary:focus-visible { outline:2px solid var(--neon); outline-offset:4px; }
+  @media(prefers-reduced-motion:reduce) { * { animation:none!important; transition:none!important; } }
 </style>
 </head>
 <body>
@@ -134,33 +139,20 @@
     <div>
       <div class="brand">KeepItUp · HQ</div>
       <h1>CEO Command Center</h1>
-      <div class="who">Acting CEO: <b>Claude</b> · Owner: <b>Emrullah</b> · you approve + provision; I run strategy &amp; execution.</div>
+      <div class="who">Product team: <b>Codex + specialist agents</b> · Owner: <b>Emrullah</b> · you approve + provision; I run strategy &amp; execution.</div>
     </div>
-    <div class="badge" id="badge" role="button" aria-expanded="false" title="Click to see every agent's status"><span class="led"></span>Crew live · updated 2026-07-06 ▾</div>
+    <a class="btn" href="#standup">Latest update &amp; owner decisions</a>
   </div>
 
-  <div class="cta-big">
-    <div>
-      <div class="t">Posts waiting for your review</div>
-      <div class="s">Approve, deny, improve-with-a-comment — then hit Done. This page is your hub; that one is your queue.</div>
-    </div>
-    <a href="/social-approve.html">Review &amp; approve posts →</a>
-  </div>
+  <div class="note" style="margin-top:20px"><p><b>You handle business decisions. The team handles priorities and delivery.</b></p><p>Read the latest report and respond to its owner action queue below. Reports are dated work records, not proof that agents are currently running.</p><p><a href="/operations/host-pilot-2026-09-14.html">Review host pilot packet</a> / <a href="/social-approve.html">Social review queue</a> / <a href="/login">Owner sign-in</a> / <button class="sd-btn" onclick="location.reload()">Refresh HQ</button></p></div>
+  <h2 class="sec">▸ Latest team report — <span id="sd-day">loading…</span></h2>
+  <noscript><div class="note"><p>Enable JavaScript to load current reports and authenticated owner decisions. <a href="/standup/latest.json">Read the repository report snapshot</a>; check its generatedAt timestamp before treating it as current.</p></div></noscript>
+  <div id="standup" aria-live="polite"><div class="note"><p>Loading the standup report…</p></div></div>
 
-  <h2 class="sec">▸ Daily standup — <span id="sd-day">loading…</span></h2>
-  <div id="standup"><div class="note"><p>Loading the standup report…</p></div></div>
+  <h2 class="sec">▸ Click funnel — anonymous, first-party (last 14 days)</h2>
+  <div id="funnel"><div class="note"><p>Loading click metrics…</p></div></div>
 
-  <div id="roster" aria-label="Agent roster">
-    <h4>The crew — Matrix callsigns · updated 2026-07-06 (you are Neo)</h4>
-    <div class="r"><span class="dot run"></span><div><div class="rn">Morpheus — CEO (main session)</div><div class="rs">Captain: shipped 10 features/fixes on 07-06 (poster v2, map picker, click analytics, domain fix, copy rules); reviews + ships every Builder run</div></div><span class="st c-run">Running</span></div>
-    <div class="r"><span class="dot run"></span><div><div class="rn">The Architect + Tank &amp; Dozer — experience loop</div><div class="rs">Running daily: plan → build the highest-value unblocked outcome → full-DoD verify. Tick 1 pinned the GDPR deletion/export contracts (1151 tests); tick 2 in flight</div></div><span class="st c-run">Active</span></div>
-    <div class="r"><span class="dot run"></span><div><div class="rn">Trinity — social growth (non-stop)</div><div class="rs">Batches 05–10 live in the approval queue incl. the manifesto deck; 6 posts publishing on IG+TikTok; ~19 approved posts awaiting Buffer slots</div></div><span class="st c-run">Active</span></div>
-    <div class="r"><span class="dot wait"></span><div><div class="rn">The Oracle — daily 06:00 standup</div><div class="rs">Fires on time; needs repo write access (your one click, direction SD-20260706-cloud-write) to self-deliver — CEO publishes manually until then</div></div><span class="st c-wait">Needs you</span></div>
-    <div class="r"><span class="dot run"></span><div><div class="rn">Seraph — tester / user-sim</div><div class="rs">Daily user's-eyes pass: workflows, pages, styles, misalignments, too-much-text — findings become tickets (docs/operations/user-sim-checklist.md)</div></div><span class="st c-run">Active</span></div>
-    <div class="r"><span class="dot idle"></span><div><div class="rn">Smith — photo moderator</div><div class="rs">Blocked: waiting on MODERATION_AGENT_SECRET from the owner; pending photos held safe meanwhile</div></div><span class="st c-idle">Blocked</span></div>
-    <div class="r"><span class="dot idle"></span><div><div class="rn">Video production</div><div class="rs">Blocked: awaiting owner's AI-video tool (decision card #1); video posts paused</div></div><span class="st c-idle">Blocked</span></div>
-  </div>
-
+  <details class="archive"><summary>Historical HQ snapshot / July 2026 / not current status or approvals</summary><p>This archive preserves earlier decisions and reports. Its running claims, metrics, pricing and blockers are historical; use the dated report above for current work.</p>
   <h2 class="sec">▸ CEO briefing</h2>
   <div class="note">
     <p><b>Where we are.</b> KeepItUp is pre-launch with a working product (beta), a brand, and — as of today — a
@@ -182,9 +174,6 @@
     <div class="kpi"><div class="v">€6.99</div><div class="l">Plus / mo (built, dark)</div></div>
     <div class="kpi"><div class="v">€0</div><div class="l">spent on marketing</div></div>
   </div>
-
-  <h2 class="sec">▸ Click funnel — anonymous, first-party (last 14 days)</h2>
-  <div id="funnel"><div class="note"><p>Loading click metrics…</p></div></div>
 
   <h2 class="sec">▸ Blocked — needs you (owner-gated)</h2>
   <div class="decisions">
@@ -382,11 +371,13 @@
     <div class="item"><div class="d">2026-07-04 · Ask</div><div class="t">5 decision cards raised above. The two that most limit growth right now: the AI-video tool (#1) and the giveaway prize (#2).</div></div>
   </div>
 
+  </details>
+
   <div class="foot">
     Guardrails I operate under (yours, unchanged): safety features are never paywalled; no dark patterns, no fake traction;
     final pricing, brand, and launch geography are your calls; agents never spend money, create Stripe/live keys, accept
     terms, or create accounts. When I hit one of those or get stuck, it shows up as a decision card here.
-    This is a static status snapshot the agents regenerate — not a live control panel.
+    The newest dated report is shown from the reporting API and repository snapshot. A saved approval records your decision; it does not prove execution.
   </div>
 </div>
 <div id="lb" role="dialog" aria-label="Image preview"><button class="x" aria-label="Close">×</button><img alt=""></div>
@@ -394,10 +385,6 @@
 const B="/brand/social/";
 const imgs=["b3-01-ick-cured.png","p3-meme-thumb-vs-legs.png","b1-02-encourage-quote.png","b1-04-three-intents.png","b1-03-safety-1-cover.png","b1-06-court-vision.png","b1-01-silence-run.png","b3-02-finish-the-sentence.png"];
 document.getElementById("cards").innerHTML=imgs.map(f=>`<img loading="lazy" src="${B}${f}" alt="KeepItUp social creative">`).join("");
-// agent roster popover
-const badge=document.getElementById("badge"), roster=document.getElementById("roster");
-badge.addEventListener("click",e=>{ e.stopPropagation(); const o=roster.classList.toggle("open"); badge.setAttribute("aria-expanded",o); });
-document.addEventListener("click",e=>{ if(!roster.contains(e.target)) { roster.classList.remove("open"); badge.setAttribute("aria-expanded","false"); } });
 // lightbox: click any image on the page to expand; click/Esc to close
 const lb=document.getElementById("lb"), lbImg=lb.querySelector("img");
 document.addEventListener("click",e=>{
@@ -417,14 +404,14 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
     return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); };
   // The funnels, in reading order. Every allowlisted event appears exactly once.
   var CHAINS=[
-    {name:"Visitor → member", steps:["landing_cta_join","signup_started","signup_completed"]},
+    {name:"Landing and signup activity", steps:["landing_viewed","landing_cta_join","signup_started","signup_completed"]},
     {name:"Member → join",    steps:["discover_viewed","join_requested"]},
     {name:"Host → publish",   steps:["event_publish_started","event_published"]},
     {name:"Sharing",          steps:["share_opened","share_platform_click","poster_downloaded"]},
     {name:"Survey",           steps:["landing_cta_survey","survey_started","survey_completed"]}
   ];
   var LABELS={
-    landing_cta_join:"Landing “join” CTA", signup_started:"Signup started", signup_completed:"Signup completed",
+    landing_viewed:"Landing page loads", landing_cta_join:"Landing “join” CTA", signup_started:"Signup started", signup_completed:"Signup completed",
     discover_viewed:"Discover viewed", join_requested:"Join requested",
     event_publish_started:"Publish form opened", event_published:"Event published",
     share_opened:"Share opened", share_platform_click:"Platform picked", poster_downloaded:"Poster downloaded",
@@ -443,11 +430,11 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
       }).join(' <span style="color:var(--mut)">→</span> ');
       return '<div class="item"><div class="d">'+esc(chain.name)+'</div><div class="t">'+t+"</div></div>";
     }).join("")+"</div>"+
-    '<div class="sd-note">'+(any?"Counts are 14-day totals of anonymous, first-party CTA beacons — aggregate counters only (no user/session/IP/UA, day granularity). Percentages are step-over-step."
-      :"No clicks recorded yet — counters start ticking as visitors use the instrumented CTAs.")+"</div>";
+    '<div class="sd-note">'+(any?"Counts are 14-day anonymous activity totals, not unique visitors or customers. Repeat loads, staff and bots can contribute. Percentages compare event counts, not cohort conversion. Landing page-load measurement starts when its release is deployed; earlier visits cannot be reconstructed."
+      :"No activity beacons recorded for this period. This does not prove zero visitors: deployment, JavaScript and delivery affect coverage.")+"</div>";
     box.innerHTML=html;
   }
-  fetch("/api/metrics/summary?days=14",{credentials:"same-origin",headers:{Accept:"application/json"}})
+  fetch("/api/metrics/summary?days=14",{credentials:"same-origin",headers:{Accept:"application/json"},signal:AbortSignal.timeout(8000)})
     .then(function(r){
       if(r.status===401||r.status===403) throw new Error("Sign in as the owner to see the click funnel.");
       if(!r.ok) throw new Error("Click metrics unavailable right now ("+r.status+").");
@@ -460,20 +447,28 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
 })();
 
 // ── Daily standup: report + owner-approvable directions ─────────────────────
+// HQ_STANDUP_RUNTIME
 (function(){
   "use strict";
   var box=document.getElementById("standup"), dayEl=document.getElementById("sd-day");
   var esc=function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
     return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); };
   var decisions={}; // directionId -> {action, comment}
+  var decisionState="unavailable", reportSource="unknown";
+  function validReport(d){
+    return d && typeof d.headline==="string" && typeof d.day==="string" && Number.isFinite(Date.parse(d.generatedAt)) &&
+      Array.isArray(d.summary) && d.summary.every(function(s){ return typeof s==="string"; }) &&
+      Array.isArray(d.directions) && Array.isArray(d.agents);
+  }
 
   function dirCard(d){
     var dec=decisions[d.id]||null;
+    var unavailable=decisionState!=="loaded";
     var st=dec?dec.action:null; // 'approve'|'deny'|null
     var pri=d.priority==="high"?"":(d.priority==="medium"?" low":" low");
     var cls=d.priority==="high"?"dec hi":"dec low";
-    var apBtn='<button class="sd-btn ap'+(st==="approve"?" active":"")+'" data-act="approve"'+(st&&st!=="approve"?" disabled":"")+'>'+(st==="approve"?"✓ Approved":"Approve")+"</button>";
-    var deBtn='<button class="sd-btn de'+(st==="deny"?" active":"")+'" data-act="deny"'+(st&&st!=="deny"?" disabled":"")+'>'+(st==="deny"?"✕ Denied":"Deny")+"</button>";
+    var apBtn='<button class="sd-btn ap'+(st==="approve"?" active":"")+'" data-act="approve"'+(unavailable||(st&&st!=="approve")?" disabled":"")+'>'+(st==="approve"?"✓ Approved":"Approve")+"</button>";
+    var deBtn='<button class="sd-btn de'+(st==="deny"?" active":"")+'" data-act="deny"'+(unavailable||(st&&st!=="deny")?" disabled":"")+'>'+(st==="deny"?"✕ Denied":"Deny")+"</button>";
     var change=st?'<button class="sd-change" data-act="change">Change</button>':"";
     return '<div class="'+cls+'" data-dir="'+esc(d.id)+'">'+
       '<div class="pri">Direction · '+esc(d.priority)+'</div>'+
@@ -481,13 +476,20 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
       "<p>"+esc(d.detail)+"</p>"+
       '<div class="rec">My call: <b>'+esc(d.recommendation)+"</b></div>"+
       '<div class="sd-actions">'+apBtn+deBtn+change+"</div>"+
-      '<textarea class="sd-comment" placeholder="Optional note with your call…">'+esc(dec&&dec.comment?dec.comment:"")+"</textarea>"+
+      '<textarea class="sd-comment" aria-label="Optional note for this decision" placeholder="Optional note with your call…">'+esc(dec&&dec.comment?dec.comment:"")+"</textarea>"+
       '<div class="sd-msg"></div>'+
     "</div>";
   }
 
   function render(data){
-    dayEl.textContent=data.day+" · 06:00 agent standup";
+    dayEl.textContent=data.day;
+    var age=Date.now()-Date.parse(data.generatedAt);
+    var freshness=age < -300000 ? "Report timestamp is in the future; freshness cannot be verified." : age > 36*60*60*1000 ? "STALE: this report is over 36 hours old. Current work and blockers are unverified." : "Recent report. Agent runtime is not monitored by HQ.";
+    var metadata='<div class="note" style="margin-bottom:12px"><p><b>'+esc(freshness)+'</b></p><p>Generated '+esc(data.generatedAt)+' / Source: '+esc(reportSource)+'.</p></div>';
+    var pending=data.directions.filter(function(d){ return !decisions[d.id]; }).length;
+    var queue='<h3>Owner action queue</h3><p>'+(decisionState==="loaded" ? pending+" awaiting your response. Approval is not execution; delivery is reported in a later update." : decisionState==="signin" ? 'Sign in as the owner to load saved decisions and respond. Unavailable decisions are not counted as pending.' : 'Saved decisions are unavailable. Refresh to retry; responses are disabled until saved state can be loaded.')+'</p>';
+    if(data.directions.length) queue+='<div class="decisions">'+data.directions.map(dirCard).join("")+'</div>';
+    else queue+='<p>No owner actions listed in this report.</p>';
     var html='<div class="note"><p><b>'+esc(data.headline)+"</b></p>"+
       (data.summary||[]).map(function(s){ return "<p>"+esc(s)+"</p>"; }).join("")+"</div>";
     if (Array.isArray(data.agents)&&data.agents.length){
@@ -496,11 +498,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
           return '<span class="sd-tag '+esc(a.status)+'">'+esc(a.status)+"</span> <b>"+esc(a.name)+"</b> — "+esc(a.note)+" <i style=\"color:var(--mut)\">(metric: "+esc(a.metric)+")</i>";
         }).join("<br>")+"</div></div>";
     }
-    if (Array.isArray(data.directions)&&data.directions.length){
-      html+='<div class="sd-note">Your call on each direction — approve or deny; your note travels with it. Decisions land instantly; the agents pick them up next cycle.</div>'+
-        '<div class="decisions" style="margin-top:10px">'+data.directions.map(dirCard).join("")+"</div>";
-    }
-    box.innerHTML=html;
+    box.innerHTML=metadata+queue+html;
     wire(data);
   }
 
@@ -543,28 +541,43 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
     });
   }
 
-  // The routine publishes straight to the API the moment it finishes — that's
-  // the live source. The static repo file is history + fallback.
-  fetch("/api/standup/report",{cache:"no-store",headers:{Accept:"application/json"}})
-    .then(function(r){ if(!r.ok) throw new Error("no api report"); return r.json(); })
-    .then(function(d){ if(!d||!d.report) throw new Error("no api report"); return d.report; })
-    .catch(function(){
-      return fetch("/standup/latest.json",{cache:"no-store"}).then(function(r){
-        if(!r.ok) throw new Error("no standup yet");
-        return r.json();
-      });
-    }).then(function(data){
-    // overlay any saved decisions, then render (decisions need owner session; ignore errors)
-    return fetch("/api/standup/directions",{credentials:"same-origin",headers:{Accept:"application/json"}})
-      .then(function(r){ return r.ok?r.json():{decisions:[]}; })
-      .catch(function(){ return {decisions:[]}; })
+  // Compare both sources so an older API report cannot hide a newer snapshot.
+  var bestReport=null;
+  var sources=[{url:"/api/standup/report",name:"reporting API",api:true},{url:"/standup/latest.json",name:"repository snapshot",api:false}];
+  Promise.all(sources.map(function(source){
+    return fetch(source.url,{cache:"no-store",credentials:"same-origin",headers:{Accept:"application/json"},signal:AbortSignal.timeout(8000)})
+      .then(function(r){ if(!r.ok) throw new Error("unavailable"); return r.json(); })
       .then(function(d){
-        (d.decisions||[]).forEach(function(x){ decisions[x.directionId]={action:x.action,comment:x.comment}; });
-        render(data);
-      });
+        var report=source.api?d.report:d;
+        if(!validReport(report)) throw new Error("invalid report");
+        // Show a valid snapshot promptly even if another service is stalled.
+        // Approval controls remain disabled until saved decisions are loaded.
+        if(!bestReport || Date.parse(report.generatedAt)>Date.parse(bestReport.generatedAt)) {
+          bestReport=report; reportSource=source.name+" (checking other source)"; render(report);
+        }
+        return {report:report,source:source.name};
+      })
+      .catch(function(){ return null; });
+  })).then(function(results){
+    var available=results.filter(Boolean).sort(function(a,b){ return Date.parse(b.report.generatedAt)-Date.parse(a.report.generatedAt); });
+    if(!available.length) throw new Error("no report");
+    var data=available[0].report;
+    reportSource=available[0].source+(available.length===1?" (other source unavailable)":"");
+    return fetch("/api/standup/directions",{cache:"no-store",credentials:"same-origin",headers:{Accept:"application/json"},signal:AbortSignal.timeout(8000)})
+      .then(function(r){
+        if(r.status===401||r.status===403){ decisionState="signin"; return null; }
+        if(!r.ok) throw new Error("decisions unavailable");
+        return r.json();
+      }).then(function(d){
+        if(d){
+          if(!Array.isArray(d.decisions)) throw new Error("invalid decisions");
+          d.decisions.forEach(function(x){ decisions[x.directionId]={action:x.action,comment:x.comment}; });
+          decisionState="loaded";
+        }
+      }).catch(function(){ decisionState="unavailable"; }).then(function(){ render(data); });
   }).catch(function(){
-    dayEl.textContent="none yet";
-    box.innerHTML='<div class="note"><p>No standup report published yet. The first one lands at 06:00.</p></div>';
+    dayEl.textContent="unavailable";
+    box.innerHTML='<div class="note"><p>No report could be loaded. Current progress, owner actions and agent runtime are unknown. Refresh to retry; no scheduled delivery is promised here.</p></div>';
   });
 })();
 </script>

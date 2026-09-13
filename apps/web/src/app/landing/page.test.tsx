@@ -9,6 +9,8 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/session", () => ({ getCurrentUser: mocks.getCurrentUser }));
 
 import LandingExperience from "@/components/landing/LandingExperience";
+import ClickTracking from "@/components/ClickTracking";
+import ConceptPage from "../concept/page";
 import LandingPage from "./page";
 
 async function render() {
@@ -24,11 +26,11 @@ const member = {
   sexualOrientation: "private-orientation",
 };
 
-function experienceProps(node: ReactNode): Record<string, unknown> | undefined {
+function experienceProps(node: ReactNode, component: unknown = LandingExperience): Record<string, unknown> | undefined {
   for (const child of Children.toArray(node)) {
     if (!isValidElement<Record<string, unknown>>(child)) continue;
-    if (child.type === LandingExperience) return child.props;
-    const nested = experienceProps(child.props.children as ReactNode);
+    if (child.type === component) return child.props;
+    const nested = experienceProps(child.props.children as ReactNode, component);
     if (nested) return nested;
   }
 }
@@ -95,6 +97,14 @@ describe("LandingPage auth-awareness", () => {
 });
 
 describe("LandingPage clear and truthful product explanation", () => {
+  it("counts only main landing loads without attaching session or demo choices", async () => {
+    for (const user of [null, member]) {
+      mocks.getCurrentUser.mockResolvedValue(user);
+      expect(experienceProps(await LandingPage(), ClickTracking)).toEqual({ pageEvent: "landing_viewed" });
+    }
+    expect(experienceProps(ConceptPage(), ClickTracking)).toBeUndefined();
+  });
+
   it("puts dating, friendship and group connection together in the hero", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
     const html = await render();

@@ -45,6 +45,23 @@ beforeEach(() => {
 });
 
 describe("POST /api/metrics/click — allowlisted, anonymous, aggregate-only", () => {
+  it("counts repeated landing loads as aggregate page events, never unique visitors", async () => {
+    for (let load = 0; load < 2; load++) {
+      const response = await POST(post({
+        event: "landing_viewed",
+        path: "/landing?private-token=discarded#example",
+        userId: "discarded-member-id",
+        sport: "discarded-demo-choice",
+      }));
+      expect(response.status).toBe(204);
+    }
+    expect(mocks.recordClickMetric.mock.calls).toEqual([
+      ["landing_viewed", "/"],
+      ["landing_viewed", "/"],
+    ]);
+    expect(mocks.getCurrentUser).not.toHaveBeenCalled();
+  });
+
   it("records an allowlisted event with its path collapsed to a page class", async () => {
     const response = await POST(post({ event: "landing_cta_join", path: "/landing" }));
     expect(response.status).toBe(204);

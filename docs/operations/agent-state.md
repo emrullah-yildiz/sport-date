@@ -1,5 +1,17 @@
 # Agent state
 
+## Latest work cycle — 2026-09-14: autonomous CEO operating system
+
+Owner delegated priorities, targets, agent allocation and HQ decision reporting. Current policy is `docs/operations/autonomous-operating-contract.md`; July runtime/staffing claims are archival. Three parallel specialists delivered a growth/revenue plan, HQ freshness/decision improvements, a five-organization host pilot and a real Windows/Codex runtime. Current target: 25 new real registrations by September 21; 200 base / 1,000 stretch by October 14, with activation, host supply, attendance and revenue-evidence gates. Production baseline is unknown; the local aggregate connection is not verified production and includes unclassified fixtures.
+
+Implemented the missing anonymous `landing_viewed` count using existing fixed-name aggregate storage, with no migration or demo-choice tracking. HQ now shows the newest valid API/snapshot report, preserves owner decision state, disables writes if unknown, shows a snapshot even when the API stalls, and archives old running claims. Host inquiry packet is reviewable at `/operations/host-pilot-2026-09-14.html`; no outreach occurred.
+
+Verified so far: full web suite 1,189 passed / 14 opt-in skipped; subsequent HQ stalled-service regression passes (7 focused HQ tests). Web typecheck/build pass; lint zero errors / four existing unrelated warnings. Local landing browser flow and mobile checks pass. Runtime: authenticated read-only CLI smoke, 23 PowerShell checks and 8 reporting tests pass. Scheduler installation and first real bounded cycle are the remaining activation checks; don't infer running from code availability.
+
+HQ report publication was attempted and failed closed: reporting credentials absent; Vercel authentication invalid. Live HQ API still reports July 14. New report is local/static only until access is restored. Owner cards: restore HQ/provider access, approve a limited Bucharest host-validation pilot, and authorize the exact final verified production release. Do not request secrets in chat/HQ.
+
+Next three outcomes: (1) activate/verify isolated recurring execution and fresh local reporting, (2) establish production aggregate baseline and host supply after access/business approvals, (3) implement the next measured activation friction fix. No new spending, messages, production writes, deployment or automatic push performed.
+
 ## Latest work cycle — 2026-09-14: approved design promoted to main landing
 
 Owner approved the concept and requested the main update. `/landing` now uses the approved design, with `/` continuing to redirect there. Shared component/style/demo files moved to `apps/web/src/components/landing/`; `/concept` retains preview metadata and banner. Guests have visible mobile sign-in/signup; members have direct discover/profile paths. Server session lookup passes only the first name to the client. Beta/open-worldwide/local-supply explanations, legal/safety links, feedback/research routes and aggregate real-CTA counters are preserved. Example choices remain fictional, local and untracked.

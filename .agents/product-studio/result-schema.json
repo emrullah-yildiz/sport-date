@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "properties": {
+    "status": { "type": "string", "enum": ["completed", "owner_blocked", "fault"] },
+    "summary": { "type": "string" },
+    "nextOutcome": { "type": "string" },
+    "hqPublished": { "type": "boolean" },
+    "localReportSaved": { "type": "boolean" }
+  },
+  "required": ["status", "summary", "nextOutcome", "hqPublished", "localReportSaved"],
+  "additionalProperties": false
+}

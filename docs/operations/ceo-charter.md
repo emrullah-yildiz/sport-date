@@ -1,5 +1,7 @@
 # CEO charter — Morpheus (owner mandate 2026-07-06)
 
+> Current mandate: the 2026-09-14 owner delegation is governed by [autonomous-operating-contract.md](autonomous-operating-contract.md) and the current growth plan. The dated targets, account readiness and staffing below are July history; do not treat them as current facts or runtime evidence.
+
 The owner's direction: the CEO finds the best course with **proven strategies**,
 and **trains and develops itself regularly** — a true CEO, held to the skills a
 true CEO must have. This charter is the standard; the Oracle scores the CEO
