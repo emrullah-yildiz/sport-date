@@ -1,5 +1,9 @@
 # Agent state
 
+## Cron credential replacement prepared - 2026-09-14
+
+Owner asked how to rotate CRON_SECRET. Prepared a separate random 32-byte key in ignored `.agents/product-studio/runtime/cron-secret.pending` and copied it to the local clipboard without outputting the value. SOCIAL_AGENT_SECRET pending copy remains separate. No production variable, active local environment or deployment changed. Repository cron consumers are session cleanup (03:00 UTC) and attendance reminders (09:00 UTC); both check the bearer secret. Owner should update the existing Production CRON_SECRET, retain Secret/Sensitive type, and redeploy the current production revision. Vercel supplies the new bearer value on cron calls after deployment. Verify scheduled-run logs; do not manually trigger reminder emails or cleanup merely to test authentication. Other external callers, if any, need the replacement too.
+
 ## HQ credential replacement prepared - 2026-09-14
 
 Owner asked how to recreate the unreadable reporting key. Generated a cryptographically random 32-byte replacement, retained only in ignored `.agents/product-studio/runtime/social-agent-secret.pending`, and copied it to the local clipboard without displaying it. It is not in the active environment; no production variable or deployment changed. Owner can update the existing production SOCIAL_AGENT_SECRET value and redeploy the current production revision. After confirmation, verify the pending key against the live authenticated endpoint before activating local reporting. The key also authorizes social-queue/dispatch and aggregate metrics endpoints; any other callers holding the old key will need coordination. Do not rotate STANDUP_AGENT_SECRET or unrelated credentials by implication.
