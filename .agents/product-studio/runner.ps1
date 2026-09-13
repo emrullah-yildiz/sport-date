@@ -83,7 +83,7 @@ try {
     $prompt = Join-Path $PSScriptRoot 'cycle-prompt.md'
     $schema = Join-Path $PSScriptRoot 'result-schema.json'
     # Each argument is fixed or a trusted local path; never interpolate model/remote text into a shell.
-    $arguments = @('-a','never','exec','-s','workspace-write','-C',('"'+$worktree+'"'),'--color','never','--output-schema',('"'+$schema+'"'),'-o',('"'+$output+'"'),'-')
+    $arguments = @('-a','never','-c','sandbox_workspace_write.network_access=true','exec','-s','workspace-write','-C',('"'+$worktree+'"'),'--color','never','--output-schema',('"'+$schema+'"'),'-o',('"'+$output+'"'),'-')
     $state = [ordered]@{ state='running'; startedAt=[DateTime]::UtcNow.ToString('o'); heartbeatAt=[DateTime]::UtcNow.ToString('o'); checkedAt=[DateTime]::UtcNow.ToString('o'); supervisorPid=$PID; runId=$runId; worktree=$worktree; decisionDigest=$signal.digest; note='Bounded local cycle; no production publishing authorized' }
     Write-JsonAtomic $statusPath $state
     $child = Start-Process -FilePath $config.codex -ArgumentList $arguments -WorkingDirectory $worktree -WindowStyle Hidden -RedirectStandardInput $prompt -RedirectStandardOutput (Join-Path $runDir 'stdout.log') -RedirectStandardError (Join-Path $runDir 'stderr.log') -PassThru

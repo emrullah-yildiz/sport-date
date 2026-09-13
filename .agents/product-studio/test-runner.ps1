@@ -18,6 +18,8 @@ Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPubl
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='completed';hqPublished=$false}) 0 $false $true) 'completed' 'Verified local fallback permits product work'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='invalid';hqPublished=$true}) 0 $false) 'fault' 'Invalid result'
 Assert-Equal (Get-ResultDisposition ([pscustomobject]@{status='owner_blocked';hqPublished=$true}) 0 $false) 'owner_blocked' 'Owner hold'
+$runnerSource=Get-Content -Raw (Join-Path $PSScriptRoot 'runner.ps1')
+Assert-Equal ($runnerSource -match "'-c','sandbox_workspace_write.network_access=true','exec','-s','workspace-write'") $true 'Outbound network enabled without changing workspace sandbox'
 $testDir=Join-Path ([IO.Path]::GetTempPath()) ('studio-runtime-test-'+[Guid]::NewGuid().ToString('N'))
 [IO.Directory]::CreateDirectory($testDir) | Out-Null
 try {
@@ -38,7 +40,7 @@ try {
         [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens,[ref]$parseErrors) | Out-Null
         Assert-Equal $parseErrors.Count 0 "Syntax $script"
     }
-    Write-Output '23 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic status, exclusive lock, lock recovery and script syntax.'
+    Write-Output '24 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic status, exclusive lock, lock recovery, scoped network configuration and script syntax.'
 } finally {
     # Delete only the explicit test files in the verified unique test directory; never recursive cleanup.
     foreach ($file in @('status.json','lock')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }
