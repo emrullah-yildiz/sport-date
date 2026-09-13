@@ -1,5 +1,9 @@
 # Agent state
 
+## Activation correction — 2026-09-14
+
+First cycle selected the framework patch and used an independent specialist, then correctly returned fault when sandbox registry access failed with EACCES. No application/dependency change was made. Reviewed documentation/report handoff preserved on `studio/autonomous` as `2c5c35a`. Supervisor invocation now explicitly enables outbound network for authorized development while retaining workspace-write filesystem/Git boundaries; 24 runtime PowerShell checks pass. Second cycle restarted at 2026-09-13 22:00 UTC. A successful product cycle and live HQ delivery remain unverified; do not infer success from the restart. No owner decision was needed for this routine runtime repair.
+
 ## Runtime activation handoff — 2026-09-14
 
 Windows task `KeepItUp Product Studio` is registered every 30 minutes and at logon; first cycle started at 2026-09-13 21:57 UTC and its heartbeat was verified. Completion remains pending independent checks. Its isolated `studio/autonomous` worktree has its own locked dependencies. Verified there: 1,190 web tests passed / 14 opt-in skipped, 229 domain tests passed, and all workspace typechecks passed. Runtime checks cover the supervisor commit handoff: Windows sandbox Git metadata stays protected; only independently verified product changes are committed outside it. Inherited CLI multi-agent support is enabled. No production deployment or live HQ publication occurred.
