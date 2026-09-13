@@ -59,6 +59,10 @@ test('mirror copies only committed valid bytes; malformed and uncommitted report
     assert.equal(mirrorReport(worktree,source,now).mirrored,true);
     assert.equal(readFileSync(join(source,relative),'utf8'),raw);
     assert.equal(readFileSync(join(source,'unrelated.txt'),'utf8'),'preserve');
+    // A Windows checkout can hold CRLF even when Git's canonical object is LF.
+    writeFileSync(join(worktree,relative),raw.replace(/\n/g,'\r\n'));
+    assert.equal(mirrorReport(worktree,source,now).mirrored,true);
+    assert.equal(readFileSync(join(source,relative),'utf8'),raw,'Mirrored bytes must be the committed LF artifact');
     writeFileSync(join(worktree,relative),JSON.stringify({...report(),headline:'Uncommitted edit'}));
     assert.throws(()=>mirrorReport(worktree,source,now),/committed artifact/);
     assert.equal(readFileSync(join(source,relative),'utf8'),raw);

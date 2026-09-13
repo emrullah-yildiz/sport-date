@@ -60,13 +60,18 @@ export function mirrorReport(worktree, sourceRoot, startedAt) {
   const report = JSON.parse(raw.toString('utf8').replace(/^\uFEFF/,''));
   if (!validReport(report, startedAt)) throw new Error('Malformed or stale report');
   const committed = execFileSync('git',['-C',worktree,'show','HEAD:'+reportRelative],{windowsHide:true,maxBuffer:256000});
-  if (!raw.equals(committed)) throw new Error('Report does not match the committed artifact');
+  // Git may normalize a clean Windows working file from CRLF to LF in its object store.
+  // Compare only that byte-level normalization; never accept semantic/whitespace edits.
+  const normalizeLines=buffer=>buffer.filter((byte,index)=>byte !== 13 || buffer[index+1] !== 10);
+  if (!raw.equals(committed) && !normalizeLines(raw).equals(normalizeLines(committed))) throw new Error('Report does not match the committed artifact');
+  const committedReport=JSON.parse(committed.toString('utf8').replace(/^\uFEFF/,''));
+  if (!validReport(committedReport,startedAt)) throw new Error('Malformed committed report');
   if (existsSync(target)) {
     const previous=JSON.parse(readFileSync(target,'utf8').replace(/^\uFEFF/,''));
     if (Date.parse(previous.generatedAt) > Date.parse(report.generatedAt)) throw new Error('Refusing to replace a newer HQ report');
   }
   const temp=target+'.studio-'+process.pid+'.tmp';
-  try { writeFileSync(temp,raw,{flag:'wx'}); renameSync(temp,target); }
+  try { writeFileSync(temp,committed,{flag:'wx'}); renameSync(temp,target); }
   finally { if (existsSync(temp)) unlinkSync(temp); }
   return { mirrored:true, generatedAt:report.generatedAt };
 }

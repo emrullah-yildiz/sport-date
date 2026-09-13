@@ -1,5 +1,13 @@
 # Agent state
 
+## Verified product outcome and resumed team - 2026-09-14
+
+Framework patch `98ac494` passed independent supervisor clean install, all workspace typechecks, 1,190 web tests / 14 skipped, 229 domain tests, lint (0 errors / 11 warnings) and production build. Root confirmed exact dependency scope, audit (0 critical / 11 high / 15 moderate), and protected-route/static smoke. Next/eslint-config-next 16.3.5 and lockfile are integrated into local main. Production remains unchanged. Root-supervised recovery completed the first outcome; do not claim it was an uninterrupted unattended cycle.
+
+Recurring worker resumed at 2026-09-13 22:13 UTC with a fresh heartbeat. Windows task runs every 30 minutes and at logon; an actual scheduled invocation returned 0 without overlapping active work. Network access is invocation-scoped, Git commits are independently verified by the supervisor, transient Windows status-reader behavior has a passing real-reader regression. Main dependencies were clean-installed and the local preview restarted on patched Next. Local HQ/report return 200 with all three owner cards. Actual committed-report mirroring passed after fixing Git CRLF normalization; 29 PowerShell runtime checks and 13 Node supervisor/reporting tests pass. Local HQ contains verified progress and three stable owner cards; live publication is still blocked by missing scoped credentials and expired Vercel login.
+
+Next: reachable dependency risks, first-event activation, real host supply. Targets: 25 new real registrations by September 21; 200 base / 1,000 stretch by October 14 with activation/attendance/revenue-evidence gates. Production baseline remains unknown. Owner actions: restore provider/HQ access, approve limited host pilot, authorize exact reviewed application release. No new spending, outreach, production writes, push or deployment.
+
 ## Activation correction — 2026-09-14
 
 First cycle selected the framework patch and used an independent specialist, then correctly returned fault when sandbox registry access failed with EACCES. No application/dependency change was made. Reviewed documentation/report handoff preserved on `studio/autonomous` as `2c5c35a`. Supervisor invocation now explicitly enables outbound network for authorized development while retaining workspace-write filesystem/Git boundaries; 24 runtime PowerShell checks pass. Second cycle restarted at 2026-09-13 22:00 UTC. A successful product cycle and live HQ delivery remain unverified; do not infer success from the restart. No owner decision was needed for this routine runtime repair.

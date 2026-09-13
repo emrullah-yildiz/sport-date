@@ -1,5 +1,9 @@
 # Decision log
 
+## 2026-09-14 - Runtime activation repairs preserve independent verification
+
+The first real worker cycle selected the framework security patch and delegated review, then stopped on registry EACCES. Outbound networking is now enabled per invocation for authorized development; workspace-write filesystem and shared Git restrictions remain. The model prepares unstaged changes, and the supervisor owns clean installation, mandatory checks and local commits. A later interrupted handoff is consistent with a Windows status-reader sharing collision, but discarded diagnostics prevent proving the cause. Atomic status writes now retry only sharing/lock violations for at most two seconds, with a real held-reader regression and sanitized structural diagnostics. Root preserved the prepared dependency patch and independently reviewed its scope, audit and protected-route smoke before submitting it to supervisor verification. Neither interrupted run is presented as a successful unattended cycle; live HQ and production release remain separately gated.
+
 ## 2026-09-14 — Autonomous CEO execution with evidence and bounded authority
 
 The owner delegated routine prioritization, targets and agent allocation, with business-only decisions surfaced in HQ. Adopted `autonomous-operating-contract.md`. The new coordinator uses a retained isolated branch, no overlapping cycles, a 25-minute maximum, heartbeat/failure states, and cheap monitoring of changed scoped owner decisions. Local verified code commits are routine; production release, spending, external outreach and final business choices remain explicit owner decisions. Internal HQ report publication is authorized by the current mandate.
