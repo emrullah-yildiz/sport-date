@@ -93,6 +93,41 @@
   gap: 34px;
   font-size: 13px;
 }
+.signIn {
+  white-space: nowrap;
+}
+.memberLink {
+  max-width: 200px;
+  overflow-wrap: anywhere;
+}
+.betaNote {
+  margin-top: 20px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.betaNote :global(.term-explainer-trigger) {
+  min-height: 44px;
+}
+.builderIntro .demoDisclosure {
+  margin-top: 14px;
+  max-width: 340px;
+  font-size: 12px;
+}
+.footer nav, .communityLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+.communityLinks a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 12px;
+}
 .header nav>a {
   min-height: 44px;
   display: flex;
@@ -916,9 +951,9 @@
     font-size: 22px;
   }
   .header nav {
-    gap: 0;
+    gap: 16px;
   }
-  .header nav>a:first-child {
+  .header nav>.howLink, .header nav>.memberLink {
     display: none;
   }
   .navAction {
@@ -1117,6 +1152,10 @@
   .footer>a {
     width: 100%;
     min-height: 30px;
+  }
+  .footer nav {
+    width: 100%;
+    gap: 18px;
   }
   .page :is(button,a):focus-visible {
     outline-offset: 3px;

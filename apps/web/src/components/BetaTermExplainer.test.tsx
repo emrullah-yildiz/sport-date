@@ -9,6 +9,7 @@ import BetaTermExplainer, {
   PRIVATE_BETA_LABEL,
   PRIVATE_BETA_POINTS,
 } from "./BetaTermExplainer";
+import LandingExperience from "./landing/LandingExperience";
 
 // The open/closed state is toggled by a click renderToStaticMarkup never runs, so the
 // trigger is asserted in its initial (collapsed) disclosure state, and the explanation
@@ -92,8 +93,15 @@ describe("BetaTermExplainer panel", () => {
 // surface that embeds BetaTermExplainer must wrap it in a non-<p> block element so the
 // block-level panel is valid HTML. This asserts the source of each render site directly.
 describe("BetaTermExplainer render sites (valid DOM nesting)", () => {
+  it("renders the landing explainer outside every paragraph", () => {
+    const html = renderToStaticMarkup(<LandingExperience memberName={null} />);
+    expect(html).toContain('class="term-explainer"');
+    // Assert the rendered ancestor relationship rather than a CSS-module name.
+    // The expandable block panel must not acquire a paragraph ancestor.
+    expect(html).not.toMatch(/<p\b[^>]*>(?:(?!<\/p>)[\s\S])*class="term-explainer"/);
+  });
+
   const RENDER_SITES: readonly { file: string; wrapperClass: string }[] = [
-    { file: "../app/landing/page.tsx", wrapperClass: "microcopy" },
     { file: "./LoginForm.tsx", wrapperClass: "auth-switch" },
     { file: "../app/profile/page.tsx", wrapperClass: "eyebrow eyebrow-with-explainer" },
   ];

@@ -2,9 +2,10 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
+import BetaTermExplainer from "@/components/BetaTermExplainer";
 import { BRAND_NAME, RallyGlyph } from "@/lib/brand";
 import { intentions, meetingDetail, plans, sports, transition, type Intention, type Sport, type Stage } from "./demo";
-import s from "./concept.module.css";
+import s from "./landing.module.css";
 
 function Arrow() { return <span aria-hidden="true">↗</span>; }
 
@@ -23,7 +24,8 @@ function Court({ sport }: { sport: Sport }) {
   </div>;
 }
 
-export default function ConceptExperience() {
+export default function LandingExperience({ preview = false, memberName = null }: { preview?: boolean; memberName?: string | null }) {
+  const signedIn = memberName !== null;
   const [sport, setSport] = useState<Sport>("Padel");
   const [intention, setIntention] = useState<Intention>("Friendship");
   const [stage, setStage] = useState<Stage>("discover");
@@ -42,10 +44,19 @@ export default function ConceptExperience() {
 
   return <div className={s.page}>
     <a className={s.skip} href="#concept-main">Skip to content</a>
-    <div className={s.preview}>DESIGN PREVIEW <span>Fictional activities. Try it freely — nothing is sent or saved.</span></div>
+    {preview && <div className={s.preview}>DESIGN PREVIEW <span>Fictional activities. Try it freely — nothing is sent or saved.</span></div>}
     <header className={s.header}>
-      <Link href="/" prefetch={false} className={s.logo} aria-label={`${BRAND_NAME} home`}><RallyGlyph size={35} /><span>{BRAND_NAME}</span></Link>
-      <nav aria-label="Concept navigation"><a href="#how-it-works">How it works</a><a className={s.navAction} href="#try-it">Find your kind of plan <Arrow /></a></nav>
+      <Link href={signedIn ? "/discover" : "/landing"} prefetch={false} className={s.logo} aria-label={`${BRAND_NAME} home`}><RallyGlyph size={35} /><span>{BRAND_NAME}</span></Link>
+      <nav aria-label="Primary navigation">
+        <a className={s.howLink} href="#how-it-works">How it works</a>
+        {preview ? <a className={s.navAction} href="#try-it">Find your kind of plan <Arrow /></a> : signedIn ? <>
+          <Link className={s.memberLink} href="/profile" prefetch={false}>Signed in as {memberName}</Link>
+          <Link className={s.navAction} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link>
+        </> : <>
+          <Link className={s.signIn} href="/login" prefetch={false}>Sign in</Link>
+          <Link className={s.navAction} href="/signup" prefetch={false} data-track="landing_cta_join">Get started <Arrow /></Link>
+        </>}
+      </nav>
     </header>
     <main id="concept-main">
       <section className={s.hero} aria-labelledby="hero-heading">
@@ -53,7 +64,16 @@ export default function ConceptExperience() {
           <p className={s.eyebrow}><span className={s.greenDot} /> A LITTLE SPORT. A REAL CONNECTION.</p>
           <h1 id="hero-heading">Less small talk.<br />More <span>good<br className={s.desktopBreak} /> company.</span></h1>
           <p className={s.definition}>Meet people for dating, friendship, or a new crew through small local sports activities.</p>
-          <div className={s.heroActions}><a className={s.primary} href="#try-it">Try an example plan <Arrow /></a><span>For adults 18+<br />All starting points welcome</span></div>
+          <div className={s.heroActions}>
+            {signedIn ? <Link className={s.primary} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link> : <a className={s.primary} href="#try-it">Try an example plan <Arrow /></a>}
+            <span>For adults 18+<br />All starting points welcome</span>
+          </div>
+          {!preview && <div className={s.betaNote}>
+            {signedIn ? <p>Your next activity is a click away. Or try the example below.</p> : <>
+              <p>Free beta · open to adults 18+ · usable worldwide</p>
+              <BetaTermExplainer />
+            </>}
+          </div>}
           <div className={s.heroAside}><span className={s.miniIcon}>↗</span><p>You bring yourself.<br /><strong>The activity breaks the ice.</strong></p></div>
         </div>
         <div className={s.heroArt}>
@@ -71,7 +91,7 @@ export default function ConceptExperience() {
         ].map(([number, title, text]) => <article key={number}><span className={s.stepNumber}>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
       </section>
       <section id="try-it" className={s.playground} aria-labelledby="try-heading">
-        <div className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Mix an activity with an intention.<br />See how your first plan could feel.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span></div>
+        <div className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Mix an activity with an intention.<br />See how your first plan could feel.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></div>
         <div className={s.builder}>
           <fieldset className={s.choices}><legend>01 <span>How do you want to move?</span></legend><div>{sports.map((item, i) => <button key={item} type="button" aria-pressed={sport === item} onClick={() => { setSport(item); reset(); }}><span aria-hidden="true">{["◉", "↗", "〰"][i]}</span>{item}</button>)}</div></fieldset>
           <fieldset className={s.choices}><legend>02 <span>What are you open to?</span></legend><div>{intentions.map(item => <button key={item} type="button" aria-pressed={intention === item} onClick={() => { setIntention(item); reset(); }}>{item}</button>)}</div></fieldset>
@@ -99,9 +119,24 @@ export default function ConceptExperience() {
           </article>
         </div>
       </section>
-      <aside className={s.trust} aria-label="The experience principles"><p>Good company.<br /><strong>Clear boundaries.</strong></p><div><span>01</span><p><strong>Adults only</strong>A space for people 18 and over.</p></div><div><span>02</span><p><strong>Private until accepted</strong>The exact meeting point comes later.</p></div><div><span>03</span><p><strong>You stay in control</strong>Clear intentions. Room to say no.</p></div></aside>
-      <section className={s.closing}><p className={s.eyebrow}>THAT WAS THE PREVIEW. THIS IS THE NEXT STEP.</p><h2>Your next good story<br />could start with <span>“fancy a game?”</span></h2><p>Explore the current product when you’re ready.</p><div><a className={s.primary} href="/discover">Explore the app (sign-in) <Arrow /></a><a className={s.secondary} href="/signup">Create an account</a></div><small>These links leave the demo. Real activity availability may vary.</small></section>
+      <aside className={s.trust} aria-label="The experience principles"><p>Good company.<br /><strong>Clear boundaries.</strong></p><div><span>01</span><p><strong>Adults only</strong>A space for people 18 and over.</p></div><div><span>02</span><p><strong>Private until accepted</strong>The exact meeting point comes later.</p></div><div><span>03</span><p><strong>You stay in control</strong>Block, report, or leave when you need to.</p></div></aside>
+      <section className={s.closing}>
+        <p className={s.eyebrow}>{preview ? "THAT WAS THE PREVIEW. THIS IS THE NEXT STEP." : "READY FOR A REAL PLAN?"}</p>
+        <h2>Your next good story<br />could start with <span>“fancy a game?”</span></h2>
+        <p>{preview ? "Explore the current product when you’re ready." : signedIn ? "Pick up where you left off and find an activity." : "Create a free profile, choose your sports, and ask to join an activity."}</p>
+        <div>
+          <Link className={s.primary} href={signedIn || preview ? "/discover" : "/signup"} prefetch={false} data-track={!preview && !signedIn ? "landing_cta_join" : undefined}>{signedIn ? `Enter ${BRAND_NAME}` : preview ? "Explore the app (sign-in)" : "Create a free profile"} <Arrow /></Link>
+          <Link className={s.secondary} href={signedIn ? "/profile" : preview ? "/signup" : "/login"} prefetch={false}>{signedIn ? "Your profile" : preview ? "Create an account" : "Sign in"}</Link>
+        </div>
+        <small>{preview ? "These links leave the demo. Real activity availability may vary." : "Open worldwide; local availability depends on hosts near you."}</small>
+        {!preview && <div className={s.communityLinks}>
+          <Link href="/research" prefetch={false} data-track="landing_cta_survey">Take the 2-min survey</Link>
+          <Link href="/feedback" prefetch={false}>Share feedback</Link>
+        </div>}
+      </section>
     </main>
-    <footer className={s.footer}><span><RallyGlyph size={25} /> {BRAND_NAME}</span><span>Meet through movement.</span><a href="/safety">Safety in the current product <Arrow /></a></footer>
+    <footer className={s.footer}><span><RallyGlyph size={25} /> {BRAND_NAME}</span><span>Meet through movement.</span><nav aria-label="Legal and trust links">
+      <Link href="/trust" prefetch={false}>Trust</Link><Link href="/terms" prefetch={false}>Terms</Link><Link href="/privacy" prefetch={false}>Privacy</Link><Link href="/safety" prefetch={false}>Safety <Arrow /></Link>
+    </nav></footer>
   </div>;
 }

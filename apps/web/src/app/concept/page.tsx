@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ConceptExperience from "./ConceptExperience";
+import LandingExperience from "@/components/landing/LandingExperience";
 
 export const metadata: Metadata = {
   title: "Design preview: more good company",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function ConceptPage() {
-  return <ConceptExperience />;
+  return <LandingExperience preview />;
 }

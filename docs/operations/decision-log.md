@@ -1,5 +1,11 @@
 # Decision log
 
+## 2026-09-14 — Promote the approved concept to the main landing
+
+Following the owner's “Looks good. Update the main”, the main `/landing` route now renders the approved experience. `/` retains its permanent redirect to `/landing`. Presentation, scoped CSS and fictional demo rules live in `src/components/landing/`, shared by the main route and `/concept`; preview-only metadata and banner stay on `/concept`.
+
+The server resolves the existing session and passes only the member's first name or null to the client component, not the full profile or session. Members get app/profile actions; visitors get signup and visible mobile sign-in. Real signup and survey actions retain the existing anonymous counter names. No example sport/intention/state choices are tracked or persisted. The interactive section retains fictional supply, host and acceptance labels. Main-page canonical/indexability, beta disclosure, worldwide-with-local-supply qualifier, legal/safety links and feedback/research destinations are preserved. No production deployment or changes to signup/discovery authorization are part of this promotion.
+
 ## 2026-09-14 — Interactive comprehension preview is separate from live flows
 
 The owner requested an autonomous design concept using parallel agents. `/concept` retains the existing KeepItUp identity and demonstrates sport/intention selection and request → review → acceptance using fictional data held in component state. Persistent example labels distinguish it from live availability; acceptance is an explicit simulation, not a booking. A fictional meeting point renders only in the accepted state and disappears on cancel/reset/selection changes. No profile preferences, real requests, messages, precise member locations, analytics choices or persistent demo state are collected.

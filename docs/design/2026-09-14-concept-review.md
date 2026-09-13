@@ -2,6 +2,8 @@
 
 Interactive concept and project evaluation, 14 September 2026.
 
+**Owner-approved follow-up:** the concept is now applied to the main `/landing` page (also reached from `/`). The production presentation adapts actions to the current session and retains the interactive example, beta disclosure, legal links and feedback destinations. Shared implementation lives in `apps/web/src/components/landing/`; `/concept` remains a noindex preview of that presentation. This promotion is committed locally, not deployed. The original design-evaluation scope and evidence below describe the preceding concept cycle.
+
 ## Open the concept
 
 Run `npm run dev:web` from the repository root, then open <http://localhost:3000/concept>. The preview uses the existing KeepItUp identity. It is a proposed experience, separate from the current landing and signed-in product. No production deployment is part of this work.

@@ -4,7 +4,8 @@
 
 - [x] Parallel product/UX evaluation and an interactive, responsive `/concept` preview: “Less small talk. More good company.” Existing KeepItUp identity; clearly fictional activity selection and host-request walkthrough. See `docs/design/2026-09-14-concept-review.md` for evidence and scope.
 - [ ] Evaluate the concept with unfamiliar adults before claiming comprehension or conversion gains; external recruitment requires owner authorization.
-- [ ] Apply the reviewed direction to the real landing, discovery and signup in separate tested slices. Current production flows were not redesigned in the concept cycle.
+- [x] Apply the owner-approved direction to the main `/landing` route, preserving authenticated navigation, guest sign-in, beta disclosure, legal links and anonymous real-CTA counts. Shared presentation keeps `/concept` available without its preview banner appearing on the main page.
+- [ ] Apply the reviewed direction to discovery and signup in separate tested slices.
 
 ## Now: trustworthy account foundation
 

@@ -1,5 +1,13 @@
 # Agent state
 
+## Latest work cycle — 2026-09-14: approved design promoted to main landing
+
+Owner approved the concept and requested the main update. `/landing` now uses the approved design, with `/` continuing to redirect there. Shared component/style/demo files moved to `apps/web/src/components/landing/`; `/concept` retains preview metadata and banner. Guests have visible mobile sign-in/signup; members have direct discover/profile paths. Server session lookup passes only the first name to the client. Beta/open-worldwide/local-supply explanations, legal/safety links, feedback/research routes and aggregate real-CTA counters are preserved. Example choices remain fictional, local and untracked.
+
+Verification: **1,175 web tests passed / 14 opt-in skipped** with two workers, after an initial concurrent build/test run hit the existing login test's five-second timeout. Web typecheck and production build passed; full lint has zero errors and four existing warnings in untouched files. Browser harness passes on main and preview routes, including root redirect/canonical/indexability, 320/390/768/1440px layouts, keyboard focus, reduced motion, 200% CSS zoom, no-JS signup path, demo state/privacy/reset, and beta disclosure/Escape recovery on a narrow phone. Landing/session-boundary and explainer suites pass (20 tests). No deployment or push performed.
+
+Next three outcomes: (1) owner-authorized production deployment if desired, (2) simplify discovery with approved visual direction, (3) revise signup's optional sensitive-question ordering with preserved consent/adult/compatibility rules. No local blocker. Human usability and assistive-technology research remain unperformed; the concept is owner-approved, not evidence of measured conversion gains.
+
 ## Latest work cycle — 2026-09-14: interactive design concept
 
 Owner requested autonomous parallel product/UX investigation and a fun, understandable concept. Three agents evaluated UX, developed strategy, and implemented an isolated `/concept` route; the primary agent integrated findings and verified the browser experience. Outcome: **“Less small talk. More good company.”** Activity and intention choices lead through an explicitly fictional plan, request, host review, simulated acceptance, cancellation and reset. Existing KeepItUp branding is preserved.
