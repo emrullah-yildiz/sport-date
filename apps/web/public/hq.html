@@ -112,6 +112,13 @@
   .sd-note{ font-size:12.5px; color:var(--mut); margin-top:8px; }
   .sd-agents{ font-size:13px; color:#c8d3d0; line-height:1.75; }
   .sd-agents b{ color:var(--ink); }
+  .assignment-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:12px; }
+  .assignment-card{ min-width:0; padding:16px; border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow-wrap:anywhere; }
+  .assignment-card h4{ margin:0 0 12px; font-size:16px; }
+  .assignment-card dl{ margin:0; }
+  .assignment-card dt{ color:var(--mut); font-size:12px; margin-top:12px; }
+  .assignment-card dd{ margin:4px 0 0; line-height:1.6; white-space:pre-wrap; }
+  .assignment-review{ color:var(--mut); font-size:12px; margin:12px 0 0; }
   .sd-tag{ font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; font-weight:800; padding:2px 8px; border-radius:6px; background:var(--panel2); border:1px solid var(--line); }
   .sd-tag.fired{ color:var(--red); } .sd-tag.hired,.sd-tag.keep,.sd-tag.rehired-v2{ color:var(--neon); }
   .sd-tag.probation{ color:var(--amber); } .sd-tag.idle-blocked{ color:var(--mut); }
@@ -454,6 +461,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
   var esc=function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
     return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"})[c]; }); };
   var decisions={}; // directionId -> {action, comment}
+  var decisionDrafts={}; // Preserve typed notes when report sources or saved decisions finish loading.
   var decisionState="unavailable", reportSource="unknown";
   function validReport(d){
     return d && typeof d.headline==="string" && typeof d.day==="string" && Number.isFinite(Date.parse(d.generatedAt)) &&
@@ -476,7 +484,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
       "<p>"+esc(d.detail)+"</p>"+
       '<div class="rec">My call: <b>'+esc(d.recommendation)+"</b></div>"+
       '<div class="sd-actions">'+apBtn+deBtn+change+"</div>"+
-      '<textarea class="sd-comment" aria-label="Optional note for this decision" placeholder="Optional note with your call…">'+esc(dec&&dec.comment?dec.comment:"")+"</textarea>"+
+      '<textarea class="sd-comment" aria-label="Optional note for this decision" placeholder="Optional note with your call…">'+esc(Object.prototype.hasOwnProperty.call(decisionDrafts,d.id)?decisionDrafts[d.id]:dec&&dec.comment?dec.comment:"")+"</textarea>"+
       '<div class="sd-msg"></div>'+
     "</div>";
   }
@@ -490,15 +498,17 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
     var queue='<h3>Owner action queue</h3><p>'+(decisionState==="loaded" ? pending+" awaiting your response. Approval is not execution; delivery is reported in a later update." : decisionState==="signin" ? 'Sign in as the owner to load saved decisions and respond. Unavailable decisions are not counted as pending.' : 'Saved decisions are unavailable. Refresh to retry; responses are disabled until saved state can be loaded.')+'</p>';
     if(data.directions.length) queue+='<div class="decisions">'+data.directions.map(dirCard).join("")+'</div>';
     else queue+='<p>No owner actions listed in this report.</p>';
-    var html='<div class="note"><p><b>'+esc(data.headline)+"</b></p>"+
+    var assignments='<section aria-labelledby="assignment-heading"><h3 id="assignment-heading">Who is working on what</h3>'+
+      '<p>Last reported assignments, as of <time datetime="'+esc(data.generatedAt)+'">'+esc(data.generatedAt)+'</time>. This is a report snapshot, not a live heartbeat. Team review labels do not indicate whether an agent is running.</p>';
+    if(data.agents.length) assignments+='<div class="assignment-grid">'+data.agents.map(function(a){
+      return '<article class="assignment-card"><h4>'+esc(a.name)+'</h4><dl><dt>Task / outcome</dt><dd>'+esc(a.metric||"No task or outcome reported.")+
+        '</dd><dt>Reported update</dt><dd>'+esc(a.note||"No update reported.")+'</dd></dl><p class="assignment-review">Team review: '+esc(a.status||"Not provided")+'</p></article>';
+    }).join("")+'</div>';
+    else assignments+='<p>No agent assignments were included in this report. Current assignments are unknown.</p>';
+    assignments+='</section>';
+    var html='<div class="note" style="margin-top:16px"><h3>Work report</h3>'+
       (data.summary||[]).map(function(s){ return "<p>"+esc(s)+"</p>"; }).join("")+"</div>";
-    if (Array.isArray(data.agents)&&data.agents.length){
-      html+='<div class="note" style="margin-top:12px"><p style="margin-bottom:8px"><b>Agent scorecard</b> (full history: docs/operations/agent-performance.md)</p><div class="sd-agents">'+
-        data.agents.map(function(a){
-          return '<span class="sd-tag '+esc(a.status)+'">'+esc(a.status)+"</span> <b>"+esc(a.name)+"</b> — "+esc(a.note)+" <i style=\"color:var(--mut)\">(metric: "+esc(a.metric)+")</i>";
-        }).join("<br>")+"</div></div>";
-    }
-    box.innerHTML=metadata+queue+html;
+    box.innerHTML=metadata+'<p><b>'+esc(data.headline)+'</b></p>'+assignments+queue+html;
     wire(data);
   }
 
@@ -510,6 +520,8 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
   function wire(data){
     Array.prototype.forEach.call(box.querySelectorAll("[data-dir]"),function(card){
       var id=card.getAttribute("data-dir");
+      var note=card.querySelector(".sd-comment");
+      if(note) note.addEventListener("input",function(){ decisionDrafts[id]=note.value; });
       Array.prototype.forEach.call(card.querySelectorAll(".sd-btn"),function(btn){
         btn.addEventListener("click",function(){
           if(btn.disabled) return;
@@ -526,6 +538,7 @@ document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ lb.classList.remo
             return res.json();
           }).then(function(){
             decisions[id]={action:action,comment:comment||null};
+            if(decisionDrafts[id]===comment) delete decisionDrafts[id];
             render(data); // re-render keeps every card's state honest
           }).catch(function(err){
             Array.prototype.forEach.call(card.querySelectorAll("button"),function(b){ b.disabled=false; });
