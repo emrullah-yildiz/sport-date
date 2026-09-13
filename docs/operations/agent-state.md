@@ -1,5 +1,9 @@
 # Agent state
 
+## HQ credential replacement prepared - 2026-09-14
+
+Owner asked how to recreate the unreadable reporting key. Generated a cryptographically random 32-byte replacement, retained only in ignored `.agents/product-studio/runtime/social-agent-secret.pending`, and copied it to the local clipboard without displaying it. It is not in the active environment; no production variable or deployment changed. Owner can update the existing production SOCIAL_AGENT_SECRET value and redeploy the current production revision. After confirmation, verify the pending key against the live authenticated endpoint before activating local reporting. The key also authorizes social-queue/dispatch and aggregate metrics endpoints; any other callers holding the old key will need coordination. Do not rotate STANDUP_AGENT_SECRET or unrelated credentials by implication.
+
 ## Access restoration check - 2026-09-14
 
 Owner reported Vercel login and proxy repair. Verified CLI sign-in, project access, public DNS and direct Vercel responses for apex/www (no Cloudflare proxy header). Existing HQ environment keys are type `sensitive`; Vercel omits their values. No credential values logged, temporary environment downloads removed, no rotation or deployment. Existing SOCIAL_AGENT_SECRET securely placed in ignored .env.studio.local would enable report publication and decision reads; otherwise prepare replacement scope/consumer inventory before a production change. Updated the existing access card rather than asking for login again. Live HQ publication remains blocked by the missing local key.
