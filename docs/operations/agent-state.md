@@ -1,5 +1,9 @@
 # Agent state
 
+## Owner steering — 2026-09-14: use judgment and evolve
+
+Owner clarified the original autonomy/CEO/1,000-user prompt is a starting point, not a rulebook. Updated operating contract, growth plan and roadmap: optimize for useful attendance, return and paid value; revise targets, offer and agent allocation from evidence. Original numerical scenarios remain visible as hypotheses; no silent target reset. No new business permissions were inferred. Useful current joining-flow work continues; future cycles read the current source contract so stale worktree plans do not override this clarification. HQ records rationale and next evidence, not activity as success. Live reporting access remains unavailable.
+
 ## Verified product outcome and resumed team - 2026-09-14
 
 Framework patch `98ac494` passed independent supervisor clean install, all workspace typechecks, 1,190 web tests / 14 skipped, 229 domain tests, lint (0 errors / 11 warnings) and production build. Root confirmed exact dependency scope, audit (0 critical / 11 high / 15 moderate), and protected-route/static smoke. Next/eslint-config-next 16.3.5 and lockfile are integrated into local main. Production remains unchanged. Root-supervised recovery completed the first outcome; do not claim it was an uninterrupted unattended cycle.

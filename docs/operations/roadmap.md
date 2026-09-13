@@ -1,5 +1,9 @@
 # Outcome roadmap
 
+## Current strategic question — owner clarification, 2026-09-14
+
+Can we create a small, repeatable local sports experience that people choose again and eventually pay to improve? Prioritize the next decisive evidence: a real host commitment, actual attendance, return, then a voluntary paid-value test under approved pricing. Fix material safety/core-flow risks and measure this path; do not expand the backlog to keep agents occupied. The first user-count/date scenarios are revisable reference points. Team structure, tactics and product bets can change without asking the owner to assign tasks; explain material changes in HQ and preserve approval boundaries.
+
 ## Autonomous commercial operation — 2026-09-14
 
 - [x] Adopt owner-delegated CEO contract, bounded parallel team and evidence-based 7/30-day targets.

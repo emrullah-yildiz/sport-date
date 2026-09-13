@@ -6,6 +6,8 @@ This plan replaces the expired July dates and follower-first priorities for this
 
 ## Evidence baseline
 
+**Owner clarification, September 14:** the original prompt and this first plan are starting hypotheses. The numerical scenarios below are preserved for comparison, not fixed commitments. Immediate priority is proof of a useful local loop: real host, worthwhile attendance, return, then voluntary payment for an implemented benefit at an approved price. Plus is one offer hypothesis. Set acquisition scale from real available places and operating capacity; revise the offer and targets from observed behavior. September 21 and October 14 are evidence-review checkpoints, not reasons to manufacture volume. Record forecast revisions and missed assumptions explicitly. One returning paying customer would be an early commercial signal, not proof of a sustainable business.
+
 Read on **2026-09-14 Europe/Bucharest**. Sources: repository HQ report dated July 14; `apps/web/src/lib/click-metrics.ts`; metrics summary route; database schema; entitlement domain; and fresh read-only aggregate SQL against the locally configured database. No individual account, message, preference, report or precise location was retrieved.
 
 | Measure | Observation | What it establishes |

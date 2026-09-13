@@ -1,5 +1,9 @@
 # Decision log
 
+## 2026-09-14 — Original prompt is an evolving brief
+
+The owner explicitly asked us to reevaluate rather than enforce the initial prompt literally. Treat autonomy as responsibility for outcomes and judgment. User targets, timing, agent count and offer assumptions can evolve without routine owner approval; privacy/safety controls and actual business authorization remain boundaries. Prioritize a real repeat-use loop and a voluntary payment test over registration volume or continuous agent activity. Preserve the original forecast and explain revisions in HQ. Current independently useful work continues; this clarification does not cancel the product mandate.
+
 ## 2026-09-14 - Runtime activation repairs preserve independent verification
 
 The first real worker cycle selected the framework security patch and delegated review, then stopped on registry EACCES. Outbound networking is now enabled per invocation for authorized development; workspace-write filesystem and shared Git restrictions remain. The model prepares unstaged changes, and the supervisor owns clean installation, mandatory checks and local commits. A later interrupted handoff is consistent with a Windows status-reader sharing collision, but discarded diagnostics prevent proving the cause. Atomic status writes now retry only sharing/lock violations for at most two seconds, with a real held-reader regression and sanitized structural diagnostics. Root preserved the prepared dependency patch and independently reviewed its scope, audit and protected-route smoke before submitting it to supervisor verification. Neither interrupted run is presented as a successful unattended cycle; live HQ and production release remain separately gated.
