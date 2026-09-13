@@ -1,5 +1,12 @@
 # Agent state
 
+## Agent assignments on HQ - 2026-09-14
+
+Owner requested visibility into who is working on what. Published current assignment entries through the existing live report API: autonomous host-edit worker, HQ interface specialist, coordinator and explicitly completed prior chat-safety team. Each entry names its task and last-observed state/time; no inferred running status from legacy keep labels. Future cycles now publish assignments at selection/delegation/state changes and final handoff, preserving concurrent work.
+
+Local commit c71bb7e adds prominent responsive assignment cards before the long report, truthful timestamp/unknown/stale states and retained owner-note drafts. Twelve HQ tests, web typecheck and Chromium at 390px/1280px pass. This new layout is not deployed; current live HQ already displays the updated assignment content through its existing agent section. No release or external email performed. Existing product cycle continues independently.
+
+
 ## Continued UX iteration and reporting recovery - 2026-09-14
 
 Owner renewed ongoing product/design/UX/UI iteration and explicitly instructed the team to continue independent tasks around decisions. Current source contract, cycle prompt and concrete experience queue reflect this. Personal-sender OAuth setup is paused while the support identity is clarified; it is not a product blocker.
