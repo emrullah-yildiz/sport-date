@@ -27,6 +27,25 @@ try {
     Write-JsonAtomic $status @{state='running'}
     Write-JsonAtomic $status @{state='completed'}
     Assert-Equal ((Get-Content -Raw $status | ConvertFrom-Json).state) 'completed' 'Atomic status replacement'
+    $ready=Join-Path $testDir 'reader-ready'
+    $readerShell=[PowerShell]::Create()
+    try {
+        $null=$readerShell.AddScript('param($path,$ready) $handle=[IO.File]::Open($path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read); try { [IO.File]::WriteAllText($ready,"ready"); Start-Sleep -Milliseconds 600 } finally { $handle.Dispose() }').AddArgument($status).AddArgument($ready)
+        $pending=$readerShell.BeginInvoke()
+        $waitDeadline=[DateTime]::UtcNow.AddSeconds(5)
+        while(-not (Test-Path $ready)) { if([DateTime]::UtcNow -ge $waitDeadline) { throw 'Reader fixture failed to start' }; Start-Sleep -Milliseconds 10 }
+        $watch=[Diagnostics.Stopwatch]::StartNew()
+        Write-JsonAtomic $status @{state='after-reader'}
+        $watch.Stop()
+        $null=$readerShell.EndInvoke($pending)
+        Assert-Equal ((Get-Content -Raw $status | ConvertFrom-Json).state) 'after-reader' 'Reader sharing collision recovers without fault'
+        Assert-Equal ($watch.ElapsedMilliseconds -ge 200) $true 'Writer genuinely waited for reader release'
+    } finally { $readerShell.Dispose() }
+    $failure=[Management.Automation.ErrorRecord]::new([UnauthorizedAccessException]::new('DO_NOT_LOG_SECRET'),'fixture',[Management.Automation.ErrorCategory]::PermissionDenied,$null)
+    Assert-Equal (Test-TransientFileSharing $failure) $false 'Real permission denial is never retried'
+    $diagnostic=Get-SafeFailureDiagnostic $failure
+    Assert-Equal (($diagnostic | ConvertTo-Json) -match 'DO_NOT_LOG_SECRET') $false 'Diagnostics exclude exception text'
+    Assert-Equal $diagnostic.exceptionType 'System.UnauthorizedAccessException' 'Diagnostics retain structural exception type'
     $lockPath=Join-Path $testDir 'lock'
     $first=[IO.File]::Open($lockPath,'OpenOrCreate','ReadWrite','None')
     $rejected=$false
@@ -40,9 +59,9 @@ try {
         [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens,[ref]$parseErrors) | Out-Null
         Assert-Equal $parseErrors.Count 0 "Syntax $script"
     }
-    Write-Output '24 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic status, exclusive lock, lock recovery, scoped network configuration and script syntax.'
+    Write-Output '29 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic status and transient-reader retry, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
 } finally {
     # Delete only the explicit test files in the verified unique test directory; never recursive cleanup.
-    foreach ($file in @('status.json','lock')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }
+    foreach ($file in @('status.json','lock','reader-ready')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }
     [IO.Directory]::Delete($testDir)
 }

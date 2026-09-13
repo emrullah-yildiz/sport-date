@@ -29,11 +29,38 @@ function Get-HQSignal($Config) {
     try { return $raw | ConvertFrom-Json } catch { return $null }
 }
 
+function Get-SafeFailureDiagnostic($Failure) {
+    $exception=$Failure.Exception
+    while ($exception.InnerException) { $exception=$exception.InnerException }
+    return [ordered]@{ exceptionType=$exception.GetType().FullName; hResult=$exception.HResult; scriptLine=$Failure.InvocationInfo.ScriptLineNumber; recordedAt=[DateTime]::UtcNow.ToString('o') }
+}
+
+function Test-TransientFileSharing($Failure) {
+    $exception=$Failure.Exception
+    while ($exception.InnerException) { $exception=$exception.InnerException }
+    $win32=$exception.HResult -band 65535
+    return ($exception -is [IO.IOException] -and $win32 -in @(32,33))
+}
+
 function Write-JsonAtomic([string]$Path, $Value) {
     $temp = "$Path.$PID.tmp"
     [IO.File]::WriteAllText($temp, ($Value | ConvertTo-Json -Depth 8), [Text.UTF8Encoding]::new($false))
-    if (Test-Path -LiteralPath $Path) { [IO.File]::Replace($temp, $Path, [NullString]::Value) }
-    else { [IO.File]::Move($temp, $Path) }
+    try {
+        for($attempt=0;$attempt -lt 21;$attempt++) {
+            try {
+                if (Test-Path -LiteralPath $Path) { [IO.File]::Replace($temp, $Path, [NullString]::Value) }
+                else { [IO.File]::Move($temp, $Path) }
+                return
+            } catch {
+                # Get-Content/other readers can briefly deny FILE_SHARE_DELETE on Windows.
+                # Retry only sharing/lock violations, for at most two seconds; never retry real permission faults.
+                if ($attempt -eq 20 -or -not (Test-TransientFileSharing $_)) { throw }
+                Start-Sleep -Milliseconds 100
+            }
+        }
+    } finally {
+        if(Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -ErrorAction SilentlyContinue }
+    }
 }
 
 if ($LibraryOnly) { return }
@@ -84,7 +111,7 @@ try {
     $schema = Join-Path $PSScriptRoot 'result-schema.json'
     # Each argument is fixed or a trusted local path; never interpolate model/remote text into a shell.
     $arguments = @('-a','never','-c','sandbox_workspace_write.network_access=true','exec','-s','workspace-write','-C',('"'+$worktree+'"'),'--color','never','--output-schema',('"'+$schema+'"'),'-o',('"'+$output+'"'),'-')
-    $state = [ordered]@{ state='running'; startedAt=[DateTime]::UtcNow.ToString('o'); heartbeatAt=[DateTime]::UtcNow.ToString('o'); checkedAt=[DateTime]::UtcNow.ToString('o'); supervisorPid=$PID; runId=$runId; worktree=$worktree; decisionDigest=$signal.digest; note='Bounded local cycle; no production publishing authorized' }
+    $state = [ordered]@{ state='running'; phase='model-work'; startedAt=[DateTime]::UtcNow.ToString('o'); heartbeatAt=[DateTime]::UtcNow.ToString('o'); checkedAt=[DateTime]::UtcNow.ToString('o'); supervisorPid=$PID; runId=$runId; worktree=$worktree; decisionDigest=$signal.digest; note='Bounded local cycle; no production publishing authorized' }
     Write-JsonAtomic $statusPath $state
     $child = Start-Process -FilePath $config.codex -ArgumentList $arguments -WorkingDirectory $worktree -WindowStyle Hidden -RedirectStandardInput $prompt -RedirectStandardOutput (Join-Path $runDir 'stdout.log') -RedirectStandardError (Join-Path $runDir 'stderr.log') -PassThru
     $null=$child.Handle # Retain the native process handle so ExitCode remains available after exit.
@@ -146,6 +173,10 @@ try {
     $state['localReportVerified']=$localReportVerified
     Write-JsonAtomic $statusPath $state
 } catch {
+    $diagnostic=Get-SafeFailureDiagnostic $_
+    # Private structural diagnostics only: never exception messages, command/provider text, or stack contents.
+    $state['failure']=$diagnostic
+    try { Write-JsonAtomic (Join-Path $runtime 'last-failure.json') $diagnostic } catch { }
     $state.state='fault'
     # Exception text may contain provider output: store only a bounded local diagnostic category.
     $state.note='Supervisor failure; inspect local configuration/worktree/auth and explicitly resume after fixing it'
