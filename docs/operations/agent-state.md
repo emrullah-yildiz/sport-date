@@ -1,5 +1,14 @@
 # Agent state
 
+## Redeployment and live HQ restored - 2026-09-14
+
+Owner confirmed redeployment. Vercel deployment dpl_5S6b4bLUCVAspaWZHrYJDnE8SArC is READY, aliased to keepitup.social, with source commit 7fe07ad31a4c86fb1fd741dde1989dd3f2d307e7. Successfully authenticated the prepared replacement SOCIAL_AGENT_SECRET against live decisions before activating it in ignored .env.studio.local; no secret was printed or committed. Published the refreshed September 14 report and verified exact live readback at 2026-09-13T22:57:58.485Z. Removed the resolved access card; retained host pilot and exact reviewed release decisions. Older access-blocked entries below are historical.
+
+The owner redeployed the existing production revision; later local HQ/framework changes and isolated joining/discovery work are not deployed. Latest autonomous cycle 7957174 passed independent typechecks, workspace tests, lint and web build and reached owner_blocked. Its original status records local-only publication; this subsequent coordinator publication resolves reporting access without rewriting that historical cycle result. The regular supervisor can detect restored credentials at its next scheduled check.
+
+CRON_SECRET and Upstash Redis token runtime operation remain unverified; readiness and HQ authentication do not prove them. No cleanup/reminder job was manually triggered. Next outcomes: scoped host-pilot decision, scoped framework/HQ release decision, verified production aggregate baseline with staff/test exclusions. No outreach or spending performed.
+
+
 ## Cron credential replacement prepared - 2026-09-14
 
 Owner asked how to rotate CRON_SECRET. Prepared a separate random 32-byte key in ignored `.agents/product-studio/runtime/cron-secret.pending` and copied it to the local clipboard without outputting the value. SOCIAL_AGENT_SECRET pending copy remains separate. No production variable, active local environment or deployment changed. Repository cron consumers are session cleanup (03:00 UTC) and attendance reminders (09:00 UTC); both check the bearer secret. Owner should update the existing Production CRON_SECRET, retain Secret/Sensitive type, and redeploy the current production revision. Vercel supplies the new bearer value on cron calls after deployment. Verify scheduled-run logs; do not manually trigger reminder emails or cleanup merely to test authentication. Other external callers, if any, need the replacement too.
