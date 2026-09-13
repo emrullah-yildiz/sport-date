@@ -1,5 +1,14 @@
 # Agent state
 
+## Decision email authorization and approved work - 2026-09-14
+
+Owner requested emails whenever a business decision is needed and selected a connected sender. Recipient/sender are stored only in ignored configuration. Two actual Gmail sends were confirmed: the initial two-decision digest and a subsequent narrow local-mail access setup request. Private receipts prevent duplicates. The live HQ decisions now approve the host pilot and exact reviewed framework/HQ release; a dedicated release worktree is being verified and deployed within that scope. Host outreach remains assigned to the owner by the approved card.
+
+Implemented recurring decision monitor and Gmail adapter with fixed endpoints, selected-sender validation, resolved-card filtering, durable deduplication and uncertainty suppression. Local Gmail OAuth credentials remain unavailable; unattended delivery is not active. HQ contains the concrete setup card, also sent by email. Existing product scheduler remains enabled. Tests: 16 notification/reporting tests pass; runtime regression checks also run. Live HQ report publication/readback verified.
+
+New live measurement evidence is in production-baseline-2026-09-14.md: anonymous 30-day counters show 11 discovery events, one signup start, one signup completion. These do not establish unique real users, conversion, attendance or settled revenue; fixture/staff exclusions remain unavailable. Continue from actual supply and attendance evidence, not inflated account counts.
+
+
 ## Redeployment and live HQ restored - 2026-09-14
 
 Owner confirmed redeployment. Vercel deployment dpl_5S6b4bLUCVAspaWZHrYJDnE8SArC is READY, aliased to keepitup.social, with source commit 7fe07ad31a4c86fb1fd741dde1989dd3f2d307e7. Successfully authenticated the prepared replacement SOCIAL_AGENT_SECRET against live decisions before activating it in ignored .env.studio.local; no secret was printed or committed. Published the refreshed September 14 report and verified exact live readback at 2026-09-13T22:57:58.485Z. Removed the resolved access card; retained host pilot and exact reviewed release decisions. Older access-blocked entries below are historical.

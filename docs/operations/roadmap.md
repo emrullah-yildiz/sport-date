@@ -10,8 +10,10 @@ Can we create a small, repeatable local sports experience that people choose aga
 - [x] Replace stale HQ activity claims with fresh-source reporting and a small authenticated owner decision queue.
 - [x] Prepare five freshly verified organization contact routes and a complete host-validation packet; outreach awaits its scoped business decision.
 - [x] Add anonymous main landing page-load counts without a migration or tracking demo choices.
-- [ ] Activate and verify the recurring local runner, isolated worktree and report delivery.
-- [ ] Restore live HQ publishing/decision access and establish a verified production user/activation/revenue baseline.
+- [x] Activate and verify the recurring local runner, isolated worktree and report delivery (successful independently verified cycles; live HQ readback September 14).
+- [x] Restore live HQ publishing and decision access after owner credential rotation/redeployment.
+- [ ] Establish a verified production user/activation/revenue baseline with staff/test exclusions.
+- [ ] Complete unattended owner decision email delivery; initial connector alert sent, local provider access still required.
 - [ ] Validate host supply and first attended sessions before pursuing the 1,000-registration stretch target.
 
 ## Owner-requested design concept — 2026-09-14

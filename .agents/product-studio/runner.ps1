@@ -29,6 +29,12 @@ function Get-HQSignal($Config) {
     try { return $raw | ConvertFrom-Json } catch { return $null }
 }
 
+function Get-DecisionEmailStatus($Config) {
+    $ErrorActionPreference='Continue'
+    $raw = & node (Join-Path $PSScriptRoot 'decision-email.mjs') monitor $Config.sourceRoot 2>$null | Out-String
+    try { return $raw | ConvertFrom-Json } catch { return @{ state='unavailable'; reason='Decision email monitor returned no status; no send claimed.' } }
+}
+
 function Get-SafeFailureDiagnostic($Failure) {
     $exception=$Failure.Exception
     while ($exception.InnerException) { $exception=$exception.InnerException }
@@ -104,6 +110,7 @@ try {
     $previous = if (Test-Path $statusPath) { Get-Content -Raw $statusPath | ConvertFrom-Json } else { $null }
     if ($Pause) { $state.state='paused'; $state.note='Explicitly paused'; Write-JsonAtomic $statusPath $state; exit 0 }
     $config = Get-Content -Raw (Join-Path $runtime 'config.json') | ConvertFrom-Json
+    $emailStatus=Get-DecisionEmailStatus $config
     $signal=$null
     $ownerResponse=$false
     if ($previous -and $previous.state -eq 'owner_blocked' -and -not $Resume) {
@@ -113,6 +120,7 @@ try {
     }
     if ((Get-CycleDisposition $previous ($Resume.IsPresent -or $ownerResponse)) -eq 'hold') {
         $previous.checkedAt=[DateTime]::UtcNow.ToString('o')
+        $previous | Add-Member -NotePropertyName decisionEmail -NotePropertyValue $emailStatus -Force
         Write-JsonAtomic $statusPath $previous
         exit 0
     }
@@ -199,6 +207,7 @@ try {
     $state['exitCode']=$exitCode
     $state['hqPublished']=$liveVerified
     $state['localReportVerified']=$localReportVerified
+    $state['decisionEmail']=Get-DecisionEmailStatus $config
     Write-JsonAtomic $statusPath $state
 } catch {
     $diagnostic=Get-SafeFailureDiagnostic $_
