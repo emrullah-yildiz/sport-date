@@ -32,14 +32,43 @@ function Get-HQSignal($Config) {
 function Get-SafeFailureDiagnostic($Failure) {
     $exception=$Failure.Exception
     while ($exception.InnerException) { $exception=$exception.InnerException }
-    return [ordered]@{ exceptionType=$exception.GetType().FullName; hResult=$exception.HResult; scriptLine=$Failure.InvocationInfo.ScriptLineNumber; recordedAt=[DateTime]::UtcNow.ToString('o') }
+    return [ordered]@{ exceptionType=$exception.GetType().FullName; hResult=$exception.HResult; nativeErrorCode=$(if($exception -is [ComponentModel.Win32Exception]) {$exception.NativeErrorCode} else {$exception.HResult -band 65535}); scriptLine=$Failure.InvocationInfo.ScriptLineNumber; recordedAt=[DateTime]::UtcNow.ToString('o') }
 }
 
-function Test-TransientFileSharing($Failure) {
+function Test-TransientFileSharing($Failure, [string]$Destination = '') {
     $exception=$Failure.Exception
     while ($exception.InnerException) { $exception=$exception.InnerException }
-    $win32=$exception.HResult -band 65535
-    return ($exception -is [IO.IOException] -and $win32 -in @(32,33))
+    $win32=if($exception -is [ComponentModel.Win32Exception]) {$exception.NativeErrorCode} else {$exception.HResult -band 65535}
+    if(($exception -is [IO.IOException] -or $exception -is [ComponentModel.Win32Exception]) -and $win32 -in @(32,33)) { return $true }
+    # MoveFileEx reports delete-sharing conflicts as ACCESS_DENIED, including locks that
+    # disappear before the probe. Only a readable, non-read-only destination gets bounded
+    # busy-file retries. No ACL is changed; persistent access failure still faults after two seconds.
+    if($exception -is [ComponentModel.Win32Exception] -and $win32 -eq 5 -and $Destination -and (Test-Path -LiteralPath $Destination)) {
+        if(([IO.File]::GetAttributes($Destination) -band [IO.FileAttributes]::ReadOnly) -ne 0) { return $false }
+        try { $probe=[IO.File]::Open($Destination,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::None); $probe.Dispose(); return $true }
+        catch { return (Test-TransientFileSharing $_) }
+    }
+    return $false
+}
+
+function Move-StatusFileAtomic([string]$Source, [string]$Destination) {
+    if(-not ('StudioStatus.NativeMove' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System.Runtime.InteropServices;
+namespace StudioStatus {
+    public static class NativeMove {
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool MoveFileEx(string existingFile, string newFile, uint flags);
+    }
+}
+'@
+    }
+    # Same-directory rename with REPLACE_EXISTING | WRITE_THROUGH. Unlike ReplaceFile,
+    # this does not merge/preserve destination metadata and avoids its ERROR_UNABLE_TO_REMOVE_REPLACED path.
+    if(-not [StudioStatus.NativeMove]::MoveFileEx($Source,$Destination,9)) {
+        throw [ComponentModel.Win32Exception]::new([Runtime.InteropServices.Marshal]::GetLastWin32Error())
+    }
 }
 
 function Write-JsonAtomic([string]$Path, $Value) {
@@ -48,13 +77,12 @@ function Write-JsonAtomic([string]$Path, $Value) {
     try {
         for($attempt=0;$attempt -lt 21;$attempt++) {
             try {
-                if (Test-Path -LiteralPath $Path) { [IO.File]::Replace($temp, $Path, [NullString]::Value) }
-                else { [IO.File]::Move($temp, $Path) }
+                Move-StatusFileAtomic $temp $Path
                 return
             } catch {
                 # Get-Content/other readers can briefly deny FILE_SHARE_DELETE on Windows.
-                # Retry only sharing/lock violations, for at most two seconds; never retry real permission faults.
-                if ($attempt -eq 20 -or -not (Test-TransientFileSharing $_)) { throw }
+                # Bound sharing/busy-file retries to two seconds. No permissions are broadened.
+                if ($attempt -eq 20 -or -not (Test-TransientFileSharing $_ $Path)) { throw }
                 Start-Sleep -Milliseconds 100
             }
         }

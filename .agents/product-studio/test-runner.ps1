@@ -41,6 +41,27 @@ try {
         Assert-Equal ((Get-Content -Raw $status | ConvertFrom-Json).state) 'after-reader' 'Reader sharing collision recovers without fault'
         Assert-Equal ($watch.ElapsedMilliseconds -ge 200) $true 'Writer genuinely waited for reader release'
     } finally { $readerShell.Dispose() }
+    $readerShell=[PowerShell]::Create()
+    try {
+        $null=$readerShell.AddScript('param($path) $reads=0; for($i=0;$i -lt 200;$i++) { try {$raw=[IO.File]::ReadAllText($path)} catch {$exception=$_.Exception; while($exception.InnerException){$exception=$exception.InnerException}; if(($exception.HResult -band 65535) -eq 32){Start-Sleep -Milliseconds 1; continue}; throw}; $null=$raw | ConvertFrom-Json; $reads++; Start-Sleep -Milliseconds 1 }; $reads').AddArgument($status)
+        $pending=$readerShell.BeginInvoke()
+        for($index=0;$index -lt 100;$index++) { Write-JsonAtomic $status @{state='stress';sequence=$index} }
+        $reads=$readerShell.EndInvoke($pending)
+        Assert-Equal $readerShell.Streams.Error.Count 0 'Concurrent readers never see missing or partial JSON'
+        Assert-Equal ([int]$reads[0] -gt 0) $true 'Concurrent reader completed real snapshot reads'
+        Assert-Equal ((Get-Content -Raw $status | ConvertFrom-Json).sequence) 99 'Repeated atomic replacement retains final state'
+    } finally { $readerShell.Dispose() }
+    $nativeDenied=[Management.Automation.ErrorRecord]::new([ComponentModel.Win32Exception]::new(5),'fixture',[Management.Automation.ErrorCategory]::PermissionDenied,$null)
+    Assert-Equal (Test-TransientFileSharing $nativeDenied $status) $true 'Busy-file access denial permits bounded retry after reader releases'
+    try { [IO.File]::SetAttributes($status,[IO.FileAttributes]::ReadOnly); Assert-Equal (Test-TransientFileSharing $nativeDenied $status) $false 'Read-only destination fails without busy-file retry' }
+    finally { [IO.File]::SetAttributes($status,[IO.FileAttributes]::Normal) }
+    $persistentReader=[IO.File]::Open($status,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::Read)
+    $boundedFailure=$false; $watch=[Diagnostics.Stopwatch]::StartNew()
+    try { Write-JsonAtomic $status @{state='must-not-replace'} } catch { $boundedFailure=$true }
+    finally { $watch.Stop(); $persistentReader.Dispose() }
+    Assert-Equal $boundedFailure $true 'Persistent lock fails instead of claiming success'
+    Assert-Equal ($watch.ElapsedMilliseconds -ge 1800 -and $watch.ElapsedMilliseconds -lt 5000) $true 'Persistent lock respects retry bound'
+    Assert-Equal ((Get-Content -Raw $status | ConvertFrom-Json).state) 'stress' 'Failed replacement preserves prior complete status'
     $failure=[Management.Automation.ErrorRecord]::new([UnauthorizedAccessException]::new('DO_NOT_LOG_SECRET'),'fixture',[Management.Automation.ErrorCategory]::PermissionDenied,$null)
     Assert-Equal (Test-TransientFileSharing $failure) $false 'Real permission denial is never retried'
     $diagnostic=Get-SafeFailureDiagnostic $failure
@@ -59,7 +80,7 @@ try {
         [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens,[ref]$parseErrors) | Out-Null
         Assert-Equal $parseErrors.Count 0 "Syntax $script"
     }
-    Write-Output '29 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic status and transient-reader retry, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
+    Write-Output '37 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/dirty-tree guards, atomic rename and concurrent-reader recovery, bounded persistent-lock failure, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
 } finally {
     # Delete only the explicit test files in the verified unique test directory; never recursive cleanup.
     foreach ($file in @('status.json','lock','reader-ready')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }

@@ -1,5 +1,11 @@
 # Agent state
 
+## Access restoration check - 2026-09-14
+
+Owner reported Vercel login and proxy repair. Verified CLI sign-in, project access, public DNS and direct Vercel responses for apex/www (no Cloudflare proxy header). Existing HQ environment keys are type `sensitive`; Vercel omits their values. No credential values logged, temporary environment downloads removed, no rotation or deployment. Existing SOCIAL_AGENT_SECRET securely placed in ignored .env.studio.local would enable report publication and decision reads; otherwise prepare replacement scope/consumer inventory before a production change. Updated the existing access card rather than asking for login again. Live HQ publication remains blocked by the missing local key.
+
+Latest recurring joining-flow work is preserved after a status-persistence failure, Win32 1175 during independent verification. Runtime specialist is testing native atomic rename; don't call the worker active until repaired and deliberately resumed. Routine product work remains autonomous within the clarified evolving brief.
+
 ## Owner steering — 2026-09-14: use judgment and evolve
 
 Owner clarified the original autonomy/CEO/1,000-user prompt is a starting point, not a rulebook. Updated operating contract, growth plan and roadmap: optimize for useful attendance, return and paid value; revise targets, offer and agent allocation from evidence. Original numerical scenarios remain visible as hypotheses; no silent target reset. No new business permissions were inferred. Useful current joining-flow work continues; future cycles read the current source contract so stale worktree plans do not override this clarification. HQ records rationale and next evidence, not activity as success. Live reporting access remains unavailable.
