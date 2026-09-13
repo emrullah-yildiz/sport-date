@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/request-security", () => ({
@@ -16,6 +16,17 @@ let PATCH: typeof import("./route").PATCH;
 let isTrustedBrowserMutation: typeof import("@/lib/request-security").isTrustedBrowserMutation;
 let getCurrentUser: typeof import("@/lib/session").getCurrentUser;
 let getDatabase: typeof import("@/lib/db").getDatabase;
+
+beforeEach(() => {
+  // Keep the fixed event fixture in the future without depending on the wall clock.
+  // Only Date is faked; asynchronous route work retains real timers.
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2026-07-01T12:00:00.000Z"));
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 beforeAll(async () => {
   ({ PATCH } = await import("./route"));

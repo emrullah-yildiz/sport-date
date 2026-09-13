@@ -1,5 +1,11 @@
 # Outcome roadmap
 
+## Owner-requested design concept — 2026-09-14
+
+- [x] Parallel product/UX evaluation and an interactive, responsive `/concept` preview: “Less small talk. More good company.” Existing KeepItUp identity; clearly fictional activity selection and host-request walkthrough. See `docs/design/2026-09-14-concept-review.md` for evidence and scope.
+- [ ] Evaluate the concept with unfamiliar adults before claiming comprehension or conversion gains; external recruitment requires owner authorization.
+- [ ] Apply the reviewed direction to the real landing, discovery and signup in separate tested slices. Current production flows were not redesigned in the concept cycle.
+
 ## Now: trustworthy account foundation
 
 - [x] Private-beta signup UI and shared validation.

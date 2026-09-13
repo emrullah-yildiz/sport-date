@@ -1,5 +1,11 @@
 # Decision log
 
+## 2026-09-14 — Interactive comprehension preview is separate from live flows
+
+The owner requested an autonomous design concept using parallel agents. `/concept` retains the existing KeepItUp identity and demonstrates sport/intention selection and request → review → acceptance using fictional data held in component state. Persistent example labels distinguish it from live availability; acceptance is an explicit simulation, not a booking. A fictional meeting point renders only in the accepted state and disappears on cancel/reset/selection changes. No profile preferences, real requests, messages, precise member locations, analytics choices or persistent demo state are collected.
+
+This client-side model is educational only; production authorization remains entirely in the existing server paths. The route uses noindex/nofollow metadata and is excluded from the sitemap, neither of which constitutes access control. Real signup/discovery links are labeled as leaving the preview. No final brand, country, price, public publication or production deployment decision was made. See `docs/design/2026-09-14-concept-review.md` for design rationale and verification; further production journey redesign remains separately scoped.
+
 ## 2026-07-06 - Click analytics are first-party, aggregate-only, and structurally anonymous
 
 The owner asked to see what visitors click. Rejected third-party analytics (consent banner + data sharing — wrong for an EU-first dating product) in favour of an in-house beacon: allowlisted event names and coarse page classes only, counted into one daily row per (day, event, path_class) in `click_metrics_daily`. The schema physically cannot hold a user id, session id, IP, user agent, or sub-day timestamp; the write path drops every extra payload field and reads no identity header (tripwire-tested). Rate limiting reuses the hashed-key limiter without storing IPs, the endpoint fails soft so analytics can never break member UX, and the summary is owner-gated (owner session or the internal agent secret). Read surface: the click-funnel section on /hq.html.
