@@ -67,6 +67,8 @@ try {
     if ($LASTEXITCODE -ne 0 -or $branch -ne 'studio/autonomous') { throw 'Isolated branch mismatch' }
     $dirty = & git -C $worktree status --porcelain
     if ($LASTEXITCODE -ne 0 -or $dirty) { throw 'Isolated worktree has unfinished changes; review before resuming' }
+    $expectedHead=(& git -C $worktree rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Initial revision unavailable' }
     if (-not (Test-Path (Join-Path $worktree 'docs/operations/autonomous-operating-contract.md'))) { throw 'Operating contract missing from worktree' }
     # Auth status exposes account mode only. Never read the auth file or permit API-key fallback.
     $env:OPENAI_API_KEY=$null
@@ -86,11 +88,11 @@ try {
     Write-JsonAtomic $statusPath $state
     $child = Start-Process -FilePath $config.codex -ArgumentList $arguments -WorkingDirectory $worktree -WindowStyle Hidden -RedirectStandardInput $prompt -RedirectStandardOutput (Join-Path $runDir 'stdout.log') -RedirectStandardError (Join-Path $runDir 'stderr.log') -PassThru
     $null=$child.Handle # Retain the native process handle so ExitCode remains available after exit.
-    $deadline = [DateTime]::UtcNow.AddMinutes(25)
+    $deadline = [DateTime]::Parse($state.startedAt).ToUniversalTime().AddMinutes(15)
     while (-not $child.WaitForExit(10000)) {
         if ([DateTime]::UtcNow -ge $deadline) {
             & taskkill.exe /PID $child.Id /T /F *> $null
-            throw 'Cycle exceeded 25 minutes; process tree terminated; review worktree before resume'
+            throw 'Model exceeded 15 minutes; process tree terminated; review worktree before resume'
         }
         $state.heartbeatAt=[DateTime]::UtcNow.ToString('o')
         $state.checkedAt=$state.heartbeatAt
@@ -99,6 +101,27 @@ try {
     $child.WaitForExit()
     $exitCode = $child.ExitCode
     $result = if (Test-Path $output) { Get-Content -Raw $output | ConvertFrom-Json } else { $null }
+    if ($exitCode -eq 0 -and $result -and $result.status -in @('completed','owner_blocked') -and $result.localReportSaved -eq $true) {
+        $state['phase']='independent-verification'
+        Write-JsonAtomic $statusPath $state
+        $handoff=Join-Path $runDir 'handoff.json'
+        $supervisor=Join-Path $PSScriptRoot 'supervisor.mjs'
+        $verifyArgs=@(('"'+$supervisor+'"'),('"'+$worktree+'"'),$state.startedAt,$expectedHead,('"'+$runDir+'"'))
+        $child=Start-Process -FilePath (Get-Command node).Source -ArgumentList $verifyArgs -WindowStyle Hidden -WorkingDirectory $worktree -RedirectStandardOutput $handoff -RedirectStandardError (Join-Path $runDir 'supervisor.log') -PassThru
+        $null=$child.Handle
+        $deadline=[DateTime]::Parse($state.startedAt).ToUniversalTime().AddMinutes(25)
+        while(-not $child.WaitForExit(10000)) {
+            if([DateTime]::UtcNow -ge $deadline) { & taskkill.exe /PID $child.Id /T /F *> $null; throw 'Independent verification exceeded cycle budget' }
+            $state.heartbeatAt=[DateTime]::UtcNow.ToString('o'); $state.checkedAt=$state.heartbeatAt
+            Write-JsonAtomic $statusPath $state
+        }
+        $child.WaitForExit()
+        if($child.ExitCode -ne 0) { throw 'Independent verification/commit failed; changes retained' }
+        $verified=Get-Content -Raw $handoff | ConvertFrom-Json
+        if($verified.committed -ne $true) { throw 'Supervisor commit missing' }
+        $state['commit']=$verified.commit
+        $state['checks']=$verified.checks
+    }
     $dirty = & git -C $worktree status --porcelain
     $gitFailed=$LASTEXITCODE -ne 0
     $localReportVerified=$false

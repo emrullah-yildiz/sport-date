@@ -1,5 +1,13 @@
 # Agent state
 
+## Runtime activation handoff — 2026-09-14
+
+Windows task `KeepItUp Product Studio` is registered every 30 minutes and at logon; first cycle is being activated under supervision. Its isolated `studio/autonomous` worktree has its own locked dependencies. Verified there: 1,190 web tests passed / 14 opt-in skipped, 229 domain tests passed, and all workspace typechecks passed. Runtime checks cover the supervisor commit handoff: Windows sandbox Git metadata stays protected; only independently verified product changes are committed outside it. Inherited CLI multi-agent support is enabled. No production deployment or live HQ publication occurred.
+
+Highest next priority is the verified Next.js dependency advisory in `docs/operations/dependency-audit-2026-09-14.md`: prepare Next/eslint-config-next 16.3.5 and the lockfile, verify installation/tests/typechecks/build/audit, then prepare the exact release candidate. Do not deploy the pre-patch candidate. Then establish real host supply and simplify first activation. Owner cards remain access restoration, limited host pilot and the pending patched release. Missing HQ credentials do not block local product work.
+
+Runtime status is authoritative at `.agents/product-studio/runtime/status.json`; registration and these preparation checks do not prove the first autonomous cycle has completed. The supervisor will mirror only a fresh validated committed report to local HQ after success. Live HQ access remains blocked by missing reporting credentials and invalid Vercel authentication.
+
 ## Latest work cycle — 2026-09-14: autonomous CEO operating system
 
 Owner delegated priorities, targets, agent allocation and HQ decision reporting. Current policy is `docs/operations/autonomous-operating-contract.md`; July runtime/staffing claims are archival. Three parallel specialists delivered a growth/revenue plan, HQ freshness/decision improvements, a five-organization host pilot and a real Windows/Codex runtime. Current target: 25 new real registrations by September 21; 200 base / 1,000 stretch by October 14, with activation, host supply, attendance and revenue-evidence gates. Production baseline is unknown; the local aggregate connection is not verified production and includes unclassified fixtures.

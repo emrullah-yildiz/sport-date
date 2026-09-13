@@ -6,11 +6,14 @@ The scheduler wakes every 30 minutes and at logon. One cycle can work for at mos
 
 Work happens only in the retained `studio/autonomous` Git worktree under ignored `runtime/worktree`. Main is not automatically merged or pushed. The runtime uses configured model settings without overrides, `workspace-write` sandbox and `never` approval; sandbox failures are recorded, never bypassed. Native CLI `--worktree` was evaluated but requires a disabled experimental feature and cannot combine with `--ephemeral`; ordinary Git worktrees provide stable isolation instead.
 
+The model prepares unstaged files and scoped checks within 15 minutes. It never stages or commits shared Git metadata. The supervisor reserves the rest of the 25-minute cycle for independent workspace typechecks, all hermetic workspace tests with two workers, lint and web production build. Only after every check passes does it stage explicitly allowed paths and commit on `studio/autonomous`, with hooks/signing disabled for that command so no external hook can publish. Source main refs remain untouched. Failed checks preserve unstaged work for review. Product source/public/docs paths and the existing dependency manifests/root lock are supported; runtime/control/auth files and operating instructions are excluded. Manifest edits must preserve scripts/workspace roots and trigger independent `npm ci --ignore-scripts` before checks. Any newly required lifecycle scripts or other paths need separate review, not a sandbox bypass. The exact allowed paths are in `cycle-prompt.md` and enforced by `supervisor.mjs`.
+
 The operating contract and authorized HQ helper must be committed first. Install from the repository root:
 
 ```powershell
 powershell -NoProfile -File .agents/product-studio/test-runner.ps1
 node --test .agents/product-studio/reporting.test.mjs
+node --test .agents/product-studio/supervisor.test.mjs
 powershell -NoProfile -File .agents/product-studio/install.ps1 -RegisterTask
 ```
 

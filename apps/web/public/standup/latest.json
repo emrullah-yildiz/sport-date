@@ -1,6 +1,6 @@
-﻿{
+{
     "day":  "2026-09-14",
-    "generatedAt":  "2026-09-13T21:51:37.2495587Z",
+    "generatedAt":  "2026-09-13T21:56:41.9765992Z",
     "headline":  "Autonomous product reset: measure real activation, secure local hosts, and earn the first repeat use before scaling acquisition.",
     "summary":  [
                     "The owner delegated CEO priorities and agent allocation on September 14. The team now owns the work queue, targets, verification and reporting. Owner actions are limited to specific business authority or access decisions below; routine design and engineering will continue independently.",
@@ -10,7 +10,7 @@
                     "Completed in this work cycle: HQ now prioritizes fresh dated reports and owner decisions, archives July claims and labels unavailable approvals honestly. The approved landing is on local main, and a new anonymous landing-page-load counter closes the missing top-funnel signal without tracking demo choices or unique people. A five-organization host pilot packet is ready for review. These product/HQ code changes are local, not deployed.",
                     "Operating model: one coordinator assigns up to three independent specialist tasks, verifies each completed slice and records local commits. The new Windows recurring runner is prepared with isolated work, overlap protection, time limits and failure stopping; an authenticated read-only CLI smoke passed. Schedule activation and the first real cycle are still being verified, so no claim of 24/7 running is made in this snapshot. Local automation requires an awake, logged-in computer, network and available ChatGPT usage.",
                     "Reporting access is blocked: local HQ publishing/decision credentials are missing and the Vercel login is expired. This report is a local repository snapshot until authenticated API publication succeeds. The live website will continue showing the old report until that access is restored. The team continues useful local work; there is no substitute for a verified live publish.",
-                    "Next priorities: verify the full create-invite-request-accept-attend path using isolated fixtures; simplify the first useful discovery/signup step; prepare host supply and a privacy-safe invitation loop. Stop expanding content volume without distribution or actual sessions. Preserve every pending owner decision under its stable ID, and replan from measured outcomes rather than activity counts."
+                    "Next priority: patch the audited Next.js dependency before further feature work; then verify the create-invite-request-accept-attend path using isolated fixtures and simplify first-use discovery/signup. Prepare host supply and a privacy-safe invitation loop. Preserve pending decisions under stable IDs and replan from measured outcomes."
                 ],
     "agents":  [
                    {
@@ -56,9 +56,9 @@
                        {
                            "id":  "SD-20260914-release-reviewed-experience",
                            "priority":  "medium",
-                           "title":  "Authorize release after the verified change set is final",
-                           "detail":  "The approved landing is committed on main (7fe07ad), and this operating cycle adds honest HQ freshness/decision reporting, a host-pilot review page and the missing anonymous landing-page-load signal. No database migration or billing activation is planned. The final verified operations commit and checks will be appended before release is requested.",
-                           "recommendation":  "Review the local main landing and HQ packet. Once the final commit and passing checks are shown here and provider access is restored, approve production release of that exact change set. Alternative: keep it local for further review. This card is pending preparation until the final commit is recorded; it is not blanket future release authority."
+                           "title":  "Review the landing and HQ; release waits for framework patch",
+                           "detail":  "Ready for review: local main through d58c0e5 includes the approved landing (7fe07ad), HQ freshness and decision reporting, the host-pilot review page and anonymous landing-page-load measurement. Validation: 1,189 web tests passed with 14 opt-in skips; the additional stalled-API regression passed in all 7 focused HQ tests. Web typecheck, production build and local landing/HQ browser checks passed. Lint has zero errors and four existing warnings. No database migration or billing activation is included. The isolated dependency audit subsequently flagged critical Next.js advisories. A framework patch and fresh verification now precede release; d58c0e5 is reviewable, but not the final release candidate.",
+                           "recommendation":  "Review the local landing and HQ packet now. The team will prepare the framework patch, passing checks and exact replacement release commit before requesting production deployment. No deployment is authorized by this pending card."
                        }
                    ]
 }
