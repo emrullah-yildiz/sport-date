@@ -1,26 +1,15 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import BetaTermExplainer from "@/components/BetaTermExplainer";
 import PrimaryNav from "@/components/PrimaryNav";
-import EmailVerificationControls from "@/components/EmailVerificationControls";
-import PrivacyControls from "@/components/PrivacyControls";
-import CommunicationPreferences from "@/components/CommunicationPreferences";
 import EditProfileForm from "@/components/EditProfileForm";
 import ProfileEmptyAction from "@/components/ProfileEmptyAction";
 import MilestoneMoment from "@/components/MilestoneMoment";
 import MovementArc from "@/components/MovementArc";
 import ReadinessIndicator from "@/components/ReadinessIndicator";
-import MobileSessionControls from "@/components/MobileSessionControls";
-import PlusBilling from "@/components/PlusBilling";
 import ProfilePhotos from "@/components/ProfilePhotos";
 import ReceivedRatingSummary from "@/components/ReceivedRatingSummary";
 import SiteFooter from "@/components/SiteFooter";
-import WebSessionControls from "@/components/WebSessionControls";
-import { getCommunicationPreferences } from "@/lib/communication-preferences";
-import { resolveTransactionalEmailProvider } from "@/lib/email-provider";
-import { isPlus } from "@/lib/entitlements";
-import { isBillingConfigured } from "@/lib/stripe";
 import { getReceivedRatingAggregate } from "@/lib/peer-feedback";
 import { listProfilePhotos } from "@/lib/photos";
 import { getMemberMovementProgress } from "@/lib/progress";
@@ -73,18 +62,13 @@ function describeSport(
 export default async function ProfilePage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
-  const [movementProgress, communicationPreferences, receivedRating, photos, sensitiveProfile] = await Promise.all([
+  const [movementProgress, receivedRating, photos, sensitiveProfile] = await Promise.all([
     getMemberMovementProgress(user.id),
-    getCommunicationPreferences(user.id),
     getReceivedRatingAggregate(user.id),
     listProfilePhotos(user.id),
     getSensitiveProfile(user.id),
   ]);
   const primaryPhoto = photos.find((photo) => photo.isPrimary) ?? photos[0] ?? null;
-  // Server-computed billing/entitlement state. The Plus surface is fully hidden
-  // when billing is dormant (flag off / no keys); `isPlus` fails closed to FREE.
-  const billingConfigured = isBillingConfigured();
-  const memberIsPlus = isPlus(user);
   // Honest readiness from REAL profile facts — a sport is the true gate to being
   // matchable; the rest is optional polish (see ReadinessIndicator / domain).
   const readiness = calculateProfileReadiness({
@@ -100,10 +84,7 @@ export default async function ProfilePage() {
       <PrimaryNav firstName={user.firstName} />
       <section className="profile-hero">
         <div>
-          <div className="eyebrow eyebrow-with-explainer">
-            Your early-preview profile
-            <BetaTermExplainer className="eyebrow-explainer" />
-          </div>
+          <p className="eyebrow">Your profile</p>
           <h1>{user.firstName} {user.lastName}</h1>
           <p className="profile-hero-meta">
             <span className="profile-hero-fact">{user.location}</span>
@@ -112,7 +93,7 @@ export default async function ProfilePage() {
             <span aria-hidden="true">·</span>
             <span className="profile-hero-fact profile-hero-seeking">{seekingSummary(user.seeking)}</span>
           </p>
-          <p>Ready when the right game appears. This is how you&rsquo;ll come across to people deciding whether to play — a warm, honest picture, no scores, no ranking. It stays your private account record too, with live controls for export, deletion, device sessions, and the preview-era legal boundary.</p>
+          <p>Your sports. Your people. A little about you.</p>
         </div>
         {primaryPhoto ? (
           // Where a single image is shown, use the member's primary photo.
@@ -134,14 +115,7 @@ export default async function ProfilePage() {
           <Link href="/discover" className="profile-action-primary" aria-label="Discover events to join">Discover events <span aria-hidden="true">→</span></Link>
           <Link href="/hosting" className="profile-action-primary" aria-label="Your events and hosting">Your events <span aria-hidden="true">→</span></Link>
         </nav>
-        <nav className="profile-actions-secondary" aria-label="Safety and support">
-          <p className="profile-actions-secondary-label" id="profile-actions-secondary-label">Safety &amp; support</p>
-          <ul aria-labelledby="profile-actions-secondary-label">
-            <li><Link href="/safety" className="profile-action-secondary" aria-label="Safety center">Safety center</Link></li>
-            <li><Link href="/safety#guidelines" className="profile-action-secondary" aria-label="Safety guidelines — how to meet safely">Safety guidelines</Link></li>
-            <li><Link href="/feedback" className="profile-action-secondary" aria-label="Share feedback">Share feedback</Link></li>
-          </ul>
-        </nav>
+        <nav className="profile-actions-secondary" aria-label="Account settings" id="account-security"><Link href="/settings" className="profile-action-secondary">Account settings</Link></nav>
       </div>
       <ReadinessIndicator readiness={readiness} firstName={user.firstName} />
       <section className="profile-grid">
@@ -179,12 +153,7 @@ export default async function ProfilePage() {
             </div>
           )}
         </article>
-        <article className="profile-panel" id="account-security">
-          <p className="panel-label">Account</p>
-          <h2>Contact &amp; sign-in</h2>
-          <p>{user.email}</p>
-          <EmailVerificationControls emailVerified={user.emailVerified} emailDeliveryLive={resolveTransactionalEmailProvider() === "gmail"} />
-        </article>
+
         <article className="profile-panel profile-sports">
           <p className="panel-label">On the field</p>
           <h2>The sports {user.firstName} plays</h2>
@@ -221,18 +190,15 @@ export default async function ProfilePage() {
         </article>
       </section>
       <ProfilePhotos firstName={user.firstName} />
-      <PlusBilling billingConfigured={billingConfigured} isPlus={memberIsPlus} />
+      <details className="hosting-standard"><summary>Your activity</summary>
       <MovementArc progress={movementProgress} />
       <MilestoneMoment
         counts={{ attendedMoves: movementProgress.attendedMoves, hostedMoves: movementProgress.hostedMoves }}
         firstName={user.firstName}
       />
       <ReceivedRatingSummary aggregate={receivedRating} />
-      <CommunicationPreferences preferences={communicationPreferences} />
-      <WebSessionControls />
-      <MobileSessionControls />
+      </details>
       <EditProfileForm profile={{ ...user, ...sensitiveProfile }} />
-      <PrivacyControls />
       <SiteFooter />
     </main>
   );

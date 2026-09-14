@@ -99,7 +99,7 @@ export function VerificationCardBody({
                 /profile), not a generic "Sign in". Resending is auth-gated, so we say
                 so plainly below rather than pretend it is one tap for a signed-out
                 member — no dark pattern, no account-existence leak. */}
-            <Link className="btn-primary" href="/profile#account-security">Get a new verification link</Link>
+            <Link className="btn-primary" href="/settings#account-security">Get a new verification link</Link>
             <Link className="btn-secondary" href="/login">Sign in</Link>
             <Link className="btn-secondary" href="/signup">Create account</Link>
           </>

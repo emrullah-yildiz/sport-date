@@ -1,0 +1,4 @@
+.footer { max-width:1120px; margin:40px auto 0; padding:24px 0; border-top:1px solid #44513e; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; }
+.footer nav { display:flex; flex-wrap:wrap; gap:4px 18px; }
+.footer a { display:inline-flex; align-items:center; min-height:44px; color:inherit; font-size:12px; text-underline-offset:4px; }
+.footer a:focus-visible { outline:3px solid #d4fb50; outline-offset:3px; }

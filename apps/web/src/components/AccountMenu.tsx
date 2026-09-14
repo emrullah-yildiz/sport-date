@@ -37,6 +37,7 @@ export function AccountMenuPanel({
       >
         Your profile
       </Link>
+      <Link href="/settings" role="menuitem" data-account-item className="account-menu-item" onClick={onNavigate}>Account settings</Link>
       <Link
         href="/feedback"
         role="menuitem"

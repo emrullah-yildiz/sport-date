@@ -1,0 +1,10 @@
+.page { min-height:100vh; padding:0 24px 48px; background:#101713; color:#f4f6ef; }
+.shell { max-width:800px; margin:32px auto 48px; }
+.shell h1 { font-size:clamp(32px,5vw,52px); line-height:1.1; letter-spacing:-.04em; margin-bottom:12px; }
+.intro { color:#bfc9b8; margin-bottom:28px; }
+.section { border:1px solid #44513e; border-radius:16px; margin:12px 0; background:#1b261e; }
+.section summary { padding:20px; min-height:56px; cursor:pointer; font-weight:700; }
+.section > div { padding:20px; }
+.section summary:focus-visible { outline:3px solid #d4fb50; outline-offset:3px; }
+.section :global(section) { margin:0; max-width:none; }
+@media(max-width:600px) { .page { padding-inline:18px; } }

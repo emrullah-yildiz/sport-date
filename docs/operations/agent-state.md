@@ -1,5 +1,13 @@
 # Agent state
 
+## Dedicated page responsibilities - September 14
+
+Implemented owner correction: Profile has no general safety instructions and focuses on personal details/editing; activity history is collapsed. Account controls moved intact to authenticated `/settings`, available through the account menu and Profile. Email verification recovery points to the new section. Hosting standards are preserved on `/hosting-guidelines`; the event form no longer follows a large instructions block. Shared footer is compact links to dedicated destinations. Report/block and authorization controls remain unchanged.
+
+Build/typecheck and lint pass (zero errors, 11 existing warnings). Settings auth boundary, navigation and verification-link tests pass. Actual-page browser checks at 390px normal/reduced motion and 1280px pass, including keyboard Settings disclosures and no overflow. Full web suite: 1,206 passed, 14 skipped. Local implementation only; production remains unchanged. Parallel delegation was unavailable due to thread limit, so the coordinator completed this slice directly. Unattended worker remains quota-blocked.
+
+Next: verify retained host-edit work, assemble a concrete integrated release candidate, evaluate member comprehension when recruitment is authorized. Do not put safety instructions on Profile in subsequent iterations.
+
 ## Event-detail continuity completed locally - 2026-09-14 07:22 UTC
 
 Discovery commit f4e625a is followed by matching event-detail posters, concise logistics with timezone, an About this plan disclosure and request controls ahead of the approximate map on mobile. Pending confirmation explains host review and cancellation. Corrected misleading accepted-location copy without changing authorized lookups. Full web suite: 1,205 tests pass (14 skipped), including four new server boundary tests; 28 focused request/discovery tests pass; typecheck/scoped lint and production build pass. Actual-page browser checks at 390px normal/reduced motion and 1280px verify details disclosure, a synthetic keyboard request, one intercepted POST, pending confirmation focus and no private address. See docs/design/event-detail-continuity-2026-09-14.md.

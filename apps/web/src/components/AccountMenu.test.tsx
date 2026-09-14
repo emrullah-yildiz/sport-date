@@ -54,6 +54,7 @@ describe("AccountMenu panel", () => {
     const html = renderPanel();
     expect(html).toContain('role="menu"');
     expect(html).toContain("Your profile");
+    expect(html).toContain('href="/settings"');
     expect(html).toContain("Send feedback");
     expect(html).toContain("Switch account");
     expect(html).toContain("Sign out");
@@ -67,7 +68,7 @@ describe("AccountMenu panel", () => {
   it("marks every menu entry with role=menuitem and keyboard-reachable roles", () => {
     const html = renderPanel();
     const menuitems = html.match(/role="menuitem"/g) ?? [];
-    expect(menuitems.length).toBe(4);
+    expect(menuitems.length).toBe(5);
   });
 
   it("disables the logout actions and shows progress while signing out", () => {

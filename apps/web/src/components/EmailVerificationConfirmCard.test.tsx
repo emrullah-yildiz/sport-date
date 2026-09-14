@@ -75,7 +75,7 @@ describe("EmailVerificationConfirmCard pending + synchronous states", () => {
   it("offers a precise deep link to the resend control on dead-end states, with Sign in / Create account kept as secondary", () => {
     for (const html of [render(""), render("not-a-valid-token")]) {
       // Primary recovery action: the exact account-security control, not a generic Sign in.
-      expect(html).toMatch(/class="btn-primary"[^>]*href="\/profile#account-security"|href="\/profile#account-security"[^>]*class="btn-primary"/);
+      expect(html).toMatch(/class="btn-primary"[^>]*href="\/settings#account-security"|href="\/settings#account-security"[^>]*class="btn-primary"/);
       expect(html).toContain("Get a new verification link");
       // Secondary options remain available.
       expect(html).toMatch(/href="\/login"/);

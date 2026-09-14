@@ -103,7 +103,6 @@ describe("BetaTermExplainer render sites (valid DOM nesting)", () => {
 
   const RENDER_SITES: readonly { file: string; wrapperClass: string }[] = [
     { file: "./LoginForm.tsx", wrapperClass: "auth-switch" },
-    { file: "../app/profile/page.tsx", wrapperClass: "eyebrow eyebrow-with-explainer" },
   ];
 
   for (const { file, wrapperClass } of RENDER_SITES) {

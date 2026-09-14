@@ -15,13 +15,16 @@ const mocks = {
   '@/lib/events': `export async function getDiscoverableEvents(){return window.fixtureEvents}export async function getDiscoverableEvent(){return window.fixtureEvents[0]}export async function getAcceptedEventLocation(){return {venueName:'Synthetic venue',address:'Synthetic address'}}`,
   '@/lib/join-requests': `export async function getMemberReliabilityStanding(){return {notice:{tone:'none',headline:'',body:'',liftsAt:null}}}`,
   '@/lib/track-click': 'export function trackClick(){}',
+  '@/lib/communication-preferences': `export async function getCommunicationPreferences(){return {productUpdatesOptIn:false,consentHistory:[],productUpdatesUpdatedAt:null}}`,
+  '@/lib/stripe': 'export function isBillingConfigured(){return false}',
+  '@/lib/email-provider': `export function resolveTransactionalEmailProvider(){return 'disabled'}`,
   '@/lib/entitlements': 'export function isPlus(){return false}',
   '@/components/ClickTracking': 'export default function Tracking(){return null}',
   'next/link': `import React from 'react';export default function Link({children,...props}){return React.createElement('a',props,children)}`,
   'next/navigation': `export function notFound(){throw Error('Unexpected not found')}export function redirect(){throw Error('Unexpected redirect')}export function useRouter(){return {push(){},refresh(){}}}export function usePathname(){return '/discover'}export function useSearchParams(){return new URLSearchParams()}`,
   'server-only': '',
 };
-const result = await build({configFile:false,root,logLevel:'error',oxc:{jsx:{runtime:'automatic'}},resolve:{alias:{'@':path.join(root,'src')}},plugins:[{name:'discovery-fixture',enforce:'pre',resolveId(id){const key=Object.keys(mocks).find(k=>id===k || (k.startsWith('@/') && id.replaceAll('\\','/')===path.join(root,'src',k.slice(2)).replaceAll('\\','/')));if(key)return '\0mock:'+key;if(id.endsWith('virtual:discovery'))return '\0entry';},load(id){if(id.startsWith('\0mock:'))return mocks[id.slice(6)];if(id==='\0entry')return `import React from 'react';import{createRoot}from'react-dom/client';import Page from '@/app/discover/page';import Detail from '@/app/discover/events/[eventId]/page';const root=createRoot(document.getElementById('root'));window.renderFixture=async()=>root.render(window.fixtureDetail ? await Detail({params:Promise.resolve({eventId:'synthetic-run'})}) : await Page({searchParams:Promise.resolve(window.fixtureParams||{})}));window.renderFixture();`;}}],build:{write:false,minify:false,lib:{entry:'virtual:discovery',name:'DiscoveryFixture',formats:['iife']}},define:{'process.env.NODE_ENV':JSON.stringify('production')}});
+const result = await build({configFile:false,root,logLevel:'error',oxc:{jsx:{runtime:'automatic'}},resolve:{alias:{'@':path.join(root,'src')}},plugins:[{name:'discovery-fixture',enforce:'pre',resolveId(id){const key=Object.keys(mocks).find(k=>id===k || (k.startsWith('@/') && id.replaceAll('\\','/')===path.join(root,'src',k.slice(2)).replaceAll('\\','/')));if(key)return '\0mock:'+key;if(id.endsWith('virtual:discovery'))return '\0entry';},load(id){if(id.startsWith('\0mock:'))return mocks[id.slice(6)];if(id==='\0entry')return `import React from 'react';import{createRoot}from'react-dom/client';import Page from '@/app/discover/page';import Detail from '@/app/discover/events/[eventId]/page';import Settings from '@/app/settings/page';const root=createRoot(document.getElementById('root'));window.renderFixture=async()=>root.render(window.fixtureSettings ? await Settings() : window.fixtureDetail ? await Detail({params:Promise.resolve({eventId:'synthetic-run'})}) : await Page({searchParams:Promise.resolve(window.fixtureParams||{})}));window.renderFixture();`;}}],build:{write:false,minify:false,lib:{entry:'virtual:discovery',name:'DiscoveryFixture',formats:['iife']}},define:{'process.env.NODE_ENV':JSON.stringify('production')}});
 const output=(Array.isArray(result)?result[0]:result).output;
 const bundle=output.find(x=>x.type==='chunk').code;
 const css=(await readFile(path.join(root,'src/app/globals.css'),'utf8')).replace('@import "tailwindcss";','')+'\n'+output.filter(x=>x.type==='asset'&&x.fileName.endsWith('.css')).map(x=>x.source).join('\n');
@@ -67,6 +70,13 @@ try {
     await page.waitForFunction(()=>document.activeElement?.tagName==='STRONG');
     assert.equal(await page.getByText('Synthetic address',{exact:false}).count(),0);
     await page.screenshot({path:path.join(out,`pending-${width}-${reducedMotion}.png`),fullPage:true,animations:'disabled'});
+    await page.evaluate(()=>{window.fixtureSettings=true;window.fetch=async(url,init)=>{if(init?.method && init.method!=='GET')throw Error('Unexpected settings mutation');return new Response(JSON.stringify({sessions:[],devices:[]}));};return window.renderFixture()});
+    await page.getByRole('heading',{name:'Account settings',exact:true}).waitFor();
+    // Reset native disclosure state reused by this isolated single-root fixture.
+    await page.evaluate(()=>document.querySelectorAll('details').forEach(el=>el.open=false));
+    await page.screenshot({path:path.join(out,`settings-${width}-${reducedMotion}.png`),fullPage:true,animations:'disabled'});
+    for(const name of ['Email & sign-in','Notifications','Devices & sessions','Your data & account deletion']) {const control=page.getByText(name,{exact:true});await control.focus();await page.keyboard.press('Enter');await page.waitForFunction(label=>[...document.querySelectorAll('summary')].some(el=>el.textContent===label && el.parentElement.open),name);await page.keyboard.press('Enter');}
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     assert.deepEqual(errors,[]);await page.close();console.log(`PASS discovery ${width}px ${reducedMotion}: finite keyboard browse, grid, empty/single, filters, detail disclosure, mocked request/pending focus, no overflow or real network`);
   }
 } finally {await browser.close();}

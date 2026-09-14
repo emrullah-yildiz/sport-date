@@ -1,12 +1,12 @@
 {
   "day": "2026-09-14",
-  "generatedAt": "2026-09-14T07:21:56.673Z",
-  "headline": "Discovery and event plans redesigned; verified locally, not deployed.",
+  "generatedAt": "2026-09-14T16:47:36.171Z",
+  "headline": "Tidier screens verified locally: Profile, Settings and dedicated guides.",
   "summary": [
-    "Owner asks for stronger product design, event atmosphere, less text and easier nearby discovery/joining. Gesture suggestions are exploratory, not rules. The team is choosing the interaction autonomously against comprehension and useful real-world participation, not novelty alone.",
-    "Implemented bold sport invitations, finite Previous/Next browsing, grid alternative, compact filters and visible approximate scope. Event details now share the poster style, concise logistics/timezone, About this plan disclosure and request controls before the map on mobile. Existing explicit request flow and eligibility/location controls remain. Pending confirmation explains host review and cancellation.",
-    "Research reviewed working patterns from Partiful Explore, Luma Discover and DICE: event-first presentation, category entry points and separation of browsing from commitment. No copied artwork, fake event supply, invented social proof or measured conversion gains.",
-    "Verified 1,205 web tests (14 skipped), typecheck, lint with no errors, production builds and actual-page synthetic browser checks at 390px normal/reduced motion and 1280px. Keyboard request resolves to pending with confirmation focus; no private address appears. No real requests, events or account mutations. Discovery specialist and coordinator completed their design slices.",
+    "Latest owner correction: safety instructions must not appear on Profile. General guidance stays in the Safety Center; essential contextual report/block controls remain available. Simplify each screen around its main task.",
+    "Profile now focuses on personal details and editing, with activity history collapsed. Account administration moves intact to authenticated Settings: email/sign-in, notifications, devices/sessions, data export/deletion and conditional billing. Account menu and verification recovery links reach the new destination.",
+    "Hosting guidance is preserved on its own Hosting Guide page; hosting and event creation use concise links. The shared footer is compact dedicated help/legal/support links, without repeated guidance or privacy-grade claims. Safety instructions remain in the Safety Center; contextual report/block controls are unchanged.",
+    "Verified 1,206 web tests (14 skipped), typecheck, production build, lint (0 errors/11 existing warnings) and actual-page synthetic browser checks at 390px normal/reduced motion and 1280px. Settings disclosures work by keyboard and fit mobile. Coordinator completed the slice directly; additional delegation was unavailable due to thread limit.",
     "Production remains approved release d7064b7; current design/signup/HQ and isolated chat/host work are not deployed. Unattended CLI worker is fault-latched after an explicit usage limit, not working in the background. Host-edit work is preserved; no paid fallback, purchase or resume. Next: verify retained host-edit changes and assemble an exact release candidate. Continuous unattended work cannot be claimed until model capacity is restored."
   ],
   "agents": [
@@ -19,8 +19,8 @@
     {
       "name": "Product coordinator",
       "status": "keep",
-      "metric": "Discovery and event-detail design integration, privacy review and browser verification",
-      "note": "Completed | Observed 2026-09-14T07:21:56.673Z | Two local design slices verified. Next queued: host-edit verification and exact release candidate. Not a background heartbeat."
+      "metric": "Profile/Settings separation, dedicated Hosting Guide and compact member footer",
+      "note": "Completed | Observed 2026-09-14T16:47:36.171Z | Verified local slice; no deployment. Next: retained host-edit verification and exact integrated release candidate."
     },
     {
       "name": "Unattended product worker",
