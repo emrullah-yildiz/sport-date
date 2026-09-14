@@ -230,4 +230,3 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
     </main>
   );
 }
-

@@ -294,7 +294,7 @@ export default function JoinRequestControls({
       return (
         <Panel key="pending" className="join-state pending">
           <strong tabIndex={-1} ref={attachConfirmation}>{joinRequestStateHeadline("pending")}</strong>
-          <p>You can cancel quietly at any time. Skip counts stay private.</p>
+          <p>The host will review your request. You can cancel at any time.</p>
           <button type="button" onClick={cancelRequest} disabled={submitting}>
             {submitting ? "Cancelling…" : "Cancel request"}
           </button>

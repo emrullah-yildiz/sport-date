@@ -1,5 +1,11 @@
 # Agent state
 
+## Event-detail continuity completed locally - 2026-09-14 07:22 UTC
+
+Discovery commit f4e625a is followed by matching event-detail posters, concise logistics with timezone, an About this plan disclosure and request controls ahead of the approximate map on mobile. Pending confirmation explains host review and cancellation. Corrected misleading accepted-location copy without changing authorized lookups. Full web suite: 1,205 tests pass (14 skipped), including four new server boundary tests; 28 focused request/discovery tests pass; typecheck/scoped lint and production build pass. Actual-page browser checks at 390px normal/reduced motion and 1280px verify details disclosure, a synthetic keyboard request, one intercepted POST, pending confirmation focus and no private address. See docs/design/event-detail-continuity-2026-09-14.md.
+
+Next: verify retained host-edit work, assemble an exact integrated release candidate, then test comprehension under authorized recruitment. Both design slices remain local. Current session completed these slices; no unattended model execution is active because of the explicit CLI quota fault. Live HQ reports distinguish completed assignments from the blocked worker. No production deployment, paid service, external recruitment or email send performed.
+
 ## Current design outcome and runtime correction - 2026-09-14 07:17 UTC
 
 Completed local discovery redesign with discovery_redesign specialist: code-native sport posters, clear approximate search scope, compact filters, finite Previous/Next browsing and a grid alternative. Viewing a plan preserves the existing explicit request flow. Coordinator mobile review reduced hero/artwork height; no event supply, conversion gains or social proof invented. Server authentication, eligibility, radius and Plus gates remain intact; only rendered public invitation markup crosses the new client boundary.

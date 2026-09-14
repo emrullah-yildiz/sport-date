@@ -2,7 +2,7 @@
 
 ## Active autonomous experience queue - September 14
 
-Prioritize a vivid, concise nearby-event experience. Discovery now has implemented sport posters, finite focus/grid browsing, compact filters and explicit plan navigation; mobile review tightened the hero and artwork. Next: carry this direction into event details and the request/confirmation journey, then verify retained host-edit work. Signup keyboard work is complete in main; chat safety is verified in the isolated studio branch. See `docs/design/discovery-direction-2026-09-14.md`. These changes are local. The unattended CLI is fault-latched after a usage limit; do not infer active work from its scheduler. Personal-sender OAuth setup remains paused and does not block local product work.
+Prioritize a vivid, concise nearby-event experience. Discovery and event details now share sport posters, compact logistics and explicit request navigation. Discovery adds finite focus/grid browsing and compact filters; details place requesting before the map on mobile and fold the description behind About this plan. Next: verify retained host-edit work, prepare an exact integrated release candidate, then evaluate comprehension with unfamiliar adults under authorized recruitment. Signup keyboard work is complete in main; chat safety is verified in the isolated studio branch. See `docs/design/discovery-direction-2026-09-14.md`. These changes are local. The unattended CLI is fault-latched after a usage limit; do not infer active work from its scheduler. Personal-sender OAuth setup remains paused and does not block local product work.
 
 ## Current strategic question — owner clarification, 2026-09-14
 

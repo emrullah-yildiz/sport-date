@@ -1,0 +1,9 @@
+# Invitation to request: visual continuity
+
+Discovery's invitation now continues into the actual event-detail page: shared sport artwork, dark ink/lime palette, concise time/availability/age/language facts and a named host. Timezone is visible beside the date. The full host description is available through a native About this plan disclosure. Request controls precede the approximate map in DOM and mobile order, reducing the distance to the primary action. Host management remains a separate state. No new gesture sends a request.
+
+Existing JoinRequestControls continues to own submission, eligibility/full/paused states, cancellation, error recovery and confirmation focus. Pending copy now explains that the host reviews the request and the member can cancel. Internal skip-count terminology is removed from that ordinary confirmation.
+
+Privacy correction: the old approximate-area copy claimed that the exact venue was absent from the page even after acceptance rendered it below. The new copy distinguishes an authorized meeting point below from the pre-acceptance explanation. Lookup still requires an accepted non-host request and the existing authorized database function; host views still skip private reliability and accepted-location lookups. No precise data is added to public posters or maps.
+
+Verification: four new server-page boundary tests cover auth-first, new/pending requests never reading precise location, accepted rendering and host separation. The actual-page synthetic browser harness additionally checks the description disclosure, a keyboard-submitted mock request resolving to pending, one intercepted POST, focus on confirmation and no private address after pending, at 390px normal/reduced motion and 1280px. Screenshots inspected. These are isolated tests with synthetic records, not real-event or production end-to-end evidence. Existing eligibility/request regression tests remain applicable. Production deployment is separate.
