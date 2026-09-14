@@ -1,5 +1,9 @@
 # Agent state
 
+## Demo-event request - September 15
+
+Owner requested fake events for testing. Prepared six clearly labeled DEMO payloads (running, two tennis scenarios, padel, walking, basketball) with future dates, varied capacities/levels, fictional meeting details and no precise coordinates. `node apps/web/qa/demo-events.mjs` validates every payload through the shared event-creation rules and writes ignored `qa/artifacts/demo-events.json`. No events or accounts have been inserted. Existing local database is not yet verified as isolated from production; owner target clarification (local/test versus live labeled DEMO) is pending. Do not run the older account seeder against an unverified database or present the prepared payloads as live events.
+
 ## Worker restart verified - September 15 local time
 
 Recovered retained host-edit work through the independent supervisor: 1,223 web tests (14 skipped), 229 domain tests, all workspace typechecks, lint and production build pass. Isolated commit 11f7f168ff5ddb6d45cd3885143fe357533f263b; no discarded work or deployment. Explicitly resumed the existing runner. New run 20260914T224042Z started at 22:40:42Z September 14 (September 15 locally), with fresh heartbeat and new command execution observed. No new quota rejection observed at restart. Current task: room-chat stale connection notice/retry with preserved messages/draft. Cycle completion remains pending; historical quota-fault statements below are superseded for this checkpoint.
