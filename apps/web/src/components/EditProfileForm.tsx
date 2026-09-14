@@ -61,6 +61,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const saveInFlightRef = useRef(false);
   // A ref (not state) so consuming it never triggers a render: set true only
   // when a save resolves in this session, so we move focus to the fresh
   // confirmation heading (never leaving keyboard / screen-reader focus on
@@ -107,6 +108,8 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (saveInFlightRef.current) return;
+    saveInFlightRef.current = true;
     setSaving(true);
     setError("");
     setConfirmation("");
@@ -138,6 +141,8 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Profile update failed.");
       setSaving(false);
+    } finally {
+      saveInFlightRef.current = false;
     }
   }
 
@@ -145,6 +150,17 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
     <details className="edit-profile" id="edit-profile">
       <summary>Edit your profile</summary>
       <form onSubmit={submit}>
+        {/* Native fieldset disabling also covers add/remove and sensitive choices.
+            Keep the confirmation outside so it remains a usable focus target. */}
+        <fieldset
+          disabled={saving}
+          aria-label="Profile details"
+          style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: "grid", gap: 16 }}
+          onChangeCapture={() => setConfirmation("")}
+          onClickCapture={(event) => {
+            if (event.target instanceof Element && event.target.closest('button[type="button"]')) setConfirmation("");
+          }}
+        >
         <div className="edit-profile-row"><label>First name<input value={fields.firstName} onChange={(event) => setFields({ ...fields, firstName: event.target.value })} /></label><label>Last name<input value={fields.lastName} onChange={(event) => setFields({ ...fields, lastName: event.target.value })} /></label></div>
         <label>City or region<input value={fields.location} onChange={(event) => setFields({ ...fields, location: event.target.value })} /></label>
         <label>Languages, separated by commas<input id="edit-profile-languages" value={fields.languagesText} onChange={(event) => setFields({ ...fields, languagesText: event.target.value })} /></label>
@@ -237,6 +253,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
               ) : null}
             </div>
           ) : null}
+        </fieldset>
         </fieldset>
         {confirmation ? <EditProfileConfirmation message={confirmation} attach={attachConfirmation} /> : null}
         {error ? <p className="error-message" role="alert">{error}</p> : null}

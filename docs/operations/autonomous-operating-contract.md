@@ -30,6 +30,10 @@ The owner prioritizes a much stronger discovery experience: exciting event atmos
 
 Prioritize a coherent visual/interaction improvement to discovery and the event-to-request journey over another cycle of incidental copy or operating documents, while preserving safety and fixing material blockers. Work already prepared in isolated branches must be retained. The unattended CLI currently has an explicit usage-limit failure; do not resume it or purchase credits automatically while that limit persists. This does not prevent authorized work in the active session. Keep runtime capacity and current session activity clearly distinguished in HQ.
 
+## Department dispatch - September 14
+
+Owner renewed ongoing department ownership. Follow `department-priorities.md` for Product Design, Engineering & Delivery, Growth & Marketing, Social & Creative and coordinator responsibilities. Reuse available agents, assign bounded independent outcomes, inspect completion and choose the next justified task. Publish actual state transitions to HQ. A department charter never establishes continuously running workers; runtime faults and publishing approvals remain explicit.
+
 ## Operating rhythm and team
 
 One coordinator runs a bounded cycle on a recurring local schedule. A cycle selects a useful outcome, assigns at most three parallel specialists with separate file ownership, integrates, verifies, commits locally and reports. Do not keep agents busy merely to show activity. Prefer a small completed slice over a growing pile of plans.

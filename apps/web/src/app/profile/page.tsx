@@ -111,6 +111,7 @@ export default async function ProfilePage() {
       </section>
       <div className="profile-actions">
         <nav className="profile-actions-primary" aria-label="Your main actions">
+          <ProfileEmptyAction target="edit-profile-bio">Edit profile</ProfileEmptyAction>
           <Link href="/events/new" className="nav-host-cta profile-action-primary" aria-label="Host an event — create a new game">Host an event <span aria-hidden="true">→</span></Link>
           <Link href="/discover" className="profile-action-primary" aria-label="Discover events to join">Discover events <span aria-hidden="true">→</span></Link>
           <Link href="/hosting" className="profile-action-primary" aria-label="Your events and hosting">Your events <span aria-hidden="true">→</span></Link>

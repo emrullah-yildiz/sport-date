@@ -8,6 +8,7 @@ import { describeDiscoveryAvailability, describeDiscoveryResultsHeading, formatD
 import { applyAdvancedFilters, ALL_RADIUS_OPTIONS_KM, resolveAdvancedFilters, SCHEDULE_WINDOWS } from "@/lib/discovery-advanced-filters";
 import { coarsenCoordinates, filterEventsWithinRadius, parseRadiusKm, RADIUS_OPTIONS_KM, resolveDiscoveryCentre } from "@/lib/discovery-geo";
 import { isPlus } from "@/lib/entitlements";
+import { isBillingConfigured } from "@/lib/stripe";
 import { joinRequestStateHeadline } from "@/lib/join-request-policy";
 import ClickTracking from "@/components/ClickTracking";
 import PrimaryNav from "@/components/PrimaryNav";
@@ -168,7 +169,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
       </form>
       <div className={styles.filterExtras}>
         <UseMyLocationControl defaultRadiusKm={RADIUS_OPTIONS_KM[1]} />
-        {plus ? null : <p><Link href="/profile">Plus filters</Link> · More distance, schedule and language options.</p>}
+        {!plus && isBillingConfigured() ? <p><Link href="/settings#plus">Plus filters</Link> · More distance, schedule and language options.</p> : null}
       </div>
         </details>
       </div>

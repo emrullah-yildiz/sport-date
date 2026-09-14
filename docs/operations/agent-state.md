@@ -1,5 +1,13 @@
 # Agent state
 
+## Department dispatch and profile recovery - September 14
+
+Owner requested continuing department ownership. Reused three completed agents successfully: Product Design reviewed then fixed editor save-state behavior; Growth prepared the existing host pilot's next experiment and measurement-readiness assessment; Social prepared a demo storyboard. Coordinator owns prioritization and verification. Durable dispatch queue: `department-priorities.md`; cycle prompt reads it. HQ records actual assignment changes rather than invented always-running departments.
+
+Product changes: prominent Edit profile shortcut, locked inputs during save with stale-success clearing, and billing-configured-only Plus link to Settings. Full web suite: 1,209 passed, 14 skipped. Production build/typecheck and scoped lint pass; actual-component mobile/desktop delayed-save checks pass. Social storyboard corrected after coordinator found overlap and re-inspected at desktop; mobile checks also pass. Retained host editing separately passes five focused tests, three browser variants and isolated typecheck; it is not integrated or supervisor-complete. Details: `host-edit-verification-2026-09-14.md`.
+
+Next priorities: (1) integrate and fully verify retained host editing into an exact release candidate; (2) authenticated aggregate pilot measurement with explicit readiness/exclusions, avoiding historical claims from mutable request/seat records; (3) produce the reviewed social demo only within approved distribution/release scope. Existing owner host-pilot execution remains a separate business action. Unattended CLI remains quota-faulted; current-session agents do not establish 24/7 uptime.
+
 ## Dedicated page responsibilities - September 14
 
 Implemented owner correction: Profile has no general safety instructions and focuses on personal details/editing; activity history is collapsed. Account controls moved intact to authenticated `/settings`, available through the account menu and Profile. Email verification recovery points to the new section. Hosting standards are preserved on `/hosting-guidelines`; the event form no longer follows a large instructions block. Shared footer is compact links to dedicated destinations. Report/block and authorization controls remain unchanged.

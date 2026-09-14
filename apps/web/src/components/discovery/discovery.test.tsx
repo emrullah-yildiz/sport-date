@@ -2,11 +2,12 @@ import { Children, isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ user: vi.fn(), events: vi.fn(), plus: vi.fn() }));
+const mocks = vi.hoisted(() => ({ user: vi.fn(), events: vi.fn(), plus: vi.fn(), billing: vi.fn(() => false) }));
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/session", () => ({ getCurrentUser: mocks.user }));
 vi.mock("@/lib/events", () => ({ getDiscoverableEvents: mocks.events }));
 vi.mock("@/lib/entitlements", () => ({ isPlus: mocks.plus }));
+vi.mock("@/lib/stripe", () => ({ isBillingConfigured: mocks.billing }));
 vi.mock("next/navigation", () => ({ redirect: (url: string) => { throw new Error(`redirect:${url}`); }, useRouter: () => ({ push: vi.fn() }), usePathname: () => "/discover", useSearchParams: () => new URLSearchParams() }));
 
 import DiscoverPage from "@/app/discover/page";
@@ -33,6 +34,13 @@ function stageProps(node: ReactNode): Record<string, unknown> | undefined {
 }
 
 describe("discovery event stage boundaries", () => {
+  it("offers a Settings destination only when billing is available", async () => {
+    mocks.billing.mockReturnValue(false);
+    expect(renderToStaticMarkup(await page())).not.toContain('href="/settings#plus"');
+    mocks.billing.mockReturnValue(true);
+    expect(renderToStaticMarkup(await page())).toContain('href="/settings#plus"');
+    mocks.billing.mockReturnValue(false);
+  });
   it("keeps authentication before fetching events", async () => {
     mocks.user.mockResolvedValue(null);
     await expect(page()).rejects.toThrow("redirect:/login");

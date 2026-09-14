@@ -61,7 +61,7 @@ export default function PlusBilling({ billingConfigured, isPlus }: PlusBillingPr
   }
 
   return (
-    <section className="plus-panel" aria-labelledby="plus-title">
+    <section className="plus-panel" id="plus" aria-labelledby="plus-title">
       <p className="panel-label">{BRAND_NAME} Plus</p>
       {isPlus ? (
         <>

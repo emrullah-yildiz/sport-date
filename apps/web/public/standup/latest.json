@@ -1,32 +1,44 @@
 {
   "day": "2026-09-14",
-  "generatedAt": "2026-09-14T16:47:36.171Z",
-  "headline": "Tidier screens verified locally: Profile, Settings and dedicated guides.",
+  "generatedAt": "2026-09-14T16:53:52.030Z",
+  "headline": "Department cycle completed: profile fixes, growth evidence and a visual demo storyboard.",
   "summary": [
-    "Latest owner correction: safety instructions must not appear on Profile. General guidance stays in the Safety Center; essential contextual report/block controls remain available. Simplify each screen around its main task.",
-    "Profile now focuses on personal details and editing, with activity history collapsed. Account administration moves intact to authenticated Settings: email/sign-in, notifications, devices/sessions, data export/deletion and conditional billing. Account menu and verification recovery links reach the new destination.",
-    "Hosting guidance is preserved on its own Hosting Guide page; hosting and event creation use concise links. The shared footer is compact dedicated help/legal/support links, without repeated guidance or privacy-grade claims. Safety instructions remain in the Safety Center; contextual report/block controls are unchanged.",
-    "Verified 1,206 web tests (14 skipped), typecheck, production build, lint (0 errors/11 existing warnings) and actual-page synthetic browser checks at 390px normal/reduced motion and 1280px. Settings disclosures work by keyboard and fit mobile. Coordinator completed the slice directly; additional delegation was unavailable due to thread limit.",
-    "Production remains approved release d7064b7; current design/signup/HQ and isolated chat/host work are not deployed. Unattended CLI worker is fault-latched after an explicit usage limit, not working in the background. Host-edit work is preserved; no paid fallback, purchase or resume. Next: verify retained host-edit changes and assemble an exact release candidate. Continuous unattended work cannot be claimed until model capacity is restored."
+    "Department responsibilities and ranked dispatch queue are now durable: Product Design, Engineering & Delivery, Growth & Marketing, Social & Creative, coordinated by CEO/Operations. Three existing agents worked in parallel and received follow-up tasks after review. HQ reports actual snapshots, not always-on department claims.",
+    "Product delivered three fixes: visible Edit profile entry, accurate save state with locked fields during pending requests and cleared stale confirmation, and a billing-configured-only Plus link to Settings. Verified 1,209 web tests (14 skipped), production build/typecheck, scoped lint and actual-component mobile/desktop browser checks. Local only.",
+    "Growth prepared the next experiment from the already approved five-organization host packet and assessed measurement readiness. Existing mutable request/seat records cannot establish historical acceptance denominators; attendance/return still need scoped aggregate measurement and explicit fixture/staff exclusions. No outreach or invented traction.",
+    "Social prepared one 20-second demo script and a self-contained four-frame visual storyboard. Coordinator rejected initial overlap; corrected desktop/mobile layouts were checked. Fictional demo is clearly labeled; no finished video or public post is claimed.",
+    "Retained host editing independently passes five focused tests, three browser variants and isolated typecheck; broader integration remains next. Production is unchanged. Recurring CLI remains quota-faulted and is not active; current-session agents do not establish continuous background operation. No paid fallback, deployment or external campaign publication."
   ],
   "agents": [
     {
-      "name": "Discovery designer/engineer (discovery_redesign)",
+      "name": "Product Design / discovery_redesign",
       "status": "keep",
-      "metric": "Rebuild discovery as a vivid activity-first browsing experience",
-      "note": "Completed | Observed 2026-09-14T07:21:56.673Z | Discovery implementation and regression handoff verified locally."
+      "metric": "Find the top three remaining Profile/Settings usability issues",
+      "note": "Completed | Observed 2026-09-14T16:53:52.030Z | Profile save/entry fixes and Plus destination verified. Next queued: event-day recovery."
     },
     {
-      "name": "Product coordinator",
+      "name": "Growth & Marketing / first_use_improvement",
       "status": "keep",
-      "metric": "Profile/Settings separation, dedicated Hosting Guide and compact member footer",
-      "note": "Completed | Observed 2026-09-14T16:47:36.171Z | Verified local slice; no deployment. Next: retained host-edit verification and exact integrated release candidate."
+      "metric": "Choose the next host-and-attendance validation experiment",
+      "note": "Prepared | Observed 2026-09-14T16:53:52.030Z | Host experiment and measurement gap assessed. Next queued: scoped aggregate pilot snapshot; owner executes approved inquiries."
     },
     {
-      "name": "Unattended product worker",
+      "name": "Social & Creative / hq_assignment_ui",
+      "status": "keep",
+      "metric": "Prepare a 20-second demo of discover to pending request",
+      "note": "Prepared | Observed 2026-09-14T16:53:52.030Z | Four-frame storyboard corrected and reviewed; next: final video production within approved scope. Not published."
+    },
+    {
+      "name": "CEO & Delivery / coordinator",
+      "status": "keep",
+      "metric": "Verify retained host editing and maintain department priorities",
+      "note": "Completed | Observed 2026-09-14T16:53:52.030Z | Verified department outputs and saved ranked next tasks. Next queued: host-edit integration and exact release candidate."
+    },
+    {
+      "name": "Recurring CLI worker",
       "status": "idle-blocked",
-      "metric": "Recurring autonomous cycles",
-      "note": "Blocked | Observed 2026-09-14T07:21:56.673Z | Explicit CLI usage limit; fault-latched. Host-edit work retained. No unattended model work active."
+      "metric": "Run bounded unattended cycles when capacity permits",
+      "note": "Blocked | Observed 2026-09-14T16:49:25.835Z | Existing runtime remains fault-latched after usage limit; not active. No paid fallback or blind retries."
     }
   ],
   "directions": []
