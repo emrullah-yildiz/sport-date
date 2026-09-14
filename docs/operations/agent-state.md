@@ -1,5 +1,9 @@
 # Agent state
 
+## Worker restart verified - September 15 local time
+
+Recovered retained host-edit work through the independent supervisor: 1,223 web tests (14 skipped), 229 domain tests, all workspace typechecks, lint and production build pass. Isolated commit 11f7f168ff5ddb6d45cd3885143fe357533f263b; no discarded work or deployment. Explicitly resumed the existing runner. New run 20260914T224042Z started at 22:40:42Z September 14 (September 15 locally), with fresh heartbeat and new command execution observed. No new quota rejection observed at restart. Current task: room-chat stale connection notice/retry with preserved messages/draft. Cycle completion remains pending; historical quota-fault statements below are superseded for this checkpoint.
+
 ## Usage correction and restart authorization - September 15 local time
 
 Owner reports 82% remaining usage and explicitly requests continuation. The September 13 CLI error is historical, not a fresh account-usage reading. Coordinator paused the old faulted runner while independently verifying its preserved dirty host-edit work; no reset/discard or paid fallback. Fresh restart evidence must supersede old fault claims only after a new run starts.
