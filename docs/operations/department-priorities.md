@@ -21,4 +21,6 @@ Departments own outcomes across cycles. They are not continuously running proces
 
 ## Current execution constraint
 
+September 15 update: owner reports 82% usage remaining and authorizes continuation. Treat the old quota rejection as historical. Coordinator is recovering the dirty worktree before an explicit bounded resume; consult current HQ/runtime for the observed restart result. No claim that current capacity is exhausted should be derived solely from the old log.
+
 The existing recurring CLI worker remains fault-latched after its recorded usage-limit failure. Active conversation agents can perform their assigned work; they are not an unattended service after the conversation ends. Restoring the recurring worker requires available model capacity and an explicit inspected resume. Continuous operation cannot be promised while that dependency is unavailable. The existing local scheduler also requires an awake, logged-in, connected PC.

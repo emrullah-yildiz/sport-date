@@ -1,5 +1,11 @@
 # Agent state
 
+## Usage correction and restart authorization - September 15 local time
+
+Owner reports 82% remaining usage and explicitly requests continuation. The September 13 CLI error is historical, not a fresh account-usage reading. Coordinator paused the old faulted runner while independently verifying its preserved dirty host-edit work; no reset/discard or paid fallback. Fresh restart evidence must supersede old fault claims only after a new run starts.
+
+Product specialist selected the next concrete queue item: failed background room-chat polls silently leave stale content. Preserve messages/draft, show an accessible stale connection notice and Retry, announce recovery and handle authorization loss separately. The cycle prompt now carries this task with a no-message-POST recovery test. Current progress is reported through HQ.
+
 ## Department dispatch and profile recovery - September 14
 
 Owner requested continuing department ownership. Reused three completed agents successfully: Product Design reviewed then fixed editor save-state behavior; Growth prepared the existing host pilot's next experiment and measurement-readiness assessment; Social prepared a demo storyboard. Coordinator owns prioritization and verification. Durable dispatch queue: `department-priorities.md`; cycle prompt reads it. HQ records actual assignment changes rather than invented always-running departments.

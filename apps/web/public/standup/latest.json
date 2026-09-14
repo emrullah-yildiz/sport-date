@@ -1,44 +1,31 @@
 {
   "day": "2026-09-14",
-  "generatedAt": "2026-09-14T16:53:52.030Z",
-  "headline": "Department cycle completed: profile fixes, growth evidence and a visual demo storyboard.",
+  "generatedAt": "2026-09-14T22:40:04.975Z",
+  "headline": "Restart requested: verifying preserved work before resuming automation.",
   "summary": [
-    "Department responsibilities and ranked dispatch queue are now durable: Product Design, Engineering & Delivery, Growth & Marketing, Social & Creative, coordinated by CEO/Operations. Three existing agents worked in parallel and received follow-up tasks after review. HQ reports actual snapshots, not always-on department claims.",
-    "Product delivered three fixes: visible Edit profile entry, accurate save state with locked fields during pending requests and cleared stale confirmation, and a billing-configured-only Plus link to Settings. Verified 1,209 web tests (14 skipped), production build/typecheck, scoped lint and actual-component mobile/desktop browser checks. Local only.",
-    "Growth prepared the next experiment from the already approved five-organization host packet and assessed measurement readiness. Existing mutable request/seat records cannot establish historical acceptance denominators; attendance/return still need scoped aggregate measurement and explicit fixture/staff exclusions. No outreach or invented traction.",
-    "Social prepared one 20-second demo script and a self-contained four-frame visual storyboard. Coordinator rejected initial overlap; corrected desktop/mobile layouts were checked. Fictional demo is clearly labeled; no finished video or public post is claimed.",
-    "Retained host editing independently passes five focused tests, three browser variants and isolated typecheck; broader integration remains next. Production is unchanged. Recurring CLI remains quota-faulted and is not active; current-session agents do not establish continuous background operation. No paid fallback, deployment or external campaign publication."
+    "Owner reports 82% usage remaining. The old quota error is historical and is not a current account reading. Restart authorized.",
+    "Recurring worker paused for recovery of retained host edits. Independent supervisor is running workspace checks before a clean commit. No data or unfinished work discarded.",
+    "Current-session product specialist is reviewing the next event-room recovery issue. Following successful recovery, coordinator will resume one bounded recurring cycle and verify a fresh heartbeat.",
+    "Existing ChatGPT account only; no paid API fallback, billing changes or production deployment."
   ],
   "agents": [
     {
+      "name": "CEO & Delivery",
+      "status": "keep",
+      "metric": "Recover verified worktree and restart recurring worker",
+      "note": "Checking | Observed 2026-09-14T22:40:04.975Z | Independent workspace verification underway."
+    },
+    {
       "name": "Product Design / discovery_redesign",
       "status": "keep",
-      "metric": "Find the top three remaining Profile/Settings usability issues",
-      "note": "Completed | Observed 2026-09-14T16:53:52.030Z | Profile save/entry fixes and Plus destination verified. Next queued: event-day recovery."
-    },
-    {
-      "name": "Growth & Marketing / first_use_improvement",
-      "status": "keep",
-      "metric": "Choose the next host-and-attendance validation experiment",
-      "note": "Prepared | Observed 2026-09-14T16:53:52.030Z | Host experiment and measurement gap assessed. Next queued: scoped aggregate pilot snapshot; owner executes approved inquiries."
-    },
-    {
-      "name": "Social & Creative / hq_assignment_ui",
-      "status": "keep",
-      "metric": "Prepare a 20-second demo of discover to pending request",
-      "note": "Prepared | Observed 2026-09-14T16:53:52.030Z | Four-frame storyboard corrected and reviewed; next: final video production within approved scope. Not published."
-    },
-    {
-      "name": "CEO & Delivery / coordinator",
-      "status": "keep",
-      "metric": "Verify retained host editing and maintain department priorities",
-      "note": "Completed | Observed 2026-09-14T16:53:52.030Z | Verified department outputs and saved ranked next tasks. Next queued: host-edit integration and exact release candidate."
+      "metric": "Select next event-room recovery improvement",
+      "note": "Working | Observed 2026-09-14T22:40:04.975Z | Read-only review; no overlap with retained work."
     },
     {
       "name": "Recurring CLI worker",
-      "status": "idle-blocked",
-      "metric": "Run bounded unattended cycles when capacity permits",
-      "note": "Blocked | Observed 2026-09-14T16:49:25.835Z | Existing runtime remains fault-latched after usage limit; not active. No paid fallback or blind retries."
+      "status": "keep",
+      "metric": "Resume after clean verified recovery",
+      "note": "Queued | Observed 2026-09-14T22:40:04.975Z | Paused for recovery; not yet restarted."
     }
   ],
   "directions": []
