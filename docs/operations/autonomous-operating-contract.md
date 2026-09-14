@@ -24,6 +24,12 @@ The owner explicitly renewed autonomous product, design, UX and UI iteration. A 
 
 Support replies and any separately authorized outreach must use the support identity; personal Gmail is not an outreach sender. The earlier personal-sender OAuth setup is paused while the support sending arrangement is clarified. Do not solicit those tokens again as a product-work prerequisite. No new outreach or production-release scope follows from this iteration mandate. Continue local verified improvements and report prepared releases in HQ.
 
+## Design priority and evolving brief - latest September 14 steering
+
+The owner prioritizes a much stronger discovery experience: exciting event atmosphere, contemporary visual design, less text, clearer nearby search and understandable join/pass actions. Treat every proposed gesture as a starting hypothesis, not a binding specification. Choose and evolve the interaction based on comprehension, voluntary commitment, worthwhile attendance and return. Avoid literal novelty, accidental joins and endless swiping incentives. Current design direction and references: docs/design/discovery-direction-2026-09-14.md.
+
+Prioritize a coherent visual/interaction improvement to discovery and the event-to-request journey over another cycle of incidental copy or operating documents, while preserving safety and fixing material blockers. Work already prepared in isolated branches must be retained. The unattended CLI currently has an explicit usage-limit failure; do not resume it or purchase credits automatically while that limit persists. This does not prevent authorized work in the active session. Keep runtime capacity and current session activity clearly distinguished in HQ.
+
 ## Operating rhythm and team
 
 One coordinator runs a bounded cycle on a recurring local schedule. A cycle selects a useful outcome, assigns at most three parallel specialists with separate file ownership, integrates, verifies, commits locally and reports. Do not keep agents busy merely to show activity. Prefer a small completed slice over a growing pile of plans.

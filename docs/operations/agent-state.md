@@ -1,5 +1,15 @@
 # Agent state
 
+## Current design outcome and runtime correction - 2026-09-14 07:17 UTC
+
+Completed local discovery redesign with discovery_redesign specialist: code-native sport posters, clear approximate search scope, compact filters, finite Previous/Next browsing and a grid alternative. Viewing a plan preserves the existing explicit request flow. Coordinator mobile review reduced hero/artwork height; no event supply, conversion gains or social proof invented. Server authentication, eligibility, radius and Plus gates remain intact; only rendered public invitation markup crosses the new client boundary.
+
+Evidence: 1,201 web tests pass (14 skipped), scoped typecheck passes, lint has zero errors/11 existing warnings, production build passes. Actual-page browser harness uses synthetic read-only dependencies at 390px normal/reduced motion and 1280px: finite keyboard browse, grid, empty/single results, everywhere filter retention, no horizontal overflow and no network requests. Screenshots inspected; this is isolated browser evidence, not a production end-to-end test. Reproduce with `node apps/web/qa/discovery-design.mjs`.
+
+Runtime: unattended cycle 20260913T235148Z stopped at 23:56:33Z with explicit CLI usage-limit error. Scheduler is fault-latched, not actively implementing. No quota bypass, paid fallback, credits purchase or automatic resume. Uncommitted host-edit work is preserved in `.agents/product-studio/runtime/worktree`; last independently verified studio commit is d12e5bb. Older running claims below are historical. Production remains d7064b7; current discovery, signup/HQ and isolated chat/host changes are not deployed.
+
+Next three outcomes: (1) event-detail/request visual continuity with safe pending/accepted states; (2) finish independent verification of preserved host-edit work; (3) prepare an exact integrated release candidate for the owner's required production decision. Local implementation can continue around business decisions when session capacity is available. No unattended decision email is configured; support sender arrangement remains unresolved.
+
 ## Agent assignments on HQ - 2026-09-14
 
 Owner requested visibility into who is working on what. Published current assignment entries through the existing live report API: autonomous host-edit worker, HQ interface specialist, coordinator and explicitly completed prior chat-safety team. Each entry names its task and last-observed state/time; no inferred running status from legacy keep labels. Future cycles now publish assignments at selection/delegation/state changes and final handoff, preserving concurrent work.

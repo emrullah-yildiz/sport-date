@@ -2,7 +2,7 @@
 
 ## Active autonomous experience queue - September 14
 
-Continue independent product improvements while business decisions are pending. Current slice: signup keyboard focus and text-step submission. Next: chat safety report limits/shared-event warning; host edit validation/timezone preservation; event-day connectivity recovery. Evidence and acceptance criteria: `docs/design/autonomous-ux-queue-2026-09-14.md`. Personal-sender OAuth setup is paused; it does not block this queue.
+Prioritize a vivid, concise nearby-event experience. Discovery now has implemented sport posters, finite focus/grid browsing, compact filters and explicit plan navigation; mobile review tightened the hero and artwork. Next: carry this direction into event details and the request/confirmation journey, then verify retained host-edit work. Signup keyboard work is complete in main; chat safety is verified in the isolated studio branch. See `docs/design/discovery-direction-2026-09-14.md`. These changes are local. The unattended CLI is fault-latched after a usage limit; do not infer active work from its scheduler. Personal-sender OAuth setup remains paused and does not block local product work.
 
 ## Current strategic question — owner clarification, 2026-09-14
 
