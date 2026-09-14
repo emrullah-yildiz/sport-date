@@ -1,5 +1,9 @@
 # Agent state
 
+## Six demo events are live - September 15
+
+Owner explicitly approved the six labeled DEMO events on live keepitup.social. Created through production registration/event APIs with a synthetic DEMO Test Host; all six public invitations and authenticated detail titles verified. Fictional addresses, no exact pins, no participants or attendance fabricated. Dates September 15–20, Bucharest, English, ages 18–100. Exact IDs and measurement exclusions: `live-demo-events-2026-09-15.md`. Earlier prepared-only status is superseded. No deployment or schema change. Credentials/creation receipt remain ignored; existing eligibility gates unchanged.
+
 ## Demo-event request - September 15
 
 Owner requested fake events for testing. Prepared six clearly labeled DEMO payloads (running, two tennis scenarios, padel, walking, basketball) with future dates, varied capacities/levels, fictional meeting details and no precise coordinates. `node apps/web/qa/demo-events.mjs` validates every payload through the shared event-creation rules and writes ignored `qa/artifacts/demo-events.json`. No events or accounts have been inserted. Existing local database is not yet verified as isolated from production; owner target clarification (local/test versus live labeled DEMO) is pending. Do not run the older account seeder against an unverified database or present the prepared payloads as live events.

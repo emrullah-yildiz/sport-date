@@ -1,20 +1,15 @@
 {
   "day": "2026-09-14",
-  "generatedAt": "2026-09-14T22:41:26.804Z",
-  "headline": "Worker restarted: room-chat connection recovery underway.",
+  "generatedAt": "2026-09-14T22:53:10.377Z",
+  "headline": "Six owner-approved demo events are live in Bucharest.",
   "summary": [
-    "Owner reports 82% usage remaining. The historical quota error no longer describes current execution: new run 20260914T224042Z started successfully, with fresh heartbeat and command execution observed. No new usage-limit error observed at this checkpoint.",
-    "Preserved host-edit work passed independent workspace checks: 1,223 web tests (14 skipped), 229 domain tests, all workspace typechecks, lint and production build. Committed on isolated studio branch as 11f7f16. No unfinished files discarded or production changes made.",
-    "Current priority: retain messages and draft during chat refresh failure, add accessible stale-connection feedback and retry, handle authorization loss distinctly, test recovery without a message POST.",
-    "Cycle is running, not complete. Existing 30-minute/logon schedule remains registered; future cycles depend on successful checks, available usage and an awake/logged-in connected PC. No paid fallback or billing changes."
+    "Created six clearly labeled DEMO events via production APIs for owner testing: Running, two Tennis scenarios, Padel, Walking and Basketball, September 15-20. Separate synthetic host; fictional venue details; no real meetup, participants, attendance or traction claimed.",
+    "Verified all six public invitation pages and authenticated DEMO titles. Existing age/language/date/capacity/block rules remain. Exclude these exact demo IDs and synthetic host from customer/supply metrics. No deployment, migration, external emails or billing change.",
+    "Confirmed silent failed polling before implementation. Chat now retains displayed messages and draft, shows accessible Retry, announces recovery and separates expired sessions from lost room access. Refresh requests are bounded and cannot overlap; automatic recovery preserves reading position.",
+    "Evidence: 49 scoped tests across 11 suites with two workers, web typecheck, scoped lint and production build pass. Specialist and coordinator replayed 11 real-component browser scenarios; existing six chat-safety scenarios pass. Synthetic mocked recovery makes zero message POSTs. Mobile normal/reduced motion and desktop include a 44px Retry target and no overflow.",
+    "studio/autonomous base 11f7f16; changes remain unstaged and prepared, not supervisor-verified, committed or deployed. Existing event-day queue updated at its original path. Next local outcome: failed message deletion feedback and intentional retry; exact release preparation follows independent verification."
   ],
   "agents": [
-    {
-      "name": "Recurring product worker",
-      "status": "keep",
-      "metric": "Room-chat stale connection and retry recovery",
-      "note": "Working | Observed 2026-09-14T22:41:26.804Z | Run 20260914T224042Z has fresh heartbeat and command execution. Next: scoped checks and independent supervisor verification."
-    },
     {
       "name": "CEO & Delivery",
       "status": "keep",
@@ -26,6 +21,24 @@
       "status": "keep",
       "metric": "Identify next highest-value recovery defect",
       "note": "Completed | Observed 2026-09-14T22:41:26.804Z | Selected silent chat refresh failure; acceptance criteria delivered to worker."
+    },
+    {
+      "name": "Studio coordinator / root",
+      "status": "keep",
+      "metric": "Prepare verified room-chat recovery for independent supervisor checks",
+      "note": "Prepared | Observed 2026-09-14T22:45:23.024Z | Scoped checks/build and independent specialist review passed. Next checkpoint: supervisor full workspace verification and commit."
+    },
+    {
+      "name": "Quality & Trust / chat_recovery_qa",
+      "status": "keep",
+      "metric": "Verify 11 chat recovery scenarios and accessible Retry target",
+      "note": "Completed | Observed 2026-09-14T22:45:23.024Z | Final replay passed and coordinator reviewed evidence. Next checkpoint: supervisor replay; no further specialist task in this bounded cycle."
+    },
+    {
+      "name": "Demo data / coordinator",
+      "status": "keep",
+      "metric": "Create six live demo events under explicit owner approval",
+      "note": "Completed | Observed 2026-09-14T22:53:10.377Z | Six creation receipts and public/authenticated readbacks verified. No duplicates or real participant activity."
     }
   ],
   "directions": []
