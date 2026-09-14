@@ -1,10 +1,15 @@
 # Outcome roadmap
 
+## Current priority ? September 15: real group formation
+
+Follow [the group-formation strategy](../strategy/group-formation-2026-09-15.md). Discovery time shortcuts and honest first-use/empty-state language are implemented locally and verified. Next: trustworthy aggregate attendance measurement with explicit fixture exclusions, then simplify the first-host invitation journey. Evaluate requests, qualified self-reported attendance and mature 14-day return; demo interactions are never adoption evidence. The recurring worker recovered and completed verified cycles including c8730d5; historical fault notes below are superseded. Production UI release remains a separate approval.
+
+
 ## Active autonomous experience queue - September 14
 
 Latest owner direction: reduce information density and keep instructions in dedicated destinations; explicitly no safety instructions on Profile. Implemented local Profile/Settings separation, dedicated Hosting Guide and compact shared footer. Continue simplifying contextual screens without hiding report/block actions or consent controls. See `docs/design/dedicated-page-responsibilities-2026-09-14.md`.
 
-Prioritize a vivid, concise nearby-event experience. Discovery and event details now share sport posters, compact logistics and explicit request navigation. Discovery adds finite focus/grid browsing and compact filters; details place requesting before the map on mobile and fold the description behind About this plan. Next: verify retained host-edit work, prepare an exact integrated release candidate, then evaluate comprehension with unfamiliar adults under authorized recruitment. Signup keyboard work is complete in main; chat safety is verified in the isolated studio branch. See `docs/design/discovery-direction-2026-09-14.md`. These changes are local. The unattended CLI is fault-latched after a usage limit; do not infer active work from its scheduler. Personal-sender OAuth setup remains paused and does not block local product work.
+Prioritize a vivid, concise nearby-event experience. Discovery and event details now share sport posters, compact logistics and explicit request navigation. Discovery adds finite focus/grid browsing and compact filters; details place requesting before the map on mobile and fold the description behind About this plan. Next: verify retained host-edit work, prepare an exact integrated release candidate, then evaluate comprehension with unfamiliar adults under authorized recruitment. Signup keyboard work is complete in main; chat safety is verified in the isolated studio branch. See `docs/design/discovery-direction-2026-09-14.md`. These changes are local. The previous quota fault was recovered; read current runtime status before claiming activity. Personal-sender OAuth setup remains paused and does not block local product work.
 
 ## Current strategic question — owner clarification, 2026-09-14
 

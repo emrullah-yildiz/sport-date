@@ -3,22 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { BRAND_NAME } from "@/lib/brand";
-
-// Honest, pre-launch empty-state for a member whose area has no events yet
-// (CX-20260704-region-honest-empty-state-and-demand-capture). Anyone, in any
-// country, can sign up — there is no geo gate — so instead of a silent void we
-// set an honest expectation ("we're not live near you *yet*, you're here early")
-// and turn the out-of-region interest into a privacy-safe demand signal the
-// growth loop can read.
-//
-// Demand capture reuses the EXISTING anonymous research pipeline: a one-tap
-// submit posts ONLY the member's own already-stored approximate area into the
-// survey's `q8_area` ("City or broad area (not an address)") field. No new PII,
-// no exact address, no new table/migration, and the row is anonymous and
-// unlinked to the member (same contract as the public survey). No dark
-// patterns: nothing is fabricated, there is no fake nearby event and no
-// invented scarcity — just an honest note and an optional way to raise a hand.
+// Empty results describe this search, not total city supply. The optional
+// anonymous research signal stores only an approximate area; it cannot notify.
 
 type SignalState = "idle" | "submitting" | "done" | "error";
 
@@ -60,12 +46,10 @@ export default function RegionInterestSignal({ area }: { area?: string }) {
   return (
     <div className="region-interest">
       <p>
-        {trimmedArea
-          ? `No ${BRAND_NAME} games near ${trimmedArea} yet — you're here early.`
-          : `No ${BRAND_NAME} games in your area yet — you're here early.`}{" "}
-        We&apos;re opening city by city, so new events show up here as hosts create them.
+        No activities are showing for your current search. Try another area or start a plan.
       </p>
 
+      {trimmedArea ? <p>Area interest is anonymous; it does not subscribe you to notifications.</p> : null}
       {state === "done" && trimmedArea ? (
         <p className="region-interest-thanks" role="status">
           Thanks — we&apos;ll let you know as games open near {trimmedArea}. It also helps us decide where to open next.
@@ -79,10 +63,10 @@ export default function RegionInterestSignal({ area }: { area?: string }) {
               onClick={() => void raiseHand()}
               disabled={state === "submitting"}
             >
-              {state === "submitting" ? "Noting…" : `Notify me about games near ${trimmedArea}`}
+              {state === "submitting" ? "Noting…" : `Show interest near ${trimmedArea}`}
             </button>
           ) : null}
-          <Link href="/events/new">Host the first one</Link>
+          <Link href="/events/new">Start a plan</Link>
           <Link href="/discover?near=all">Search everywhere</Link>
           <Link href="/landing">See how it works</Link>
         </div>

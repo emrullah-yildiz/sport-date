@@ -1,3 +1,12 @@
+## Current cycle ? September 15: choose a real activity with new people
+
+- Strategy: test forming small sports groups before expanding administration. See docs/strategy/group-formation-2026-09-15.md for delivery dates, five-person adoption test and qualified attendance/14-day return definitions.
+- Implemented locally: rolling-time discovery choices preserving supported filters/coarse coordinates; landing explains new-people value and fictional demo behavior; empty state describes search results and anonymous interest honestly, with no unsupported notification promise.
+- Verification: 23 focused tests, web typecheck, production build, and discovery browser replay at 390px normal/reduced motion and 1280px passed. Screenshot reviewed. No production UI deployment or adoption gain claimed.
+- Specialists: discovery_redesign completed intent component; hq_assignment_ui completed copy audit/landing implementation; first_use_improvement completed strategy and next-cycle dispatch; root integrated and verified.
+- Next three: implement trustworthy pilot attendance snapshot with known DEMO exclusions/readiness flags; simplify first-host invitation; prepare real-host adoption test. Existing recurring worker prompt updated; historical runtime c8730d5 independently completed.
+- Owner boundary: exact production release and external recruitment/publication require scoped approval; no new owner decision is needed for these local tasks. Real supply, real attendance and return remain unproven.
+
 # Agent state
 
 ## Six demo events are live - September 15

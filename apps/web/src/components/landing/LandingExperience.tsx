@@ -63,18 +63,18 @@ export default function LandingExperience({ preview = false, memberName = null }
         <div className={s.heroCopy}>
           <p className={s.eyebrow}><span className={s.greenDot} /> A LITTLE SPORT. A REAL CONNECTION.</p>
           <h1 id="hero-heading">Less small talk.<br />More <span>good<br className={s.desktopBreak} /> company.</span></h1>
-          <p className={s.definition}>Meet people for dating, friendship, or a new crew through small local sports activities.</p>
+          <p className={s.definition}>Meet new people through small local sports activities—for dating, friendship, or a new crew.</p>
           <div className={s.heroActions}>
             {signedIn ? <Link className={s.primary} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link> : <a className={s.primary} href="#try-it">Try an example plan <Arrow /></a>}
             <span>For adults 18+<br />All starting points welcome</span>
           </div>
           {!preview && <div className={s.betaNote}>
-            {signedIn ? <p>Your next activity is a click away. Or try the example below.</p> : <>
+            {signedIn ? <p>Explore activities, or try the example below.</p> : <>
               <p>Free beta · open to adults 18+ · usable worldwide</p>
               <BetaTermExplainer />
             </>}
           </div>}
-          <div className={s.heroAside}><span className={s.miniIcon}>↗</span><p>You bring yourself.<br /><strong>The activity breaks the ice.</strong></p></div>
+          <div className={s.heroAside}><span className={s.miniIcon}>↗</span><p>Come on your own.<br /><strong>Start with an activity.</strong></p></div>
         </div>
         <div className={s.heroArt}>
           <Court sport={sport} />
@@ -91,11 +91,11 @@ export default function LandingExperience({ preview = false, memberName = null }
         ].map(([number, title, text]) => <article key={number}><span className={s.stepNumber}>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
       </section>
       <section id="try-it" className={s.playground} aria-labelledby="try-heading">
-        <div className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Mix an activity with an intention.<br />See how your first plan could feel.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></div>
+        <div className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Choose a fictional activity and see how asking to join works.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></div>
         <div className={s.builder}>
           <fieldset className={s.choices}><legend>01 <span>How do you want to move?</span></legend><div>{sports.map((item, i) => <button key={item} type="button" aria-pressed={sport === item} onClick={() => { setSport(item); reset(); }}><span aria-hidden="true">{["◉", "↗", "〰"][i]}</span>{item}</button>)}</div></fieldset>
           <fieldset className={s.choices}><legend>02 <span>What are you open to?</span></legend><div>{intentions.map(item => <button key={item} type="button" aria-pressed={intention === item} onClick={() => { setIntention(item); reset(); }}>{item}</button>)}</div></fieldset>
-          <p className={s.choiceNote}>Your intention helps set expectations. Connection is mutual, never guaranteed.</p>
+          <p className={s.choiceNote}>These choices change this example only. They do not find people or send a request.</p>
           <article className={s.plan} aria-label="Your example activity">
             <div className={s.planTop}><span>EXAMPLE ACTIVITY</span><span>{sport} <span aria-hidden="true">↗</span></span></div>
             <div className={s.planBody}>

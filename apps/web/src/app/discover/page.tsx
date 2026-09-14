@@ -1,4 +1,5 @@
 import Link from "next/link";
+import DiscoveryIntentEntry from "@/components/discovery/intent-entry";
 import EventStage from "@/components/discovery/EventStage";
 import SportArtwork from "@/components/discovery/SportArtwork";
 import styles from "@/components/discovery/discovery.module.css";
@@ -174,6 +175,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         </details>
       </div>
 
+      <DiscoveryIntentEntry query={parameters} withinDays={filters.withinDays} />
       <section className={styles.results}>
         <div className={styles.resultsHeader}><h2>{events.length === 0 ? "Your next plan starts here" : describeDiscoveryResultsHeading({ count: events.length, memberArea: displayArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p className={styles.privacy}>Approximate areas now. Meeting point after acceptance.</p></div>
         {events.length === 0 ? (
@@ -183,9 +185,9 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
           <div className="discovery-empty">
             {radiusActive ? (
               <>
-                <p>Nothing&apos;s open within <strong>{requestedRadiusKm} km</strong> just yet. {nextRadiusKm ? `Try widening the distance to ${nextRadiusKm} km` : "Try searching everywhere"}, or start one close to home.</p>
+                <p>No activities match this search within <strong>{requestedRadiusKm} km</strong>. {nextRadiusKm ? `Try widening the distance to ${nextRadiusKm} km` : "Try searching everywhere"}, or start one close to home.</p>
                 <Link href={widenRadiusHref}>{nextRadiusKm ? `Widen to ${nextRadiusKm} km` : "Search everywhere"}</Link>
-                <Link href="/events/new">Host the first one</Link>
+                <Link href="/events/new">Start a plan</Link>
               </>
             ) : area.isNearMeDefault && !filters.sport && !filters.language && !advanced.anyActive && filters.withinDays === 7 ? (
               <RegionInterestSignal area={displayArea} />
