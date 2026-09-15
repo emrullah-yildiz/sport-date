@@ -1,4 +1,4 @@
-.story { --chapter-one: 1; --chapter-two: 0; --chapter-three: 0; background: #101b17; color: #f1f5f3; position: relative; }
+.story { --chapter-one: 1; --chapter-two: 0; --chapter-three: 0; background: transparent; color: #f1f5f3; position: relative; }
 .stage { max-width: 1600px; margin: auto; padding: 36px 7%; overflow: clip; }
 .topline,.bottomline { display: flex; align-items: center; justify-content: space-between; gap: 20px; position: relative; z-index: 3; }
 .topline { color: #a3b8ad; font-size: 10px; font-weight: 700; letter-spacing: .14em; }
@@ -37,7 +37,7 @@
 .progress span { display: block; width: 36px; height: 3px; background: #476051; border-radius: 5px; }
 /* The same objects persist: day, court, people, then the thread between them. */
 @media (prefers-reduced-motion: no-preference) and (min-height: 620px) {
-  .story[data-motion="true"] { height: 300svh; }
+  .story[data-motion="true"] { height: 500svh; }
   .story[data-motion="true"] .stage { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; justify-content: space-between; }
   .story[data-motion="true"] .scene { flex: 1; padding: 30px 0; min-height: 0; }
   .story[data-motion="true"] .copy { height: 360px; }

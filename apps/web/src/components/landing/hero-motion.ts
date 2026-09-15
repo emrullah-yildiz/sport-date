@@ -6,9 +6,11 @@ export function observeHeroMotion(element: HTMLElement) {
   const draw = () => {
     frame = 0;
     if (disposed) return;
-    const rect = element.getBoundingClientRect();
+    const chapter = element.closest<HTMLElement>("[data-scroll-chapter]");
+    const pinned = chapter?.dataset.pinned === "true";
+    const rect = (pinned ? chapter : element).getBoundingClientRect();
     const progress = preference.matches || element.matches(":focus-within")
-      ? 0 : Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height)));
+      ? 0 : Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height - (pinned ? window.innerHeight : 0))));
     element.style.setProperty("--hero-progress", progress.toFixed(4));
   };
   const schedule = () => { if (!frame) frame = requestAnimationFrame(draw); };

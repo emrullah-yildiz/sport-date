@@ -1,0 +1,19 @@
+.chapter { position: relative; --assemble-one: 1; --assemble-two: 1; --assemble-three: 1; }
+.stage { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: center; }
+.thread { width: min(1208px, calc(100% - 112px)); margin: 0 auto; padding-top: 32px; position: relative; color: #a3cfb1; }
+.thread span { font-size: 9px; letter-spacing: .18em; }
+.thread svg { width: 100%; height: 60px; fill: none; stroke: #79b48c; stroke-width: 1; overflow: visible; }
+.thread i { position: absolute; bottom: 24px; left: 0; width: 12px; height: 12px; background: #c4ef7d; border-radius: 50%; box-shadow: 0 0 25px #9bee7455; }
+@media (prefers-reduced-motion: no-preference) and (min-height: 620px) {
+  .chapter[data-pinned="true"] { min-height: 210svh; }
+  .chapter[data-pinned="true"][data-opening="true"] { min-height: 170svh; }
+  .chapter[data-pinned="true"] .stage { position: sticky; top: 0; min-height: 100svh; }
+  .chapter[data-scroll-chapter="footer"][data-pinned="true"] { min-height: 130svh; }
+  .chapter[data-chapter-motion="true"] .thread svg path { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--chapter-progress)); }
+  .chapter[data-chapter-motion="true"] .thread i { left: calc(var(--chapter-progress) * (100% - 12px)); }
+  .chapter[data-chapter-motion="true"] [data-assemble] { --piece: var(--assemble-one); opacity: var(--piece); transform: translate3d(0, calc((1 - var(--piece)) * 65px), 0); }
+  .chapter[data-chapter-motion="true"] [data-assemble="two"] { --piece: var(--assemble-two); }
+  .chapter[data-chapter-motion="true"] [data-assemble="three"] { --piece: var(--assemble-three); }
+  .chapter:focus-within [data-assemble] { opacity: 1; transform: none; }
+}
+@media(max-width:720px) { .thread { width: calc(100% - 44px); padding-top: 22px; } .thread svg { height: 40px; } .thread i { bottom: 14px; } }

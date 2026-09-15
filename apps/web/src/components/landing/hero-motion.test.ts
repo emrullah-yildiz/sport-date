@@ -3,7 +3,7 @@ import { observeHeroMotion } from "./hero-motion";
 
 afterEach(() => vi.unstubAllGlobals());
 
-it("scrubs reversibly, batches frames, stops for focus/reduced motion and cleans up", () => {
+it.each([false, true])("scrubs reversibly, batches frames, stops for focus/reduced motion and cleans up (pinned=%s)", (pinned) => {
   let top = 0;
   let focused = false;
   let callback: FrameRequestCallback = () => {};
@@ -12,9 +12,10 @@ it("scrubs reversibly, batches frames, stops for focus/reduced motion and cleans
   const surface = Object.assign(new EventTarget(), {
     style: { setProperty: (key: string, value: string) => values.set(key, value), removeProperty: (key: string) => values.delete(key) },
     matches: () => focused,
+    closest: () => pinned ? { dataset: { pinned: "true" }, getBoundingClientRect: () => ({ top, height: 1600 }) } : null,
     getBoundingClientRect: () => ({ top, height: 800 }),
   });
-  const browser = Object.assign(new EventTarget(), { matchMedia: () => preference });
+  const browser = Object.assign(new EventTarget(), { innerHeight: 800, matchMedia: () => preference });
   const request = vi.fn((fn: FrameRequestCallback) => { callback = fn; return 1; });
   vi.stubGlobal("window", browser);
   vi.stubGlobal("requestAnimationFrame", request);

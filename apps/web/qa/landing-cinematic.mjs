@@ -43,6 +43,75 @@ async function scrollTo(page, y) {
 async function heroProgress(page) {
   return page.locator('[data-hero-motion]').evaluate(el => Number(el.style.getPropertyValue('--hero-progress')));
 }
+async function chapterState(chapter) {
+  return chapter.evaluate(el => ({
+    name: el.dataset.scrollChapter,
+    motion: el.dataset.chapterMotion === 'true',
+    pinned: el.dataset.pinned === 'true',
+    progress: Number(el.style.getPropertyValue('--chapter-progress')),
+    assembly: ['one', 'two', 'three'].map(part => Number(el.style.getPropertyValue(`--assemble-${part}`))),
+    stagePosition: getComputedStyle(el.querySelector('[data-chapter-stage]')).position,
+  }));
+}
+async function assertChapterWidth(chapter) {
+  const clipped = await chapter.locator('[data-assemble]').evaluateAll(elements => elements.flatMap(el => {
+    const rect = el.getBoundingClientRect();
+    return rect.left < -1 || rect.right > innerWidth + 1 ? [`${el.tagName}: ${rect.left}..${rect.right}`] : [];
+  }));
+  assert.deepEqual(clipped, [], 'Assembled content stays visible even when the page clips overflow');
+}
+async function verifyWholePage(page, width, height, reducedMotion) {
+  const chapters = page.locator('[data-scroll-chapter]');
+  assert.equal(await chapters.count(), 5, 'Opening, walkthrough, boundaries, invitation and footer share the scroll narrative');
+  for (const chapter of await chapters.all()) {
+    const initial = await chapterState(chapter);
+    const bounds = await chapter.evaluate(el => ({ top: el.getBoundingClientRect().top + scrollY, height: el.getBoundingClientRect().height }));
+    if (initial.pinned) {
+      assert.equal(reducedMotion, 'no-preference');
+      assert.equal(initial.stagePosition, 'sticky', `${initial.name} is part of the pinned narrative`);
+      const frames = [];
+      for (const progress of [.08, .50, .92, .08]) {
+        await scrollTo(page, bounds.top + (bounds.height - height) * progress);
+        const state = await chapterState(chapter);
+        assert.ok(Math.abs(state.progress - progress) < .01, `${state.name} follows native scroll: ${state.progress} / ${progress}`);
+        frames.push(state);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${state.name} stays within the viewport`);
+        if (progress === .92) {
+          assert.ok(state.assembly.every(value => value === 1), `${state.name} finishes assembling before its handoff`);
+          await assertChapterWidth(chapter);
+          await page.screenshot({ path: path.join(out, `whole-page-${width}-${state.name}.png`) });
+        }
+      }
+      assert.deepEqual(frames[0], frames[3], `${initial.name} restores its earlier composition when scrolling back`);
+      if (initial.name !== 'hero') assert.ok(frames[0].assembly.some((value, i) => value < frames[2].assembly[i]), `${initial.name} builds progressively`);
+    } else if (initial.motion) {
+      assert.notEqual(initial.stagePosition, 'sticky', `${initial.name} lets tall content scroll naturally`);
+      await scrollTo(page, Math.max(0, bounds.top - height * .65));
+      const entry = await chapterState(chapter);
+      await scrollTo(page, bounds.top);
+      const assembled = await chapterState(chapter);
+      assert.ok(assembled.assembly.every(value => value === 1), `${initial.name} assembles before tall content passes the reader`);
+      await assertChapterWidth(chapter);
+      if (initial.name !== 'hero') assert.ok(entry.assembly.some((value, i) => value < assembled.assembly[i]), `${initial.name} still animates in the natural-flow layout`);
+      await page.screenshot({ path: path.join(out, `whole-page-${width}-${initial.name}.png`) });
+    } else {
+      assert.notEqual(initial.stagePosition, 'sticky', `${initial.name} remains naturally readable when it cannot fit`);
+      assert.ok(initial.assembly.every(value => value === 1), `${initial.name} keeps every part visible in the static fallback`);
+    }
+  }
+  if (reducedMotion === 'no-preference') {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await settle(page);
+    for (const chapter of await chapters.all()) {
+      const state = await chapterState(chapter);
+      assert.equal(state.motion, false, `${state.name} responds to a changed motion preference`);
+      assert.notEqual(state.stagePosition, 'sticky');
+      assert.ok(state.assembly.every(value => value === 1));
+    }
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await settle(page);
+  }
+}
 try {
   for (const [width, height, reducedMotion] of [[320, 740, 'no-preference'], [390, 844, 'no-preference'], [1280, 900, 'no-preference'], [390, 844, 'reduce'], [1280, 900, 'reduce'], [844, 390, 'no-preference']]) {
     const page = await browser.newPage({ viewport: { width, height }, reducedMotion });
@@ -144,8 +213,13 @@ try {
       await page.screenshot({ path: path.join(out, `static-${width}.png`), fullPage: true });
     }
 
+    await verifyWholePage(page, width, height, reducedMotion);
     const trigger = page.getByRole('button', { name: 'See how it works', exact: true });
-    await trigger.focus(); await page.keyboard.press('Enter');
+    await trigger.focus();
+    await settle(page);
+    const focusedChapter = trigger.locator('xpath=ancestor::*[@data-scroll-chapter]');
+    assert.ok((await chapterState(focusedChapter)).assembly.every(value => value === 1), 'Keyboard focus reveals the complete walkthrough entry');
+    await page.keyboard.press('Enter');
     await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.keyboard.press('Escape');
@@ -154,7 +228,7 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'No horizontal overflow');
     assert.deepEqual(await page.evaluate(() => ({ requests: window.calls, telemetry: window.telemetry, refreshes: window.refreshes })), { requests: [], telemetry: [], refreshes: 0 });
     assert.deepEqual(errors, []);
-    console.log(`PASS narrative ${width}x${height} ${reducedMotion}: cumulative assembly, reversible scroll, pinned chapters, compact reduced motion, keyboard tutorial, no requests/errors/overflow`);
+    console.log(`PASS narrative ${width}x${height} ${reducedMotion}: all five page chapters, cumulative scene, reversible assembly, natural-flow/reduced fallback, keyboard tutorial, no requests/errors/clipping`);
     await page.close();
   }
   if (process.argv.includes('--video')) {
@@ -166,8 +240,7 @@ try {
     await page.locator('[data-scroll-story][data-motion="true"]').waitFor();
     await page.waitForTimeout(500);
     await page.evaluate(async () => {
-      const story = document.querySelector('[data-scroll-story]');
-      const end = story.getBoundingClientRect().top + scrollY + story.getBoundingClientRect().height - innerHeight;
+      const end = document.documentElement.scrollHeight - innerHeight;
       const animate = (from, to, duration) => new Promise(resolve => {
         const start = performance.now();
         function frame(now) {
@@ -177,12 +250,12 @@ try {
         }
         requestAnimationFrame(frame);
       });
-      await animate(0, end, 12000);
-      await animate(end, 0, 5000);
+      await animate(0, end, 35000);
+      await animate(end, 0, 7000);
     });
     const video = page.video();
     await page.close();
-    await video.saveAs(path.join(out, 'story-scroll-preview.webm'));
-    console.log(`VIDEO ${path.join(out, 'story-scroll-preview.webm')}`);
+    await video.saveAs(path.join(out, 'full-landing-scroll-preview.webm'));
+    console.log(`VIDEO ${path.join(out, 'full-landing-scroll-preview.webm')}`);
   }
 } finally { await browser.close(); }

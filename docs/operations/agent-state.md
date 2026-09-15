@@ -1,3 +1,10 @@
+## Whole landing scroll narrative - September 15
+
+- Owner requested every section participate in a slower, unified story. Implemented five native-scroll chapters around the expanded four-beat plan sequence, continuous background, drawing line/ball, sequential tutorial and boundary cards, invitation and footer epilogue. Removed mixed one-time fades from the landing.
+- Verified: 1,262 web tests pass (14 opt-in skipped), typecheck, production build and scoped lint. Actual-component QA covers the whole page, forward/reverse assembly, six viewport/motion combinations, clipping bounds and focus/reduced-motion behavior. Tall content uses normal flow; controls reveal on focus. Local changes only; no deployment or adoption claim.
+- Root delivered chapter architecture/design; fullpage_qa independently checked responsive composition and recorded the complete page. Fixed narrow tutorial clipping found in visual review.
+- Next three: owner review of full-page recording; scoped release preparation; observe first-time tutorial/host/join completion after release. No owner decision needed for local implementation. Forms, free-date filters and privacy controls remain intact.
+
 ## Continuous story assembly - September 15
 
 - Owner refined scroll direction: reading a story with pieces coming together. The scene now follows four connected moments (free afternoon, plan, host acceptance, first rally/hello). One date card persists, the court draws itself, other people join separately, and connections complete the group. A keepsake accumulates day + game + company and hands off to the optional tutorial.
