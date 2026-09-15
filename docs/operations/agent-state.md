@@ -1,3 +1,10 @@
+## Cinematic landing scroll - September 15
+
+- Owner requested stronger Apple-like motion. Replaced the ribbon with a bounded native sticky three-chapter scene: free time > play > company, reversible scroll-driven court/ball/calendar/group transformations and staggered large text. Added layered hero depth. Kept tutorials optional and real forms unchanged.
+- Verified: 1,261 web tests pass (14 opt-in skipped), production build/type validation, scoped lint and actual-component mobile/desktop motion checks. Keyframe screenshots reviewed; recorded forward/reverse preview in ignored runtime. Runtime reduced motion restores the compact static story. No new network or telemetry and no deployment.
+- Team: root integrated hero, text handoffs and verification; scroll_story implemented scene; scroll_qa independently checked sticky/reversible motion, fallback and keyboard paths. Details: `docs/design/cinematic-scroll-2026-09-15.md`.
+- Next three: review recorded motion; prepare exact scoped release; observe first-time completion and date-search-to-attendance. No measured comprehension/conversion improvement claimed.
+
 ## On-demand tutorials and free-date discovery - September 15
 
 - Owner-requested outcome: compact See how it works entry opens Host an event and Join an event tutorials using the actual forms, with stage-specific sketch bubbles/arrows. Removed the old separate demo/state machine and repetitive disclosure copy. Landing now frames spare time as a starting point for meeting through activity.

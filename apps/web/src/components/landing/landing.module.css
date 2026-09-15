@@ -6,7 +6,7 @@
   background: var(--ink);
   color: var(--paper);
   font-family: var(--font-sans),sans-serif;
-  overflow: hidden;
+  overflow: clip;
   isolation: isolate;
 }
 .page * {
@@ -859,3 +859,18 @@
 .tutorialDialog { width: min(1080px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid var(--line); border-radius: 24px; background: var(--bg, #20262b); color: var(--text, #f1f5f3); overflow: auto; overscroll-behavior: contain; }
 .tutorialDialog::backdrop { background: #101a16d9; backdrop-filter: blur(6px); }
 @media (max-width: 720px) { .tutorialEntry { padding: 24px; } .tutorialDialog { width: calc(100% - 16px); max-height: calc(100dvh - 16px); border-radius: 18px; } }
+
+/* A second depth plane follows the reader into the next scene. */
+@media (prefers-reduced-motion: no-preference) {
+  .heroArt { transform: translate3d(0, calc(var(--hero-progress, 0) * -72px), 0) scale(calc(1 + var(--hero-progress, 0) * .08)); }
+  .heroCopy { transform: translate3d(0, calc(var(--hero-progress, 0) * 32px), 0); opacity: calc(1 - var(--hero-progress, 0) * .2); }
+  .courtLines { transform: rotate(calc(-18deg + var(--hero-progress, 0) * 24deg)) scale(calc(1 + var(--hero-progress, 0) * .08)); }
+  .playerOne { transform: translate3d(calc(var(--hero-progress, 0) * 28px), calc(var(--hero-progress, 0) * 35px), 0) rotate(-18deg); }
+  .playerTwo { transform: translate3d(calc(var(--hero-progress, 0) * -35px), calc(var(--hero-progress, 0) * -25px), 0) rotate(-18deg); }
+  .ball { animation: none; transform: translate3d(calc(var(--hero-progress, 0) * 90px), calc(var(--hero-progress, 0) * -145px), 0) scale(calc(1 + var(--hero-progress, 0) * .8)); }
+}
+.heroArt::before { content: ""; position: absolute; inset: 5% -12%; background: radial-gradient(ellipse at center, #64ee8f20, transparent 65%); pointer-events: none; }
+@media (max-width: 720px) and (prefers-reduced-motion: no-preference) {
+  .heroArt { transform: translate3d(0, calc(var(--hero-progress, 0) * -32px), 0); }
+  .heroCopy { transform: none; opacity: 1; }
+}

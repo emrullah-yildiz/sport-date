@@ -6,6 +6,8 @@ import BetaTermExplainer from "@/components/BetaTermExplainer";
 import ScrollReveal from "@/components/ScrollReveal";
 import { BRAND_NAME, RallyGlyph } from "@/lib/brand";
 import EventTutorials from "@/components/EventTutorials";
+import ScrollStory from "./ScrollStory";
+import { observeHeroMotion } from "./hero-motion";
 
 import s from "./landing.module.css";
 
@@ -33,6 +35,8 @@ export default function LandingExperience({ preview = false, memberName = null }
   const sport: Sport = "Padel";
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
+  const hero = useRef<HTMLElement>(null);
+  useEffect(() => hero.current ? observeHeroMotion(hero.current) : undefined, []);
   const opener = useRef<HTMLElement | null>(null);
   function openTutorial(event: React.MouseEvent<HTMLElement>) {
     opener.current = event.currentTarget;
@@ -63,7 +67,7 @@ export default function LandingExperience({ preview = false, memberName = null }
       </nav>
     </header>
     <main id="concept-main">
-      <section className={s.hero} aria-labelledby="hero-heading">
+      <section ref={hero} className={s.hero} aria-labelledby="hero-heading" data-hero-motion>
         <div className={s.heroCopy}>
           <p className={s.eyebrow}><span className={s.greenDot} /> A LITTLE SPORT. A REAL CONNECTION.</p>
           <h1 id="hero-heading">Less small talk.<br />More <span>good<br className={s.desktopBreak} /> company.</span></h1>
@@ -85,7 +89,7 @@ export default function LandingExperience({ preview = false, memberName = null }
           <a className={s.floatingCard} href="#how-it-works"><span className={s.cardKicker}>YOUR WEEKEND COULD LOOK LIKE THIS</span><div><strong>Rally. Laugh. Repeat.</strong><span className={s.roundArrow}>↗</span></div><span>{sport} · a small group · Your pace. Your people.</span></a>
         </div>
       </section>
-      <div className={s.ribbon} aria-hidden="true"><span>COME FOR THE GAME</span><span>↗</span><span>STAY FOR THE COMPANY</span><span>↗</span><span>YOUR PACE. YOUR PEOPLE.</span><span>↗</span></div>
+      <ScrollStory />
       <section id="how-it-works" className={s.how} aria-labelledby="how-heading">
         <ScrollReveal className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">A plan makes<br />hello easier.</h2><p>No perfect opening line required.</p></ScrollReveal>
         <ScrollReveal className={s.tutorialEntry}>
