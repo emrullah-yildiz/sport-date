@@ -2,6 +2,7 @@
 
 ## Cinematic landing motion - September 15
 
+- [x] Refine the motion into a continuous four-part story with persistent day/plan pieces, separately arriving people and a completed group; hand off to optional tutorials.
 - [x] Add reversible scroll-driven scene choreography and layered hero depth, with native scrolling and compact reduced-motion/short-screen fallbacks. See `docs/design/cinematic-scroll-2026-09-15.md`.
 - [ ] Review motion and first-time completion after scoped release; visual polish is not adoption evidence.
 

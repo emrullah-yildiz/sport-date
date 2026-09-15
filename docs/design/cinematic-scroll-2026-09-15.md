@@ -6,7 +6,9 @@ Owner asked for Apple-like scroll animation after finding entrance fades too wea
 
 ## Behavior
 
-A native sticky scene between the hero and tutorials tells three short chapters: free time, activity, company. Over a bounded 240svh section, scrolling rotates/scales the court, moves the ball, lifts away the calendar and introduces the group. Typography hands off without superimposed readable headlines. Scrolling backward reverses the same sequence. The hero uses separate depth rates for its artwork, court lines, players, ball and copy.
+The latest owner refinement asks for a story whose pieces come together. A native sticky scene now follows four connected moments: a free afternoon, a plan worth joining, acceptance into the group, and a first rally/hello. Over a bounded 300svh section, the same free-day card docks in the scene, court lines draw into place, three other people arrive separately, and a connecting line completes the group. A persistent keepsake collects day + game + company; previous pieces remain as the story advances. The ball leaves all participants visible.
+
+Typography hands off without superimposed readable headlines. The acceptance chapter explicitly waits for the host's decision before meeting details open; this story is illustrative, not an automatic booking promise. Scrolling backward reverses assembly. The hero retains its layered depth. The handoff into the optional tutorials now reads Now make it your afternoon.
 
 The scene never captures wheel/touch input, changes scrolling speed or requires watching before proceeding. Its direct anchor skips to the optional tutorials. Existing real forms/date filtering remain unchanged. Artwork is illustrative, not a claim of live event supply.
 
@@ -18,4 +20,4 @@ Passive scroll listeners schedule at most one animation frame per event batch. T
 
 ## Verification
 
-1,261 web tests pass (14 opt-in skipped); production build/type validation pass. Actual-component browser QA verifies reversible keyframes, pinned stage geometry, mobile/desktop viewport widths, runtime reduced-motion switching, keyboard tutorial access, and no requests/errors/overflow. Keyframes were visually reviewed. A recorded desktop walkthrough is stored in ignored runtime artifacts for owner review. No production deployment or measured conversion improvement claimed.
+1,261 web tests pass (14 opt-in skipped); production build/type validation pass. Actual-component browser QA verifies reversible keyframes, pinned stage geometry, mobile/desktop viewport widths, runtime reduced-motion switching, keyboard tutorial access, and no requests/errors/overflow. Keyframes were visually reviewed at mobile and desktop sizes. Browser assertions cover persistent pieces, separately arriving guests, final connections, non-overlapping participants and captions, and exact reverse restoration. A recorded desktop walkthrough is stored in ignored runtime artifacts for owner review. No production deployment or measured conversion improvement claimed.

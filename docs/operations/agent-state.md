@@ -1,3 +1,10 @@
+## Continuous story assembly - September 15
+
+- Owner refined scroll direction: reading a story with pieces coming together. The scene now follows four connected moments (free afternoon, plan, host acceptance, first rally/hello). One date card persists, the court draws itself, other people join separately, and connections complete the group. A keepsake accumulates day + game + company and hands off to the optional tutorial.
+- Verified: 1,261 web tests pass (14 opt-in skipped), web typecheck/build and scoped lint. Independent actual-component browser checks cover six viewport/motion combinations, cumulative pieces, staggered guests, reverse restoration, unobscured captions/people, keyboard tutorial access and reduced/short-screen fallback. Updated video preview is in ignored runtime. No production deployment or measured conversion improvement.
+- Team: root implemented narrative continuity and scene assembly; story_qa independently tested and recorded it. Existing date filters/forms/privacy rules unchanged. Acceptance is explicitly host-dependent in the narrative.
+- Next three: review the updated motion; prepare scoped release; observe first-time tutorial/host/join completion. Current design details: `docs/design/cinematic-scroll-2026-09-15.md`.
+
 ## Cinematic landing scroll - September 15
 
 - Owner requested stronger Apple-like motion. Replaced the ribbon with a bounded native sticky three-chapter scene: free time > play > company, reversible scroll-driven court/ball/calendar/group transformations and staggered large text. Added layered hero depth. Kept tutorials optional and real forms unchanged.

@@ -91,7 +91,7 @@ export default function LandingExperience({ preview = false, memberName = null }
       </section>
       <ScrollStory />
       <section id="how-it-works" className={s.how} aria-labelledby="how-heading">
-        <ScrollReveal className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">A plan makes<br />hello easier.</h2><p>No perfect opening line required.</p></ScrollReveal>
+        <ScrollReveal className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">Now make it<br />your afternoon.</h2><p>See how a plan comes together, one step at a time.</p></ScrollReveal>
         <ScrollReveal className={s.tutorialEntry}>
           <div className={s.sketchMark} aria-hidden="true"><span>you</span><svg viewBox="0 0 150 55" fill="none"><path d="M5 32C40 4 55 52 91 25S123 13 143 22M130 8l13 14-18 5" /></svg><span>your next plan</span></div>
           <h3>A free afternoon?<br />Make something of it.</h3>

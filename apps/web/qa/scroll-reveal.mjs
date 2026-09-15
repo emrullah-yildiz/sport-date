@@ -35,7 +35,7 @@ try {
   }
   await page.evaluate(()=>{window.scrollTo(0,0);window.landing()});
   await page.getByRole('heading',{name:'Less small talk. More good company.'}).waitFor();
-  await page.getByRole('heading',{name:'A plan makes hello easier.'}).scrollIntoViewIfNeeded();
+  await page.getByRole('heading',{name:'Now make it your afternoon.'}).scrollIntoViewIfNeeded();
   await page.waitForTimeout(650);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await page.screenshot({path:path.join(out,`landing-${reducedMotion}.png`),fullPage:true,animations:'disabled'});

@@ -72,7 +72,7 @@ try {
     if (reducedMotion === 'no-preference' && height >= 620) {
       await expect(story).toHaveAttribute('data-motion', 'true');
       const frames = [];
-      for (const [progress, chapter] of [[.1, '1'], [.5, '2'], [.9, '3'], [.1, '1']]) {
+      for (const [progress, chapter] of [[.08, '1'], [.36, '2'], [.63, '3'], [.92, '4'], [.08, '1']]) {
         await scrollTo(page, bounds.top + (bounds.height - height) * progress);
         await expect(story).toHaveAttribute('data-chapter', chapter);
         const actual = await story.evaluate(el => Number(el.style.getPropertyValue('--story-progress')));
@@ -80,14 +80,44 @@ try {
         assert.ok(Math.abs((await stage.boundingBox()).y) < 2, 'Scene remains pinned during scroll');
         const visible = page.locator(`[data-story-chapter="${chapter}"]`);
         assert.equal(await visible.evaluate(el => getComputedStyle(el).opacity), '1');
-        const state = await story.evaluate(el => ({ progress: el.style.getPropertyValue('--story-progress'), court: getComputedStyle(el.querySelector('[class*="court"]')).transform }));
+        const state = await story.evaluate(el => ({
+          progress: el.style.getPropertyValue('--story-progress'),
+          planBuilt: Number(el.style.getPropertyValue('--plan-built')),
+          groupBuilt: Number(el.style.getPropertyValue('--group-built')),
+          together: Number(el.style.getPropertyValue('--together')),
+          pieces: Object.fromEntries([...el.querySelectorAll('[data-story-piece]')].map(piece => [piece.dataset.storyPiece, {
+            opacity: Number(getComputedStyle(piece).opacity), transform: getComputedStyle(piece).transform,
+          }])),
+        }));
         frames.push(state);
+        assert.equal(state.pieces.date.opacity, 1, 'The selected date stays visible throughout the story');
+        if (Number(chapter) >= 2) assert.ok(state.pieces.plan.opacity > .99, 'The plan remains once assembled');
+        if (chapter === '4') for (const person of ['person-one', 'person-two', 'person-three', 'person-four']) {
+          assert.equal(state.pieces[person].opacity, 1, 'Everyone remains in the completed plan');
+          const personBounds = await story.locator(`[data-story-piece="${person}"]`).boundingBox();
+          const ballBounds = await story.locator('[class*="ball"]').boundingBox();
+          const personRadius = await story.locator(`[data-story-piece="${person}"]`).evaluate(el => el.offsetWidth / 2);
+          const ballRadius = await story.locator('[class*="ball"]').evaluate(el => el.offsetWidth / 2);
+          const separation = Math.hypot(personBounds.x + personBounds.width / 2 - ballBounds.x - ballBounds.width / 2, personBounds.y + personBounds.height / 2 - ballBounds.y - ballBounds.height / 2);
+          assert.ok(separation >= personRadius + ballRadius, `The final ball does not obscure ${person}`);
+          const keepsakeBounds = await story.locator('[data-story-keepsake]').boundingBox();
+          assert.ok(personBounds.y + personBounds.height <= keepsakeBounds.y, `The keepsake does not obscure ${person}: participant ends ${personBounds.y + personBounds.height}, keepsake starts ${keepsakeBounds.y}`);
+        }
+        const caption = await visible.boundingBox();
+        assert.ok(caption.y >= 0 && caption.y + caption.height <= height, 'Active chapter fits within the pinned viewport');
         await page.screenshot({ path: path.join(out, `scene-${width}-${chapter}-${frames.length}.png`) });
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       }
-      assert.notEqual(frames[0].court, frames[1].court, 'Court transforms during scroll');
-      assert.deepEqual(frames[0], frames[3], 'Reverse scroll restores the first keyframe');
-      for (const progress of [.29, .7]) {
+      assert.ok(frames[0].planBuilt < frames[1].planBuilt, 'The plan assembles after choosing a date');
+      assert.ok(frames[1].groupBuilt < frames[2].groupBuilt, 'People gather after the plan takes shape');
+      assert.ok(frames[2].together < frames[3].together, 'The final connection completes the scene');
+      assert.equal(frames[0].pieces.plan.opacity, 0, 'The story starts with space for a plan');
+      assert.equal(frames[1].pieces['person-two'].opacity, 0, 'Guests arrive after the plan');
+      assert.ok(frames[2].pieces['person-two'].opacity > frames[2].pieces['person-four'].opacity, 'Guests join sequentially');
+      assert.equal(frames[1].pieces.connections.opacity, 0, 'Connections wait until the group gathers');
+      assert.ok(frames[3].pieces.connections.opacity > .99, 'The final chapter connects the group');
+      assert.deepEqual(frames[0], frames[4], 'Reverse scroll restores every piece of the first keyframe');
+      for (const progress of [.23, .48, .75]) {
         await scrollTo(page, bounds.top + (bounds.height - height) * progress);
         const readableCount = await page.locator('[data-story-chapter]').evaluateAll(elements => elements.filter(el => Number(getComputedStyle(el).opacity) > .01).length);
         assert.ok(readableCount <= 1, 'Chapter transitions do not overlay competing headings');
@@ -105,7 +135,7 @@ try {
       await expect(story).not.toHaveAttribute('data-motion', 'true');
       assert.notEqual(await stage.evaluate(el => getComputedStyle(el).position), 'sticky');
       assert.equal(await story.evaluate(el => getComputedStyle(el).height === `${Math.round(innerHeight * 2.4)}px`), false, 'Static story removes the fixed scroll runway');
-      for (const chapter of ['1', '2', '3']) {
+      for (const chapter of ['1', '2', '3', '4']) {
         const part = page.locator(`[data-story-chapter="${chapter}"]`);
         assert.equal(await part.evaluate(el => getComputedStyle(el).opacity), '1');
         assert.notEqual(await part.evaluate(el => getComputedStyle(el).position), 'absolute');
@@ -124,7 +154,7 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'No horizontal overflow');
     assert.deepEqual(await page.evaluate(() => ({ requests: window.calls, telemetry: window.telemetry, refreshes: window.refreshes })), { requests: [], telemetry: [], refreshes: 0 });
     assert.deepEqual(errors, []);
-    console.log(`PASS cinematic ${width}x${height} ${reducedMotion}: reversible scroll, sticky scenes, compact reduced motion, keyboard tutorial, no requests/errors/overflow`);
+    console.log(`PASS narrative ${width}x${height} ${reducedMotion}: cumulative assembly, reversible scroll, pinned chapters, compact reduced motion, keyboard tutorial, no requests/errors/overflow`);
     await page.close();
   }
   if (process.argv.includes('--video')) {
@@ -147,12 +177,12 @@ try {
         }
         requestAnimationFrame(frame);
       });
-      await animate(0, end, 8000);
+      await animate(0, end, 12000);
       await animate(end, 0, 5000);
     });
     const video = page.video();
     await page.close();
-    await video.saveAs(path.join(out, 'landing-scroll-preview.webm'));
-    console.log(`VIDEO ${path.join(out, 'landing-scroll-preview.webm')}`);
+    await video.saveAs(path.join(out, 'story-scroll-preview.webm'));
+    console.log(`VIDEO ${path.join(out, 'story-scroll-preview.webm')}`);
   }
 } finally { await browser.close(); }
