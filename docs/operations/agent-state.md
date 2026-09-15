@@ -1,3 +1,10 @@
+## Event steps and interactive motion - September 15
+
+- Owner-requested local outcome: hosting Activity > Time > Group > Place > Review; joining optional note > review > explicit send. Back preserves drafts; stage validation and server error recovery focus the relevant field. Scroll reveals enhance landing, discovery grid and event details with reduced-motion/focus fallbacks.
+- Verified: 1,226 web + 229 domain tests pass (14 opt-in skipped), all workspace typechecks, production build, lint without errors; isolated mobile/desktop keyboard, draft, review, submission recovery and motion browser checks. See `docs/design/event-steps-and-motion-2026-09-15.md`.
+- Team: root integrated hosting; join_steps implemented and browser-verified participation; scroll_motion implemented/tested reveals; host_qa independently verified hosting. Prepared locally; no deployment or live event/request mutation.
+- Next three: prepare exact reviewed release; test first-time host/participant completion; continue trustworthy attendance measurement with DEMO exclusions. Production release remains a scoped owner action. Drafts persist within the current page visit only.
+
 ## Current cycle ? September 15: choose a real activity with new people
 
 - Strategy: test forming small sports groups before expanding administration. See docs/strategy/group-formation-2026-09-15.md for delivery dates, five-person adoption test and qualified attendance/14-day return definitions.

@@ -1,6 +1,7 @@
 "use client";
 
 import { Children, useState, type ReactNode } from "react";
+import ScrollReveal from "@/components/ScrollReveal";
 import styles from "./discovery.module.css";
 
 /** Only server-rendered public invitation markup crosses this boundary, never event records. */
@@ -17,7 +18,7 @@ export default function EventStage({ children }: { children: ReactNode }) {
         <button type="button" aria-pressed={showAll} onClick={() => setShowAll(!showAll)}>{showAll ? "One at a time" : "See all"}</button>
       </div>
       <div className={showAll ? styles.grid : styles.focused} id="invitation-stage">
-        {showAll ? cards : <div key={current} className={styles.enter}>{cards[current]}</div>}
+        {showAll ? cards.map((card, cardIndex) => <ScrollReveal key={cardIndex}>{card}</ScrollReveal>) : <div key={current} className={styles.enter}>{cards[current]}</div>}
       </div>
       {!showAll && cards.length > 1 ? <nav className={styles.browseControls} aria-label="Browse invitations">
         <button type="button" aria-controls="invitation-stage" disabled={current === 0} onClick={() => setIndex(current - 1)}>← Previous</button>

@@ -9,6 +9,7 @@ import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
 import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline, showsFullJoinState } from "@/lib/join-request-policy";
 import { trackClick } from "@/lib/track-click";
+import styles from "./JoinRequestControls.module.css";
 
 type Status = DiscoveryRequest["status"];
 
@@ -39,6 +40,24 @@ type JoinEligibilityInfo = {
   language: string;
 };
 
+// Keep the panel component stable across draft edits so inputs retain focus.
+// The server and first client render remain plain markup for hydration parity.
+function Panel({ className, role, children }: { className: string; role?: string; children: ReactNode }) {
+  const reducedMotion = useReducedMotion();
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+  const panelMotion = reducedMotion
+    ? { initial: false as const, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0 } }
+    : {
+        initial: { opacity: 0, y: 8 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -8 },
+        transition: { duration: 0.28, ease: "easeOut" as const },
+      };
+
+  if (!mounted) return <div className={className} role={role}>{children}</div>;
+  return <motion.div className={className} role={role} {...panelMotion}>{children}</motion.div>;
+}
+
 export default function JoinRequestControls({
   eventId,
   request,
@@ -59,14 +78,8 @@ export default function JoinRequestControls({
   isFull?: boolean;
 }) {
   const router = useRouter();
-  const reducedMotion = useReducedMotion();
-  // false on the server and on the first client paint, true only after
-  // hydration. Gating the framer-motion wrapper on this makes the SSR HTML and
-  // the first client render byte-identical (see `Panel` below). Implemented with
-  // useSyncExternalStore — its server snapshot is false and its client snapshot
-  // is true — so the mismatch-free first render needs no setState-in-effect.
-  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
   const [introduction, setIntroduction] = useState("");
+  const [step, setStep] = useState<"note" | "review">("note");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   // Local mirror of the server-provided request so the box can resolve in place
@@ -98,43 +111,8 @@ export default function JoinRequestControls({
     }
   }
 
-  // Motion is purposeful but calm: a small fade/rise marking the shift from
-  // deciding to committed. Under prefers-reduced-motion it becomes an instant
-  // swap (no transform, zero duration) — full reduced-motion parity.
-  const panelMotion = reducedMotion
-    ? { initial: false as const, animate: { opacity: 1 }, exit: { opacity: 1 }, transition: { duration: 0 } }
-    : {
-        initial: { opacity: 0, y: 8 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -8 },
-        transition: { duration: 0.28, ease: "easeOut" as const },
-      };
-
-  // Progressive enhancement to avoid a React hydration mismatch
-  // (CX-20260702-join-controls-reduced-motion-hydration-mismatch): a
-  // framer-motion `motion.div` serializes its resolved inline style differently
-  // on the server vs the client (e.g. the server emits `transform:none` that the
-  // client's post-mount render omits), which React "won't patch up". Before
-  // hydration (`mounted === false` — the server pass and the first client paint)
-  // we render each panel as a plain `<div>` with NO motion props and NO inline
-  // opacity/transform, so both passes are byte-identical in every motion
-  // setting. After mount we swap in the `motion.div` so the calm reveal still
-  // plays client-side only on subsequent state changes. AnimatePresence's
-  // `initial={false}` means the first mounted panel does not animate its
-  // entrance, so nothing visibly changes at hydration — only later in-place
-  // resolutions (request → pending/accepted/cancelled) get the gentle swap.
-  function Panel({ className, role, children }: { className: string; role?: string; children: ReactNode }) {
-    if (!mounted) {
-      return <div className={className} role={role}>{children}</div>;
-    }
-    return (
-      <motion.div className={className} role={role} {...panelMotion}>
-        {children}
-      </motion.div>
-    );
-  }
-
   async function createRequest() {
+    if (step !== "review" || submitting) return;
     setSubmitting(true);
     setError("");
     try {
@@ -337,6 +315,7 @@ export default function JoinRequestControls({
                   // active reliability pause.
                   setError("");
                   setStatus(null);
+                  setStep("note");
                   focusOnResolveRef.current = true;
                 }}
               >
@@ -348,29 +327,56 @@ export default function JoinRequestControls({
       );
     }
     return (
-      <Panel key="request" className="join-request-box">
-        {reliability?.tone === "warning" && !pausedBody ? (
-          <p className="reliability-warning" role="status">{reliability.body}</p>
-        ) : null}
-        <label htmlFor="join-introduction">A short note to the host <span>optional</span></label>
-        <textarea
-          id="join-introduction"
-          // Lands focus here when the member chooses to ask again from the
-          // cancelled state, so a keyboard / screen-reader member is never
-          // stranded on <body> when the join form returns.
-          ref={attachConfirmation}
-          maxLength={500}
-          rows={4}
-          value={introduction}
-          onChange={(event) => setIntroduction(event.target.value)}
-          placeholder="What would help the host welcome you well?"
-        />
-        <div>
-          <small>{introduction.length}/500</small>
-          <button type="button" onClick={createRequest} disabled={submitting}>
-            {submitting ? "Sending…" : "Request a place"}
-          </button>
-        </div>
+      <Panel key={`request-${step}`} className="join-request-box">
+        <ol className={styles.progress} aria-label="Request progress">
+          <li aria-current={step === "note" ? "step" : undefined}><span>1</span> Your note</li>
+          <li aria-current={step === "review" ? "step" : undefined}><span>2</span> Review</li>
+        </ol>
+        <strong className={styles.title} tabIndex={-1} ref={attachConfirmation}>
+          {step === "note" ? "Request a place" : "Ready to join the game?"}
+        </strong>
+        {step === "note" ? (
+          <>
+            <label htmlFor="join-introduction">A short note to the host <span>optional</span></label>
+            <textarea
+              id="join-introduction"
+              maxLength={500}
+              rows={3}
+              value={introduction}
+              onChange={(event) => setIntroduction(event.target.value)}
+              placeholder="What would help the host welcome you well?"
+              aria-describedby="join-note-count"
+            />
+            <div className={styles.actions}>
+              <small id="join-note-count">{introduction.length}/500</small>
+              <button type="button" onClick={() => {
+                focusOnResolveRef.current = true;
+                setStep("review");
+              }}>Review request <span aria-hidden="true">&rarr;</span></button>
+            </div>
+          </>
+        ) : (
+          <>
+            <section className={styles.review} aria-label="Your note to the host">
+              <small>Your note</small>
+              <p>{introduction.trim() || "No note added. You can send your request as it is."}</p>
+            </section>
+            <p className={styles.explanation}>The host will review your request. The exact meeting point appears after acceptance. You can cancel at any time.</p>
+            {reliability?.tone === "warning" && !pausedBody ? (
+              <p className="reliability-warning" role="status">{reliability.body}</p>
+            ) : null}
+            <div className={styles.actions}>
+              <button className={styles.back} type="button" disabled={submitting} onClick={() => {
+                setError("");
+                focusOnResolveRef.current = true;
+                setStep("note");
+              }}>Back</button>
+              <button type="button" onClick={createRequest} disabled={submitting}>
+                {submitting ? "Sending…" : "Send request"}
+              </button>
+            </div>
+          </>
+        )}
         {error ? <p className="error-message" role="alert">{error}</p> : null}
       </Panel>
     );

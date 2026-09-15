@@ -1,5 +1,11 @@
 # Outcome roadmap
 
+## Owner-requested event interaction - September 15
+
+- [x] Replace crowded hosting with five focused stages and a final review; participation with note and review stages. Preserve drafts, validation, final-action commitment and location/access boundaries.
+- [x] Add progressive scroll reveals and accessible reduced-motion/focus behavior across landing, discovery grid and event details. Verified locally; see `docs/design/event-steps-and-motion-2026-09-15.md`.
+- [ ] Evaluate first-time completion after scoped release approval; conversion impact remains unmeasured.
+
 ## Current priority ? September 15: real group formation
 
 Follow [the group-formation strategy](../strategy/group-formation-2026-09-15.md). Discovery time shortcuts and honest first-use/empty-state language are implemented locally and verified. Next: trustworthy aggregate attendance measurement with explicit fixture exclusions, then simplify the first-host invitation journey. Evaluate requests, qualified self-reported attendance and mature 14-day return; demo interactions are never adoption evidence. The recurring worker recovered and completed verified cycles including c8730d5; historical fault notes below are superseded. Production UI release remains a separate approval.

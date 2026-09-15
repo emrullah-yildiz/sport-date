@@ -86,6 +86,33 @@ function ungatedPanelHtml(variant: typeof defaultMotion | typeof reducedMotionVa
 }
 
 describe("JoinRequestControls server render (hydration parity)", () => {
+  it("starts with only the optional note and a review action, without a send action", () => {
+    const html = serverHtml(null);
+    expect(html).toContain('aria-label="Request progress"');
+    expect(html).toContain('aria-current="step"');
+    expect(html).toContain("Review request");
+    expect(html).toContain('maxLength="500"');
+    expect(html).not.toContain("Send request");
+    expect(html).not.toContain("Ready to join the game?");
+  });
+
+  it.each(["age", "language", "past"] as const)("keeps %s eligibility blockers ahead of every request step", (reason) => {
+    const html = renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={null} eligibility={{ reason, minimumAge: 18, maximumAge: 40, language: "English" }} />);
+    expect(html).toContain("You can&#x27;t request a place here.");
+    expect(html).not.toContain("Review request");
+    expect(html).not.toContain("<textarea");
+  });
+
+  it("keeps reliability pauses ahead of the request steps while allowing cancellation of an existing request", () => {
+    const reliability = { tone: "paused" as const, headline: "Paused", body: "Your requests reopen soon.", liftsAt: null, timeZone: "Europe/Bucharest" };
+    const paused = renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={null} reliability={reliability} />);
+    expect(paused).toContain("Your requests reopen soon.");
+    expect(paused).not.toContain("Review request");
+    const pending = renderToStaticMarkup(<JoinRequestControls eventId="evt-1" request={{ id: "req-1", status: "pending", skipCount: 0 }} reliability={reliability} />);
+    expect(pending).toContain("Cancel request");
+    expect(pending).not.toContain("Your requests reopen soon.");
+  });
+
   // Positive control: PROVE the assertions below can fail. If the gate were
   // removed, the server pass renders this motion.div — and it demonstrably
   // carries the telltale inline style in BOTH motion settings, so a green

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import ScrollReveal from "@/components/ScrollReveal";
 import PrimaryNav from "@/components/PrimaryNav";
 import SportArtwork from "@/components/discovery/SportArtwork";
 import styles from "@/components/discovery/detail.module.css";
@@ -76,7 +77,7 @@ export default async function DiscoveryEventPage({ params }: { params: Promise<{
         </div>
       ) : (
         <><JoinRequestControls eventId={event.id} request={event.request} isFull={availability.isFull} eligibility={{ reason: event.eligibility, minimumAge: event.minimumAge, maximumAge: event.maximumAge, language: event.language }} reliability={{ tone: standing!.notice.tone, headline: standing!.notice.headline, body: standing!.notice.body, liftsAt: standing!.notice.liftsAt ? standing!.notice.liftsAt.toISOString() : null, timeZone: event.timeZone }} />{event.request?.status === "pending" ? <p className="event-detail-chat-locked">The private group chat with the host and other attendees opens once your request is accepted.</p> : null}</>
-      )}</div><article><p className="panel-label">Approximate area</p><h2>{event.areaLabel}, {event.city}</h2><ApproximateAreaMap areaLabel={event.areaLabel} city={event.city} approximateLatitude={event.approximateLatitude} approximateLongitude={event.approximateLongitude} viewerArea={user.location} />{locationCue.distanceHint ? <p className="approx-area-distance">{locationCue.distanceHint}</p> : null}<p>{privateLocation ? "Your accepted meeting point is below." : "The exact meeting point opens after your request is accepted."}</p></article></section>
+      )}</div><ScrollReveal as="article"><p className="panel-label">Approximate area</p><h2>{event.areaLabel}, {event.city}</h2><ApproximateAreaMap areaLabel={event.areaLabel} city={event.city} approximateLatitude={event.approximateLatitude} approximateLongitude={event.approximateLongitude} viewerArea={user.location} />{locationCue.distanceHint ? <p className="approx-area-distance">{locationCue.distanceHint}</p> : null}<p>{privateLocation ? "Your accepted meeting point is below." : "The exact meeting point opens after your request is accepted."}</p></ScrollReveal></section>
       {privateLocation ? <section className="accepted-location"><p className="panel-label">Your accepted meeting point</p><AcceptedMeetingPoint venueName={privateLocation.venueName} address={privateLocation.address} postalCode={privateLocation.postalCode} city={event.city} latitude={privateLocation.latitude} longitude={privateLocation.longitude} instructions={privateLocation.instructions} /><Link href={`/events/${event.id}/room`}>Enter the event room →</Link></section> : null}
       {!event.viewerIsHost ? <section className="event-invite-friend"><p className="panel-label">Know someone?</p><InviteFriendButton eventId={event.id} sport={event.sport} /></section> : null}
       <div className="event-safety"><ReportSafetyControls eventId={event.id} subjectUserId={event.hostUserId} subjectName={event.hostFirstName} /></div>

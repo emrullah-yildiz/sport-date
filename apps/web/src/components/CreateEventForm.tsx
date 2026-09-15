@@ -3,6 +3,7 @@
 import type { ExperienceLevel } from "@sport-date/domain";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
+import styles from "./CreateEventForm.module.css";
 import AddressAutocomplete from "@/components/AddressAutocomplete";
 import { trackClick } from "@/lib/track-click";
 
@@ -16,8 +17,6 @@ import {
   PAST_START_TIME_MESSAGE,
   requiredFieldsHeadline,
   REQUIRED_FIELDS_SUMMARY_MESSAGE,
-  sectionProgressLabel,
-  sectionsNeedingAttention,
   type EventFieldIssue,
   type EventFieldName,
 } from "@/lib/event-create-recovery";
@@ -28,10 +27,21 @@ const levels: Array<{ value: ExperienceLevel; label: string }> = [
   { value: "advanced", label: "Advanced" },
 ];
 
+const steps = [
+  { id: "invitation", label: "Activity", fields: ["sport", "title", "description"] },
+  { id: "rhythm", label: "Time", fields: ["startsAt", "durationMinutes"] },
+  { id: "people", label: "Group", fields: ["capacity", "language", "experienceLevels", "minimumAge", "maximumAge"] },
+  { id: "location", label: "Place", fields: ["city", "countryCode", "areaLabel", "venueName", "address", "postalCode", "instructions"] },
+  { id: "review", label: "Review", fields: [] },
+];
+const fieldStep = (field: string) => steps.findIndex((item) => item.fields.includes(field));
+
 type SummaryKind = "empty-required" | "server" | "";
 
 export default function CreateEventForm() {
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>(["beginner", "intermediate"]);
+  const [step, setStep] = useState(0);
+  const [review, setReview] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   // Every problem to show at once — tied to a field where one exists — so the
   // host fixes them in one calm pass instead of one-per-round-trip.
@@ -71,12 +81,12 @@ export default function CreateEventForm() {
     return set;
   }, [issues]);
 
-  // Which sections still have a flagged field, so the progress rail can quietly
-  // point the host at what remains. Informative only — never a submit blocker.
-  const attentionSections = useMemo(
-    () => new Set(sectionsNeedingAttention(issues)),
-    [issues],
-  );
+  function goToStep(next: number) {
+    setStep(next);
+    requestAnimationFrame(() => {
+      formRef.current?.querySelector<HTMLElement>(`#section-${steps[next].id}-heading`)?.focus();
+    });
+  }
 
   function describedBy(field: EventFieldName): string | undefined {
     return invalidFields.has(field) ? `${field}-error` : undefined;
@@ -102,24 +112,25 @@ export default function CreateEventForm() {
   function focusFirstIssue(nextIssues: EventFieldIssue[]) {
     const form = formRef.current;
     const firstField = nextIssues.find((issue) => issue.field)?.field ?? null;
+    if (firstField && fieldStep(firstField) >= 0) setStep(fieldStep(firstField));
     // Prefer moving the host to the actual field to fix; fall back to the
     // summary so a form-wide problem is still surfaced in view.
-    const target = (firstField && form?.querySelector<HTMLElement>(`[name="${firstField}"]`)) || summaryRef.current;
-    if (!target) return;
     requestAnimationFrame(() => {
-      target.scrollIntoView({ block: "center", behavior: "smooth" });
+    const target = (firstField && form?.querySelector<HTMLElement>(`[name="${firstField}"]:not([type="hidden"]), #${firstField}:not([type="hidden"])`)) || (firstField && fieldStep(firstField) >= 0 && form?.querySelector<HTMLElement>(`#section-${steps[fieldStep(firstField)].id}-heading`)) || summaryRef.current;
+    if (!target) return;
+      target.scrollIntoView({ block: "center", behavior: "instant" });
       target.focus({ preventScroll: true });
     });
   }
 
-  function reportEmptyRequired(): boolean {
+  function reportEmptyRequired(all = false): boolean {
     const form = formRef.current;
     if (!form) return false;
     // Collect every currently-blocked field, in page order, as its own issue so
     // the host sees the full list rather than the native one-bubble-at-a-time.
     const emptyIssues: EventFieldIssue[] = [];
     let kind: SummaryKind = "empty-required";
-    if (form.checkValidity()) {
+    if (all && form.checkValidity()) {
       // Still guard the client-side past-time rule even when everything is
       // "filled" — the native `min` catches most, this catches an edited value.
       const startInput = form.elements.namedItem("startsAt");
@@ -133,6 +144,7 @@ export default function CreateEventForm() {
       if (levelIssue) emptyIssues.push(levelIssue);
     } else {
       for (const field of EVENT_FIELD_ORDER) {
+        if (!all && !steps[step].fields.includes(field)) continue;
         // Experience levels are React-state checkboxes with no native `required`,
         // so the browser can't flag an empty set — check it explicitly, in its
         // canonical page position, so it joins the same recovery summary as
@@ -167,6 +179,9 @@ export default function CreateEventForm() {
         }
       }
     }
+    if ((all || step === 2) && Number((form.elements.namedItem("minimumAge") as HTMLInputElement).value) > Number((form.elements.namedItem("maximumAge") as HTMLInputElement).value)) {
+      emptyIssues.push({ field: "maximumAge", message: "Maximum age must be at least the minimum age." });
+    }
     if (emptyIssues.length === 0) return false;
     setIssues(emptyIssues);
     setSummaryKind(kind);
@@ -182,7 +197,12 @@ export default function CreateEventForm() {
     // Client-side prevention/visibility first: if native `required` or the
     // past-time rule would block us, show a VISIBLE summary + move focus instead
     // of letting the browser silently jump to a hidden bubble.
-    if (reportEmptyRequired()) return;
+    if (submitting || reportEmptyRequired(step === 4)) return;
+    if (step < 4) {
+      if (step === 3) setReview(Object.fromEntries(Array.from(new FormData(event.currentTarget), ([key, value]) => [key, String(value)])));
+      goToStep(step + 1);
+      return;
+    }
 
     setSubmitting(true);
     const form = new FormData(event.currentTarget);
@@ -233,7 +253,7 @@ export default function CreateEventForm() {
   }
 
   const summaryHeadline =
-    summaryKind === "empty-required" ? REQUIRED_FIELDS_SUMMARY_MESSAGE : "Please fix the following to publish:";
+    summaryKind === "empty-required" ? REQUIRED_FIELDS_SUMMARY_MESSAGE : "Please check these details:";
 
   // The reason Publish is blocked when no experience level is chosen — shown the
   // moment the selection empties (not only after a submit round-trip), and
@@ -243,7 +263,7 @@ export default function CreateEventForm() {
     fieldMessage("experienceLevels") ?? experienceLevelsIssue(experienceLevels.length)?.message;
 
   return (
-    <form className="event-form" onSubmit={submit} noValidate ref={formRef}>
+    <form className={`event-form ${styles.form}`} onSubmit={submit} noValidate ref={formRef}>
       {issues.length > 0 ? (
         <div className="event-form-summary" role="alert" aria-live="assertive" tabIndex={-1} ref={summaryRef}>
           <p className="event-form-summary-headline">{summaryHeadline}</p>
@@ -272,31 +292,17 @@ export default function CreateEventForm() {
         </div>
       ) : null}
 
-      <p className="event-form-standard" role="note">
-        A quick standard: events are for a real shared activity — dating, friendship, or community
-        through the game. Events organised for sexual purposes or hookups aren&rsquo;t allowed. See the{" "}
-        <a href="/hosting-guidelines">hosting guidelines</a>.
-      </p>
-
-      <nav className="event-form-progress" aria-label="Event details progress">
-        <p className="event-form-progress-lede">Three calm sections. One publish at the end—your details are kept as you go.</p>
-        <ol className="event-form-progress-rail">
-          <li className={`event-form-progress-step${attentionSections.has("invitation") ? " needs-attention" : ""}`}>
-            <a href="#section-invitation"><span className="event-form-progress-num" aria-hidden="true">1</span><span className="event-form-progress-name">The invitation</span>{attentionSections.has("invitation") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
-          </li>
-          <li className={`event-form-progress-step${attentionSections.has("rhythm") ? " needs-attention" : ""}`}>
-            <a href="#section-rhythm"><span className="event-form-progress-num" aria-hidden="true">2</span><span className="event-form-progress-name">The rhythm</span>{attentionSections.has("rhythm") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
-          </li>
-          <li className={`event-form-progress-step${attentionSections.has("location") ? " needs-attention" : ""}`}>
-            <a href="#section-location"><span className="event-form-progress-num" aria-hidden="true">3</span><span className="event-form-progress-name">Where you&apos;ll meet</span>{attentionSections.has("location") ? <span className="event-form-progress-flag"> — needs attention</span> : null}</a>
-          </li>
-        </ol>
+      <nav className={styles.progress} aria-label="Event creation progress">
+        <p aria-live="polite">Step {step + 1} of {steps.length} &middot; {steps[step].label}</p>
+        <ol>{steps.map((item, index) => <li key={item.id} aria-current={step === index ? "step" : undefined}>
+          <span className={index <= step ? styles.reached : undefined} />{item.label}
+        </li>)}</ol>
       </nav>
-
-      <section className="event-form-section" id="section-invitation" aria-labelledby="section-invitation-heading">
-        <p className="event-form-step-indicator">{sectionProgressLabel(0)}</p>
+      <fieldset className={styles.body} disabled={submitting}>
+        <legend className={styles.srOnly}>Create your event</legend>
+      <section className="event-form-section" id="section-invitation" hidden={step !== 0} aria-labelledby="section-invitation-heading">
         <p className="panel-label">The invitation</p>
-        <h2 id="section-invitation-heading">Give people a reason to picture themselves there.</h2>
+        <h2 tabIndex={-1} id="section-invitation-heading">What are you planning?</h2>
         <div className="event-field-grid">
           <label htmlFor="sport">Sport<input {...fieldProps("sport")} required maxLength={60} placeholder="Tennis" />{fieldMessage("sport") ? <span id="sport-error" className="field-error">{fieldMessage("sport")}</span> : null}</label>
           <label htmlFor="title">Event name<input {...fieldProps("title")} required maxLength={100} placeholder="An easy evening rally" />{fieldMessage("title") ? <span id="title-error" className="field-error">{fieldMessage("title")}</span> : null}</label>
@@ -304,35 +310,48 @@ export default function CreateEventForm() {
         <label htmlFor="description">Description<textarea {...fieldProps("description")} required minLength={20} maxLength={1000} rows={5} placeholder="Set the pace, mood, and what a newcomer should expect." />{fieldMessage("description") ? <span id="description-error" className="field-error">{fieldMessage("description")}</span> : null}</label>
       </section>
 
-      <section className="event-form-section" id="section-rhythm" aria-labelledby="section-rhythm-heading">
-        <p className="event-form-step-indicator">{sectionProgressLabel(1)}</p>
+      <section className="event-form-section" id="section-rhythm" hidden={step !== 1} aria-labelledby="section-rhythm-heading">
         <p className="panel-label">The rhythm</p>
-        <h2 id="section-rhythm-heading">Make the commitment easy to understand.</h2>
-        <div className="event-field-grid"><label htmlFor="startsAt">Starts at<input {...fieldProps("startsAt")} type="datetime-local" min={startMin} required /><span className="field-format-hint">Date order follows your browser&apos;s region.</span>{fieldMessage("startsAt") ? <span id="startsAt-error" className="field-error">{fieldMessage("startsAt")}</span> : null}</label><label htmlFor="durationMinutes">Duration in minutes<input {...fieldProps("durationMinutes")} type="number" min="15" max="480" defaultValue="90" required />{fieldMessage("durationMinutes") ? <span id="durationMinutes-error" className="field-error">{fieldMessage("durationMinutes")}</span> : null}</label><label htmlFor="capacity">Places for others<input {...fieldProps("capacity")} type="number" min="2" max="20" defaultValue="4" required aria-describedby="capacity-hint" /><span id="capacity-hint" className="field-format-hint">You&apos;re already in as host — this is how many others can join, not counting you.</span>{fieldMessage("capacity") ? <span id="capacity-error" className="field-error">{fieldMessage("capacity")}</span> : null}</label><label htmlFor="language">Event language<input {...fieldProps("language")} maxLength={35} placeholder="English" required />{fieldMessage("language") ? <span id="language-error" className="field-error">{fieldMessage("language")}</span> : null}</label></div>
-        <p className="field-help">The event time zone is captured from your device when you publish.</p>
-        <fieldset aria-invalid={experienceLevelsError ? true : undefined} aria-describedby={experienceLevelsError ? "experienceLevels-hint experienceLevels-error" : "experienceLevels-hint"}><legend>Experience levels welcome</legend><p id="experienceLevels-hint" className="field-help">Pick at least one — welcome as many levels as you like.</p><div className="choice-row">{levels.map((level) => <label className="choice-pill" key={level.value}><input type="checkbox" checked={experienceLevels.includes(level.value)} onChange={() => toggleLevel(level.value)} />{level.label}</label>)}</div>{experienceLevelsError ? <span id="experienceLevels-error" className="field-error" role="status">{experienceLevelsError}</span> : null}</fieldset>
+        <h2 tabIndex={-1} id="section-rhythm-heading">When are you getting together?</h2>
+        <div className="event-field-grid"><label htmlFor="startsAt">Starts at<input {...fieldProps("startsAt")} type="datetime-local" min={startMin} required /><span className="field-format-hint">Date order follows your browser&apos;s region.</span>{fieldMessage("startsAt") ? <span id="startsAt-error" className="field-error">{fieldMessage("startsAt")}</span> : null}</label><label htmlFor="durationMinutes">Duration in minutes<input {...fieldProps("durationMinutes")} type="number" min="15" max="480" defaultValue="90" required />{fieldMessage("durationMinutes") ? <span id="durationMinutes-error" className="field-error">{fieldMessage("durationMinutes")}</span> : null}</label></div>
+        <p className="field-help">Times use your device time zone.</p>
+      </section>
+      <section className="event-form-section" id="section-people" hidden={step !== 2} aria-labelledby="section-people-heading">
+        <p className="panel-label">The group</p>
+        <h2 tabIndex={-1} id="section-people-heading">Who is this activity for?</h2>
+        <div className="event-field-grid"><label htmlFor="capacity">Places for others<input {...fieldProps("capacity")} type="number" min="2" max="20" defaultValue="4" required aria-describedby={invalidFields.has("capacity") ? "capacity-hint capacity-error" : "capacity-hint"} /><span id="capacity-hint" className="field-format-hint">You&apos;re already in as host — this is how many others can join, not counting you.</span>{fieldMessage("capacity") ? <span id="capacity-error" className="field-error">{fieldMessage("capacity")}</span> : null}</label><label htmlFor="language">Event language<input {...fieldProps("language")} maxLength={35} placeholder="English" required />{fieldMessage("language") ? <span id="language-error" className="field-error">{fieldMessage("language")}</span> : null}</label></div>
+        <fieldset id="experienceLevels" tabIndex={-1} aria-invalid={experienceLevelsError ? true : undefined} aria-describedby={experienceLevelsError ? "experienceLevels-hint experienceLevels-error" : "experienceLevels-hint"}><legend>Experience levels welcome</legend><p id="experienceLevels-hint" className="field-help">Pick at least one — welcome as many levels as you like.</p><div className="choice-row">{levels.map((level) => <label className="choice-pill" key={level.value}><input type="checkbox" checked={experienceLevels.includes(level.value)} onChange={() => toggleLevel(level.value)} />{level.label}</label>)}</div>{experienceLevelsError ? <span id="experienceLevels-error" className="field-error" role="status">{experienceLevelsError}</span> : null}</fieldset>
         <div className="event-field-grid"><label htmlFor="minimumAge">Minimum age<input {...fieldProps("minimumAge")} type="number" min="18" max="100" defaultValue="24" required />{fieldMessage("minimumAge") ? <span id="minimumAge-error" className="field-error">{fieldMessage("minimumAge")}</span> : null}</label><label htmlFor="maximumAge">Maximum age<input {...fieldProps("maximumAge")} type="number" min="18" max="100" defaultValue="38" required />{fieldMessage("maximumAge") ? <span id="maximumAge-error" className="field-error">{fieldMessage("maximumAge")}</span> : null}</label></div>
       </section>
 
-      <section className="event-form-section location-section" id="section-location" aria-labelledby="section-location-heading">
-        <p className="event-form-step-indicator">{sectionProgressLabel(2)}</p>
+      <section className="event-form-section location-section" id="section-location" hidden={step !== 3} aria-labelledby="section-location-heading">
         <p className="panel-label">Where you&apos;ll meet</p>
-        <h2 id="section-location-heading">Set the meeting point once.</h2>
+        <h2 tabIndex={-1} id="section-location-heading">Set the meeting point once.</h2>
         <p className="location-trust-note">Discovery only ever sees the <strong>approximate area</strong> (city and district). The exact pin, address, and postal code stay private until you accept someone.</p>
         <label htmlFor="venueName">Place name<input {...fieldProps("venueName")} required maxLength={120} placeholder="Court 2" />{fieldMessage("venueName") ? <span id="venueName-error" className="field-error">{fieldMessage("venueName")}</span> : null}</label>
         <AddressAutocomplete error={fieldMessage("address")} />
         <label htmlFor="instructions">Arrival details<textarea {...fieldProps("instructions")} maxLength={500} rows={3} placeholder="Where to enter, who to ask for, and what to bring." />{fieldMessage("instructions") ? <span id="instructions-error" className="field-error">{fieldMessage("instructions")}</span> : null}</label>
       </section>
 
-      {issues.length > 0 ? (
-        <p className="event-form-action-alert" role="status">
-          {summaryKind === "empty-required"
-            ? "Some required details above still need attention — we've highlighted them for you."
-            : "We couldn't publish yet — see the highlighted problems above."}
-        </p>
-      ) : null}
-      <button className="event-publish" type="submit" disabled={submitting} aria-describedby={experienceLevelsError ? "experienceLevels-error" : undefined}>{submitting ? "Publishing…" : "Publish the invitation"}</button>
-      <p className="event-form-note">Publishing makes only the approximate event details discoverable. Exact meeting details remain private.</p>
+      <section className="event-form-section" id="section-review" hidden={step !== 4} aria-labelledby="section-review-heading">
+        <p className="panel-label">Ready when you are</p>
+        <h2 tabIndex={-1} id="section-review-heading">Review your invitation</h2>
+        <dl className={styles.review}>
+          <div><dt>Activity</dt><dd>{review.title} &middot; {review.sport}</dd><dd>{review.description}</dd></div>
+          <div><dt>Time</dt><dd>{review.startsAt?.replace("T", " at ")} &middot; {review.durationMinutes} minutes</dd></div>
+          <div><dt>Group</dt><dd>{review.capacity} places &middot; {review.language} &middot; Ages {review.minimumAge} to {review.maximumAge}</dd><dd>{experienceLevels.join(", ")}</dd></div>
+          <div><dt>Public area</dt><dd>{review.areaLabel}, {review.city}, {review.countryCode}</dd></div>
+          <div><dt>Meeting point &middot; shared after acceptance</dt><dd>{review.venueName} &middot; {review.address} {review.postalCode}</dd><dd>{review.instructions}</dd></div>
+        </dl>
+        <div className={styles.editLinks}>{steps.slice(0, 4).map((item, index) => <button type="button" key={item.id} onClick={() => goToStep(index)}>Edit {item.label.toLowerCase()}</button>)}</div>
+        <p className="field-help">Events are for a real shared activity. Events organised for sexual purposes or hookups are not allowed. <a href="/hosting-guidelines">Hosting guidelines</a></p>
+      </section>
+      </fieldset>
+      <div className={styles.actions}>
+        {step > 0 ? <button type="button" className={styles.back} disabled={submitting} onClick={() => { setIssues([]); goToStep(step - 1); }}>Back</button> : <a href="/hosting-guidelines">Hosting guide</a>}
+        <button className="event-publish" type="submit" disabled={submitting}>{submitting ? "Publishing..." : step === 4 ? "Publish the invitation" : step === 3 ? "Review invitation" : "Continue"}</button>
+      </div>
+      {step === 4 ? <p className="event-form-note">Publishing makes only the approximate event details discoverable. Exact meeting details remain private.</p> : null}
     </form>
   );
 }

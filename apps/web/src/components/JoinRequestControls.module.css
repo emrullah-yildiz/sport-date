@@ -1,0 +1,13 @@
+.progress { display: flex; gap: 20px; padding: 0; margin: 0 0 6px; list-style: none; color: var(--text-muted); font-size: 12px; }
+.progress li { display: flex; align-items: center; gap: 7px; }
+.progress span { display: grid; place-items: center; width: 25px; height: 25px; border: 1px solid var(--line); border-radius: 50%; }
+.progress [aria-current="step"] { color: var(--text); font-weight: 800; }
+.progress [aria-current="step"] span { background: var(--lime); color: var(--bg); border-color: transparent; }
+.title { font-size: 22px; letter-spacing: -.03em; }
+.review { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.review small { color: var(--text-muted); }
+.review p { margin: 7px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.explanation { margin: 0; color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+.actions { gap: 10px; flex-wrap: wrap; }
+.actions button { min-height: 44px; }
+.actions .back { color: var(--text); background: var(--surface); border: 1px solid var(--line); }

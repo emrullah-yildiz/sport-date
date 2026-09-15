@@ -58,13 +58,15 @@ try {
     await page.locator('summary').click();assert.equal(await page.locator('input[name="near"]').inputValue(),'all');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await page.evaluate(f=>{window.fixtureDetail=true;window.fixtureEvents=[{...f,description:'Bring comfortable shoes and water.',durationMinutes:60,eligibility:'eligible',hostUserId:'synthetic-host',viewerIsHost:false}];window.calls=[];window.fetch=async(url,init)=>{if(init?.method!=='POST'||!url.endsWith('/requests'))throw Error('Unexpected request');window.calls.push({url,body:JSON.parse(init.body)});return new Response(JSON.stringify({requestId:'synthetic-request',status:'pending'}));};return window.renderFixture()},fixture);
-    await page.getByRole('button',{name:'Request a place',exact:true}).waitFor();
+    await page.getByRole('button',{name:'Review request',exact:false}).waitFor();
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     await page.screenshot({path:path.join(out,`detail-${width}-${reducedMotion}.png`),fullPage:true,animations:'disabled'});
     await page.getByText('About this plan',{exact:true}).click();
     await page.getByText('Bring comfortable shoes and water.',{exact:true}).waitFor();
     await page.getByRole('textbox',{name:'A short note to the host optional'}).fill('Looking forward to a gentle pace.');
-    const request=page.getByRole('button',{name:'Request a place',exact:true});await request.focus();await page.keyboard.press('Enter');
+    const request=page.getByRole('button',{name:'Review request',exact:false});await request.focus();await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(()=>window.calls.length),0);
+    await page.getByRole('button',{name:'Send request',exact:true}).click();
     await page.getByRole('button',{name:'Cancel request',exact:true}).waitFor();
     assert.equal(await page.evaluate(()=>window.calls.length),1);
     await page.waitForFunction(()=>document.activeElement?.tagName==='STRONG');

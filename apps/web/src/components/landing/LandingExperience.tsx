@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import BetaTermExplainer from "@/components/BetaTermExplainer";
+import ScrollReveal from "@/components/ScrollReveal";
 import { BRAND_NAME, RallyGlyph } from "@/lib/brand";
 import { intentions, meetingDetail, plans, sports, transition, type Intention, type Sport, type Stage } from "./demo";
 import s from "./landing.module.css";
@@ -83,16 +84,16 @@ export default function LandingExperience({ preview = false, memberName = null }
       </section>
       <div className={s.ribbon} aria-hidden="true"><span>COME FOR THE GAME</span><span>↗</span><span>STAY FOR THE COMPANY</span><span>↗</span><span>YOUR PACE. YOUR PEOPLE.</span><span>↗</span></div>
       <section id="how-it-works" className={s.how} aria-labelledby="how-heading">
-        <div className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">A plan makes<br />hello easier.</h2><p>No perfect opening line required.</p></div>
+        <ScrollReveal className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">A plan makes<br />hello easier.</h2><p>No perfect opening line required.</p></ScrollReveal>
         <div className={s.steps}>{[
           ["01", "Pick your kind of fun.", "Choose an activity, a comfortable pace, and what kind of connection you’re open to."],
           ["02", "Ask to join a small group.", "Read the plan, then send a request. The host reviews it; a request isn’t a booking."],
           ["03", "Get the details. Show up.", "Once accepted, see the meeting point. Bring yourself, say hello, and get moving."],
-        ].map(([number, title, text]) => <article key={number}><span className={s.stepNumber}>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+        ].map(([number, title, text]) => <ScrollReveal as="article" key={number}><span className={s.stepNumber}>{number}</span><h3>{title}</h3><p>{text}</p></ScrollReveal>)}</div>
       </section>
       <section id="try-it" className={s.playground} aria-labelledby="try-heading">
-        <div className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Choose a fictional activity and see how asking to join works.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></div>
-        <div className={s.builder}>
+        <ScrollReveal className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Choose a fictional activity and see how asking to join works.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></ScrollReveal>
+        <ScrollReveal className={s.builder}>
           <fieldset className={s.choices}><legend>01 <span>How do you want to move?</span></legend><div>{sports.map((item, i) => <button key={item} type="button" aria-pressed={sport === item} onClick={() => { setSport(item); reset(); }}><span aria-hidden="true">{["◉", "↗", "〰"][i]}</span>{item}</button>)}</div></fieldset>
           <fieldset className={s.choices}><legend>02 <span>What are you open to?</span></legend><div>{intentions.map(item => <button key={item} type="button" aria-pressed={intention === item} onClick={() => { setIntention(item); reset(); }}>{item}</button>)}</div></fieldset>
           <p className={s.choiceNote}>These choices change this example only. They do not find people or send a request.</p>
@@ -117,10 +118,10 @@ export default function LandingExperience({ preview = false, memberName = null }
               <div className={s.progress} aria-label={`Demo step ${stageNumber + 1} of 5`}><span>EXPLORE</span><div>{[0, 1, 2, 3, 4].map(i => <i key={i} className={i <= stageNumber ? s.complete : undefined} />)}</div><span>MEET</span></div>
             </div>
           </article>
-        </div>
+        </ScrollReveal>
       </section>
-      <aside className={s.trust} aria-label="The experience principles"><p>Good company.<br /><strong>Clear boundaries.</strong></p><div><span>01</span><p><strong>Adults only</strong>A space for people 18 and over.</p></div><div><span>02</span><p><strong>Private until accepted</strong>The exact meeting point comes later.</p></div><div><span>03</span><p><strong>You stay in control</strong>Block, report, or leave when you need to.</p></div></aside>
-      <section className={s.closing}>
+      <ScrollReveal as="aside" className={s.trust} aria-label="The experience principles"><p>Good company.<br /><strong>Clear boundaries.</strong></p><div><span>01</span><p><strong>Adults only</strong>A space for people 18 and over.</p></div><div><span>02</span><p><strong>Private until accepted</strong>The exact meeting point comes later.</p></div><div><span>03</span><p><strong>You stay in control</strong>Block, report, or leave when you need to.</p></div></ScrollReveal>
+      <ScrollReveal as="section" className={s.closing}>
         <p className={s.eyebrow}>{preview ? "THAT WAS THE PREVIEW. THIS IS THE NEXT STEP." : "READY FOR A REAL PLAN?"}</p>
         <h2>Your next good story<br />could start with <span>“fancy a game?”</span></h2>
         <p>{preview ? "Explore the current product when you’re ready." : signedIn ? "Pick up where you left off and find an activity." : "Create a free profile, choose your sports, and ask to join an activity."}</p>
@@ -133,7 +134,7 @@ export default function LandingExperience({ preview = false, memberName = null }
           <Link href="/research" prefetch={false} data-track="landing_cta_survey">Take the 2-min survey</Link>
           <Link href="/feedback" prefetch={false}>Share feedback</Link>
         </div>}
-      </section>
+      </ScrollReveal>
     </main>
     <footer className={s.footer}><span><RallyGlyph size={25} /> {BRAND_NAME}</span><span>Meet through movement.</span><nav aria-label="Legal and trust links">
       <Link href="/trust" prefetch={false}>Trust</Link><Link href="/terms" prefetch={false}>Terms</Link><Link href="/privacy" prefetch={false}>Privacy</Link><Link href="/safety" prefetch={false}>Safety <Arrow /></Link>
