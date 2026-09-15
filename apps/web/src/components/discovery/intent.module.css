@@ -10,3 +10,12 @@
 .choice:focus-visible,.selected:focus-visible { outline:3px solid #f4caff; outline-offset:4px; }
 .note { font-size:11px; color:#b7c5af; margin:12px 0 0; }
 @media(max-width:600px) { .intent { padding:18px; border-radius:18px; } .choices { gap:7px; } .choice,.selected { flex-direction:column; align-items:flex-start; gap:12px; padding:12px 10px; font-size:13px; } .heading { display:block; } .heading p { margin-top:8px; } }
+
+.dateForm { display:flex; align-items:flex-end; flex-wrap:wrap; gap:12px; }
+.dateForm label { display:grid; gap:8px; font-weight:700; font-size:14px; }
+.dateForm input[type="date"] { min-height:48px; min-width:210px; max-width:100%; border:1px solid #77856e; border-radius:12px; background:#253227; color:#f4f6ef; color-scheme:dark; padding:10px 14px; font:inherit; }
+.dateForm button { min-height:48px; padding:12px 20px; border:0; border-radius:12px; background:#d4fb50; color:#142018; font:inherit; font-weight:750; cursor:pointer; }
+.dateForm a { color:#eef5e6; padding:14px 4px; font-size:14px; }
+.dateForm input:focus-visible,.dateForm button:focus-visible,.dateForm a:focus-visible { outline:3px solid #f4caff; outline-offset:3px; }
+.dateHelp { margin:12px 0 18px; color:#c3cfbd; font-size:13px; line-height:1.5; }
+@media(max-width:600px) { .dateForm label { width:100%; } .dateForm input[type="date"] { min-width:0; width:100%; box-sizing:border-box; } }

@@ -42,3 +42,23 @@ describe("discovery time intent", () => {
     expect(html).not.toMatch(/people near|join now|request a place|plans match|crew found/i);
   });
 });
+
+
+describe("free date entry", () => {
+  it("shows the selected day, retains filters in its GET form, and clears date on shortcuts", () => {
+    const query = { date: "2026-10-25", sport: "Tennis", languages: ["English", "French"], lat: "44.456789", lng: "26.123456", token: "SECRET" };
+    const html = renderToStaticMarkup(<DiscoveryIntentEntry query={query} withinDays={7} onDate="2026-10-25" />);
+    expect(html).toContain('action="/discover"');
+    expect(html).toContain('method="get"');
+    expect(html).toContain('type="date"');
+    expect(html).toContain('value="2026-10-25"');
+    expect(html).toContain('name="sport" value="Tennis"');
+    expect(html).toContain('name="languages" value="French"');
+    expect(html).toContain('name="lat" value="44.5"');
+    expect(html).toContain("25 October 2026");
+    expect(html).toContain("Clear date");
+    expect(html).not.toContain('aria-current="page"');
+    expect(html).not.toMatch(/SECRET|44\.456789|26\.123456/);
+    expect(discoveryIntentHref(query, 1)).not.toContain("date=");
+  });
+});

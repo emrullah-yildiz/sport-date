@@ -111,7 +111,7 @@ describe("LandingPage clear and truthful product explanation", () => {
     const hero = html.match(/<section\b[^>]*aria-labelledby="hero-heading"[\s\S]*?<\/section>/)?.[0];
     expect(hero).toBeDefined();
     expect(hero).toContain("dating, friendship, or a new crew");
-    expect(hero).toContain("small local sports activities");
+    expect(hero).toContain("local sports activities");
   });
 
   it("states open adult worldwide access with an accessible beta disclosure and local-supply caveat", async () => {
@@ -127,28 +127,24 @@ describe("LandingPage clear and truthful product explanation", () => {
     expect(html).not.toMatch(/first events (?:are being |are )?seeded in Europe/i);
   });
 
-  it("labels example supply and keeps the demo distinct from a real request", async () => {
+  it("keeps tutorials closed until an explicit action without an always-visible imitation flow", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
     const html = await render();
-    expect(html).toContain("EXAMPLE ACTIVITY");
-    expect(html).toContain("Fictional host");
-    expect(html).toMatch(/nothing (?:you choose here )?is sent or saved/i);
-    expect(html).toContain("Explore this example");
-    expect(html).not.toContain("Near you this week");
+    expect(html).toContain("See how it works");
+    expect(html).toContain('aria-haspopup="dialog"');
+    expect(html).not.toContain("EXAMPLE ACTIVITY");
+    expect(html).not.toMatch(/Fictional host|INTERACTIVE DEMO|fake|<dialog|join-introduction|section-invitation/);
     expect(html).not.toContain("DESIGN PREVIEW");
   });
 
-  it("explains choosing, host approval and accepted meeting details in order", async () => {
+  it("offers hosting and joining on demand and connects discovery to free time", async () => {
     mocks.getCurrentUser.mockResolvedValue(null);
     const html = await render();
     const how = html.match(/<section\b[^>]*id="how-it-works"[\s\S]*?<\/section>/)?.[0] ?? "";
-    const steps = [...how.matchAll(/<article\b[\s\S]*?<\/article>/g)].map(match => match[0]);
-    expect(steps).toHaveLength(3);
-    expect(steps[0]).toMatch(/01<\/span><h3>Pick your kind of fun\./);
-    expect(steps[1]).toMatch(/02<\/span><h3>Ask to join a small group\./);
-    expect(steps[1]).toContain("host reviews");
-    expect(steps[2]).toMatch(/03<\/span><h3>Get the details\. Show up\./);
-    expect(steps[2]).toContain("Once accepted");
+    expect(how).toContain("the day you have free");
+    expect(how).toContain("Join a plan or host your own");
+    expect(how).not.toContain("<article");
+    expect(html).toContain("Turn your free time into a plan");
   });
 
   it("preserves legal, safety, research and feedback destinations", async () => {

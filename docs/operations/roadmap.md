@@ -1,5 +1,11 @@
 # Outcome roadmap
 
+## Free-time planning and optional tutorials - September 15
+
+- [x] Replace the always-visible separate demo with an explicit See how it works entry and two tutorials reusing actual hosting/joining forms, sketch explanations and local-only practice actions.
+- [x] Add specific event-local calendar-date filtering, clear/invalid-date recovery and date-preserving discovery/API behavior. Verified locally, including DST boundaries.
+- [ ] Evaluate first-time completion and free-date search outcomes after scoped release; no measured improvement claimed. See `docs/design/on-demand-tutorials-and-free-dates-2026-09-15.md`.
+
 ## Owner-requested event interaction - September 15
 
 - [x] Replace crowded hosting with five focused stages and a final review; participation with note and review stages. Preserve drafts, validation, final-action commitment and location/access boundaries.

@@ -38,7 +38,9 @@ const fieldStep = (field: string) => steps.findIndex((item) => item.fields.inclu
 
 type SummaryKind = "empty-required" | "server" | "";
 
-export default function CreateEventForm() {
+type TutorialOptions = { onStepChange: (step: number) => void; onComplete: () => void; startsAt: string };
+
+export default function CreateEventForm({ tutorial }: { tutorial?: TutorialOptions } = {}) {
   const [experienceLevels, setExperienceLevels] = useState<ExperienceLevel[]>(["beginner", "intermediate"]);
   const [step, setStep] = useState(0);
   const [review, setReview] = useState<Record<string, string>>({});
@@ -47,19 +49,34 @@ export default function CreateEventForm() {
   // host fixes them in one calm pass instead of one-per-round-trip.
   const [issues, setIssues] = useState<EventFieldIssue[]>([]);
   const [summaryKind, setSummaryKind] = useState<SummaryKind>("");
+  const [focusRequest, setFocusRequest] = useState<{ field: EventFieldName | null } | null>(null);
 
   const formRef = useRef<HTMLFormElement>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
+
+  // Wait for React to reveal the step and unlock its fields before focusing.
+  // A frame scheduled from a network callback can run before that commit.
+  useEffect(() => {
+    if (!focusRequest) return;
+    const field = focusRequest.field;
+    const form = formRef.current;
+    const target = (field && form?.querySelector<HTMLElement>(`[name="${field}"]:not([type="hidden"]), #${field}:not([type="hidden"])`))
+      || (field && fieldStep(field) >= 0 && form?.querySelector<HTMLElement>(`#section-${steps[fieldStep(field)].id}-heading`))
+      || summaryRef.current;
+    target?.scrollIntoView({ block: "center", behavior: "instant" });
+    target?.focus({ preventScroll: true });
+  }, [focusRequest]);
+
 
   // Anonymous funnel counter (CX-20260706): one tick when the publish form is
   // opened, once per mount (ref-guarded against StrictMode's dev double-effect).
   // Fire-and-forget — never affects the form.
   const startedTracked = useRef(false);
   useEffect(() => {
-    if (startedTracked.current) return;
+    if (tutorial || startedTracked.current) return;
     startedTracked.current = true;
     trackClick("event_publish_started");
-  }, []);
+  }, [tutorial]);
 
   // `min` only exists to stop a clearly-past time from being picked; the server
   // stays the authoritative check. `datetimeLocalMin()` reads the wall clock, so
@@ -83,8 +100,9 @@ export default function CreateEventForm() {
 
   function goToStep(next: number) {
     setStep(next);
+    tutorial?.onStepChange(next);
     requestAnimationFrame(() => {
-      formRef.current?.querySelector<HTMLElement>(`#section-${steps[next].id}-heading`)?.focus();
+      formRef.current?.querySelector<HTMLElement>(`#section-${steps[next].id}-heading`)?.focus({ preventScroll: Boolean(tutorial) });
     });
   }
 
@@ -96,8 +114,15 @@ export default function CreateEventForm() {
     return issues.find((issue) => issue.field === field)?.message;
   }
 
+  const tutorialDefaults: Partial<Record<EventFieldName, string>> = tutorial ? {
+    sport: "Tennis", title: "An easy evening rally",
+    description: "A relaxed tennis session with time to meet everyone. All experience levels welcome.",
+    startsAt: tutorial.startsAt, language: "English", venueName: "Riverside courts",
+  } : {};
+
   function fieldProps(field: EventFieldName) {
     return {
+      ...(tutorial && tutorialDefaults[field] ? { defaultValue: tutorialDefaults[field] } : {}),
       id: field,
       name: field,
       "aria-invalid": invalidFields.has(field) || undefined,
@@ -110,17 +135,12 @@ export default function CreateEventForm() {
   }
 
   function focusFirstIssue(nextIssues: EventFieldIssue[]) {
-    const form = formRef.current;
     const firstField = nextIssues.find((issue) => issue.field)?.field ?? null;
-    if (firstField && fieldStep(firstField) >= 0) setStep(fieldStep(firstField));
-    // Prefer moving the host to the actual field to fix; fall back to the
-    // summary so a form-wide problem is still surfaced in view.
-    requestAnimationFrame(() => {
-    const target = (firstField && form?.querySelector<HTMLElement>(`[name="${firstField}"]:not([type="hidden"]), #${firstField}:not([type="hidden"])`)) || (firstField && fieldStep(firstField) >= 0 && form?.querySelector<HTMLElement>(`#section-${steps[fieldStep(firstField)].id}-heading`)) || summaryRef.current;
-    if (!target) return;
-      target.scrollIntoView({ block: "center", behavior: "instant" });
-      target.focus({ preventScroll: true });
-    });
+    if (firstField && fieldStep(firstField) >= 0) {
+      setStep(fieldStep(firstField));
+      tutorial?.onStepChange(fieldStep(firstField));
+    }
+    setFocusRequest({ field: firstField });
   }
 
   function reportEmptyRequired(all = false): boolean {
@@ -203,6 +223,9 @@ export default function CreateEventForm() {
       goToStep(step + 1);
       return;
     }
+
+    // Walkthroughs reuse validation and stages but never publish, count, or navigate.
+    if (tutorial) { tutorial.onComplete(); return; }
 
     setSubmitting(true);
     const form = new FormData(event.currentTarget);
@@ -329,7 +352,7 @@ export default function CreateEventForm() {
         <h2 tabIndex={-1} id="section-location-heading">Set the meeting point once.</h2>
         <p className="location-trust-note">Discovery only ever sees the <strong>approximate area</strong> (city and district). The exact pin, address, and postal code stay private until you accept someone.</p>
         <label htmlFor="venueName">Place name<input {...fieldProps("venueName")} required maxLength={120} placeholder="Court 2" />{fieldMessage("venueName") ? <span id="venueName-error" className="field-error">{fieldMessage("venueName")}</span> : null}</label>
-        <AddressAutocomplete error={fieldMessage("address")} />
+        <AddressAutocomplete error={fieldMessage("address")} tutorial={Boolean(tutorial)} />
         <label htmlFor="instructions">Arrival details<textarea {...fieldProps("instructions")} maxLength={500} rows={3} placeholder="Where to enter, who to ask for, and what to bring." />{fieldMessage("instructions") ? <span id="instructions-error" className="field-error">{fieldMessage("instructions")}</span> : null}</label>
       </section>
 

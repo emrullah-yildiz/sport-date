@@ -1,3 +1,12 @@
+## On-demand tutorials and free-date discovery - September 15
+
+- Owner-requested outcome: compact See how it works entry opens Host an event and Join an event tutorials using the actual forms, with stage-specific sketch bubbles/arrows. Removed the old separate demo/state machine and repetitive disclosure copy. Landing now frames spare time as a starting point for meeting through activity.
+- Added an explicit free-date picker across discovery and its web/mobile APIs: event-local start date, future-only, independent of the rolling horizon, retaining other filters and coarse coordinates. Invalid dates explain the fallback; clearing returns to rolling choices. Availability is not stored as member data.
+- Verified: 1,260 web tests (14 opt-in skipped), 229 domain tests; all workspace typechecks; web build and lint (no errors, 11 existing warnings). One login test timed out during concurrent checks, then passed alone and in the full suite with four workers. Actual-component tutorial/live-host/live-join/date browser checks cover mobile/desktop, reduced motion, keyboard/focus, draft retention and no tutorial API/metrics calls. Fourteen read-only synthetic PostgreSQL date/DST boundary cases passed without accessing application rows.
+- Fixed a host error-focus race found by browser QA: focus now waits for the render that reveals/unlocks the field. Preserved live API behavior and no production mutations/deployment.
+- Team: root integrated landing and checked full delivery; tutorials implemented shared practice adapters; free_date implemented/tested date filtering; tutorial_qa verified tutorial and real forms independently. See `docs/design/on-demand-tutorials-and-free-dates-2026-09-15.md`.
+- Next three: prepare exact scoped release; observe first-time tutorial-to-host/join completion; assess date-search-to-attendance with DEMO exclusions. Conversion improvement and real group formation remain unmeasured.
+
 ## Event steps and interactive motion - September 15
 
 - Owner-requested local outcome: hosting Activity > Time > Group > Place > Review; joining optional note > review > explicit send. Back preserves drafts; stage validation and server error recovery focus the relevant field. Scroll reveals enhance landing, discovery grid and event details with reduced-motion/focus fallbacks.

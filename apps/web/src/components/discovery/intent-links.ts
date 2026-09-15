@@ -13,6 +13,12 @@ export const DISCOVERY_TIME_CHOICES = [
 /** Change time only; the destination still runs all eligibility/Plus gates.
  * Copy only supported filters, never arbitrary query values or a precise pin. */
 export function discoveryIntentHref(query: DiscoveryIntentQuery, days: DiscoveryIntentDays): string {
+  const next = discoveryPreservedFilters(query);
+  next.set("days", String(days));
+  return `/discover?${next.toString()}`;
+}
+
+export function discoveryPreservedFilters(query: DiscoveryIntentQuery): URLSearchParams {
   const next = new URLSearchParams();
   const fields = { city: 100, sport: 60, language: 35, near: 3, radius: 3, schedule: 12 };
   for (const [key, maximum] of Object.entries(fields)) {
@@ -29,6 +35,5 @@ export function discoveryIntentHref(query: DiscoveryIntentQuery, days: Discovery
     next.set("lat", String(coordinates.latitude));
     next.set("lng", String(coordinates.longitude));
   }
-  next.set("days", String(days));
-  return `/discover?${next.toString()}`;
+  return next;
 }

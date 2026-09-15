@@ -1,3 +1,4 @@
+import { parseDiscoveryDate, formatDiscoveryDay } from "@/lib/discovery-date";
 import Link from "next/link";
 import DiscoveryIntentEntry from "@/components/discovery/intent-entry";
 import EventStage from "@/components/discovery/EventStage";
@@ -77,6 +78,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
     city: radiusActive && !requestedCity ? "" : area.effectiveCity,
     sport: text(parameters.sport, 60),
     language: text(parameters.language, 35),
+    onDate: parseDiscoveryDate(parameters.date),
     withinDays: requestedDays === 1 || requestedDays === 30 ? requestedDays : 7,
   };
   const fetched = await getDiscoverableEvents(user, filters);
@@ -88,7 +90,7 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   // inactive for a free member, so this is a no-op for them. It only NARROWS at the
   // member's own request — never bypasses any eligibility/safety gate.
   const events: DiscoveryEvent[] = applyAdvancedFilters(withinRadius, advanced);
-  const hasNarrowingFilters = Boolean(filters.city || filters.sport || filters.language || advanced.anyActive);
+  const hasNarrowingFilters = Boolean(filters.onDate || filters.city || filters.sport || filters.language || advanced.anyActive);
   // When a radius returns nothing, offer to widen to the next-larger option, or to
   // search everywhere if already at the widest. Preserves the current query params.
   // Widen to the next-larger band in the set the member is actually offered (Plus
@@ -97,9 +99,13 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
   const nextRadiusKm = radiusActive ? radiusLadder.find((km) => km > requestedRadiusKm!) : undefined;
   const widenRadiusHref = (() => {
     const next = new URLSearchParams();
-    for (const key of ["sport", "language", "days", "city", "lat", "lng", "schedule"]) {
+    for (const key of ["sport", "language", "date", "days", "city", "schedule"]) {
       const value = text(parameters[key], 40);
       if (value) next.set(key, value);
+    }
+    if (deviceCoordinates) {
+      next.set("lat", String(deviceCoordinates.latitude));
+      next.set("lng", String(deviceCoordinates.longitude));
     }
     for (const language of advanced.languages) next.append("languages", language);
     if (nextRadiusKm) {
@@ -150,7 +156,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         <label>City<input name="city" defaultValue={requestedCity} placeholder={displayArea ? `Near ${displayArea}` : "Any city"} title="Leave blank to see events near your profile area" /></label>
         <label>Sport<input name="sport" defaultValue={filters.sport} placeholder="Any sport" title="Leave blank to see events for every sport; type one to narrow to it" /></label>
         <label>Language<input name="language" defaultValue={filters.language} placeholder="Any compatible" title="Defaults to any compatible language" /></label>
-        <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>
+        {filters.onDate ? <input type="hidden" name="date" value={filters.onDate} /> : null}
+        {filters.onDate ? <input type="hidden" name="days" value={filters.withinDays} /> : <label>When<select name="days" defaultValue={String(filters.withinDays)}><option value="1">Next 24 hours</option><option value="7">Next 7 days</option><option value="30">Next 30 days</option></select></label>}
         <label>Distance<select name="radius" defaultValue={requestedRadiusKm ? String(requestedRadiusKm) : ""} title={plus ? "Filter by how far you'll travel, with finer Plus distance bands." : "Filter by how far you'll travel. 'My area' keeps the profile-area default; 'Search everywhere' is on the note above."}>
           <option value="">My area</option>
           {(plus ? ALL_RADIUS_OPTIONS_KM : (RADIUS_OPTIONS_KM as readonly number[])).map((km) => <option key={km} value={String(km)}>{`Within ${km} km`}</option>)}
@@ -164,8 +171,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         {plus ? (
           <label>More languages<input name="languages" defaultValue={advanced.languages.join(", ")} placeholder="e.g. English, Romanian" title="Plus: accept events in any of these languages (comma-separated). You still only see events you're eligible for." /></label>
         ) : null}
-        {parameters.lat && parameters.lng ? <input type="hidden" name="lat" value={text(parameters.lat, 12)} /> : null}
-        {parameters.lat && parameters.lng ? <input type="hidden" name="lng" value={text(parameters.lng, 12)} /> : null}
+        {deviceCoordinates ? <input type="hidden" name="lat" value={deviceCoordinates.latitude} /> : null}
+        {deviceCoordinates ? <input type="hidden" name="lng" value={deviceCoordinates.longitude} /> : null}
         <button type="submit">Find my events</button>
       </form>
       <div className={styles.filterExtras}>
@@ -175,9 +182,9 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
         </details>
       </div>
 
-      <DiscoveryIntentEntry query={parameters} withinDays={filters.withinDays} />
+      <DiscoveryIntentEntry query={{ ...parameters, schedule: advanced.schedule ?? undefined, languages: [...advanced.languages], radius: requestedRadiusKm ? String(requestedRadiusKm) : undefined }} withinDays={filters.withinDays} onDate={filters.onDate} />
       <section className={styles.results}>
-        <div className={styles.resultsHeader}><h2>{events.length === 0 ? "Your next plan starts here" : describeDiscoveryResultsHeading({ count: events.length, memberArea: displayArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p className={styles.privacy}>Approximate areas now. Meeting point after acceptance.</p></div>
+        <div className={styles.resultsHeader}><h2>{filters.onDate ? `Plans for ${formatDiscoveryDay(filters.onDate)}` : events.length === 0 ? "Your next plan starts here" : describeDiscoveryResultsHeading({ count: events.length, memberArea: displayArea, isNearMeDefault: area.isNearMeDefault, searchEverywhere })}</h2><p className={styles.privacy}>Approximate areas now. Meeting point after acceptance.</p></div>
         {events.length === 0 ? (
           <div className={styles.empty}>
             <div className={styles.emptyArt}><SportArtwork sport="running" /></div>
@@ -189,6 +196,8 @@ export default async function DiscoverPage({ searchParams }: { searchParams: Pro
                 <Link href={widenRadiusHref}>{nextRadiusKm ? `Widen to ${nextRadiusKm} km` : "Search everywhere"}</Link>
                 <Link href="/events/new">Start a plan</Link>
               </>
+            ) : filters.onDate ? (
+              <><p>No events match your search on {formatDiscoveryDay(filters.onDate)}. Try another date above, or host something for your free day.</p><Link href="/events/new">Start a plan</Link></>
             ) : area.isNearMeDefault && !filters.sport && !filters.language && !advanced.anyActive && filters.withinDays === 7 ? (
               <RegionInterestSignal area={displayArea} />
             ) : hasNarrowingFilters ? (

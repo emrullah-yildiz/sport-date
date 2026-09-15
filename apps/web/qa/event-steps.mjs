@@ -49,7 +49,7 @@ try {
     await next.click();await step('people');await next.click();await page.waitForFunction(()=>document.activeElement?.id==='language');await page.locator('#language').fill('English');
     await page.getByRole('checkbox',{name:'Beginner',exact:true}).uncheck();await page.getByRole('checkbox',{name:'Intermediate',exact:true}).uncheck();await next.click();await page.waitForFunction(()=>document.activeElement?.id==='experienceLevels');await page.getByRole('checkbox',{name:'Beginner',exact:true}).check();
     await next.click();await step('location');await page.getByRole('button',{name:'Review invitation',exact:true}).click();assert.equal(await page.locator('[role="alert"]').count(),1);
-    await page.locator('#venueName').fill('Court 2');await page.locator('#address').fill('Synthetic court');await page.getByRole('button',{name:'Synthetic court, Bucharest',exact:false}).click();await page.locator('#instructions').fill('Meet at the entrance.');
+    await page.locator('#venueName').fill('Court 2');await page.locator('#address').fill('Synthetic court');await page.getByRole('option',{name:'Synthetic court, Bucharest',exact:false}).click();await page.locator('#instructions').fill('Meet at the entrance.');
     await page.getByRole('button',{name:'Review invitation',exact:true}).click();await step('review');
     assert.equal(await page.evaluate(()=>window.calls.length),0);
     for(const text of ['An easy evening rally','English','North','Example street 1','010101','Meet at the entrance.'])assert.ok((await page.locator('#section-review').innerText()).includes(text));

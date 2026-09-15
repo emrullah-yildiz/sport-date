@@ -88,3 +88,19 @@ describe("discovery event stage boundaries", () => {
     expect(renderToStaticMarkup(<EventStage>{[]}</EventStage>)).toBe("");
   });
 });
+
+
+it("passes a calendar day for free members and preserves it in the other filter form", async () => {
+  const html = renderToStaticMarkup(await page({ date: "2026-10-25", sport: "Tennis", days: "1" }));
+  expect(mocks.events).toHaveBeenCalledWith(member, expect.objectContaining({ onDate: "2026-10-25", withinDays: 1, sport: "Tennis" }));
+  expect(html).toContain("Plans for 25 October 2026");
+  expect(html).toContain('type="hidden" name="date" value="2026-10-25"');
+});
+it("ignores invalid dates and gives selected dates a useful empty state", async () => {
+  await page({ date: "2026-02-31" });
+  expect(mocks.events).toHaveBeenLastCalledWith(member, expect.objectContaining({ onDate: null }));
+  mocks.events.mockResolvedValue([]);
+  const html = renderToStaticMarkup(await page({ date: "2026-10-25" }));
+  expect(html).toContain("No events match your search on 25 October 2026");
+  expect(html).toContain("Try another date above");
+});

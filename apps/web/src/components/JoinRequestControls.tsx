@@ -4,7 +4,7 @@ import type { DiscoveryRequest } from "@/lib/events";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 
 import { cancelJoinRequest } from "@/lib/cancel-join-request";
 import { declinedJoinRequestMessage, joinRequestConfirmationMessage, joinRequestStateHeadline, showsFullJoinState } from "@/lib/join-request-policy";
@@ -64,7 +64,9 @@ export default function JoinRequestControls({
   reliability,
   eligibility,
   isFull = false,
+  tutorial,
 }: {
+  tutorial?: { onStepChange: (step: "note" | "review" | "pending" | "cancelled") => void };
   eventId: string;
   request: DiscoveryRequest | null;
   reliability?: ReliabilityNotice;
@@ -107,12 +109,24 @@ export default function JoinRequestControls({
     confirmationRef.current = node;
     if (node && focusOnResolveRef.current) {
       focusOnResolveRef.current = false;
-      node.focus();
+      node.focus({ preventScroll: Boolean(tutorial) });
     }
   }
 
+  useEffect(() => {
+    if (tutorial) tutorial.onStepChange(status === "pending" || status === "cancelled" ? status : step);
+  }, [step, status, tutorial]);
+
   async function createRequest() {
     if (step !== "review" || submitting) return;
+    // Local practice state only: no request API or adoption counter.
+    if (tutorial) {
+      focusOnResolveRef.current = true;
+      setStatus("pending");
+      setRequestId("practice-request");
+      setAnnouncement(joinRequestConfirmationMessage("pending"));
+      return;
+    }
     setSubmitting(true);
     setError("");
     try {
@@ -151,6 +165,13 @@ export default function JoinRequestControls({
 
   async function cancelRequest() {
     if (!requestId) return;
+    // Local practice state only: no request API or adoption counter.
+    if (tutorial) {
+      focusOnResolveRef.current = true;
+      setStatus("cancelled");
+      setAnnouncement(joinRequestConfirmationMessage("cancelled"));
+      return;
+    }
     setSubmitting(true);
     setError("");
     // The shared helper owns the client-side timeout/abort so a hung or slow

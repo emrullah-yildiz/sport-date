@@ -1,3 +1,4 @@
+import { parseDiscoveryDate } from "@/lib/discovery-date";
 import { NextResponse } from "next/server";
 
 import { resolveDiscoveryArea } from "@/lib/discovery-card";
@@ -45,6 +46,7 @@ export async function GET(request: Request) {
     sport: (parameters.get("sport") ?? "").trim().slice(0, 60),
     language: (parameters.get("language") ?? "").trim().slice(0, 35),
     withinDays,
+    onDate: parseDiscoveryDate(parameters.getAll("date").length === 1 ? parameters.get("date") : null),
   };
   const fetched = await getDiscoverableEvents(user, filters);
   const withinRadius =

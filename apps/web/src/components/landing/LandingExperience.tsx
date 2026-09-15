@@ -1,12 +1,15 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import BetaTermExplainer from "@/components/BetaTermExplainer";
 import ScrollReveal from "@/components/ScrollReveal";
 import { BRAND_NAME, RallyGlyph } from "@/lib/brand";
-import { intentions, meetingDetail, plans, sports, transition, type Intention, type Sport, type Stage } from "./demo";
+import EventTutorials from "@/components/EventTutorials";
+
 import s from "./landing.module.css";
+
+type Sport = "Padel" | "Running" | "Walk";
 
 function Arrow() { return <span aria-hidden="true">↗</span>; }
 
@@ -27,30 +30,30 @@ function Court({ sport }: { sport: Sport }) {
 
 export default function LandingExperience({ preview = false, memberName = null }: { preview?: boolean; memberName?: string | null }) {
   const signedIn = memberName !== null;
-  const [sport, setSport] = useState<Sport>("Padel");
-  const [intention, setIntention] = useState<Intention>("Friendship");
-  const [stage, setStage] = useState<Stage>("discover");
-  const primaryAction = useRef<HTMLButtonElement>(null);
-  const plan = plans[sport];
-  const meeting = meetingDetail(stage);
-  const reset = () => setStage("discover");
-  const stageNumber = ["discover", "details", "requested", "review", "accepted"].indexOf(stage);
-  const nextActions = {
-    discover: { label: "Explore this example", action: "details" },
-    details: { label: "Try sending a demo request", action: "request" },
-    requested: { label: "Demo: see the host review", action: "review" },
-    review: { label: "Demo: simulate acceptance", action: "accept" },
-    accepted: { label: "Try another plan", action: "reset" },
-  } as const;
+  const sport: Sport = "Padel";
+  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
+  function openTutorial(event: React.MouseEvent<HTMLElement>) {
+    opener.current = event.currentTarget;
+    setTutorialOpen(true);
+  }
+  function closeTutorial() {
+    setTutorialOpen(false);
+    requestAnimationFrame(() => opener.current?.focus());
+  }
+  useEffect(() => {
+    if (tutorialOpen) dialog.current?.showModal();
+  }, [tutorialOpen]);
 
-  return <div className={s.page}>
+  return <><div className={s.page}>
     <a className={s.skip} href="#concept-main">Skip to content</a>
-    {preview && <div className={s.preview}>DESIGN PREVIEW <span>Fictional activities. Try it freely — nothing is sent or saved.</span></div>}
+    {preview && <div className={s.preview}>DESIGN PREVIEW <span>Explore the experience — at your own pace.</span></div>}
     <header className={s.header}>
       <Link href={signedIn ? "/discover" : "/landing"} prefetch={false} className={s.logo} aria-label={`${BRAND_NAME} home`}><RallyGlyph size={35} /><span>{BRAND_NAME}</span></Link>
       <nav aria-label="Primary navigation">
         <a className={s.howLink} href="#how-it-works">How it works</a>
-        {preview ? <a className={s.navAction} href="#try-it">Find your kind of plan <Arrow /></a> : signedIn ? <>
+        {preview ? <a className={s.navAction} href="#how-it-works">Find your kind of plan <Arrow /></a> : signedIn ? <>
           <Link className={s.memberLink} href="/profile" prefetch={false}>Signed in as {memberName}</Link>
           <Link className={s.navAction} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link>
         </> : <>
@@ -64,13 +67,13 @@ export default function LandingExperience({ preview = false, memberName = null }
         <div className={s.heroCopy}>
           <p className={s.eyebrow}><span className={s.greenDot} /> A LITTLE SPORT. A REAL CONNECTION.</p>
           <h1 id="hero-heading">Less small talk.<br />More <span>good<br className={s.desktopBreak} /> company.</span></h1>
-          <p className={s.definition}>Meet new people through small local sports activities—for dating, friendship, or a new crew.</p>
+          <p className={s.definition}>Turn your free time into a plan with new people through local sports activities—for dating, friendship, or a new crew.</p>
           <div className={s.heroActions}>
-            {signedIn ? <Link className={s.primary} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link> : <a className={s.primary} href="#try-it">Try an example plan <Arrow /></a>}
+            {signedIn ? <Link className={s.primary} href="/discover" prefetch={false}>Enter {BRAND_NAME} <Arrow /></Link> : <Link className={s.primary} href="/discover" prefetch={false}>Find an activity <Arrow /></Link>}
             <span>For adults 18+<br />All starting points welcome</span>
           </div>
           {!preview && <div className={s.betaNote}>
-            {signedIn ? <p>Explore activities, or try the example below.</p> : <>
+            {signedIn ? <p>Find something to do with your free time.</p> : <>
               <p>Free beta · open to adults 18+ · usable worldwide</p>
               <BetaTermExplainer />
             </>}
@@ -79,45 +82,18 @@ export default function LandingExperience({ preview = false, memberName = null }
         </div>
         <div className={s.heroArt}>
           <Court sport={sport} />
-          <a className={s.floatingCard} href="#try-it"><span className={s.cardKicker}>YOUR WEEKEND COULD LOOK LIKE THIS</span><div><strong>{sport === "Padel" ? "Rally. Laugh. Repeat." : sport === "Running" ? "An easy run. A new crew." : "A walk worth sharing."}</strong><span className={s.roundArrow}>↗</span></div><span>{sport} · {plan.size} · Example activity</span></a>
+          <a className={s.floatingCard} href="#how-it-works"><span className={s.cardKicker}>YOUR WEEKEND COULD LOOK LIKE THIS</span><div><strong>Rally. Laugh. Repeat.</strong><span className={s.roundArrow}>↗</span></div><span>{sport} · a small group · Your pace. Your people.</span></a>
         </div>
       </section>
       <div className={s.ribbon} aria-hidden="true"><span>COME FOR THE GAME</span><span>↗</span><span>STAY FOR THE COMPANY</span><span>↗</span><span>YOUR PACE. YOUR PEOPLE.</span><span>↗</span></div>
       <section id="how-it-works" className={s.how} aria-labelledby="how-heading">
         <ScrollReveal className={s.sectionHeading}><p className={s.eyebrow}>FROM “MAYBE” TO “SEE YOU THERE”</p><h2 id="how-heading">A plan makes<br />hello easier.</h2><p>No perfect opening line required.</p></ScrollReveal>
-        <div className={s.steps}>{[
-          ["01", "Pick your kind of fun.", "Choose an activity, a comfortable pace, and what kind of connection you’re open to."],
-          ["02", "Ask to join a small group.", "Read the plan, then send a request. The host reviews it; a request isn’t a booking."],
-          ["03", "Get the details. Show up.", "Once accepted, see the meeting point. Bring yourself, say hello, and get moving."],
-        ].map(([number, title, text]) => <ScrollReveal as="article" key={number}><span className={s.stepNumber}>{number}</span><h3>{title}</h3><p>{text}</p></ScrollReveal>)}</div>
-      </section>
-      <section id="try-it" className={s.playground} aria-labelledby="try-heading">
-        <ScrollReveal className={s.builderIntro}><p className={s.eyebrow}>MAKE ROOM FOR SOMETHING GOOD</p><h2 id="try-heading">What’s your<br /><span>kind of hello?</span></h2><p>Choose a fictional activity and see how asking to join works.</p><span className={s.demoBadge}>INTERACTIVE DEMO · NO ACCOUNT NEEDED</span><p className={s.demoDisclosure}>Fictional activities. Nothing you choose here is sent or saved.</p></ScrollReveal>
-        <ScrollReveal className={s.builder}>
-          <fieldset className={s.choices}><legend>01 <span>How do you want to move?</span></legend><div>{sports.map((item, i) => <button key={item} type="button" aria-pressed={sport === item} onClick={() => { setSport(item); reset(); }}><span aria-hidden="true">{["◉", "↗", "〰"][i]}</span>{item}</button>)}</div></fieldset>
-          <fieldset className={s.choices}><legend>02 <span>What are you open to?</span></legend><div>{intentions.map(item => <button key={item} type="button" aria-pressed={intention === item} onClick={() => { setIntention(item); reset(); }}>{item}</button>)}</div></fieldset>
-          <p className={s.choiceNote}>These choices change this example only. They do not find people or send a request.</p>
-          <article className={s.plan} aria-label="Your example activity">
-            <div className={s.planTop}><span>EXAMPLE ACTIVITY</span><span>{sport} <span aria-hidden="true">↗</span></span></div>
-            <div className={s.planBody}>
-              <div className={s.pills}><span>{intention === "Dating" ? "Open to dating" : intention === "Friendship" ? "Make a new friend" : "Meet a new crew"}</span><span>{plan.level}</span></div>
-              <h3>{plan.title}</h3><p className={s.planTime}>{plan.time}</p>
-              <div className={s.planFacts}><span><b>Where</b>{plan.area}</span><span><b>The group</b>{plan.size} · adults 18+</span></div>
-              <div className={s.host}><span className={s.avatar} aria-hidden="true">S</span><p><strong>Hosted by Sam</strong><span>Fictional host · this is a sample plan</span></p><span aria-hidden="true">☺</span></div>
-              <div className={s.status} aria-live="polite" aria-atomic="true">
-                {stage === "discover" && <p>Start with the plan. The exact meeting point stays private until your request is accepted.</p>}
-                {stage === "details" && <><h4>A little more about the plan</h4><p>{plan.note}</p><p>{plan.bring}</p><p>Exact meeting point hidden. You can cancel your request before acceptance.</p></>}
-                {stage === "requested" && <><h4>Demo request sent. You’re not booked yet.</h4><p>In the real product, the host would review your request. Nothing was sent here, and the meeting point is still hidden.</p></>}
-                {stage === "review" && <><h4>The host has a decision to make.</h4><p>This preview lets you simulate acceptance. A real host can accept or decline; there’s no automatic place in the group.</p></>}
-                {stage === "accepted" && <><h4><span aria-hidden="true">✓ </span>You’re in — in this demo.</h4><p>{meeting}</p><p>In the real product, accepted participants can see the meeting details. You’re always free to change your mind.</p></>}
-              </div>
-              <div className={s.planActions}>
-                <button ref={primaryAction} className={s.primary} onClick={() => setStage(transition(stage, nextActions[stage].action))}>{nextActions[stage].label} <Arrow /></button>
-                {stage !== "discover" && <button className={s.textButton} onClick={() => { reset(); primaryAction.current?.focus(); }}>{stage === "requested" || stage === "review" ? "Cancel demo request" : stage === "accepted" ? "Leave demo activity" : "Back to the plan"}</button>}
-              </div>
-              <div className={s.progress} aria-label={`Demo step ${stageNumber + 1} of 5`}><span>EXPLORE</span><div>{[0, 1, 2, 3, 4].map(i => <i key={i} className={i <= stageNumber ? s.complete : undefined} />)}</div><span>MEET</span></div>
-            </div>
-          </article>
+        <ScrollReveal className={s.tutorialEntry}>
+          <div className={s.sketchMark} aria-hidden="true"><span>you</span><svg viewBox="0 0 150 55" fill="none"><path d="M5 32C40 4 55 52 91 25S123 13 143 22M130 8l13 14-18 5" /></svg><span>your next plan</span></div>
+          <h3>A free afternoon?<br />Make something of it.</h3>
+          <p>Find an activity for the day you have free, or bring a group together yourself.</p>
+          <button type="button" className={s.primary} onClick={openTutorial} aria-haspopup="dialog" aria-expanded={tutorialOpen}>See how it works <Arrow /></button>
+          <small>Two short walkthroughs. Join a plan or host your own.</small>
         </ScrollReveal>
       </section>
       <ScrollReveal as="aside" className={s.trust} aria-label="The experience principles"><p>Good company.<br /><strong>Clear boundaries.</strong></p><div><span>01</span><p><strong>Adults only</strong>A space for people 18 and over.</p></div><div><span>02</span><p><strong>Private until accepted</strong>The exact meeting point comes later.</p></div><div><span>03</span><p><strong>You stay in control</strong>Block, report, or leave when you need to.</p></div></ScrollReveal>
@@ -129,7 +105,7 @@ export default function LandingExperience({ preview = false, memberName = null }
           <Link className={s.primary} href={signedIn || preview ? "/discover" : "/signup"} prefetch={false} data-track={!preview && !signedIn ? "landing_cta_join" : undefined}>{signedIn ? `Enter ${BRAND_NAME}` : preview ? "Explore the app (sign-in)" : "Create a free profile"} <Arrow /></Link>
           <Link className={s.secondary} href={signedIn ? "/profile" : preview ? "/signup" : "/login"} prefetch={false}>{signedIn ? "Your profile" : preview ? "Create an account" : "Sign in"}</Link>
         </div>
-        <small>{preview ? "These links leave the demo. Real activity availability may vary." : "Open worldwide; local availability depends on hosts near you."}</small>
+        <small>{preview ? "Local activity availability depends on hosts near you." : "Open worldwide; local availability depends on hosts near you."}</small>
         {!preview && <div className={s.communityLinks}>
           <Link href="/research" prefetch={false} data-track="landing_cta_survey">Take the 2-min survey</Link>
           <Link href="/feedback" prefetch={false}>Share feedback</Link>
@@ -139,5 +115,9 @@ export default function LandingExperience({ preview = false, memberName = null }
     <footer className={s.footer}><span><RallyGlyph size={25} /> {BRAND_NAME}</span><span>Meet through movement.</span><nav aria-label="Legal and trust links">
       <Link href="/trust" prefetch={false}>Trust</Link><Link href="/terms" prefetch={false}>Terms</Link><Link href="/privacy" prefetch={false}>Privacy</Link><Link href="/safety" prefetch={false}>Safety <Arrow /></Link>
     </nav></footer>
-  </div>;
+  </div>
+    {tutorialOpen ? <dialog className={s.tutorialDialog} ref={dialog} aria-label="How it works" onCancel={closeTutorial} onClose={closeTutorial}>
+      <EventTutorials onClose={closeTutorial} />
+    </dialog> : null}
+  </>;
 }

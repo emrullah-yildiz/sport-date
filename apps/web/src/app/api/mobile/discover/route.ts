@@ -1,3 +1,4 @@
+import { parseDiscoveryDate } from "@/lib/discovery-date";
 import { NextResponse } from "next/server";
 
 import { applyAdvancedFilters, resolveAdvancedFilters } from "@/lib/discovery-advanced-filters";
@@ -22,6 +23,7 @@ export async function GET(request: Request) {
     languages: url.searchParams.getAll("languages"),
   });
   const fetched = await getDiscoverableEvents({ id: session.user.id, age: session.user.age }, {
+    onDate: parseDiscoveryDate(url.searchParams.getAll("date").length === 1 ? url.searchParams.get("date") : null),
     city: bounded("city", 100), sport: bounded("sport", 60), language: bounded("language", 35), withinDays,
   });
   const events = applyAdvancedFilters(fetched, advanced);

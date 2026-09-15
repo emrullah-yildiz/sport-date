@@ -1,5 +1,6 @@
 import "server-only";
 
+import { parseDiscoveryDate } from "@/lib/discovery-date";
 import { getDatabase } from "@/lib/db";
 import { coarsenCoordinates } from "@/lib/discovery-geo";
 import { publicEventInviteFromRow, type PublicEventInvite, type PublicEventInviteRow } from "@/lib/public-event-invite";
@@ -14,7 +15,7 @@ export type HostEvent = Readonly<{
   privateLocation: { venueName: string; address: string; postalCode: string | null; latitude: number | null; longitude: number | null; instructions: string | null };
 }>;
 
-export type DiscoveryFilters = Readonly<{ city: string; sport: string; language: string; withinDays: 1 | 7 | 30 }>;
+export type DiscoveryFilters = Readonly<{ city: string; sport: string; language: string; withinDays: 1 | 7 | 30; onDate?: string | null }>;
 export type DiscoveryRequest = { id: string; status: "pending" | "accepted" | "declined" | "cancelled"; skipCount: number };
 export type DiscoveryEvent = Readonly<{
   id: string; sport: string; title: string; description: string; startsAt: string;
@@ -196,6 +197,7 @@ export async function getDiscoverableEvents(
   eventId?: string,
 ): Promise<DiscoveryEvent[]> {
   if (eventId && !UUID_PATTERN.test(eventId)) return [];
+  const onDate = parseDiscoveryDate(filters.onDate);
   const sql = getDatabase();
   const rows = await sql`
     SELECT
@@ -223,7 +225,10 @@ export async function getDiscoverableEvents(
       ON member_request.event_id = events.id AND member_request.requester_user_id = ${user.id}
     WHERE events.status = 'published'
       AND events.starts_at > NOW()
-      AND events.starts_at <= NOW() + (${filters.withinDays} * INTERVAL '1 day')
+      AND CASE WHEN ${onDate}::date IS NOT NULL
+        THEN (events.starts_at AT TIME ZONE events.time_zone)::date = ${onDate}::date
+        ELSE events.starts_at <= NOW() + (${filters.withinDays} * INTERVAL '1 day')
+      END
       AND events.host_user_id <> ${user.id}
       AND (${eventId ?? ""} = '' OR events.id = NULLIF(${eventId ?? ""}, '')::uuid)
       AND ${user.age} BETWEEN events.minimum_age AND events.maximum_age

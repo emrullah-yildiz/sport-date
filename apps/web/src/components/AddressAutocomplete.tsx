@@ -23,7 +23,9 @@ type InitialPin = Readonly<{
 // the (private) postal code that rides with the pin.
 type DerivedArea = { city: string; countryCode: string; areaLabel: string; postalCode: string };
 
-export default function AddressAutocomplete({ initial, error }: { initial?: InitialPin; error?: string }) {
+const practiceLocation: LocationSuggestion = { id: "practice-courts", label: "Riverside courts, Example City", address: "1 Example Walk", postalCode: "", city: "Example City", district: "Riverside", countryCode: "RO", latitude: 0, longitude: 0 };
+
+export default function AddressAutocomplete({ initial, error, tutorial = false }: { initial?: InitialPin; error?: string; tutorial?: boolean }) {
   const [query, setQuery] = useState(initial?.address ?? "");
   const [selected, setSelected] = useState<LocationSuggestion | null>(initial?.latitude != null && initial.longitude != null ? {
     id: "existing", label: initial.address, address: initial.address, postalCode: initial.postalCode ?? "", city: initial.city ?? "", district: "", countryCode: initial.countryCode ?? "", latitude: initial.latitude, longitude: initial.longitude,
@@ -60,6 +62,12 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setStatus("Searching locations…");
+      if (tutorial) {
+        setSuggestions([practiceLocation]);
+        setActiveIndex(-1);
+        setStatus("1 location found.");
+        return;
+      }
       try {
         const params = new URLSearchParams({ q: query.trim() });
         // Bias by the coarse country the host has confirmed (from a prior pick or
@@ -82,7 +90,7 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
       }
     }, 350);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [query, area.countryCode, selected]);
+  }, [query, area.countryCode, selected, tutorial]);
 
   function choose(suggestion: LocationSuggestion) {
     setSelected(suggestion);
@@ -104,6 +112,7 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
   // text and the coarse public area. The typed venue name lives in a separate
   // field and is never touched.
   async function applyMapPick(pickedLatitude: number, pickedLongitude: number) {
+    if (tutorial) return;
     const latitude = roundPinCoordinate(pickedLatitude);
     const longitude = roundPinCoordinate(pickedLongitude);
     setSelected((current) => (current ? pinnedSuggestion(current, latitude, longitude) : current));
@@ -214,7 +223,7 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
     {/* Host-only map preview + fine-tune of the PRIVATE pin. Rendered only once a
         pin exists (a chosen suggestion, or the stored pin on edit); Leaflet and
         the first tile load lazily when the map scrolls into view. */}
-    {selected ? <EventLocationMapPicker latitude={selected.latitude} longitude={selected.longitude} onPick={applyMapPick} /> : null}
+    {selected && !tutorial ? <EventLocationMapPicker latitude={selected.latitude} longitude={selected.longitude} onPick={applyMapPick} /> : null}
     <p id={`${listId}-status`} className={`address-search-status${selected ? " pin-set" : ""}`} role="status" aria-live="polite">{status || "Choose a result to set the exact map pin — the city and area fill in automatically."}</p>
     {areaComplete
       ? <p className="address-derived-area">Discovery will show <strong>{areaLabelValue}{area.countryCode ? `, ${area.countryCode}` : ""}</strong> — the approximate area only. Your exact pin stays private until you accept someone.</p>
@@ -225,7 +234,7 @@ export default function AddressAutocomplete({ initial, error }: { initial?: Init
             <label htmlFor="countryCode">Country code<input id="countryCode" name="countryCode" value={area.countryCode} onChange={(event) => setArea((current) => ({ ...current, countryCode: event.target.value.toUpperCase() }))} required minLength={2} maxLength={2} placeholder="RO" /></label>
           </div>
         </div>}
-    {providerUnavailable
+    {tutorial ? <small>Example location. Search stays in this walkthrough.</small> : providerUnavailable
       ? <small className="address-fallback-hint">Location search is unavailable right now — you can still type the full address by hand and publish. Accepted guests will get directions to that address; add a pin later by editing the event once search is back.</small>
       : <small>Your search is sent to our <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>-based location provider. Your identity is not sent, and the selected pin stays private until acceptance.</small>}
     {areaComplete ? <>
