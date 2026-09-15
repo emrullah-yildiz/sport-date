@@ -1,3 +1,10 @@
+## Production release - September 15
+
+- Owner explicitly requested deployment. Pushed verified landing commit `6075614` to main; Vercel production deployment `dpl_r8hG9yDMw47LD64H1yAWxLY49iYH` is Ready and aliased to https://keepitup.social.
+- Build/type validation passed; deployment migration hook applied zero new migrations. Runtime functions remain in Frankfurt (`fra1`). Live health and database readiness both return HTTP 200.
+- Production browser smoke verified all five surrounding chapters, working scroll progress, tutorial open/Escape with focus restored, no page errors, mobile reduced-motion fallback and no horizontal overflow.
+- Next: review the live experience and observe first-time completion. Existing local HQ report changes preserved. This release does not authorize subsequent production changes.
+
 ## Whole landing scroll narrative - September 15
 
 - Owner requested every section participate in a slower, unified story. Implemented five native-scroll chapters around the expanded four-beat plan sequence, continuous background, drawing line/ball, sequential tutorial and boundary cards, invitation and footer epilogue. Removed mixed one-time fades from the landing.
