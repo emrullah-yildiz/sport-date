@@ -1,3 +1,9 @@
+## Signup spacing refinement - September 15
+
+- Owner screenshot showed choice chips touching Back/Next. Added a shared signup form grid with 28px separation, a padded navigation divider, responsive question typography, a wider desktop card, compact mobile two-button navigation and constrained field widths. Scoped to signup; consent, validation and registration behavior unchanged.
+- Verified production build, typecheck, scoped lint and 20 relevant signup tests. Browser QA traversed all ten steps at 320/390/814px, checking spacing, control bounds, keyboard/back navigation, errors and mocked submission recovery; separately reviewed expanded self-description at 320/814px. No real registrations or messages sent.
+- Local only; prior deployment approval covered the previous landing release. Next: review spacing, release when authorized, observe signup completion.
+
 ## Production release - September 15
 
 - Owner explicitly requested deployment. Pushed verified landing commit `6075614` to main; Vercel production deployment `dpl_r8hG9yDMw47LD64H1yAWxLY49iYH` is Ready and aliased to https://keepitup.social.

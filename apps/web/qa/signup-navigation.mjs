@@ -8,8 +8,8 @@ await mkdir(artifacts, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 try {
-  for (const reducedMotion of ["no-preference", "reduce"]) {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion });
+  for (const [width, reducedMotion] of [[320, "no-preference"], [390, "reduce"], [814, "no-preference"]]) {
+    const page = await browser.newPage({ viewport: { width, height: 844 }, reducedMotion });
     let releaseRegistration;
     const registrationResponse = new Promise((resolve) => { releaseRegistration = resolve; });
     let registrations = 0;
@@ -22,13 +22,24 @@ try {
       }
       return route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
     });
-    await page.goto("http://127.0.0.1:3000/signup");
+    await page.goto("http://127.0.0.1:3000/signup", { waitUntil: "networkidle" });
+    await expect(page.locator(".signup-card")).toHaveCSS("opacity", "1");
     const next = page.getByRole("button", { name: "Next", exact: true });
     const back = page.getByRole("button", { name: "Back", exact: true });
     const heading = page.getByRole("heading", { level: 1 });
     const focusedHeading = async (text) => {
       await expect(heading).toHaveText(text);
       await expect(heading).toBeFocused();
+      await expect(heading.locator("../../..")).toHaveCSS("opacity", "1");
+      const layout = await page.evaluate(() => {
+        const content = document.querySelector('.signup-step').getBoundingClientRect();
+        const actions = document.querySelector('.signup-actions').getBoundingClientRect();
+        const controls = [...document.querySelectorAll('.signup-step input, .signup-step button, .signup-actions button')].map(n => n.getBoundingClientRect());
+        return { gap: actions.top - content.bottom, fits: controls.every(r => r.left >= 0 && r.right <= innerWidth), actionGap: document.querySelector('.signup-actions button').getBoundingClientRect().top - actions.top };
+      });
+      expect(layout.gap).toBeGreaterThanOrEqual(27);
+      expect(layout.actionGap).toBeGreaterThanOrEqual(20);
+      expect(layout.fits).toBe(true);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     };
     await page.getByLabel("First name", { exact: true }).fill("Test");
@@ -39,7 +50,7 @@ try {
     await focusedHeading("How do you describe your gender?");
     await expect(heading.locator("../../..")).toHaveCSS("opacity", "1");
     await expect(page.locator(".signup-card")).toHaveCSS("opacity", "1");
-    await page.screenshot({ path: new URL(`gender-${reducedMotion}.png`, artifacts).pathname.replace(/^\/(?=[A-Za-z]:)/, ""), fullPage: true });
+    await page.screenshot({ path: new URL(`gender-${width}-${reducedMotion}.png`, artifacts).pathname.replace(/^\/(?=[A-Za-z]:)/, ""), fullPage: true });
     await page.keyboard.press("Tab");
     await expect(page.getByRole("group", { name: "Gender", exact: true }).getByRole("button").first()).toBeFocused();
     await next.click();
@@ -91,7 +102,7 @@ try {
     await expect(back).toBeEnabled();
     expect(registrations).toBe(1);
     await page.close();
-    console.log(`PASS: signup keyboard, back, optional questions, custom sport, submission recovery; motion=${reducedMotion}`);
+    console.log(`PASS: signup keyboard, back, optional questions, custom sport, submission recovery; width=${width}; motion=${reducedMotion}`);
   }
 } finally {
   await browser.close();

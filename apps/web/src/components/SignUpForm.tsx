@@ -174,7 +174,7 @@ export default function SignUpForm({ emailDeliveryLive = false }: { emailDeliver
           <div className="progress-bar"><div style={{ width: `${(step / steps.length) * 100}%` }} /></div>
         </div>
 
-        <form noValidate onSubmit={(event) => {
+        <form className="signup-form" noValidate onSubmit={(event) => {
           event.preventDefault();
           if (isSubmitting) return;
           if (step < steps.length) handleNext();
