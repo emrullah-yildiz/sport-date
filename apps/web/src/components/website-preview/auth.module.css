@@ -1,0 +1,63 @@
+.auth { --auth-ink: #161c29; --auth-muted: #626c7a; --auth-cyan: #a4e9dc; --auth-coral: #f3a08f; width: 100%; max-width: 634px; margin: 0 auto; padding: 30px 22px 65px; color: #eef0e9; font-size: 16px; font-weight: 400; line-height: 1.5; }
+.auth *, .auth *::before, .auth *::after { box-sizing: border-box; }
+.auth button, .auth input { font: inherit; }
+.auth button { cursor: pointer; }
+.auth button:focus-visible, .auth input:focus-visible, .auth summary:focus-visible { outline: 3px solid #237d70; outline-offset: 4px; }
+.topline { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 0 4px 20px; }
+.back { display: inline-flex; gap: 8px; align-items: center; padding: 8px 0; color: inherit; background: transparent; border: 0; }
+.back span { font-size: 24px; line-height: 1; }
+.demo { border: 1px solid #71848666; padding: 5px 12px; border-radius: 30px; color: #b6c7ca; font-size: 13px; }
+.panel { background: #fff; color: var(--auth-ink); border: 1px solid #e0e4e9; border-radius: 24px; padding: clamp(22px, 5vw, 40px); box-shadow: 0 16px 60px #161c2906; }
+.panel input { color-scheme: light; }
+.panel h1 { margin: 0; font-size: clamp(29px, 5vw, 40px); letter-spacing: -.045em; line-height: 1.08; font-weight: 400; }
+.panel h1:focus { outline: none; }
+.subtitle { margin: 12px 0 0; color: var(--auth-muted); }
+.context { display: flex; gap: 10px; align-items: baseline; border-left: 2px solid var(--auth-coral); padding-left: 12px; margin: 20px 0 0; font-size: 14px; }
+.context span { color: #895041; }
+.steps { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0; margin: 0 0 32px; gap: 8px; }
+.steps li { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; color: #757f8a; font-size: 12px; }
+.steps li span { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dce1e6; font-size: 13px; }
+.steps li[aria-current="step"] { color: var(--auth-ink); }
+.steps li[aria-current="step"] span { background: var(--auth-ink); border-color: var(--auth-ink); color: #fff; }
+.steps li[data-complete="true"] span { background: var(--auth-cyan); border-color: var(--auth-cyan); color: var(--auth-ink); }
+.form { display: grid; gap: 20px; margin-top: 28px; }
+.fill { display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%; min-height: 48px; border: 1px solid #dbe5e1; border-radius: 12px; background: #eff8f4; color: var(--auth-ink); padding: 10px 16px; }
+.hint { color: var(--auth-muted); font-size: 13px; line-height: 1.5; margin: 0; font-weight: 400; }
+.fill + .hint { margin-top: -12px; }
+.field { display: grid; gap: 8px; font-size: 15px; }
+.field > input, .password { width: 100%; min-width: 0; border: 1px solid #cdd3dc; border-radius: 11px; background: #fff; }
+.field > input, .password input { height: 50px; min-width: 0; padding: 12px 14px; color: var(--auth-ink); font-size: 16px; font-weight: 400; }
+.field input::placeholder { color: #7c8591; }
+.password { display: flex; align-items: center; }
+.password input { flex: 1; width: 100%; border: 0; border-radius: inherit; background: transparent; }
+.password button { align-self: stretch; border: 0; color: #475563; background: transparent; font-size: 13px; padding: 0 14px; border-radius: 8px; }
+.field input[aria-invalid="true"] { border-color: #b74732; }
+.password:has(input[aria-invalid="true"]) { border-color: #b74732; }
+.error { display: block; color: #a83d2c; font-size: 13px; }
+.choices { padding: 0; margin: 0; border: 0; min-width: 0; }
+.choices legend { margin-bottom: 10px; font-size: 15px; }
+.choices > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices label { position: relative; }
+.choices input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.choices label > span { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 46px; padding: 10px 14px; border: 1px solid #cdd3dc; border-radius: 12px; font-size: 15px; cursor: pointer; }
+.choices input:checked + span { color: #153d35; border-color: #6db8a7; background: #e4f6ef; }
+.choices input:focus-visible + span { outline: 3px solid #237d70; outline-offset: 3px; }
+.player { display: flex; align-items: center; gap: 14px; border: 1px solid #dce2e7; padding: 16px; border-radius: 14px; }
+.avatar { display: grid; flex-shrink: 0; place-items: center; background: var(--auth-coral); color: var(--auth-ink); width: 48px; height: 48px; font-size: 23px; border-radius: 50%; }
+.player > div { min-width: 0; flex: 1; }
+.player h2 { margin: 0 0 3px; font-size: 20px; font-weight: 400; overflow-wrap: anywhere; }
+.player p { margin: 0; font-size: 13px; color: var(--auth-muted); }
+.edit { background: transparent; border: 0; padding: 8px 0 8px 8px; text-decoration: underline; color: inherit; font-size: 13px !important; }
+.check { display: flex; align-items: flex-start; gap: 12px; cursor: pointer; }
+.check input { flex-shrink: 0; width: 20px; height: 20px; margin: 3px 0 0; accent-color: #237d70; }
+.check + .error { margin-top: -12px; }
+.notice { font-size: 13px; color: var(--auth-muted); }
+.notice summary { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.notice p { margin: 10px 0 0; }
+.auth .primary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; width: 100%; padding: 13px 18px; margin-top: 4px; border: 0; border-radius: 12px; background: var(--auth-ink); color: #fff; }
+.primary:hover { background: #29364a; }
+.primary span { font-size: 22px; line-height: 1; }
+.switch { margin: 24px 0 0; color: var(--auth-muted); text-align: center; font-size: 14px; }
+.switch button { background: transparent; border: 0; color: var(--auth-ink); text-decoration: underline; text-underline-offset: 4px; margin-left: 3px; padding: 5px 0; }
+@media (max-width: 420px) { .auth { padding: 22px 18px 50px; } .panel { border-radius: 18px; padding: 24px 18px; } .steps { gap: 5px; margin-bottom: 26px; } .steps li { font-size: 11px; } .choices label > span { padding: 10px 12px; font-size: 14px; } .topline { padding-bottom: 12px; } .player { padding: 12px; gap: 10px; } }
+@media (prefers-reduced-motion: reduce) { .auth *, .auth *::before, .auth *::after { scroll-behavior: auto; transition: none; animation: none; } }

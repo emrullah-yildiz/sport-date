@@ -1,0 +1,166 @@
+.landing{color:#f4f4ec;background:#161c29;font-size:16px;font-weight:400;line-height:1.5;padding:0 5.2% 40px}
+.landing *{box-sizing:border-box}
+.landing button{font:inherit;cursor:pointer}
+.landing button:focus-visible{outline:3px solid #a4e9dc;outline-offset:5px}
+.landing h1,.landing h2,.landing p{margin:0}
+.landing h1,.landing h2{font-family:inherit}
+.landing button svg{flex-shrink:0}
+.hero{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:28px;min-height:590px;padding:34px 0 48px}
+.heroCopy{padding:12px 0;position:relative;z-index:1}
+.kicker{display:flex;gap:9px;align-items:center;color:#c5cec9;font-size:13px;line-height:1.5;letter-spacing:.015em}
+.kicker>span{width:7px;height:7px;flex-shrink:0;border-radius:50%;background:#a4e9dc}
+.hero h1{font-size:clamp(46px,5.4cqw,76px);font-weight:400;line-height:1.04;letter-spacing:-.045em;margin:25px 0 23px}
+.hero h1>span{color:#a4e9dc}
+.intro{max-width:380px;color:#c5cbcF;font-size:17px;line-height:1.65}
+.actions{display:flex;align-items:center;gap:23px;flex-wrap:wrap;margin-top:29px}
+.primary{display:flex;justify-content:space-between;align-items:center;gap:35px;min-height:54px;border:0;border-radius:999px;background:#a4e9dc;color:#152926;padding:14px 22px;transition:background .18s,transform .18s}
+.landing .primary{color:#152926}
+.primary:hover{background:#c5f5ed;transform:translateY(-2px)}
+.textButton{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:8px 0;border:0;background:none;color:#f3f4ec;text-align:left;font-size:15px!important}
+.textButton:hover{color:#a4e9dc}
+.quiet{margin-top:16px!important;font-size:12px;color:#9da8b5}
+.scene{position:relative;min-width:0;height:500px;margin-left:8px}
+.path{position:absolute;inset:-2% -6% 0;width:110%;height:100%;color:#a4e9dc77;pointer-events:none}
+.backCourt{position:absolute;right:-1%;top:2%;width:70%;height:48%;transform:rotate(13deg);color:#a4e9dc;background:#233b3a;border:1px solid #a4e9dc45;border-radius:6px;overflow:hidden}
+.backCourt svg{width:100%;height:100%;stroke:currentColor;stroke-width:1.5;opacity:.58}
+.portrait{position:absolute;left:14%;top:9%;width:66%;height:78%;border-radius:110px 110px 10px 10px;transform:rotate(-5deg);overflow:hidden;border:1px solid #f4f4ec40;background:#385458;box-shadow:0 22px 40px #00000024}
+.portrait>img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 35%}
+.emptyPortrait{background:#234645;display:flex;align-items:center;justify-content:center;padding:25px;color:#cef4e7}
+.emptyPortrait>svg{position:absolute;width:180%;height:80%;stroke:#a4e9dc45;stroke-width:1.6;transform:rotate(90deg)}
+.emptyPortrait>span{position:relative;z-index:1;font-size:27px;line-height:1.25;letter-spacing:-.03em}
+.portrait::after{position:absolute;content:"";inset:50% 0 0;background:linear-gradient(transparent,#0c1a22cc);pointer-events:none}
+.photoLabel{position:absolute;bottom:83px;left:24px;right:15px;z-index:1;font-size:20px;font-weight:400;text-shadow:0 1px 8px #0006}
+.photoLabel>span{display:block;font-size:12px;margin-top:3px}
+.mapDot{position:absolute;left:2%;top:12%;display:grid;place-items:center;width:60px;height:60px;border-radius:50%;color:#172e2c;background:#a4e9dc;box-shadow:0 0 0 8px #a4e9dc14}
+.spark{position:absolute;right:1%;top:50%;color:#f3a08f;font-size:88px;line-height:1;transform:rotate(12deg)}
+.gameTicket{position:absolute;bottom:4%;left:18%;display:flex;gap:12px;align-items:center;width:82%;min-height:81px;transform:rotate(4deg);padding:13px 16px;background:#f4f3e9;color:#192b30;border:0;border-radius:9px;box-shadow:0 12px 40px #0508123a;text-align:left;transition:transform .2s}
+.landing .gameTicket{color:#192b30}
+.gameTicket:hover{transform:rotate(2deg) translateY(-3px)}
+.ticketIcon{display:grid;place-items:center;width:46px;height:46px;flex-shrink:0;border-radius:50%;color:#243932;background:#d7e5d9}
+.gameTicket>span:nth-child(2){flex:1;font-size:15px;font-weight:500;line-height:1.3}
+.gameTicket small{display:block;font-size:12px;font-weight:400;margin-top:6px;color:#53635f}
+.sceneCaption{position:absolute;bottom:-4%;left:19%;font-size:11px;letter-spacing:.02em;color:#96aaa7}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:28px 0;margin:0;list-style:none;border-top:1px solid #ffffff1c;border-bottom:1px solid #ffffff1c}
+.steps li{display:flex;gap:13px;align-items:center;min-width:0}
+.stepNumber{font-size:12px;color:#a4e9dc;align-self:flex-start;margin-top:5px;flex-shrink:0}
+.steps h2{font-size:17px;font-weight:400;line-height:1.4}
+.steps p{font-size:13px;line-height:1.5;color:#aeb7c2;margin-top:4px}
+.steps li>svg{margin-left:auto;color:#72808e;width:17px;flex-shrink:0}
+.games{padding:60px 0 44px}
+.sectionHeading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px}
+.sectionHeading .kicker{color:#f3a08f;font-size:12px}
+.sectionHeading h2{font-size:36px;font-weight:400;line-height:1.2;letter-spacing:-.025em;margin:8px 0}
+.sectionHeading p:last-child{color:#aeb7c2;font-size:14px}
+.gameGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0;margin:0;list-style:none}
+.emptyGames{border:1px dashed #a4e9dc44;border-radius:15px;padding:28px;color:#c9d5d3}
+.emptyGames .textButton{margin-top:10px}
+.gameCard{border:1px solid #ffffff20;border-radius:15px;background:#1e2735;min-width:0;overflow:hidden;transition:border-color .18s}
+.gameCard:hover{border-color:#a4e9dc80}
+.gameDetail{display:flex;flex-direction:column;align-items:stretch;width:100%;border:0;background:transparent;color:inherit;text-align:left;padding:21px 21px 17px}
+.gameDetail:focus-visible{outline-offset:-5px!important;border-radius:15px}
+.cardTop{display:flex;align-items:center;gap:12px;margin-bottom:25px}
+.sportIcon{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;color:#a4e9dc;background:#a4e9dc13;flex-shrink:0}
+.gameCard[data-sport="Running"] .sportIcon{color:#f3a08f;background:#f3a08f13}
+.gameCard[data-sport="Padel"] .sportIcon{color:#d1c5f3;background:#d1c5f313}
+.cardTop>span:nth-child(2){font-size:14px;color:#e9ece9}
+.cardTop small{display:block;color:#aeb7c2;font-size:12px;margin-top:2px}
+.cardTop>svg{margin-left:auto;color:#94a6ad}
+.gameSport{font-size:12px;color:#aeb7c2;margin-bottom:8px}
+.gameDetail strong{font-weight:400;font-size:23px;line-height:1.25;letter-spacing:-.02em;min-height:58px}
+.gameArea{font-size:13px;color:#b8c2ce;margin-top:13px}
+.cardBottom{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #ffffff12}
+.cardBottom>span{font-size:12px;color:#bbc5ce;display:flex;align-items:center;gap:7px}
+.cardBottom i{width:5px;height:5px;display:block;border-radius:50%;background:#a4e9dc}
+.joinButton{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:88px;min-height:44px;border-radius:25px;border:1px solid #a4e9dc70;color:#a4e9dc;background:#a4e9dc0d;font-size:14px!important;padding:8px 16px;transition:background .18s,color .18s}
+.landing .joinButton{color:#a4e9dc}
+.joinButton>span{font-size:23px;font-weight:400;line-height:1}
+.landing .joinButton:hover{background:#a4e9dc;color:#192c2b}
+.landing .joinButton:disabled{cursor:default;color:#b6c7c4;background:#a4e9dc08;border-color:#a4e9dc28}
+.hostNote{display:flex;align-items:center;gap:20px;padding:29px 0 8px;border-top:1px solid #ffffff1c}
+.hostSymbol{width:52px;height:52px;display:grid;place-items:center;flex-shrink:0;border-radius:50%;border:1px solid #f3a08f50;color:#f3a08f;font-size:32px;font-weight:400;line-height:1}
+.hostNote h2{font-size:22px;font-weight:400;letter-spacing:-.02em}
+.hostNote p{font-size:14px;color:#aeb7c2;margin-top:3px}
+.hostNote .textButton{margin-left:auto}
+@container preview (max-width:900px){
+  .landing{padding:0 4.5% 28px}
+  .hero{gap:10px;min-height:520px;padding-top:25px;padding-bottom:42px}
+  .hero h1{font-size:52px}
+  .scene{height:425px;margin-left:0}
+  .actions{gap:12px}
+  .primary{gap:19px}
+  .gameTicket{left:6%;width:94%;padding:12px}
+  .ticketIcon{width:35px;height:35px}
+  .gameTicket>span:nth-child(2){font-size:13px}
+  .gameTicket small{font-size:11px}
+  .sceneCaption{left:8%;font-size:10px}
+  .mapDot{width:46px;height:46px;left:0}
+  .spark{font-size:68px}
+  .steps{gap:20px}
+  .steps li>svg{display:none}
+  .gameGrid{gap:10px}
+  .gameDetail{padding:17px 15px}
+  .gameDetail strong{font-size:20px;min-height:50px}
+  .cardBottom{padding:12px 14px;gap:6px}
+  .joinButton{min-width:77px;padding:8px 12px}
+}
+@container preview (max-width:650px){
+  .landing{padding:0 20px 25px}
+  .hero{display:flex;flex-direction:column;gap:14px;padding:21px 0 33px;min-height:0;align-items:stretch}
+  .heroCopy{padding:0}
+  .hero .kicker{font-size:11px}
+  .hero h1{font-size:46px;line-height:1.07;margin:20px 0 18px;letter-spacing:-.04em}
+  .desktopBreak{display:none}
+  .intro{font-size:16px;line-height:1.55;max-width:350px}
+  .actions{margin-top:23px;gap:20px;flex-wrap:nowrap}
+  .primary{min-height:50px;padding:12px 19px;gap:19px;font-size:15px!important}
+  .actions .textButton{font-size:13px!important;gap:5px}
+  .actions .textButton svg{width:17px}
+  .quiet{font-size:11px;margin-top:13px!important}
+  .scene{height:285px;width:min(100%,390px);margin:6px auto 12px}
+  .portrait{left:17%;top:4%;width:62%;height:85%;border-radius:90px 90px 10px 10px}
+  .backCourt{right:3%;top:3%;height:54%;width:65%}
+  .photoLabel{bottom:65px;left:18px;font-size:17px}
+  .photoLabel>span{font-size:11px}
+  .mapDot{width:46px;height:46px;top:17%;left:4%}
+  .spark{font-size:69px;right:1%;top:49%}
+  .gameTicket{left:12%;width:86%;bottom:0;min-height:68px;padding:10px 12px;gap:9px}
+  .gameTicket>span:nth-child(2){font-size:14px}
+  .gameTicket small{font-size:11px;margin-top:4px}
+  .sceneCaption{display:none}
+  .steps{grid-template-columns:1fr;padding:23px 0;gap:18px}
+  .steps li{gap:16px}
+  .stepNumber{min-width:22px;font-size:12px;margin-top:3px}
+  .steps h2{font-size:16px}
+  .steps p{font-size:13px;margin-top:1px}
+  .games{padding:34px 0 32px}
+  .sectionHeading{align-items:flex-start;flex-direction:column;gap:7px;margin-bottom:15px}
+  .sectionHeading h2{font-size:30px;margin:7px 0}
+  .sectionHeading .textButton{font-size:13px!important;min-height:40px}
+  .gameGrid{grid-template-columns:1fr;gap:13px}
+  .gameDetail{padding:19px 20px 16px}
+  .cardTop{margin-bottom:17px}
+  .cardTop>span:nth-child(2){font-size:14px}
+  .gameDetail strong{font-size:23px;min-height:0}
+  .gameArea{margin-top:10px}
+  .cardBottom{padding:11px 19px}
+  .hostNote{display:grid;grid-template-columns:41px 1fr;gap:12px;padding-top:24px}
+  .hostSymbol{width:41px;height:41px;font-size:28px}
+  .hostNote h2{font-size:20px}
+  .hostNote p{font-size:13px;line-height:1.5}
+  .hostNote .textButton{grid-column:2;margin-left:0;justify-self:start;font-size:14px!important}
+}
+@container preview (max-width:350px){
+  .landing{padding-right:16px;padding-left:16px}
+  .hero h1{font-size:39px}
+  .hero .kicker{font-size:10px;gap:7px}
+  .actions{gap:15px}
+  .primary{padding:12px 16px;gap:13px}
+  .actions .textButton{font-size:12px!important}
+  .actions .textButton svg{display:none}
+  .scene{height:285px}
+  .gameTicket{left:5%;width:93%}
+  .gameTicket>span:nth-child(2){font-size:13px}
+  .gameTicket small{font-size:10px}
+  .sectionHeading h2{font-size:28px}
+}
+@media(prefers-reduced-motion:reduce){.landing *{transition:none!important;animation:none!important}}

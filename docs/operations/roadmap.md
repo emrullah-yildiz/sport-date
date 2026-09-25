@@ -1,3 +1,9 @@
+## September 25: show the whole simple website
+
+- [x] Complete local `/preview`: landing, public map/list, direct + Join, four-stage demo signup, sign-in returning to the game, three-stage creation, My games and profiles.
+- [x] Preserve request/acceptance separation, adult eligibility, explicit demo confirmations, restricted meeting-point display, mobile controls and draft/navigation continuity.
+- [ ] Owner/testers walk through the full site, request a game and create a plan; consolidate final changes before wiring the design into production flows. See docs/design/full-website-preview-2026-09-25.md.
+
 ## September 25: refine preferred Play Map for scale and travel
 
 - [x] Develop the owner's preferred Play Map with broad-area counts, a complete paginated list, destination/trip dates and sport/skill/time/language/availability/cost filters. Local fictional supply: 100 games per city in three sample countries.

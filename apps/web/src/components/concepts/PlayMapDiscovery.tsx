@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { photoSources } from "./concept-assets";
 import type { ConceptEvent, Sport } from "./concept-data";
 import { destinations, mapGames, defaultMapFilters, filterMapGames, groupMapGames } from "./play-map-data";
-import type { MapFilters } from "./play-map-data";
+import type { MapFilters, MapGame } from "./play-map-data";
 import { Arrow, CourtLines, SportGlyph } from "./ConceptVisuals";
 import s from "./play-map.module.css";
 
@@ -14,16 +14,18 @@ export const initialMapDiscovery: MapDiscoveryState = { filters: { ...defaultMap
 const pageSize = 8;
 const sports: (Sport | "All")[] = ["All", "Tennis", "Running", "Padel"];
 
-export default function PlayMapDiscovery({ empty, state, onChange, onEvent, onProfile, onProgress }: {
+export default function PlayMapDiscovery({ empty, state, onChange, onEvent, onProfile, onProgress, games = mapGames, onJoin, joinState, compact = false }: {
   empty: boolean; state: MapDiscoveryState; onChange: (state: MapDiscoveryState) => void;
   onEvent: (event: ConceptEvent) => void; onProfile: () => void; onProgress: () => void;
+  games?: MapGame[]; onJoin?: (game: MapGame) => void;
+  joinState?: (game: MapGame) => "pending" | "accepted" | "hosting" | undefined; compact?: boolean;
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const resultsHeading = useRef<HTMLHeadingElement>(null);
   const resultList = useRef<HTMLUListElement>(null);
   const { filters, view } = state;
   const destination = destinations.find(place => place.id === filters.destinationId) ?? destinations[0];
-  const results = empty ? [] : filterMapGames(mapGames, filters);
+  const results = empty ? [] : filterMapGames(games, filters);
   const clusters = groupMapGames(results, destination.id);
   const page = Math.min(state.page, Math.max(0, Math.ceil(results.length / pageSize) - 1));
   const pageGames = results.slice(page * pageSize, (page + 1) * pageSize);
@@ -37,8 +39,8 @@ export default function PlayMapDiscovery({ empty, state, onChange, onEvent, onPr
     requestAnimationFrame(() => { resultList.current?.scrollTo({ top: 0, behavior: "instant" }); resultsHeading.current?.focus({ preventScroll: true }); resultsHeading.current?.scrollIntoView({ block: "start", behavior: "instant" }); });
   }
   function selectArea(areaId: string) { update({ areaId }); document.getElementById("map-results")?.scrollIntoView({ block: "nearest", behavior: "instant" }); }
-  return <div className={s.page}>
-    <header className={s.header}><div><p className={s.eyebrow}><span /> YOUR NEXT PLACE TO PLAY</p><h1>Where are we<br /><span>playing next?</span></h1><p className={s.intro}>At home or away. Find a game that fits.</p></div><button className={s.profile} type="button" onClick={onProfile}><img src={photoSources[0]} alt="" /><span>Mara<small>View player card <Arrow /></small></span></button></header>
+  return <div className={s.page} data-compact={compact}>
+    <header className={s.header}>{compact ? <div><h1>Find a game.</h1><p className={s.intro}>Pick your place. Tap + Join.</p></div> : <><div><p className={s.eyebrow}><span /> YOUR NEXT PLACE TO PLAY</p><h1>Where are we<br /><span>playing next?</span></h1><p className={s.intro}>At home or away. Find a game that fits.</p></div><button className={s.profile} type="button" onClick={onProfile}><img src={photoSources[0]} alt="" /><span>Mara<small>View player card <Arrow /></small></span></button></>}</header>
 
     <section className={s.search} aria-label="Find your game">
       <div className={s.primaryFilters}>
@@ -68,8 +70,8 @@ export default function PlayMapDiscovery({ empty, state, onChange, onEvent, onPr
     </section>
 
     <section className={s.playground} aria-label="Game search results">
-      <header className={s.toolbar}><div><h2 data-testid="map-result-count" data-count={results.length} aria-live="polite">{results.length} {results.length === 1 ? "game" : "games"} in {destination.city}</h2><p>{destination.country} · Times in {destination.timezoneLabel}</p></div><div className={s.viewToggle} role="group" aria-label="Activity view"><button aria-pressed={view === "map"} onClick={() => onChange({ ...state, view: "map" })}>Map</button><button aria-pressed={view === "list"} onClick={() => onChange({ ...state, view: "list" })}>List</button></div></header>
-      <div className={s.sampleBar}><span>100 fictional games per city · 2–8 Oct 2026</span><button onClick={clear}>Clear filters</button></div>
+      <header className={s.toolbar}><div><h2 data-testid="map-result-count" data-count={results.length} aria-live="polite">{results.length} {results.length === 1 ? "game" : "games"} in {destination.city}</h2><p>{destination.country} · Times in {compact ? destination.timezone : destination.timezoneLabel}</p></div><div className={s.viewToggle} role="group" aria-label="Activity view"><button aria-pressed={view === "map"} onClick={() => onChange({ ...state, view: "map" })}>Map</button><button aria-pressed={view === "list"} onClick={() => onChange({ ...state, view: "list" })}>List</button></div></header>
+      <div className={s.sampleBar}><span>{compact ? "Host confirms your place after you join." : "100 fictional games per city · 2–8 Oct 2026"}</span><button onClick={clear}>Clear filters</button></div>
       {results.length === 0 ? <div className={s.empty}><span aria-hidden="true">↗</span><h3>No games fit just yet.</h3><p>Try another date, sport or level.</p><button onClick={clear}>Reset search in {destination.city} <Arrow /></button></div> : <div className={s.workspace} data-view={view}>
         {view === "map" && <div className={s.mapPanel}>
           <div className={s.mapHeading}><span>{selectedArea ? selectedArea.name : destination.city + " · Area overview"}</span>{selectedArea ? <button onClick={() => update({ areaId: "all" })}>All areas <span aria-hidden="true">↗</span></button> : <span>Tap a count to explore</span>}</div>
@@ -82,11 +84,11 @@ export default function PlayMapDiscovery({ empty, state, onChange, onEvent, onPr
         </div>}
         <div id="map-results" className={s.resultsPanel}>
           <div className={s.listHeading}><h3 ref={resultsHeading} tabIndex={-1}>{selectedArea ? "In " + selectedArea.name : "Your next game"}</h3><label>Sort<select aria-label="Sort games" value={filters.sort} onChange={event => update({ sort: event.target.value as MapFilters["sort"] })}><option value="soonest">Soonest</option><option value="availability">Most places</option></select></label></div>
-          <ul ref={resultList} className={s.eventList}>{pageGames.map(event => <li key={event.id} data-game-id={event.id} data-game-date={event.date} data-game-sport={event.sport} data-game-level={event.difficulty} data-game-language={event.language} data-game-time={event.time} data-game-places={event.places} data-game-free={event.cost === "free"}><button className={s.listEvent} onClick={() => onEvent(event)}><span className={s.listGlyph} data-sport={event.sport}><SportGlyph sport={event.sport} size={23} /></span><span className={s.listInfo}><span className={s.eventMeta}>{event.sport} · {event.level}</span><strong>{event.title}</strong><span className={s.eventWhen}>{new Date(event.date + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })} · {event.time}</span><span className={s.eventArea}>{event.area} · {event.language} · {event.cost === "free" ? "Free" : "Shared cost"}</span><span className={s.listPlaces}>{event.places > 0 ? event.places + (event.places === 1 ? " place open" : " places open") : "Full"}<Arrow /></span></span></button></li>)}</ul>
+          <ul ref={resultList} className={s.eventList}>{pageGames.map(event => <li key={event.id} data-game-id={event.id} data-game-date={event.date} data-game-sport={event.sport} data-game-level={event.difficulty} data-game-language={event.language} data-game-time={event.time} data-game-places={event.places} data-game-free={event.cost === "free"}><div className={s.gameRow} data-quick-join={Boolean(onJoin)}><button className={s.listEvent} onClick={() => onEvent(event)}><span className={s.listGlyph} data-sport={event.sport}><SportGlyph sport={event.sport} size={23} /></span><span className={s.listInfo}><span className={s.eventMeta}>{event.sport} · {event.level}</span><strong>{event.title}</strong><span className={s.eventWhen}>{new Date(event.date + "T12:00:00Z").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" })} · {event.time}</span><span className={s.eventArea}>{event.area} · {event.language} · {event.cost === "free" ? "Free" : "Shared cost"}</span><span className={s.listPlaces}>{event.places > 0 ? event.places + (event.places === 1 ? " place open" : " places open") : "Full"}<Arrow /></span></span></button>{onJoin && <button className={s.quickJoin} aria-label={(joinState?.(event) === "pending" ? "Requested: " : joinState?.(event) === "accepted" ? "Joined: " : joinState?.(event) === "hosting" ? "Hosting: " : event.places === 0 ? "Full: " : "Join: ") + event.title} disabled={event.places === 0 || Boolean(joinState?.(event))} onClick={() => onJoin(event)}><span aria-hidden="true">{joinState?.(event) ? "\u2713" : "+"}</span>{joinState?.(event) === "pending" ? "Requested" : joinState?.(event) === "accepted" ? "Joined" : joinState?.(event) === "hosting" ? "Hosting" : event.places === 0 ? "Full" : "Join"}</button>}</div></li>)}</ul>
           <div className={s.pagination}><span>{page * pageSize + 1}–{Math.min((page + 1) * pageSize, results.length)} of {results.length}</span><div><button aria-label="Previous games" disabled={page === 0} onClick={() => changePage(page - 1)}><Arrow back /></button><button aria-label="Next games" disabled={(page + 1) * pageSize >= results.length} onClick={() => changePage(page + 1)}><Arrow /></button></div></div>
         </div>
       </div>}
     </section>
-    <button className={s.quest} onClick={onProgress}><SportGlyph sport="Running" size={29} /><span>A new place. Another good memory.<small>Your private movement arc</small></span><Arrow /></button>
+    {!compact && <button className={s.quest} onClick={onProgress}><SportGlyph sport="Running" size={29} /><span>A new place. Another good memory.<small>Your private movement arc</small></span><Arrow /></button>}
   </div>;
 }
