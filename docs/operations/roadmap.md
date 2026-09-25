@@ -1,3 +1,11 @@
+## September 25: compare gamified themes before redesign
+
+- [x] Build local-only Player Cards, Clubhouse and Play Map concepts with shared fictional photography, responsive discovery/profile/event/progress views and working interactions.
+- [x] Add comparison notes, photo/state/reduced-motion checks, and the five-person evaluation protocol in docs/design/gamified-concepts-2026-09-25.md.
+- [ ] Owner and introduced testers compare the three directions; select one before applying a production theme.
+- [ ] Apply selected system to invitation discovery, return-to-event authentication, four-stage signup and existing feedback intake in verified slices.
+- [ ] Observe real hosted attendance and mature return; choose member or organizer paid value from evidence before activating a subscription offer.
+
 # Outcome roadmap
 
 ## Cinematic landing motion - September 15

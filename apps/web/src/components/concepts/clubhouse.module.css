@@ -1,0 +1,86 @@
+.page { --cream:#fff9ed; --ink:#293d32; --cherry:#b93735; --lavender:#ded3ee; color:var(--ink); background:var(--cream); padding:52px 58px 20px; overflow:hidden; }
+.page *, .page *::before, .page *::after { box-sizing:border-box; }
+.page button, .page a { -webkit-tap-highlight-color:transparent; }
+.page button { font:inherit; cursor:pointer; }
+.page button:focus-visible, .page a:focus-visible { outline:3px solid var(--cherry); outline-offset:5px; }
+.page h1, .page h2, .page h3, .page p { margin:0; }
+.hero { display:grid; grid-template-columns:1.15fr 1fr; gap:28px; align-items:center; min-height:550px; }
+.heroCopy { position:relative; z-index:2; padding-bottom:42px; }
+.kicker { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:500; letter-spacing:1.5px; line-height:1.5; }
+.kicker > span { width:7px; height:7px; background:var(--cherry); border-radius:50%; }
+.hero h1 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(48px,5.9cqw,84px); font-weight:400; line-height:1.04; letter-spacing:-3.6px; margin:26px 0 23px; }
+.hero h1 em { color:var(--cherry); font-weight:400; }
+.intro { font-size:16px; line-height:1.7; color:#657062; }
+.primary { display:inline-flex; gap:25px; justify-content:center; align-items:center; margin-top:29px; min-height:49px; background:var(--ink); color:var(--cream); padding:13px 19px; border-radius:3px; text-decoration:none; font-size:12px; }
+.primary:hover { background:#405b4a; }
+.handwritten { display:flex; align-items:center; margin:24px 0 0 63px; gap:8px; color:var(--cherry); font-family:Georgia,"Times New Roman",serif; font-size:19px; font-style:italic; transform:rotate(-7deg); }
+.handwritten svg { width:88px; height:35px; transform:rotate(162deg); }
+.editorial { position:relative; width:100%; min-width:0; padding:20px 15px 51px 15px; }
+.portrait { width:calc(100% - 36px); display:block; background:#fffdf6; padding:10px; border:1px solid #d8d6c9; text-align:left; box-shadow:4px 8px 0 #283d3311,0 14px 38px #293d3210; transform:rotate(4deg); transition:transform .24s ease; position:relative; }
+.portrait:hover { transform:rotate(1deg) translateY(-3px); }
+.photoWindow { position:relative; width:100%; aspect-ratio:4 / 4.65; background:#dcd5ba; overflow:hidden; }
+.photoWindow img { width:100%; height:100%; display:block; object-fit:cover; object-position:50% 37%; }
+.portraitCaption { display:flex; align-items:center; justify-content:space-between; color:var(--ink); font-family:Georgia,"Times New Roman",serif; font-size:24px; padding:15px 4px 6px; }
+.portraitCaption small { display:block; font-family:Arial,sans-serif; font-size:12px; color:#77796e; margin-top:5px; }
+.portraitArrow { display:grid; width:36px; height:36px; place-items:center; border:1px solid #cbcdbf; border-radius:50%; }
+.verticalCaption { position:absolute; top:84px; right:-12px; writing-mode:vertical-rl; font-size:12px; letter-spacing:2.3px; color:#7c8073; }
+.note { background:var(--lavender); padding:21px 24px; position:absolute; left:-41px; bottom:13px; width:218px; min-height:124px; transform:rotate(-7deg); box-shadow:1px 5px 9px #23271b0c; pointer-events:none; }
+.note > span { font-size:12px; letter-spacing:1.8px; }
+.note p { font-family:Georgia,"Times New Roman",serif; font-size:26px; margin-top:10px; line-height:1.04; }
+.note > svg { position:absolute; right:15px; bottom:17px; width:32px; height:32px; color:var(--cherry); }
+.sticker { position:absolute; right:0; bottom:36px; width:105px; height:105px; border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border:1px solid var(--cherry); outline:4px solid var(--cream); outline-offset:-8px; background:var(--cherry); color:var(--cream); font-family:Georgia,"Times New Roman",serif; font-size:23px; line-height:.95; transform:rotate(11deg); pointer-events:none; }
+.sticker small { font-family:Arial,sans-serif; font-size:12px; letter-spacing:1px; margin-top:8px; }
+.plans { padding-top:52px; scroll-margin-top:30px; }
+.sectionHeader { display:flex; gap:16px; align-items:flex-end; justify-content:space-between; border-top:1px solid #ced1c2; padding:24px 0 28px; }
+.sectionHeader h2 { font-family:Georgia,"Times New Roman",serif; font-size:36px; line-height:1.15; font-weight:400; letter-spacing:-1.2px; margin-top:10px; }
+.sectionHeader .kicker { color:#6e776a; font-size:12px; letter-spacing:1.2px; }
+.edition { font-size:12px; white-space:nowrap; padding-bottom:7px; }
+.edition span { margin-left:8px; }
+.tickets { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:17px; }
+.tickets li { min-width:0; }
+.ticket { width:100%; height:100%; display:flex; flex-direction:column; background:#fffdf6; border:1px solid #d2d5c8; padding:0; color:var(--ink); text-align:left; border-radius:4px; box-shadow:0 4px 0 #34422f08; transition:transform .2s ease,box-shadow .2s ease; overflow:hidden; }
+.ticket:hover { transform:translateY(-5px) rotate(-1deg); box-shadow:0 9px 0 #34422f08; }
+.ticketArt { display:flex; align-items:center; justify-content:center; height:130px; position:relative; overflow:hidden; width:100%; border-bottom:1px solid #283c3219; }
+.ticketTennis .ticketArt { background:#e0e7cf; color:#355b3f; }
+.ticketRunning .ticketArt { background:#e6dbed; color:#735c8a; }
+.ticketPadel .ticketArt { background:#f4d7c6; color:#a54b3f; }
+.ticketSport { position:absolute; top:15px; left:18px; font-family:Georgia,"Times New Roman",serif; font-size:15px; font-style:italic; }
+.ticketNumber { position:absolute; top:17px; right:17px; font-size:12px; opacity:.6; }
+.ticketArt > svg:not(.ticketCourt) { position:relative; z-index:1; transform:rotate(-15deg); }
+.ticketCourt { position:absolute; width:130%; height:170%; opacity:.12; stroke:currentColor; stroke-width:1.2px; transform:rotate(15deg); }
+.ticketBody { padding:20px 18px 22px; display:flex; flex:1; flex-direction:column; }
+.ticketTime { font-size:12px; letter-spacing:.5px; text-transform:uppercase; }
+.ticketTime span, .ticketArea span { padding:0 3px; }
+.ticketTitle { display:block; font-family:Georgia,"Times New Roman",serif; font-size:28px; line-height:1.08; margin:11px 0 17px; letter-spacing:-.7px; }
+.ticketArea { font-size:12px; line-height:1.6; color:#72796b; margin-top:auto; }
+.ticketStub { position:relative; border-top:1px dashed #ced0c2; width:100%; padding:15px 18px; display:flex; align-items:center; gap:7px; justify-content:space-between; }
+.ticketStub::before,.ticketStub::after { content:""; position:absolute; width:14px; height:14px; border-radius:50%; background:var(--cream); border:1px solid #d2d5c8; top:-7px; }
+.ticketStub::before { left:-8px; }.ticketStub::after { right:-8px; }
+.ticketStub > span:first-child { font-size:12px; color:#777d70; }
+.ticketLink { display:flex; gap:5px; align-items:center; font-size:12px; white-space:nowrap; }
+.ticketLink svg { width:15px; height:15px; }
+.empty { padding:58px 20px; border:1px dashed #bfc4b5; text-align:center; border-radius:4px; }
+.empty > svg { width:34px; color:var(--cherry); margin-bottom:16px; }
+.empty h3 { font:400 30px Georgia,"Times New Roman",serif; }.empty p { margin-top:12px; font-size:16px; color:#66705f; }
+.progress { width:100%; border:0; background:#eee7f3; color:var(--ink); display:flex; align-items:center; gap:23px; padding:29px 31px; margin-top:43px; text-align:left; border-radius:3px; }
+.stamp { flex:0 0 73px; width:73px; height:84px; position:relative; display:grid; place-items:center; border:1px dashed #9585a8; outline:1px solid #9585a8; outline-offset:-5px; transform:rotate(-8deg); }
+.stamp > svg { position:absolute; width:35px; height:35px; opacity:.17; color:#82589b; }.stamp > span { font-family:Georgia,"Times New Roman",serif; font-size:15px; text-align:center; }
+.progressCopy { flex:1; }.progressCopy .kicker { display:block; font-size:12px; letter-spacing:1.3px; color:#786681; }
+.progressTitle { display:block; font:400 27px/1.15 Georgia,"Times New Roman",serif; letter-spacing:-.7px; margin-top:8px; }
+.progressLink { display:flex; align-items:center; gap:13px; font-size:12px; white-space:nowrap; }.progress:hover .progressLink { text-decoration:underline; text-underline-offset:5px; }
+.footer { display:flex; align-items:center; justify-content:space-between; color:#83897b; font-family:Georgia,"Times New Roman",serif; font-size:12px; padding:30px 0 12px; }.footer svg { width:15px; height:15px; color:var(--cherry); }
+@container concept (max-width:850px) { .page { padding:35px 32px 14px; }.hero { gap:12px; min-height:460px; }.hero h1 { font-size:56px; letter-spacing:-2.5px; }.heroCopy { padding-bottom:15px; }.intro { font-size:16px; }.note { left:-18px; width:175px; padding:15px 18px; }.note p { font-size:22px; }.sticker { width:87px; height:87px; font-size:19px; }.sectionHeader h2 { font-size:30px; }.ticketTitle { font-size:23px; }.ticketBody { padding:17px 13px; }.ticketStub { padding:12px; flex-wrap:wrap; }.progress { padding:24px; gap:18px; }.progressTitle { font-size:23px; }.progressLink { max-width:85px; white-space:normal; line-height:1.5; } }
+@container concept (max-width:600px) { .page { padding:28px 22px 10px; }.hero { display:flex; flex-direction:column; align-items:stretch; gap:15px; min-height:0; }.heroCopy { padding:0; }.hero .kicker { font-size:12px; }.hero h1 { font-size:54px; line-height:1.02; margin:21px 0 18px; letter-spacing:-2.8px; }.intro { font-size:16px; line-height:1.6; }.primary { margin-top:23px; font-size:12px; min-height:47px; }.handwritten { position:absolute; right:0; bottom:-16px; flex-direction:column; gap:0; margin:0; font-size:17px; }.handwritten svg { width:56px; height:27px; transform:rotate(115deg); }.editorial { width:88%; align-self:center; margin-top:26px; padding:16px 0 48px; }.portrait { width:100%; padding:8px; }.photoWindow { aspect-ratio:4 / 4.4; }.portraitCaption { font-size:24px; padding:13px 5px 5px; }.verticalCaption { right:-23px; font-size:12px; letter-spacing:1.5px; top:64px; }.note { left:-24px; bottom:6px; width:168px; min-height:105px; padding:17px; }.note p { font-size:23px; }.note > span { font-size:12px; }.note > svg { width:23px; bottom:14px; right:12px; }.sticker { right:-17px; bottom:40px; width:86px; height:86px; font-size:19px; }.plans { padding-top:39px; }.sectionHeader { padding:21px 0 22px; align-items:flex-start; }.sectionHeader h2 { font-size:29px; line-height:1.1; max-width:245px; }.sectionHeader .kicker { font-size:12px; letter-spacing:1px; max-width:220px; }.edition { writing-mode:vertical-rl; font-size:12px; padding:3px 0 0; }.edition span { margin:6px 0 0; }.tickets { grid-template-columns:1fr; gap:18px; }.ticket { display:grid; grid-template-columns:82px 1fr; }.ticketArt { height:100%; min-height:145px; grid-row:span 2; border-bottom:0; border-right:1px solid #283c3219; }.ticketArt > svg:not(.ticketCourt) { width:51px; height:51px; }.ticketSport { font-size:12px; top:16px; left:11px; }.ticketNumber { top:auto; bottom:14px; left:13px; }.ticketBody { padding:18px 15px 14px; }.ticketTitle { font-size:27px; margin:9px 0 10px; }.ticketTime { font-size:12px; }.ticketArea { font-size:12px; }.ticketStub { padding:13px 15px; font-size:12px; }.ticketStub > span:first-child { font-size:12px; }.ticketLink { font-size:12px; }.progress { margin-top:30px; padding:22px 18px; gap:18px; display:grid; grid-template-columns:55px 1fr; }.stamp { width:55px; height:67px; grid-row:span 2; }.stamp > span { font-size:12px; }.progressCopy .kicker { font-size:12px; letter-spacing:1px; }.progressTitle { font-size:23px; margin-top:9px; }.progressLink { max-width:none; grid-column:2; font-size:12px; gap:10px; }.footer { font-size:12px; gap:10px; padding-top:25px; }.footer span { max-width:40%; }.footer span:last-child { text-align:right; }.empty { padding:38px 16px; }.empty h3 { font-size:26px; } }
+@container concept (max-width:350px) { .page { padding-inline:16px; }.hero h1 { font-size:46px; letter-spacing:-2px; }.handwritten { font-size:14px; right:-3px; }.primary { gap:13px; padding-inline:14px; }.ticket { grid-template-columns:66px 1fr; }.ticketArt > svg:not(.ticketCourt) { width:42px; }.ticketTitle { font-size:24px; }.ticketBody { padding:17px 12px 14px; }.ticketStub { padding:12px; }.progress { padding:20px 14px; gap:13px; }.progressTitle { font-size:21px; } }
+.ticketStub { flex-wrap:wrap; row-gap:10px; }
+.ticketBody { line-height:1.5; }
+.ticketTime, .ticketArea, .ticketStub, .ticketLink { font-size:12px; }
+.note { bottom:161px; }
+.note > span, .sticker small, .verticalCaption, .ticketNumber { font-size:11px; }
+.note > span { letter-spacing:.8px; }
+.sticker small { letter-spacing:0; }
+.progressCopy .kicker { letter-spacing:1px; line-height:1.6; }
+@container concept (max-width:850px) { .note { width:190px; bottom:148px; }.progressLink { max-width:116px; flex-shrink:0; } }
+@container concept (max-width:600px) { .note { width:184px; bottom:151px; padding:17px; }.note p { font-size:22px; }.sticker { right:-17px; bottom:31px; width:95px; height:95px; }.verticalCaption { font-size:11px; letter-spacing:.8px; }.handwritten { font-size:15px; right:-3px; bottom:-24px; }.sectionHeader .kicker { max-width:225px; line-height:1.6; }.progressLink { max-width:none; }.ticketStub { padding-block:14px; }.ticketArt { min-height:190px; }.ticketLink { margin-left:auto; }.intro { max-width:300px; }.footer { font-size:12px; line-height:1.5; } }
+@container concept (max-width:350px) { .note { width:168px; left:-14px; }.note p { font-size:21px; }.note > span { font-size:11px; letter-spacing:0; }.note > svg { width:19px; right:10px; }.handwritten { font-size:13px; right:-4px; bottom:-33px; }.editorial { margin-top:39px; }.ticketTime { letter-spacing:0; }.ticketArea { font-size:12px; }.ticketArt { min-height:216px; } }
+@media (prefers-reduced-motion:reduce) { .portrait,.ticket { transition:none; }.portrait:hover { transform:rotate(4deg); }.ticket:hover { transform:none; } }
