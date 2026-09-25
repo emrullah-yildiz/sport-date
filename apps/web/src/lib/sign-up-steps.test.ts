@@ -43,6 +43,16 @@ describe("SIGN_UP_STEP_ORDER — interactive one-question-per-step, credentials 
 });
 
 describe("signUpStepError — the per-step gates moved with their steps, rules intact", () => {
+  it("requires at least one intention and preserves multiple choices across steps", () => {
+    expect(signUpStepError(stepNumber("intentions"), completeState({ seekingPreferences: [] }))).toBe("Choose at least one connection preference.");
+    expect(signUpStepError(stepNumber("intentions"), completeState({ seekingPreferences: ["dating", "friendship", "group"] }))).toBeNull();
+    useSignUpStore.getState().reset();
+    useSignUpStore.getState().setField("seekingPreferences", ["dating", "friendship", "group"]);
+    useSignUpStore.getState().setStep(7);
+    useSignUpStore.getState().setStep(6);
+    expect(useSignUpStore.getState().seekingPreferences).toEqual(["dating", "friendship", "group"]);
+    useSignUpStore.getState().reset();
+  });
   it("passes every step for a complete state", () => {
     for (let step = 1; step <= SIGN_UP_STEP_ORDER.length; step += 1) {
       expect(signUpStepError(step, completeState())).toBeNull();

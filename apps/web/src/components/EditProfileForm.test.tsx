@@ -27,6 +27,7 @@ vi.mock("react", async (importOriginal) => {
 });
 
 import EditProfileForm, { EditProfileConfirmation } from "./EditProfileForm";
+import ConnectionChoices from "./ConnectionChoices";
 
 afterEach(() => { hooks.active = false; hooks.slots = []; hooks.cursor = 0; vi.unstubAllGlobals(); vi.clearAllMocks(); });
 
@@ -111,6 +112,21 @@ const form = (tree: ReactNode) => find(tree, (type) => type === "form")!;
 const fields = (tree: ReactNode) => find(tree, (type, props) => type === "fieldset" && props["aria-label"] === "Profile details")!;
 
 describe("EditProfileForm pending save and subsequent edits", () => {
+  it("saves every selected connection preference and blocks an empty selection", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    let tree = editor();
+    const choices = () => find(tree, (type) => type === ConnectionChoices)!;
+    expect(choices().value).toEqual(["friendship"]);
+    (choices().onChange as (value: string[]) => void)([]);
+    tree = editor();
+    await (form(tree).onSubmit as (event: { preventDefault(): void }) => Promise<void>)({ preventDefault() {} });
+    expect(fetchMock).not.toHaveBeenCalled();
+    (choices().onChange as (value: string[]) => void)(["dating", "friendship", "group"]);
+    tree = editor();
+    await (form(tree).onSubmit as (event: { preventDefault(): void }) => Promise<void>)({ preventDefault() {} });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).seekingPreferences).toEqual(["dating", "friendship", "group"]);
+  });
   it("locks all editable controls during a delayed request, rejects duplicate submits and clears success on another edit", async () => {
     let finish!: (value: Response) => void;
     const fetchMock = vi.fn(() => new Promise<Response>((resolve) => { finish = resolve; }));

@@ -1,3 +1,4 @@
+import { connectionLabels } from "@/lib/connection-preferences";
 import type { ViewableMemberProfile } from "@/lib/member-profile";
 import type { SessionUser } from "@/lib/session";
 
@@ -8,12 +9,6 @@ import type { SessionUser } from "@/lib/session";
 // ONLY the privacy-safe fields carried by ViewableMemberProfile. There is no account
 // panel, no contact detail, no precise/meeting location, and no score/ranking of any
 // kind. Photos are served through the authenticated, block-gated /api/photos route.
-
-const SEEKING_HEADLINES: Record<SessionUser["seeking"], string> = {
-  dating: "Dating",
-  friendship: "Friendship",
-  group: "Group games",
-};
 
 const SEEKING_SUMMARIES: Record<SessionUser["seeking"], string> = {
   dating: "Open to dating through sport.",
@@ -50,6 +45,8 @@ export default function MemberProfileView({
   // member requested a place in their event). Non-identifying, no private data.
   relationshipLabel: string;
 }) {
+  const preferences = profile.seekingPreferences ?? [profile.seeking];
+  const summary = preferences.length > 1 ? connectionLabels(preferences) : SEEKING_SUMMARIES[preferences[0]];
   const primaryPhoto = profile.photos.find((photo) => photo.isPrimary) ?? profile.photos[0] ?? null;
   const galleryPhotos = profile.photos;
 
@@ -64,7 +61,7 @@ export default function MemberProfileView({
             <span aria-hidden="true">·</span>
             <span className="profile-hero-fact">{profile.age}</span>
             <span aria-hidden="true">·</span>
-            <span className="profile-hero-fact profile-hero-seeking">{SEEKING_SUMMARIES[profile.seeking]}</span>
+            <span className="profile-hero-fact profile-hero-seeking">{summary}</span>
           </p>
           <p>This is how {profile.firstName} comes across to people deciding whether to play — a warm, honest picture, no scores, no ranking. The exact meeting point and contact details are never shown here.</p>
         </div>
@@ -93,8 +90,8 @@ export default function MemberProfileView({
 
         <article className="profile-panel">
           <p className="panel-label">Looking for</p>
-          <h2 className="capitalize">{SEEKING_HEADLINES[profile.seeking]}</h2>
-          <p>{SEEKING_SUMMARIES[profile.seeking]} Dating, friendship, and group games are all first-class here — none is a consolation prize.</p>
+          <h2 className="capitalize">{connectionLabels(preferences)}</h2>
+          <p>{summary} Dating, friendship, and group games are all first-class here — none is a consolation prize.</p>
         </article>
 
         <article className="profile-panel">

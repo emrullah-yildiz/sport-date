@@ -18,6 +18,7 @@ export type SessionUser = Readonly<{
   bio: string;
   languages: readonly string[];
   seeking: "dating" | "friendship" | "group";
+  seekingPreferences?: readonly SessionUser["seeking"][];
   emailVerified: boolean;
   sports: ReadonlyArray<{
     name: string;
@@ -44,6 +45,7 @@ type SessionUserRow = {
   bio: string;
   languages: string[];
   seeking: SessionUser["seeking"];
+  seeking_preferences?: SessionUser["seeking"][];
   email_verified: boolean;
   sports: Array<{ name: string; skillLevel: SessionUser["sports"][number]["skillLevel"]; frequency: SessionUser["sports"][number]["frequency"] }>;
   prompts: Array<{ prompt: string; answer: string }> | null;
@@ -83,7 +85,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
       users.id, users.email,
       DATE_PART('year', AGE(CURRENT_DATE, users.date_of_birth))::integer AS age,
       users.first_name, users.last_name, users.location,
-      users.bio, users.languages, users.seeking, users.email_verified,
+      users.bio, users.languages, users.seeking, users.seeking_preferences, users.email_verified,
       users.personality_prompts AS prompts,
       users.plus_until,
       COALESCE(
@@ -118,6 +120,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     bio: row.bio,
     languages: row.languages,
     seeking: row.seeking,
+    seekingPreferences: row.seeking_preferences ?? [row.seeking],
     emailVerified: row.email_verified,
     sports: row.sports,
     prompts: Array.isArray(row.prompts) ? row.prompts : [],

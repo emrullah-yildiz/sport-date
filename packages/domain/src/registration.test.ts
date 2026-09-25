@@ -269,3 +269,25 @@ describe("profile update validation", () => {
     if (!tooMany.valid) expect(tooMany.errors).toContain("Answer up to 3 prompts.");
   });
 });
+
+
+describe("multiple connection preferences", () => {
+  for (const [label, validate] of [["registration", validateRegistration], ["profile", validateProfileUpdate]] as const) {
+    it(`${label} preserves all choices and projects the first into the legacy field`, () => {
+      const result = validate({ ...validInput, seekingPreferences: ["group", "dating", "friendship"] });
+      expect(result.valid).toBe(true);
+      if (result.valid) {
+        expect(result.data.seekingPreferences).toEqual(["group", "dating", "friendship"]);
+        expect(result.data.seeking).toBe("group");
+      }
+    });
+    it(`${label} accepts legacy scalar payloads`, () => {
+      const result = validate(validInput);
+      expect(result.valid).toBe(true);
+      if (result.valid) expect(result.data.seekingPreferences).toEqual(["dating"]);
+    });
+    it.each([[], ["dating", "dating"], ["unknown"], ["dating", null], null, "dating"])(`${label} rejects malformed choices %j`, (seekingPreferences) => {
+      expect(validate({ ...validInput, seekingPreferences }).valid).toBe(false);
+    });
+  }
+});

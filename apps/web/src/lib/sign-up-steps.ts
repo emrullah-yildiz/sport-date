@@ -51,6 +51,7 @@ export type SignUpStepFields = Readonly<{
   lastName: string;
   location: string;
   bio: string;
+  seekingPreferences?: readonly unknown[];
   sports: ReadonlyArray<unknown>;
 }>;
 
@@ -72,6 +73,7 @@ export function signUpStepError(step: number, state: SignUpStepFields): string |
     if (dobError) return dobError;
   }
   if (id === "sports" && state.sports.length === 0) return "Choose at least one sport.";
+  if (id === "intentions" && state.seekingPreferences?.length === 0) return "Choose at least one connection preference.";
   if (id === "intentions" && state.bio.length > 200) return "Keep your bio within 200 characters.";
   if (id === "location" && !state.location.trim()) return "Add your city or region.";
   if (id === "credentials") {

@@ -22,6 +22,7 @@ export type ViewableMemberProfile = Readonly<{
   bio: string;
   languages: readonly string[];
   seeking: SessionUser["seeking"];
+  seekingPreferences?: SessionUser["seekingPreferences"];
   sports: SessionUser["sports"];
   prompts: SessionUser["prompts"];
   // Photos are ALSO block-gated at serve time by /api/photos/[id]; we only surface
@@ -56,6 +57,7 @@ type ViewableProfileRow = {
   bio: string;
   languages: string[];
   seeking: SessionUser["seeking"];
+  seeking_preferences?: SessionUser["seeking"][];
   prompts: Array<{ prompt: string; answer: string }> | null;
   sports: Array<{
     name: string;
@@ -101,7 +103,7 @@ export async function getViewableMemberProfile(
     SELECT
       target.id, target.first_name, target.last_name,
       DATE_PART('year', AGE(CURRENT_DATE, target.date_of_birth))::integer AS age,
-      target.location, target.bio, target.languages, target.seeking,
+      target.location, target.bio, target.languages, target.seeking, target.seeking_preferences,
       target.personality_prompts AS prompts,
       COALESCE(
         jsonb_agg(
@@ -204,6 +206,7 @@ export async function getViewableMemberProfile(
     bio: row.bio,
     languages: row.languages,
     seeking: row.seeking,
+    seekingPreferences: row.seeking_preferences ?? [row.seeking],
     sports: row.sports,
     prompts: Array.isArray(row.prompts) ? row.prompts : [],
     photos,

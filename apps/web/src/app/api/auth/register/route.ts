@@ -53,13 +53,13 @@ export async function POST(request: Request) {
       WITH new_user AS (
         INSERT INTO users (
           email, password_hash, date_of_birth, first_name, last_name,
-          location, bio, seeking, accepted_terms_at, email_verified,
+          location, bio, seeking, seeking_preferences, accepted_terms_at, email_verified,
           gender, gender_self_describe, gender_visible,
           sexual_orientation, orientation_self_describe, orientation_consent_at, orientation_visible
         )
         VALUES (
           ${input.email}, ${passwordHash}, ${input.dateOfBirth}, ${input.firstName},
-          ${input.lastName}, ${input.location}, ${input.bio}, ${input.seeking}, NOW(), FALSE,
+          ${input.lastName}, ${input.location}, ${input.bio}, ${input.seeking}, ARRAY(SELECT jsonb_array_elements_text(${JSON.stringify(input.seekingPreferences)}::jsonb)), NOW(), FALSE,
           ${input.gender}, ${genderSelfDescribe}, ${input.genderVisible},
           ${input.sexualOrientation}, ${orientationSelfDescribe}, ${orientationConsentAt}, ${input.orientationVisible}
         )

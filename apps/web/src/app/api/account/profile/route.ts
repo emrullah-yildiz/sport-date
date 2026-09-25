@@ -18,7 +18,11 @@ export async function PATCH(request: Request) {
   } catch {
     return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
   }
-  const validation = validateProfileUpdate(body);
+  // Older clients do not send the array; preserve every existing selection.
+  const profileBody = body && typeof body === "object" && !Array.isArray(body) && !("seekingPreferences" in body)
+    ? { ...body, seekingPreferences: user.seekingPreferences ?? [user.seeking] }
+    : body;
+  const validation = validateProfileUpdate(profileBody);
   if (!validation.valid) {
     return NextResponse.json({ error: validation.errors[0], errors: validation.errors }, { status: 400 });
   }
@@ -46,6 +50,7 @@ export async function PATCH(request: Request) {
           languages = ARRAY(SELECT jsonb_array_elements_text(${languagesJson}::jsonb)),
           personality_prompts = ${promptsJson}::jsonb,
           seeking = ${input.seeking},
+          seeking_preferences = ARRAY(SELECT jsonb_array_elements_text(${JSON.stringify(input.seekingPreferences)}::jsonb)),
           gender = ${input.gender}, gender_self_describe = ${genderSelfDescribe},
           gender_visible = ${input.genderVisible},
           sexual_orientation = ${input.sexualOrientation},

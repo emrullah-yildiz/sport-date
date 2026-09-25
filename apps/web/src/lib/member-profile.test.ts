@@ -98,6 +98,7 @@ describe("getViewableMemberProfile authorization boundary", () => {
     expect(result!.id).toBe("42");
     expect(result!.firstName).toBe("Bianca");
     expect(result!.seeking).toBe("friendship");
+    expect(result!.seekingPreferences).toEqual(["friendship"]);
     expect(result!.sports).toEqual([{ name: "Tennis", skillLevel: "intermediate", frequency: "weekly" }]);
     expect(result!.prompts).toEqual([{ prompt: "A perfect Saturday game is…", answer: "Doubles, then coffee." }]);
     expect(listApprovedProfilePhotos).toHaveBeenCalledWith("42");
@@ -155,4 +156,9 @@ describe("memberProfileRelationshipLabel", () => {
     expect(pending).toBe("You can see this because they asked to join one of your events");
     expect(pending).not.toContain("share an event");
   });
+});
+
+it("reads every connection selection for an authorized member profile", async () => {
+  reset([{ ...ROW, seeking_preferences: ["friendship", "group"] }]);
+  expect((await getViewableMemberProfile("7", "42"))?.seekingPreferences).toEqual(["friendship", "group"]);
 });

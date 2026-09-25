@@ -18,6 +18,7 @@ type AccountExportRow = {
   bio: string;
   languages: string[];
   seeking: string;
+  seeking_preferences?: string[];
   email_verified: boolean;
   accepted_terms_at: string;
   created_at: string;
@@ -46,7 +47,7 @@ export async function GET() {
   const rows = await sql`
     SELECT
       users.id, users.email, users.first_name, users.last_name, users.date_of_birth,
-      users.location, users.timezone, users.bio, users.languages, users.seeking,
+      users.location, users.timezone, users.bio, users.languages, users.seeking, users.seeking_preferences,
       users.email_verified, users.accepted_terms_at, users.created_at, users.updated_at,
       users.personality_prompts,
       users.gender, users.gender_self_describe, users.gender_visible,
@@ -197,6 +198,7 @@ export async function GET() {
       bio: account.bio,
       languages: account.languages,
       seeking: account.seeking,
+      seekingPreferences: account.seeking_preferences ?? [account.seeking],
       emailVerified: account.email_verified,
       acceptedTermsAt: account.accepted_terms_at,
       createdAt: account.created_at,

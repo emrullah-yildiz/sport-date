@@ -17,6 +17,7 @@ try {
       if (route.request().method() === "GET") return route.continue();
       if (new URL(route.request().url()).pathname === "/api/auth/register") {
         registrations += 1;
+        expect(route.request().postDataJSON().seekingPreferences).toEqual(["dating", "friendship", "group"]);
         await registrationResponse;
         return route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "Please try again shortly." }) });
       }
@@ -76,7 +77,22 @@ try {
     await page.getByLabel("Don't see your sport? Add your own.").press("Enter");
     await expect(heading).toHaveText("What sports do you play?");
     await next.click();
-    await expect(heading).toBeFocused();
+    await focusedHeading("What are you here for?");
+    const intentions = page.getByRole("group", { name: "Connection preferences" });
+    await intentions.getByRole("button", { name: /^Dating/ }).click();
+    await next.click();
+    await expect(page.locator("form").getByRole("alert")).toHaveText("Choose at least one connection preference.");
+    for (const name of [/^Dating/, /^Friendship/, /^Community/]) {
+      await intentions.getByRole("button", { name }).click();
+    }
+    await next.click();
+    await focusedHeading("Add a photo or two?");
+    await back.click();
+    await focusedHeading("What are you here for?");
+    for (const name of [/^Dating/, /^Friendship/, /^Community/]) {
+      await expect(intentions.getByRole("button", { name })).toHaveAttribute("aria-pressed", "true");
+    }
+    await page.screenshot({ path: new URL(`intentions-${width}.png`, artifacts).pathname.replace(/^\/(?=[A-Za-z]:)/, ""), fullPage: true });
     await next.click();
     await focusedHeading("Add a photo or two?");
     await next.click();
@@ -94,6 +110,7 @@ try {
     await page.getByRole("checkbox").check();
     await page.getByLabel("Password", { exact: true }).press("Enter");
     await focusedHeading("Let’s review your profile");
+    await expect(page.locator(".review-row").filter({ hasText: "Looking for:" })).toContainText("Dating, Friendship, Community");
     await page.getByRole("button", { name: "Create account", exact: true }).click();
     await expect(back).toBeDisabled();
     await expect(page.getByRole("button", { name: "Creating account…" })).toBeDisabled();

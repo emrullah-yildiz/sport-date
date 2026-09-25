@@ -5,6 +5,7 @@ import { MAX_PERSONALITY_PROMPTS, PERSONALITY_PROMPT_ANSWER_MAX, PERSONALITY_PRO
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
+import ConnectionChoices from "./ConnectionChoices";
 import { GENDER_CHOICES, SEXUAL_ORIENTATION_CHOICES } from "@/lib/sensitive-profile-options";
 
 type EditableProfile = {
@@ -14,6 +15,7 @@ type EditableProfile = {
   bio: string;
   languages: readonly string[];
   seeking: Seeking;
+  seekingPreferences?: readonly Seeking[];
   sports: readonly RegistrationSport[];
   prompts: readonly PersonalityPrompt[];
   // Optional, GDPR-careful identity fields (CX-20260704).
@@ -50,6 +52,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
   const router = useRouter();
   const [fields, setFields] = useState({
     ...profile,
+    seekingPreferences: [...(profile.seekingPreferences ?? [profile.seeking])],
     languagesText: profile.languages.join(", "),
     sports: profile.sports.map((sport) => ({ ...sport })),
     prompts: profile.prompts.map((prompt) => ({ ...prompt })),
@@ -109,6 +112,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saveInFlightRef.current) return;
+    if (fields.seekingPreferences.length === 0) { setError("Choose at least one connection preference."); return; }
     saveInFlightRef.current = true;
     setSaving(true);
     setError("");
@@ -119,7 +123,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstName: fields.firstName, lastName: fields.lastName, location: fields.location,
-          bio: fields.bio, seeking: fields.seeking, sports: fields.sports,
+          bio: fields.bio, seeking: fields.seekingPreferences[0] ?? fields.seeking, seekingPreferences: fields.seekingPreferences, sports: fields.sports,
           languages: fields.languagesText.split(",").map((language) => language.trim()).filter(Boolean),
           prompts: fields.prompts.map((prompt) => ({ prompt: prompt.prompt, answer: prompt.answer.trim() })).filter((prompt) => prompt.answer),
           gender: fields.gender, genderSelfDescribe: fields.genderSelfDescribe, genderVisible: fields.genderVisible,
@@ -164,7 +168,7 @@ export default function EditProfileForm({ profile }: { profile: EditableProfile 
         <div className="edit-profile-row"><label>First name<input value={fields.firstName} onChange={(event) => setFields({ ...fields, firstName: event.target.value })} /></label><label>Last name<input value={fields.lastName} onChange={(event) => setFields({ ...fields, lastName: event.target.value })} /></label></div>
         <label>City or region<input value={fields.location} onChange={(event) => setFields({ ...fields, location: event.target.value })} /></label>
         <label>Languages, separated by commas<input id="edit-profile-languages" value={fields.languagesText} onChange={(event) => setFields({ ...fields, languagesText: event.target.value })} /></label>
-        <label>What are you looking for?<select value={fields.seeking} onChange={(event) => setFields({ ...fields, seeking: event.target.value as Seeking })}><option value="dating">Dating</option><option value="friendship">Friendship</option><option value="group">Group events</option></select></label>
+        <fieldset><legend>What are you looking for?</legend><ConnectionChoices value={fields.seekingPreferences} onChange={(value) => setFields(current => ({ ...current, seekingPreferences: value }))} /></fieldset>
         <label>Bio<textarea id="edit-profile-bio" rows={3} maxLength={200} value={fields.bio} onChange={(event) => setFields({ ...fields, bio: event.target.value })} /></label>
         <fieldset><legend>Your sports</legend>{fields.sports.map((sport, index) => <div className="edit-sport-row" key={index}><input aria-label={`Sport ${index + 1}`} value={sport.name} onChange={(event) => updateSport(index, { name: event.target.value })} /><select aria-label={`${sport.name || `Sport ${index + 1}`} skill level`} value={sport.skillLevel} onChange={(event) => updateSport(index, { skillLevel: event.target.value as SportSkillLevel })}><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select><select aria-label={`${sport.name || `Sport ${index + 1}`} frequency`} value={sport.frequency} onChange={(event) => updateSport(index, { frequency: event.target.value as SportFrequency })}><option value="weekly">Weekly</option><option value="biweekly">Every two weeks</option><option value="monthly">Monthly</option><option value="casual">Casual</option></select><button className="remove-sport" type="button" onClick={() => removeSport(index)} disabled={fields.sports.length === 1}>Remove</button></div>)}<button id="edit-profile-sports" className="add-sport" type="button" disabled={fields.sports.length >= 5} onClick={() => setFields((current) => ({ ...current, sports: [...current.sports, { name: "", skillLevel: "beginner", frequency: "casual" }] }))}>Add another sport</button></fieldset>
         <fieldset>

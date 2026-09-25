@@ -107,12 +107,13 @@ export type RegistrationInput = Readonly<{
   location: string;
   bio: string;
   seeking: Seeking;
+  seekingPreferences?: readonly Seeking[];
   sports: readonly RegistrationSport[];
   acceptedTerms: boolean;
 }> & SensitiveProfileFields;
 
 export type RegistrationValidation =
-  | { valid: true; data: RegistrationInput }
+  | { valid: true; data: RegistrationInput & { seekingPreferences: readonly Seeking[] } }
   | { valid: false; errors: readonly string[] };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -171,13 +172,14 @@ export type ProfileUpdateInput = Readonly<{
   location: string;
   bio: string;
   seeking: Seeking;
+  seekingPreferences?: readonly Seeking[];
   languages: readonly string[];
   sports: readonly RegistrationSport[];
   prompts: readonly PersonalityPrompt[];
 }> & SensitiveProfileFields;
 
 export type ProfileUpdateValidation =
-  | { valid: true; data: ProfileUpdateInput }
+  | { valid: true; data: ProfileUpdateInput & { seekingPreferences: readonly Seeking[] } }
   | { valid: false; errors: readonly string[] };
 
 export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
@@ -187,7 +189,9 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
   const lastName = typeof input.lastName === "string" ? input.lastName.trim() : "";
   const location = typeof input.location === "string" ? input.location.trim() : "";
   const bio = typeof input.bio === "string" ? input.bio.trim() : "";
-  const seeking = input.seeking;
+  const preferences = input.seekingPreferences === undefined ? [input.seeking] : input.seekingPreferences;
+  const seekingPreferences = Array.isArray(preferences) ? preferences : [];
+  const seeking = seekingPreferences[0];
   const languages = Array.isArray(input.languages)
     ? input.languages.filter((language): language is string => typeof language === "string").map((language) => language.trim()).filter(Boolean)
     : [];
@@ -199,7 +203,11 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
   if (!lastName || lastName.length > 80) errors.push("Enter a last name of 80 characters or fewer.");
   if (!location || location.length > 120) errors.push("Enter a city or region of 120 characters or fewer.");
   if (bio.length > 200) errors.push("Bio must be 200 characters or fewer.");
-  if (!SEEKING_OPTIONS.includes(seeking as Seeking)) errors.push("Choose a valid connection preference.");
+  if (!Array.isArray(preferences) || seekingPreferences.length < 1 || seekingPreferences.length > 3 ||
+      seekingPreferences.some((value) => !SEEKING_OPTIONS.includes(value as Seeking)) ||
+      new Set(seekingPreferences).size !== seekingPreferences.length) {
+    errors.push("Choose one or more connection preferences, selecting each only once.");
+  }
   if (languages.length > 5 || languages.some((language) => language.length > 35)) errors.push("Choose up to five languages of 35 characters or fewer.");
   if (new Set(languages.map((language) => language.toLowerCase())).size !== languages.length) errors.push("Choose each language only once.");
   if (rawSports.length < 1 || rawSports.length > 5) errors.push("Choose between one and five sports.");
@@ -240,7 +248,7 @@ export function validateProfileUpdate(raw: unknown): ProfileUpdateValidation {
   errors.push(...sensitive.errors);
   return errors.length > 0
     ? { valid: false, errors }
-    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, languages, sports, prompts, ...sensitive.data } };
+    : { valid: true, data: { firstName, lastName, location, bio, seeking: seeking as Seeking, seekingPreferences: seekingPreferences as Seeking[], languages, sports, prompts, ...sensitive.data } };
 }
 
 export function ageOnDate(dateOfBirth: string, today = new Date()): number | null {
@@ -297,7 +305,9 @@ export function validateRegistration(
   const lastName = typeof input.lastName === "string" ? input.lastName.trim() : "";
   const location = typeof input.location === "string" ? input.location.trim() : "";
   const bio = typeof input.bio === "string" ? input.bio.trim() : "";
-  const seeking = input.seeking;
+  const preferences = input.seekingPreferences === undefined ? [input.seeking] : input.seekingPreferences;
+  const seekingPreferences = Array.isArray(preferences) ? preferences : [];
+  const seeking = seekingPreferences[0];
   const acceptedTerms = input.acceptedTerms === true;
   const rawSports = Array.isArray(input.sports) ? input.sports : [];
   const errors: string[] = [];
@@ -314,7 +324,11 @@ export function validateRegistration(
   if (!lastName || lastName.length > 80) errors.push("Enter a last name of 80 characters or fewer.");
   if (!location || location.length > 120) errors.push("Enter a city or region of 120 characters or fewer.");
   if (bio.length > 200) errors.push("Bio must be 200 characters or fewer.");
-  if (!SEEKING_OPTIONS.includes(seeking as Seeking)) errors.push("Choose a valid connection preference.");
+  if (!Array.isArray(preferences) || seekingPreferences.length < 1 || seekingPreferences.length > 3 ||
+      seekingPreferences.some((value) => !SEEKING_OPTIONS.includes(value as Seeking)) ||
+      new Set(seekingPreferences).size !== seekingPreferences.length) {
+    errors.push("Choose one or more connection preferences, selecting each only once.");
+  }
   if (!acceptedTerms) errors.push("Accept the Terms and Safety Guidelines to continue.");
   if (rawSports.length < 1 || rawSports.length > 5) errors.push("Choose between one and five sports.");
 
@@ -351,7 +365,7 @@ export function validateRegistration(
     valid: true,
     data: {
       email, password, dateOfBirth, firstName, lastName, location, bio,
-      seeking: seeking as Seeking, sports, acceptedTerms, ...sensitive.data,
+      seeking: seeking as Seeking, seekingPreferences: seekingPreferences as Seeking[], sports, acceptedTerms, ...sensitive.data,
     },
   };
 }

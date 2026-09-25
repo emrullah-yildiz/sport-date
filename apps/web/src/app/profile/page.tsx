@@ -1,3 +1,4 @@
+import { connectionLabels } from "@/lib/connection-preferences";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -19,12 +20,6 @@ import { getCurrentUser, type SessionUser } from "@/lib/session";
 
 export const metadata = { title: "Your profile" };
 
-const SEEKING_HEADLINES: Record<SessionUser["seeking"], string> = {
-  dating: "Dating",
-  friendship: "Friendship",
-  group: "Group games",
-};
-
 const SEEKING_SUMMARIES: Record<SessionUser["seeking"], string> = {
   dating: "Open to dating through sport.",
   friendship: "Here to make friends through sport.",
@@ -44,12 +39,13 @@ const FREQUENCY_PHRASES: Record<SessionUser["sports"][number]["frequency"], stri
   casual: "now and then",
 };
 
-function seekingHeadline(seeking: SessionUser["seeking"]): string {
-  return SEEKING_HEADLINES[seeking];
+function seekingHeadline(user: SessionUser): string {
+  return connectionLabels(user.seekingPreferences ?? [user.seeking]);
 }
 
-function seekingSummary(seeking: SessionUser["seeking"]): string {
-  return SEEKING_SUMMARIES[seeking];
+function seekingSummary(user: SessionUser): string {
+  const preferences = user.seekingPreferences ?? [user.seeking];
+  return preferences.length > 1 ? connectionLabels(preferences) : SEEKING_SUMMARIES[preferences[0]];
 }
 
 function describeSport(
@@ -91,7 +87,7 @@ export default async function ProfilePage() {
             <span aria-hidden="true">·</span>
             <span className="profile-hero-fact">{user.age}</span>
             <span aria-hidden="true">·</span>
-            <span className="profile-hero-fact profile-hero-seeking">{seekingSummary(user.seeking)}</span>
+            <span className="profile-hero-fact profile-hero-seeking">{seekingSummary(user)}</span>
           </p>
           <p>Your sports. Your people. A little about you.</p>
         </div>
@@ -134,8 +130,8 @@ export default async function ProfilePage() {
         </article>
         <article className="profile-panel">
           <p className="panel-label">Looking for</p>
-          <h2 className="capitalize">{seekingHeadline(user.seeking)}</h2>
-          <p>{seekingSummary(user.seeking)} Dating, friendship, and group games are all first-class here — pick whatever fits you now, change it whenever.</p>
+          <h2 className="capitalize">{seekingHeadline(user)}</h2>
+          <p>{seekingSummary(user)} Dating, friendship, and group games are all first-class here — pick whatever fits you now, change it whenever.</p>
         </article>
         <article className="profile-panel">
           <p className="panel-label">Languages</p>

@@ -12,6 +12,7 @@ export interface SignUpFields {
   bio: string;
   languages: string[];
   seeking: Seeking;
+  seekingPreferences: Seeking[];
   sports: RegistrationSport[];
   acceptedTerms: boolean;
   // Optional, GDPR-careful identity fields (CX-20260704). Gender is optional and
@@ -53,6 +54,7 @@ const initialState: SignUpFields = {
   bio: "",
   languages: [],
   seeking: "dating",
+  seekingPreferences: ["dating"],
   sports: [],
   acceptedTerms: false,
   gender: null,

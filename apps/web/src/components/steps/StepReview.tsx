@@ -1,5 +1,6 @@
 "use client";
 
+import { connectionLabels } from "@/lib/connection-preferences";
 import { motion } from "framer-motion";
 import { useSignUpStore } from "@/lib/sign-up-store";
 import { genderDisplay, orientationDisplay } from "@/lib/sensitive-profile-options";
@@ -20,7 +21,7 @@ export default function StepReview() {
         <div className="review-section"><h2>{state.firstName} {state.lastName}</h2><p className="location">{state.location}</p>{state.bio ? <p className="bio">&ldquo;{state.bio}&rdquo;</p> : null}</div>
         <div className="review-row"><span>Email:</span><span>{state.email}</span></div>
         <div className="review-row"><span>Sports:</span><div className="sports-tags">{state.sports.map((sport) => <span className="tag" key={sport.name}>{sport.name}</span>)}</div></div>
-        <div className="review-row"><span>Looking for:</span><span className="capitalize">{state.seeking}</span></div>
+        <div className="review-row"><span>Looking for:</span><span className="capitalize">{connectionLabels(state.seekingPreferences)}</span></div>
         {gender ? (
           <div className="review-row"><span>Gender:</span><span>{gender}{state.genderVisible ? "" : " · private"}</span></div>
         ) : null}

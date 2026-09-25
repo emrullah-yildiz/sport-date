@@ -82,3 +82,13 @@ describe("GET /api/account/export — GDPR Art. 15 completeness (CX-20260704 ite
     expect(messagesQuery).toContain("sender_user_id");
   });
 });
+
+it("exports all connection choices for the authenticated member", async () => {
+  const choices = ["dating", "friendship", "group"];
+  const sql = vi.fn((strings: TemplateStringsArray) => Promise.resolve(
+    strings.join("?").includes("FROM users") ? [{ ...ACCOUNT_ROW, seeking: "dating", seeking_preferences: choices }] : [],
+  ));
+  vi.mocked(getDatabase).mockReturnValue(sql as never);
+  const response = await GET();
+  expect((await response.json()).account.seekingPreferences).toEqual(choices);
+});

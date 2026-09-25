@@ -1800,3 +1800,9 @@ button:disabled:hover, button[disabled]:hover {
    keep the rounded clip and the app font, and let the canvas's own z-index: 0
    keep Leaflet's internally-stacked panes below the app's overlays. */
 .event-location-map-canvas.leaflet-container { border-radius: 13px; font-family: var(--font-sans); }
+
+.connection-choices { display: grid; gap: 14px; }
+.connection-choices > p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+.connection-choices .seeking-card strong { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.connection-choices .seeking-card .connection-check { color: inherit; font-size: 20px; line-height: 1; }
+.connection-choices .seeking-card { width: 100%; min-width: 0; }
