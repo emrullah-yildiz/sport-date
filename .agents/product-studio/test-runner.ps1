@@ -9,6 +9,8 @@ foreach ($state in @('fault','paused','owner_blocked','running')) {
 }
 Assert-Equal (Get-CycleDisposition $null $false) 'run' 'Initial run'
 Assert-Equal (Get-CycleDisposition ([pscustomobject]@{state='completed'}) $false) 'run' 'Next successful cycle'
+Assert-Equal (Get-DecisionEmailStatus ([pscustomobject]@{})).state 'disabled' 'Missing email opt-in never contacts a provider'
+Assert-Equal (Get-DecisionEmailStatus ([pscustomobject]@{decisionEmailEnabled='true'})).state 'disabled' 'Malformed email opt-in fails closed'
 $ok=[pscustomobject]@{status='completed';hqPublished=$true}
 Assert-Equal (Get-ResultDisposition $ok 0 $false) 'completed' 'Verified published success'
 Assert-Equal (Get-ResultDisposition $ok 1 $false) 'fault' 'Nonzero exit'
@@ -79,12 +81,12 @@ try {
     Assert-Equal $rejected $true 'Concurrent supervisor excluded'
     $next=[IO.File]::Open($lockPath,'OpenOrCreate','ReadWrite','None'); $next.Dispose()
     # Parse both production scripts without executing or registering them.
-    foreach ($script in @('runner.ps1','install.ps1')) {
+    foreach ($script in @('runner.ps1','install.ps1','schedule.ps1','configure-schedule.ps1','test-schedule.ps1')) {
         $parseErrors=$null; $tokens=$null
         [Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot $script), [ref]$tokens,[ref]$parseErrors) | Out-Null
         Assert-Equal $parseErrors.Count 0 "Syntax $script"
     }
-    Write-Output '41 runtime checks passed: fault/owner/pause/interruption latch, exit/publication/local-fallback/superseded-report/dirty-tree guards, atomic rename and concurrent-reader recovery, bounded persistent-lock failure, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
+    Write-Output '46 runtime checks passed: fault/owner/pause/interruption latch, email opt-in, exit/publication/local-fallback/superseded-report/dirty-tree guards, atomic rename and concurrent-reader recovery, bounded persistent-lock failure, safe diagnostics, exclusive lock, lock recovery, scoped network configuration and script syntax.'
 } finally {
     # Delete only the explicit test files in the verified unique test directory; never recursive cleanup.
     foreach ($file in @('status.json','lock','reader-ready')) { $path=Join-Path $testDir $file; if (Test-Path $path) { Remove-Item -LiteralPath $path } }

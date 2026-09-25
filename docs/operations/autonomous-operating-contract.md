@@ -4,6 +4,14 @@ Effective 14 September 2026. Owner mandate: run KeepItUp as an autonomous produc
 
 ## Accountability
 
+### Product lifecycle and concept review - September 25
+
+The owner renewed lifecycle ownership for a simpler, enjoyable sports-and-connection website, real feedback and evidence-led subscription value. Friendship, dating and community positioning may evolve; the paying audience remains a test between member and organizer value. Current work prioritizes reviewing the website and preparing the requested design alternatives in an isolated preview. The owner chooses the visual direction before agents apply it to the main website. Do not interpret permission to explore redesigns as permission to select a theme or deploy one. Continue independent research, feedback preparation, verification and material safety work while that selection is pending.
+
+The approved local cadence is two bounded daily slots, 09:00 and 17:00 Europe/Bucharest, with at most two model-start attempts per local day. Cheap 30-minute/logon checks may monitor decisions without invoking a model. Reserve each start durably before launch; failed starts and usage rejections consume their slot. Waking late skips earlier missed slots and never produces a catch-up burst. Explicit resume does not bypass the schedule or daily cap. Retain the default model, 15-minute model limit, 25-minute total limit, isolated worktree and fault circuit breaker; no additional paid access is authorized. This bounds starts and runtime, not an exact token or spending amount.
+
+Runtime activation requires preserving and independently verifying unfinished retained work, checking possible orphan processes, and waiting until the active coordinator has finished. A stale running status becomes an explicit interrupted fault; old heartbeat/start evidence stays historical. Track last start, last successful verification, last failure, daily consumption and next eligible slot separately. The scheduler must stay disabled when retained work or another execution makes restart unsafe. Setup and tested scheduling rules alone do not establish an active autonomous team.
+
 ### Evolving mandate — owner clarification, 14 September 2026
 
 The owner explicitly clarified that the original prompt is a starting point, not a fixed rulebook. Preserve the intent: take responsibility for building a useful, commercially viable product and minimize the owner's coordination burden. User counts, deadlines, staffing, cadence, product bets and this operating model are revisable hypotheses. The CEO analogy delegates judgment; it does not require titles, a fixed team or organizational ceremony. Continuous responsibility does not mean keeping agents busy continuously.

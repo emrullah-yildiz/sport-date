@@ -1,5 +1,6 @@
 param([switch]$Resume, [switch]$Pause, [switch]$LibraryOnly)
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'schedule.ps1')
 
 function Get-CycleDisposition($Previous, [bool]$ResumeRequested) {
     if ($ResumeRequested) { return 'run' }
@@ -30,6 +31,9 @@ function Get-HQSignal($Config) {
 }
 
 function Get-DecisionEmailStatus($Config) {
+    if ($Config.decisionEmailEnabled -isnot [bool] -or -not $Config.decisionEmailEnabled) {
+        return @{state='disabled';checkedAt=[DateTime]::UtcNow.ToString('o');reason='Automatic decision-email monitoring is not enabled in private runtime configuration.'}
+    }
     $ErrorActionPreference='Continue'
     $raw = & node (Join-Path $PSScriptRoot 'decision-email.mjs') monitor $Config.sourceRoot 2>$null | Out-String
     try { return $raw | ConvertFrom-Json } catch { return @{ state='unavailable'; reason='Decision email monitor returned no status; no send claimed.' } }
@@ -108,20 +112,40 @@ $state = [ordered]@{ state='fault'; checkedAt=[DateTime]::UtcNow.ToString('o'); 
 $child = $null
 try {
     $previous = if (Test-Path $statusPath) { Get-Content -Raw $statusPath | ConvertFrom-Json } else { $null }
-    if ($Pause) { $state.state='paused'; $state.note='Explicitly paused'; Write-JsonAtomic $statusPath $state; exit 0 }
+    $state=Repair-InterruptedStudioState $previous ([DateTimeOffset]::UtcNow)
+    $state.checkedAt=[DateTime]::UtcNow.ToString('o')
+    if ($previous -and $previous.state -eq 'running') {
+        Write-JsonAtomic $statusPath $state
+        exit 0 # A new interruption must be inspected before a later explicit resume.
+    }
+    if ($Pause) { $state.state='paused'; $state.phase='waiting'; $state.note='Explicitly paused'; Write-JsonAtomic $statusPath $state; exit 0 }
     $config = Get-Content -Raw (Join-Path $runtime 'config.json') | ConvertFrom-Json
+    $task=Get-ScheduledTask -TaskName 'KeepItUp Product Studio' -ErrorAction SilentlyContinue
+    $state.scheduleEnabled=[bool]($task -and $task.State -ne 'Disabled')
+    $state.scheduleObservedAt=[DateTime]::UtcNow.ToString('o')
+    $schedule=Get-StudioSchedule $config
+    $ledgerPath=Join-Path $runtime 'schedule-ledger.json'
+    # Never recreate a missing/corrupt ledger during a trigger: that could reset the daily cap.
+    $ledger=Get-Content -Raw -LiteralPath $ledgerPath | ConvertFrom-Json
+    $slot=Get-StudioSlotDecision $schedule $ledger ([DateTimeOffset]::UtcNow)
+    Set-StudioScheduleSnapshot $state $slot $schedule
     $emailStatus=Get-DecisionEmailStatus $config
     $signal=$null
-    $ownerResponse=$false
+    $ownerResponse=$state.ownerResponsePending -eq $true
     if ($previous -and $previous.state -eq 'owner_blocked' -and -not $Resume) {
         $signal=Get-HQSignal $config
-        $ownerResponse=($signal -and $signal.available -and $previous.decisionDigest -and $signal.digest -ne $previous.decisionDigest)
-        if ($signal) { $previous | Add-Member -NotePropertyName decisionDigest -NotePropertyValue $signal.digest -Force }
+        $ownerResponse=$ownerResponse -or ($signal -and $signal.available -and $previous.decisionDigest -and $signal.digest -ne $previous.decisionDigest)
+        if ($signal) { $state.decisionDigest=$signal.digest }
+        $state.ownerResponsePending=$ownerResponse
     }
-    if ((Get-CycleDisposition $previous ($Resume.IsPresent -or $ownerResponse)) -eq 'hold') {
-        $previous.checkedAt=[DateTime]::UtcNow.ToString('o')
-        $previous | Add-Member -NotePropertyName decisionEmail -NotePropertyValue $emailStatus -Force
-        Write-JsonAtomic $statusPath $previous
+    $disposition=Get-StudioActivationDisposition $previous $Resume.IsPresent $ownerResponse $slot
+    if ($disposition -ne 'run') {
+        $state.decisionEmail=$emailStatus
+        if ($disposition -eq 'scheduled_wait') {
+            $state.state='scheduled_wait'; $state.phase='waiting'
+            $state.note='No model invoked. Waiting for the next unconsumed 09:00 or 17:00 Europe/Bucharest slot; at most two starts per local day.'
+        }
+        Write-JsonAtomic $statusPath $state
         exit 0
     }
     $worktree = [IO.Path]::GetFullPath($config.worktree)
@@ -147,7 +171,17 @@ try {
     $schema = Join-Path $PSScriptRoot 'result-schema.json'
     # Each argument is fixed or a trusted local path; never interpolate model/remote text into a shell.
     $arguments = @('-a','never','-c','sandbox_workspace_write.network_access=true','exec','-s','workspace-write','-C',('"'+$worktree+'"'),'--color','never','--output-schema',('"'+$schema+'"'),'-o',('"'+$output+'"'),'-')
-    $state = [ordered]@{ state='running'; phase='model-work'; startedAt=[DateTime]::UtcNow.ToString('o'); heartbeatAt=[DateTime]::UtcNow.ToString('o'); checkedAt=[DateTime]::UtcNow.ToString('o'); supervisorPid=$PID; runId=$runId; worktree=$worktree; decisionDigest=$signal.digest; note='Bounded local cycle; no production publishing authorized' }
+    # Reserve durably under cycle.lock BEFORE Start-Process. Failed launches, quota
+    # failures and crashes consume the slot; explicit resume cannot reclaim it.
+    $ledger=Reserve-StudioSlot $schedule $ledger ([DateTimeOffset]::UtcNow) $runId
+    Write-JsonAtomic $ledgerPath $ledger
+    $slot=Get-StudioSlotDecision $schedule $ledger ([DateTimeOffset]::UtcNow)
+    Set-StudioScheduleSnapshot $state $slot $schedule
+    $state.state='running'; $state.phase='model-work'; $state.startedAt=[DateTime]::UtcNow.ToString('o')
+    foreach ($field in @('completedAt','exitCode','hqPublished','localReportVerified','reportSuperseded','commit','checks','failedAt','failure','interruptedAt')) { $state.Remove($field) }
+    $state.lastStartedAt=$state.startedAt; $state.heartbeatAt=$state.startedAt; $state.checkedAt=$state.startedAt
+    $state.supervisorPid=$PID; $state.runId=$runId; $state.worktree=$worktree; $state.decisionDigest=$signal.digest
+    $state.ownerResponsePending=$false; $state.note='Bounded local cycle; no production publishing authorized'
     Write-JsonAtomic $statusPath $state
     $child = Start-Process -FilePath $config.codex -ArgumentList $arguments -WorkingDirectory $worktree -WindowStyle Hidden -RedirectStandardInput $prompt -RedirectStandardOutput (Join-Path $runDir 'stdout.log') -RedirectStandardError (Join-Path $runDir 'stderr.log') -PassThru
     $null=$child.Handle # Retain the native process handle so ExitCode remains available after exit.
@@ -208,6 +242,8 @@ try {
     if ($localReportVerified -and -not $liveVerified) { $state.note += ' HQ report is local-only; independent live readback was not verified.' }
     if ($reportSuperseded) { $state.note += ' Committed cycle report verified; a newer source HQ report was preserved. This cycle report was not mirrored.' }
     $state['completedAt']=[DateTime]::UtcNow.ToString('o')
+    if ($state.state -eq 'fault') { $state.lastFailedAt=$state.completedAt }
+    else { $state.lastSucceededAt=$state.completedAt }
     $state['exitCode']=$exitCode
     $state['hqPublished']=$liveVerified
     $state['localReportVerified']=$localReportVerified
@@ -223,6 +259,7 @@ try {
     # Exception text may contain provider output: store only a bounded local diagnostic category.
     $state.note='Supervisor failure; inspect local configuration/worktree/auth and explicitly resume after fixing it'
     $state['failedAt']=[DateTime]::UtcNow.ToString('o')
+    $state['lastFailedAt']=$state.failedAt
     Write-JsonAtomic $statusPath $state
     exit 1
 } finally {
