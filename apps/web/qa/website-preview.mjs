@@ -187,7 +187,7 @@ async function check(width, reducedMotion = "no-preference") {
     const main = page.locator("main[data-preview-view]");
     const nav = page.getByRole("navigation", { name: "Main navigation", exact: true });
     await expect(main).toHaveAttribute("data-preview-view", "home");
-    await expect(main.getByRole("heading", { level: 1 })).toContainText("Your next game.");
+    await expect(main.getByRole("heading", { level: 1 })).toHaveCount(1);
     await nav.getByRole("button", { name: "Find a game", exact: true }).click();
     await expect(main).toHaveAttribute("data-preview-view", "discover");
     await expect(main).toBeFocused();
@@ -297,14 +297,16 @@ async function check(width, reducedMotion = "no-preference") {
     await main.getByRole("button", { name: "Sign out", exact: true }).click();
     await expect(main).toHaveAttribute("data-preview-view", "home");
     await expect(page.getByRole("button", { name: "Sign up", exact: true })).toBeVisible();
-    await main.getByRole("button", { name: /^Join[: ]/ }).first().click();
+    const signupJoin = main.getByRole("button", { name: /^Join[: ]/ }).first();
+    const signupTitle = (await signupJoin.getAttribute("aria-label")).replace(/^Join[: ]+/, "");
+    await signupJoin.click();
     await expect(main).toHaveAttribute("data-preview-view", "signin");
     await main.getByRole("button", { name: "Create an account", exact: true }).click();
     await expect(main).toHaveAttribute("data-preview-view", "signup");
-    await expect(main).toContainText("Next: join A rally, then a coffee.");
+    await expect(main).toContainText(`Next: join ${signupTitle}`);
     await signUp(page, name);
     await expect(main).toHaveAttribute("data-preview-view", "event");
-    await expect(main.getByRole("heading", { level: 1 })).toHaveText("A rally, then a coffee.");
+    await expect(main.getByRole("heading", { level: 1 })).toHaveText(signupTitle);
     await expect(main.getByTestId("private-meeting-point")).toHaveCount(0);
     await main.getByRole("button", { name: "Send request", exact: true }).click();
     await expect(main.getByRole("heading", { name: "Request sent.", exact: true })).toBeVisible();

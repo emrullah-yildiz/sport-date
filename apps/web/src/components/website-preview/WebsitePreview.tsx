@@ -11,6 +11,7 @@ import { Arrow, SportGlyph } from "../concepts/ConceptVisuals";
 import { courtSource, photoSources } from "../concepts/concept-assets";
 import { cyclePhoto, person } from "../concepts/concept-data";
 import { draftToGame, initialGameDraft, joinOutcome, maySeeMeetingPoint, type PreviewRequest } from "./preview-model";
+import { patchLandingFilters } from "./landing-filter";
 import s from "./website.module.css";
 
 type View = "home" | "discover" | "signin" | "signup" | "create" | "event" | "my-games" | "profile" | "account";
@@ -98,12 +99,12 @@ export default function WebsitePreview() {
   const protectedView = ["create", "my-games", "account"].includes(view) && !viewer;
   const shownView = protectedView ? "signin" : view;
 
-  return <div className={s.site}>
+  return <div className={s.site} data-surface={shownView === "home" ? "pavilion" : undefined}>
     <div className={s.previewBar}><span>Website preview · fictional games & accounts</span><div><a href="/concepts">Compare concepts</a><button onClick={reset}>Reset preview</button></div></div>
     <header className={s.header}><button className={s.logo} onClick={() => navigate("home")} aria-label="KeepItUp home">keepitup<span>↗</span></button><nav aria-label="Main navigation"><button aria-current={view === "discover" ? "page" : undefined} onClick={() => navigate("discover")}>Find a game</button><button aria-current={view === "create" ? "page" : undefined} onClick={startCreate}>Create a game</button><button aria-current={view === "my-games" ? "page" : undefined} onClick={showMyGames}>My games{viewer && Object.keys(requests).length > 0 && <span className={s.navCount}>{Object.keys(requests).length}</span>}</button></nav><div className={s.accountNav}>{viewer ? <button className={s.avatar} onClick={() => navigate("account")} aria-label="My profile">{viewer.name.slice(0, 1)}</button> : <><button onClick={() => authenticate("signin")}>Sign in</button><button className={s.signupLink} onClick={() => authenticate("signup")}>Sign up</button></>}</div></header>
     {toast && <div className={s.toast} role="status"><span><span aria-hidden="true">✓</span> {toast}</span>{viewer && Object.keys(requests).length > 0 && <button onClick={showMyGames}>View my games <Arrow /></button>}<button aria-label="Dismiss notification" onClick={() => setToast("")}>×</button></div>}
     <main ref={main} tabIndex={-1} className={s.main} data-preview-view={shownView}>
-      {shownView === "home" && <PreviewLanding games={blockedMara ? [] : undefined} onDiscover={() => navigate("discover")} onCreate={startCreate} onEvent={openGame} onJoin={join} joinState={stateFor} />}
+      {shownView === "home" && <PreviewLanding filters={mapState.filters} onFiltersChange={patch => setMapState(current => patchLandingFilters(current, patch))} games={searchGames} showPerson={!blockedMara} onDiscover={() => navigate("discover")} onCreate={startCreate} onEvent={openGame} onJoin={join} joinState={stateFor} />}
       {shownView === "discover" && <div className={s.discovery}><PlayMapDiscovery compact empty={false} state={mapState} onChange={setMapState} games={searchGames} onJoin={join} joinState={stateFor} onEvent={game => openGame(game as MapGame)} onProfile={() => navigate("profile")} onProgress={showMyGames} /></div>}
       {(shownView === "signin" || shownView === "signup") && <PreviewAuth mode={shownView} context={context} onModeChange={mode => navigate(mode)} onComplete={signedIn} onCancel={() => { setIntent(null); navigate("discover"); }} />}
       {shownView === "create" && <CreateGame draft={draft} onChange={setDraft} onCreate={create} onCancel={() => navigate("discover")} />}

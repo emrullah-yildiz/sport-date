@@ -1,3 +1,9 @@
+## September 25: Play Pavilion landing
+
+- [x] Implement the owner's bright, sculptural direction in local `/preview`: original transforming 3D pavilion, shared sport/city discovery filters, compact invitations and direct + Join, light shell and mobile/static fallbacks.
+- [x] Verify 25 focused tests, typechecks, lint/build, 11 pavilion scenarios, five complete website journeys and three map/travel regressions. See docs/design/play-pavilion-2026-09-25.md.
+- [ ] Owner and five adults review clarity, perceived fun and independent activity/request completion. Human target remains four of five; no usability or commercial result is inferred from automated checks.
+
 ## September 25: show the whole simple website
 
 - [x] Complete local `/preview`: landing, public map/list, direct + Join, four-stage demo signup, sign-in returning to the game, three-stage creation, My games and profiles.
