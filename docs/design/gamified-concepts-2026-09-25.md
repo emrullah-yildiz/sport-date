@@ -2,6 +2,8 @@
 
 ## Delivered scope
 
+September 25 follow-up: the owner prefers Play Map. The comparison now opens on its expanded [scale and travel refinement](play-map-scale-and-travel-2026-09-25.md): 100 fictional games per city, broad-area clusters, pagination and destination/trip filters. Player Cards and Clubhouse retain the original shared three-event comparison. This refinement is local and is not a production rollout.
+
 The September 25 owner-approved first milestone is an interactive comparison, before selecting or applying a production redesign. `/concepts` runs only under the local Next development server; production returns not-found. Existing landing, signup, member/profile access and production APIs are unchanged by this concept work. All photos, people, activity records, places available and progress are explicitly fictional.
 
 Start with `npm.cmd run dev --workspace @sport-date/web -- --hostname 127.0.0.1 --port 3015`, then open `http://127.0.0.1:3015/concepts`.

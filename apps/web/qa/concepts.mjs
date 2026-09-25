@@ -91,20 +91,25 @@ async function checkTheme(theme, width) {
     const filters = page.getByRole("group", { name: "Filter activities" });
     for (const [index, sport] of ["Tennis", "Running", "Padel"].entries()) {
       await filters.getByRole("button", { name: sport, exact: true }).click();
-      for (const [eventIndex, button] of eventsIn(surface).entries()) await expect(button).toHaveCount(eventIndex === index ? 1 : 0);
+      if (theme.id === "map") {
+        const rows = surface.locator("[data-game-id]");
+        await expect(rows.first()).toHaveAttribute("data-game-sport", sport);
+        expect(await rows.evaluateAll(elements => elements.every(element => element.dataset.gameSport === elements[0].dataset.gameSport))).toBe(true);
+      } else for (const [eventIndex, button] of eventsIn(surface).entries()) await expect(button).toHaveCount(eventIndex === index ? 1 : 0);
     }
     await filters.getByRole("button", { name: "Anything goes", exact: true }).click();
     if (theme.id === "map") {
       const views = page.getByRole("group", { name: "Activity view" });
       await views.getByRole("button", { name: "List", exact: true }).click();
       await expect(views.getByRole("button", { name: "List", exact: true })).toHaveAttribute("aria-pressed", "true");
-      for (const button of eventsIn(surface)) await expect(button).toBeVisible();
+      await expect(surface.locator("[data-game-id]")).toHaveCount(8);
       await noOverflow(page, `${name} list`);
       await screenshot(page, `${name}-list`);
       await views.getByRole("button", { name: "Map", exact: true }).click();
     }
     await page.getByLabel("Preview state", { exact: true }).selectOption("empty");
-    for (const button of eventsIn(surface)) await expect(button).toHaveCount(0);
+    if (theme.id === "map") await expect(surface.locator("[data-game-id]")).toHaveCount(0);
+    else for (const button of eventsIn(surface)) await expect(button).toHaveCount(0);
     await expect(surface.getByRole("heading", { level: 3 }).last()).toBeVisible();
     await noOverflow(page, `${name} empty`);
     await page.getByLabel("Preview state", { exact: true }).selectOption("normal");
@@ -160,14 +165,20 @@ async function checkTheme(theme, width) {
     await sports.getByRole("button", { name: "Running", exact: true }).click();
     await expect(surface.getByText("Beginner", { exact: true })).toBeVisible();
     await expect(surface.getByText("Casual", { exact: true })).toBeVisible();
-    await surface.getByRole("button", { name: /See the running plan/ }).click();
+    await surface.getByRole("button", { name: theme.id === "map" ? "Find a running game" : /See the running plan/ }).click();
+    if (theme.id === "map") {
+      await expect(surface).toHaveAttribute("data-view", "discover");
+      await expect(surface.getByRole("group", { name: "Filter activities" }).getByRole("button", { name: "Running", exact: true })).toHaveAttribute("aria-pressed", "true");
+      await surface.locator("[data-game-id]").first().getByRole("button").click();
+    }
     await expect(surface).toHaveAttribute("data-view", "event");
-    await expect(surface.getByRole("heading", { level: 1 })).toHaveText(eventNames[1]);
+    if (theme.id !== "map") await expect(surface.getByRole("heading", { level: 1 })).toHaveText(eventNames[1]);
     await surface.getByRole("button", { name: /Say hello to Mara/ }).click();
     await expect(sports.getByRole("button", { name: "Running", exact: true })).toHaveAttribute("aria-pressed", "true");
 
     await nav.getByRole("button", { name: "Find a game", exact: true }).click();
-    await eventsIn(surface)[0].click();
+    if (theme.id === "map") await surface.locator("[data-game-id]").first().getByRole("button").click();
+    else await eventsIn(surface)[0].click();
     await expect(surface).toHaveAttribute("data-view", "event");
     const accept = page.getByRole("button", { name: "Host accepts", exact: true });
     const attend = page.getByRole("button", { name: "Event attended", exact: true });
@@ -249,6 +260,7 @@ async function checkCosmetics() {
   page.on("pageerror", error => browserErrors.push({ case: "card-cosmetics", message: error.message }));
   try {
     await page.goto(`${base}/concepts`, { waitUntil: "networkidle" });
+    await page.getByRole("group", { name: "Design theme" }).getByRole("button", { name: /Player Cards/ }).click();
     const surface = page.locator("[data-theme][data-view]");
     const nav = surface.getByRole("navigation", { name: "Concept navigation" });
     const progress = nav.getByRole("button", { name: "My progress", exact: true });

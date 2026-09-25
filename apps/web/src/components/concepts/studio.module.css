@@ -1,6 +1,7 @@
 .studio { min-height:100vh; color:#242629; background:#e8e9e7; font-family:var(--font-sans),Arial,sans-serif; font-size:16px; font-weight:400; line-height:1.5; padding-bottom:24px; }
 .studio * { box-sizing:border-box; }
 .studio button,.studio select,.studio textarea { font:inherit; }
+.travelContext { margin:16px 0!important; font-size:13px; color:var(--quiet); line-height:1.8; }
 .studio button { cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .studio button:disabled { cursor:default; opacity:.4; }
 .studio button:focus-visible,.studio select:focus-visible,.studio textarea:focus-visible,.studio summary:focus-visible { outline:2px solid #5377ef; outline-offset:4px; }

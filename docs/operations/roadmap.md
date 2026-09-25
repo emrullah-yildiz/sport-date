@@ -1,3 +1,8 @@
+## September 25: refine preferred Play Map for scale and travel
+
+- [x] Develop the owner's preferred Play Map with broad-area counts, a complete paginated list, destination/trip dates and sport/skill/time/language/availability/cost filters. Local fictional supply: 100 games per city in three sample countries.
+- [ ] Review the refined discovery with owner/testers, including travel and crowded-area tasks; consolidate the selected system before applying it to the real product. See docs/design/play-map-scale-and-travel-2026-09-25.md.
+
 ## September 25: compare gamified themes before redesign
 
 - [x] Build local-only Player Cards, Clubhouse and Play Map concepts with shared fictional photography, responsive discovery/profile/event/progress views and working interactions.
