@@ -1,5 +1,5 @@
 import { validateLogin } from "@sport-date/domain";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 
 import { requestPasswordResetTokenForEmail } from "@/lib/auth-email";
 import { DatabaseNotConfiguredError } from "@/lib/db";
@@ -8,7 +8,7 @@ import { isTrustedBrowserMutation } from "@/lib/request-security";
 
 export const runtime = "nodejs";
 
-const GENERIC_SUCCESS_MESSAGE = "If an account exists for that email, password reset instructions will be sent when delivery is configured.";
+const GENERIC_SUCCESS_MESSAGE = "If an account exists for that email, check your inbox for a password reset link.";
 
 export async function POST(request: Request) {
   if (!isTrustedBrowserMutation(request)) {
@@ -35,14 +35,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Enter a valid email address." }, { status: 400 });
   }
 
-  try {
-    await requestPasswordResetTokenForEmail(email, getRequestIp(request));
-    return NextResponse.json({ success: true, message: GENERIC_SUCCESS_MESSAGE }, { status: 202 });
-  } catch (error) {
-    if (error instanceof DatabaseNotConfiguredError) {
-      return NextResponse.json({ success: true, message: GENERIC_SUCCESS_MESSAGE }, { status: 202 });
+  const requestIp = getRequestIp(request);
+  // Keep account lookup, token persistence, and provider latency outside the
+  // public response. Next's after() retains this work through the platform's
+  // waitUntil support; a detached promise could be abandoned after returning.
+  after(async () => {
+    try {
+      await requestPasswordResetTokenForEmail(email, requestIp);
+    } catch (error) {
+      if (error instanceof DatabaseNotConfiguredError) return;
+      console.error("Password reset request failed:", error);
     }
-    console.error("Password reset request failed:", error);
-    return NextResponse.json({ success: true, message: GENERIC_SUCCESS_MESSAGE }, { status: 202 });
-  }
+  });
+  return NextResponse.json({ success: true, message: GENERIC_SUCCESS_MESSAGE }, { status: 202 });
 }

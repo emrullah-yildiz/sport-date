@@ -71,7 +71,7 @@ export default function ForgotPasswordPanel({
       setMessage(
         result && typeof result === "object" && "message" in result && typeof result.message === "string"
           ? result.message
-          : "If an account exists for that email, password reset instructions will be sent when delivery is configured.",
+          : "If an account exists for that email, check your inbox for a password reset link.",
       );
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Password reset could not be started.");
@@ -95,9 +95,9 @@ export default function ForgotPasswordPanel({
         <div id="forgot-password-panel" className="auth-support-card">
           <div>
             <p className="eyebrow">Password reset</p>
-            <h2 id="forgot-password-title">Recover access without exposing whether the account exists.</h2>
+            <h2 id="forgot-password-title">Get back into your account.</h2>
             <p className="auth-support-copy">
-              We prepare the reset flow now, but transactional email delivery is still disabled until an approved provider is connected.
+              Enter your account email to request a password reset link.
             </p>
           </div>
           <form className="auth-support-form" onSubmit={submit}>
@@ -111,7 +111,7 @@ export default function ForgotPasswordPanel({
               onChange={(event) => setEmail(event.target.value)}
             />
             <button className="btn-secondary auth-support-action" type="submit" disabled={submitting}>
-              {submitting ? "Preparing…" : "Start password reset"}
+              {submitting ? "Requesting…" : "Send reset link"}
             </button>
           </form>
           {message ? <p className="auth-support-message" role="status">{message}</p> : null}

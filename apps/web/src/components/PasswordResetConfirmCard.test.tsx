@@ -59,7 +59,8 @@ describe("PasswordResetConfirmCard dead-end recovery action", () => {
     const html = render("");
     // The panel reuses the same request form whose success copy never reveals whether
     // the email is registered.
-    expect(html).toMatch(/without exposing whether the account exists/i);
+    expect(html).toMatch(/Enter your account email to request a password reset link/i);
+    expect(html).not.toMatch(/transactional email delivery is still disabled/i);
     expect(html).not.toMatch(/no such account|account exists for that email|not registered/i);
   });
 

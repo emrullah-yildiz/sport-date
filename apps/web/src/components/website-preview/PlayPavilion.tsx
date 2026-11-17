@@ -95,8 +95,6 @@ export default function PlayPavilion({ sport, paused, progress = 0, playSignal =
     latest.current = { sport, paused, progress: scrollProgress, playSignal };
     controller.current?.setSport(sport);
     controller.current?.setPaused(paused);
-    controller.current?.setProgress(scrollProgress);
-    controller.current?.play(playSignal);
   }, [sport, paused, scrollProgress, playSignal]);
 
   useEffect(() => {

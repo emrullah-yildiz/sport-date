@@ -219,7 +219,7 @@ async function runPasswordResetTokenRequest(email: string, requestIp: string, no
   const ipHash = requestIp && requestIp !== "unknown" ? hashSessionToken(requestIp) : null;
   const sql = getDatabase();
 
-  await sql`
+  const inserted = await sql`
     WITH target_user AS (
       SELECT id FROM users
       WHERE email = ${email} AND account_status = 'active'
@@ -244,7 +244,23 @@ async function runPasswordResetTokenRequest(email: string, requestIp: string, no
       COALESCE((SELECT MAX(send_count) FROM invalidated), 0) + 1,
       ${ipHash}
     FROM target_user
+    RETURNING id
   `;
+
+  // An absent or inactive account inserts no token. Do not email a link that
+  // cannot work, or let this endpoint send arbitrary mail to non-members. The
+  // route keeps the same neutral response and timing floor for both outcomes.
+  if (inserted.length === 0) {
+    return {
+      delivery: {
+        state: deliveryState(),
+        origin: resolveAuthEmailOrigin(),
+        draft: null,
+        provider: resolveAuthEmailProvider(),
+        messageId: null,
+      } satisfies AuthEmailDeliveryPreparation,
+    };
+  }
 
   return { delivery: await buildPasswordResetDeliveryPreparation(email, token.token, token.expiresAt) };
 }
