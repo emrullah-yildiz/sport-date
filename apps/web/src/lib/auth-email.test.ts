@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
 vi.mock("@/lib/db", () => ({
   getDatabase: vi.fn(),
   DatabaseNotConfiguredError: class DatabaseNotConfiguredError extends Error {},
 }));
+vi.mock("@/lib/gmail-email-delivery", () => ({ sendGmailEmail: vi.fn() }));
 
 import {
   createEmailVerificationToken,
@@ -12,6 +13,7 @@ import {
   hashSessionToken,
 } from "./auth";
 import { getDatabase } from "./db";
+import { sendGmailEmail } from "./gmail-email-delivery";
 
 let confirmEmailVerificationToken: typeof import("./auth-email").confirmEmailVerificationToken;
 let confirmPasswordResetToken: typeof import("./auth-email").confirmPasswordResetToken;
@@ -22,6 +24,7 @@ let setResetRequestMinDurationForTests: typeof import("./auth-email").setResetRe
 beforeEach(async () => {
   vi.resetModules();
   vi.clearAllMocks();
+  vi.mocked(sendGmailEmail).mockResolvedValue({ messageId: "mock-reset-message" });
   // Keep email delivery disabled so these tests exercise persistence logic only.
   delete process.env.EMAIL_DELIVERY_ENABLED;
   delete process.env.EMAIL_DELIVERY_PROVIDER;
@@ -40,6 +43,10 @@ beforeEach(async () => {
   } = await import("./auth-email"));
   // Keep the timing-floor out of unrelated assertions; the floor has dedicated coverage below.
   setResetRequestMinDurationForTests(0);
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });
 
 /**
@@ -231,6 +238,57 @@ describe("issuing verification tokens", () => {
 });
 
 describe("requesting password reset tokens", () => {
+  function enableMockGmailDelivery() {
+    vi.stubEnv("EMAIL_DELIVERY_ENABLED", "true");
+    vi.stubEnv("EMAIL_DELIVERY_PROVIDER", "gmail");
+    vi.stubEnv("GMAIL_CLIENT_ID", "test-client-id");
+    vi.stubEnv("GMAIL_CLIENT_SECRET", "test-client-secret");
+    vi.stubEnv("GMAIL_REFRESH_TOKEN", "test-refresh-token");
+    vi.stubEnv("GMAIL_SENDER_EMAIL", "support@example.invalid");
+    vi.stubEnv("APP_PUBLIC_ORIGIN", "https://keepitup.example");
+  }
+
+  it("does not prepare or send a reset email when no active account token was inserted", async () => {
+    enableMockGmailDelivery();
+    const { sql } = buildSqlMock([[]]);
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    const result = await requestPasswordResetTokenForEmail("missing@example.invalid", "unknown");
+
+    expect(sendGmailEmail).not.toHaveBeenCalled();
+    expect(result.delivery.draft).toBeNull();
+    expect(result.delivery.messageId).toBeNull();
+    expect(result.delivery.state).not.toBe("sent");
+  });
+
+  it("sends a usable reset email after the account token is inserted", async () => {
+    enableMockGmailDelivery();
+    const { sql } = buildSqlMock([[{ id: "33333333-3333-4333-8333-333333333333" }]]);
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    const result = await requestPasswordResetTokenForEmail("member@example.invalid", "unknown");
+
+    expect(sendGmailEmail).toHaveBeenCalledOnce();
+    expect(sendGmailEmail).toHaveBeenCalledWith(expect.objectContaining({
+      kind: "password_reset",
+      to: "member@example.invalid",
+      actionUrl: expect.stringMatching(/^https:\/\/keepitup\.example\/reset-password\?token=sdp_/),
+    }), expect.any(Object));
+    expect(result.delivery.state).toBe("sent");
+    expect(result.delivery.messageId).toBe("mock-reset-message");
+  });
+
+  it("does not send a reset email when saving its token fails", async () => {
+    enableMockGmailDelivery();
+    const { sql } = buildSqlMock([]);
+    sql.mockRejectedValueOnce(new Error("database unavailable"));
+    vi.mocked(getDatabase).mockReturnValue(sql as never);
+
+    await expect(requestPasswordResetTokenForEmail("member@example.invalid", "unknown"))
+      .rejects.toThrow("database unavailable");
+    expect(sendGmailEmail).not.toHaveBeenCalled();
+  });
+
   it("hashes the requester IP rather than persisting it in clear text", async () => {
     const { sql } = buildSqlMock([[]]);
     vi.mocked(getDatabase).mockReturnValue(sql as never);
